@@ -1,10 +1,11 @@
-import React from 'react'
-import InputRol from '../../common/inputs/InputRol'
-import InputGenero from '../../common/inputs/InputGenero'
-import InputTipoDocumentoIdentidad from '../../common/inputs/InputTipoDocumentoIdentidad'
-import InputNumerosGeneral from '../../common/inputs/InputNumerosGeneral'
-import InputCheckBox from '../../common/inputs/InputCheckBox'
-import InputTextoGeneral from '../../common/inputs/InputTextoGeneral'
+import {
+    InputRol,
+    InputGenero,
+    InputTipoDocumentoIdentidad,
+    InputNumerosGeneral,
+    InputCheckBox,
+    InputTextoGeneral
+} from '@/components/common/inputs'
 
 function FormAdminDashboardUsuarios() {
     return (

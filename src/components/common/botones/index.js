@@ -3,10 +3,12 @@ import BotonAgregarUsuarios from '@/components/common/botones/BotonAgregarUsuari
 import BotonEnviarCorreo from '@/components/common/botones/BotonEnviarCorreo';
 import BotonExportarPDF from '@/components/common/botones/BotonExportarPDF';
 import BotonEditar from '@/components/common/botones/BotonEditar';
+import BotonEliminar from './BotonEliminar';
 
 
 
 
 
 
-export { BotonGeneral, BotonAgregarUsuarios, BotonEnviarCorreo, BotonExportarPDF , BotonEditar };
+
+export { BotonGeneral, BotonAgregarUsuarios, BotonEnviarCorreo, BotonExportarPDF , BotonEditar, BotonEliminar};

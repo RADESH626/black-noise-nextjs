@@ -1,8 +1,6 @@
-import React from 'react'
-
 function IconoEditar() {
   return (
-    <img src="/icons/editar.svg" alt="" />
+    <img src="/icons/icono-editar.svg" alt="icono editar" className="w-auto h-auto "/>
   )
 }
 

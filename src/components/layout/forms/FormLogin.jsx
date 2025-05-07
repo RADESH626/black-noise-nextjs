@@ -7,7 +7,7 @@ function FormLogin() {
     return (
 
 
-            <form className="flex flex-col" action={IniciarSesion}  method='POST'>
+            <form className="flex flex-col" action={IniciarSesion} >
 
                 <div className="relative mb-5">
 

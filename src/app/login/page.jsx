@@ -1,5 +1,5 @@
 import FormLogin from "@/components/layout/forms/FormLogin"
-import {RegistrarUsuario} from "@/app/acciones/UsuariosCRUD"
+import {IniciarSesion} from "@/app/acciones/UsuariosCRUD"
 
 
 function login() {
@@ -27,7 +27,7 @@ function login() {
         <div className="flex flex-row justify-center">
           <div className="p-10 bg-black flex-1 bg-gradient-to-l from-black to-gray-900">
           <h2 className="text-3xl font-bold mb-8 text-bn-highlight text-center">Iniciar Sesión</h2>
-            <FormLogin />
+            <FormLogin/>
           </div>
 
           <div className="flex flex-1 flex-col bg-gradient-to-r from-black to-gray-900 text-white p-8 justify-center text-center">
@@ -62,3 +62,5 @@ function login() {
 }
 
 export default login
+
+//TODO: arreglar el boton para ir al index

@@ -47,3 +47,6 @@ function registro() {
 }
 
 export default registro
+
+//TODO:corregir los colores de los forms 
+// TODO: centrar el boton de registrarse  
