@@ -1,7 +1,7 @@
 
 function BotonGeneral({children,props}) {
     return (
-        <button type="submit" className="
+        <button className="
         inline-flex
         items-center
         py-4 px-12

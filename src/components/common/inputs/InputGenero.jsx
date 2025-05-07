@@ -5,8 +5,8 @@ function InputGenero() {
         <select  
             className="w-full
             p-3
-            bg-bn-input-bg
-            text-bn-secondary
+            bg-black
+            text-white
             border
             border-bn-accent
             rounded-md

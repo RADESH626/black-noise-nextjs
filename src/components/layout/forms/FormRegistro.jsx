@@ -217,9 +217,9 @@ function FormRegistro() {
 
       </div>
 
-      <div className="relative">
+      <div className="flex items-center justify-center mt-5">
 
-      <BotonGeneral type="submit" >Registrarse</BotonGeneral>
+        <BotonGeneral type="submit" >Registrarse</BotonGeneral>
 
       </div>
 

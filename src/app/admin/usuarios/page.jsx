@@ -1,13 +1,13 @@
 import HeaderAdminDashboard from '@/components/layout/headers/HeaderAdminDashBoard'
 import { BotonAgregarUsuarios, BotonEnviarCorreo, BotonExportarPDF } from '@/components/common/botones'
-
-
 import FormAdminDashboardUsuarios from '@/components/layout/forms/FormAdminDashboardUsuarios'
 import connectDB from '@/utils/DBconection'
 import Usuario from '@/models/Usuario'
 import TdGeneral from '@/components/common/tablas/TdGeneral'
 import THeader from '@/components/layout/tablas/AdminDashboard/THeader'
 import FormEditarEliminarUsuario from '@/components/layout/forms/FormEditarEliminarUsuario'
+import { IconoPersona } from '@/components/common/iconos'
+import ModalAgregarUsuario from '@/components/common/modales/ModalAgregarUsuario'
 
 async function obtenerUsuarios() {
     connectDB()
@@ -24,7 +24,14 @@ async function usuarios() {
 
         <div className='flex flex-col justify-center w-screen  bg-gray-200 '>
 
-            <HeaderAdminDashboard />
+            <HeaderAdminDashboard >
+
+                <IconoPersona className="text-white" />
+
+            </HeaderAdminDashboard>
+
+
+
 
             <div className="flex flex-col items-center justify-center  h-full   p-4 ">
 
@@ -43,7 +50,7 @@ async function usuarios() {
 
                     <footer className="flex flex-row  justify-r w-full h-full bg-gray-600  p-4 gap-4">
 
-                        <BotonAgregarUsuarios />
+                        <BotonAgregarUsuarios onclick={() => openModal()} />
                         <BotonExportarPDF />
                         <BotonEnviarCorreo />
 
@@ -76,8 +83,7 @@ async function usuarios() {
 
                                         <td className=" border border-gray-400 px-4 py-2 justify-center items-center gap-4">
                                             <div className='flex flex-row justify-center items-center gap-4'>
-                                                <FormEditarEliminarUsuario usuario={usuario} />
-
+                                                <FormEditarEliminarUsuario />
                                             </div>
 
                                         </td>
@@ -90,7 +96,12 @@ async function usuarios() {
 
             </div >
 
+            <ModalAgregarUsuario    />
+
         </div >
+
+
+
 
     )
 }
@@ -119,5 +130,6 @@ export default usuarios
 {/* TODO:lista de usuarios
     agregar nombre del usuario
     agregar foto de los usuarios
+    arreglar boton de editar
 
 */}

@@ -1,11 +1,18 @@
-import InputTipoDocumentoIdentidad from '@/components/ui/inputs/InputTipoDocumentoIdentidad';
-import InputDocumentoIdentidad from '@/components/ui/inputs/InputDocumentoIdentidad';
-import InputTextoGeneral from '@/components/ui/inputs/InputTextoGeneral';
-import InputFecha from '@/components/ui/inputs/InputFecha';
-import InputGenero from '@/components/ui/inputs/InputGenero';
-import InputTelefono from '@/components/ui/inputs/InputTelefono';
-import InputEmail from '@/components/ui/inputs/InputEmail';
+import { BotonGeneral } from '@/components/common/botones';
 import IconoPersona from '../../common/iconos/IconoPersona';
+
+import {
+    InputTipoDocumentoIdentidad,
+    InputDocumentoIdentidad,
+    InputTextoGeneral,
+    InputFecha,
+    InputGenero,
+    InputTelefono,
+    InputEmail,
+    InputRol
+
+
+} from '@/components/common/inputs';
 
 
 function FormAgregarUsuarios() {
@@ -33,7 +40,6 @@ function FormAgregarUsuarios() {
                     <label htmlFor="numeroDocumento" className="block mb-1 text-sm font-medium text-bn-accent">Número de Documento</label>
                     <div className="relative">
 
-                        <IconoPersona/>
                         <InputDocumentoIdentidad id="numeroDocumento" name="numeroDocumento" required />
 
                     </div>
@@ -54,7 +60,6 @@ function FormAgregarUsuarios() {
 
                     <label htmlFor="primerNombre" className="block mb-1 text-sm font-medium text-bn-accent">Primer nombre</label>        <div className="relative">
 
-                        <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
                         <InputTextoGeneral id="primerNombre" name="primerNombre" required placeholder="Primer nombre" />
 
                     </div>
@@ -67,7 +72,6 @@ function FormAgregarUsuarios() {
 
                     <label htmlFor="segundoNombre" className="block mb-1 text-sm font-medium text-bn-accent">Segundo nombre</label>        <div className="relative">
 
-                        <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
                         <InputTextoGeneral id="segundoNombre" name="segundoNombre" required placeholder="Segundo nombre (opcional)" />
 
                     </div>
@@ -86,7 +90,6 @@ function FormAgregarUsuarios() {
 
                     <label htmlFor="primerApellido" className="block mb-1 text-sm font-medium text-bn-accent">Primer apellido</label>        <div className="relative">
 
-                        <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
                         <InputTextoGeneral id="primerApellido" name="primerApellido" required placeholder="Primer apellido" />
 
                     </div>
@@ -98,7 +101,6 @@ function FormAgregarUsuarios() {
 
                     <label htmlFor="segundoApellido" className="block mb-1 text-sm font-medium text-bn-accent">Segundo apellido</label>        <div className="relative">
 
-                        <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
                         <InputTextoGeneral id="segundoApellido" name="segundoApellido" required placeholder="Segundo apellido" />
 
                     </div>
@@ -122,7 +124,6 @@ function FormAgregarUsuarios() {
 
                 <div className="relative">
                     <label htmlFor="genero" className="block mb-1 text-sm font-medium text-bn-accent">Género</label>        <div className="relative">
-                        <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
                         <InputGenero id="genero" name="genero" required />
                     </div>
                 </div>
@@ -131,19 +132,35 @@ function FormAgregarUsuarios() {
 
             {/* ==================================================================================================== */}
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <div className="relative">
+
+                <label htmlFor="telefono" className="block mb-1 text-sm font-medium text-bn-accent">Número de teléfono</label>      
+                <div className="relative">
+                    <InputTelefono id="telefono" name="telefono" required />
+                </div>
+                   
+
+                </div>
+
+
+                <div className="relative">
+                    <label htmlFor="genero" className="block mb-1 text-sm font-medium text-bn-accent">Género</label>        <div className="relative">
+                        <InputRol id="genero" name="genero" required />
+                    </div>
+                </div>
+
+            </div>
+
             <div className="relative">
 
-                <label htmlFor="telefono" className="block mb-1 text-sm font-medium text-bn-accent">Número de teléfono</label>      <div className="relative">
-                    <InputTelefono id="telefono" name="telefono" required />
-                    <i className='bx bxs-phone absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
-                </div>
 
             </div>
 
             <div className="relative">
                 <label htmlFor="direccion" className="block mb-1 text-sm font-medium text-bn-accent">Dirección</label>      <div className="relative">
                     <InputTextoGeneral id="direccion" name="direccion" required placeholder="Dirección" />
-                    <i className='bx bxs-home absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
                 </div>
 
             </div>
@@ -153,7 +170,6 @@ function FormAgregarUsuarios() {
             <div className="relative">
                 <label htmlFor="correo-registro" className="block mb-1 text-sm font-medium text-bn-accent">Correo electrónico</label>      <div className="relative">
                     <InputEmail id="correo-registro" name="correo" required placeholder="Correo electrónico" />
-                    <i className='bx bxs-envelope absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
                 </div>
 
             </div>
@@ -164,9 +180,12 @@ function FormAgregarUsuarios() {
             {/* ==================================================================================================== */}
 
 
+            <div className="flex flex-row gap-2 items-center justify-center mt-5">
 
-            <button type="submit" className="w-full p-3 bg-bn-secondary text-bn-primary font-bold border-none rounded-lg mt-3 transition-colors duration-300 ease-in-out hover:bg-bn-accent">Registrarse</button>
+                <BotonGeneral type="submit">agregar usuario</BotonGeneral>
+                <BotonGeneral type="button" >cargar usuarios</BotonGeneral>
 
+            </div>
 
         </form>
     )
