@@ -1,6 +1,6 @@
 import {BotonGeneral} from '@/components/common/botones/index';
 import {InputEmail,InputPassword} from "@/components/common/inputs";
-import {IniciarSesion} from "@/app/acciones/UsuariosCRUD";
+import {IniciarSesion} from "@/app/acciones/UsuariosActions";
 
 function FormLogin() {
 

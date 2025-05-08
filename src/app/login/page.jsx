@@ -1,5 +1,5 @@
 import FormLogin from "@/components/layout/forms/FormLogin"
-import { IniciarSesion } from "@/app/acciones/UsuariosCRUD"
+import { IniciarSesion } from "@/app/acciones/UsuariosActions"
 
 
 function login() {

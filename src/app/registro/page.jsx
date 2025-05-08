@@ -4,8 +4,11 @@ function registro() {
     return (
 
         <main className='min-h-screen flex items-center justify-center bg-gradient-to-br p-5  from-gray-600 to-pink-400'>
+
             <div className=" rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.2)] overflow-hidden text-white">
+
                 <div className="flex flex-row justify-center">
+                    
                     <div className="p-10 bg-black flex-1 bg-gradient-to-l from-black to-gray-900">
 
                         <h2 className="text-3xl mb-8 text-bn-highlight text-center">Crear Cuenta</h2>

@@ -3,8 +3,8 @@ import React from 'react'
 function InputFecha(props) {
     return (
         <input type="date" 
-            classnam="w-full
-            p-3
+            classnam="
+            h-full
             bg-bn-input-bg
             text-bn-secondary
             border

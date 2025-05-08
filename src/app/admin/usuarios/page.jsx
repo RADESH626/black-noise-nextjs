@@ -1,24 +1,22 @@
 import HeaderAdminDashboard from '@/components/layout/headers/HeaderAdminDashBoard'
 import { BotonAgregarUsuarios, BotonEnviarCorreo, BotonExportarPDF } from '@/components/common/botones'
 import FormAdminDashboardUsuarios from '@/components/layout/forms/FormAdminDashboardUsuarios'
-import connectDB from '@/utils/DBconection'
-import Usuario from '@/models/Usuario'
 import TdGeneral from '@/components/common/tablas/TdGeneral'
 import THeader from '@/components/layout/tablas/AdminDashboard/THeader'
 import FormEditarEliminarUsuario from '@/components/layout/forms/FormEditarEliminarUsuario'
 import { IconoPersona } from '@/components/common/iconos'
-import ModalAgregarUsuario from '@/components/common/modales/ModalAgregarUsuario'
-
-async function obtenerUsuarios() {
-    connectDB()
-    const usuarios = await Usuario.find()
-    return usuarios.map((usuario) => usuario.toObject());
-}
+import {obtenerUsuarios} from '@/app/acciones/UsuariosActions'
 
 
 async function usuarios() {
 
-    const usuarios = await obtenerUsuarios()
+    const data = await obtenerUsuarios();
+
+    if(data.error){ 
+        alert(data.error)
+    }
+
+    const usuarios = data || [];
 
     return (
 
@@ -29,9 +27,6 @@ async function usuarios() {
                 <IconoPersona className="text-white" />
 
             </HeaderAdminDashboard>
-
-
-
 
             <div className="flex flex-col items-center justify-center  h-full   p-4 ">
 
@@ -50,7 +45,7 @@ async function usuarios() {
 
                     <footer className="flex flex-row  justify-r w-full h-full bg-gray-600  p-4 gap-4">
 
-                        <BotonAgregarUsuarios onclick={() => openModal()} />
+                        <BotonAgregarUsuarios />
                         <BotonExportarPDF />
                         <BotonEnviarCorreo />
 
@@ -63,7 +58,7 @@ async function usuarios() {
                         <table className="table-auto text-left w-full border-gray-400">
                             <THeader className="bg-gray-300" />
                             <tbody>
-                                {usuarios.map((usuario) => (
+                                {usuarios.data.map((usuario) => (
                                     <tr key={usuario._id}>
                                         <TdGeneral>{usuario.nombreUsuario}</TdGeneral>
                                         <TdGeneral>{usuario.primerNombre}</TdGeneral>
@@ -83,7 +78,9 @@ async function usuarios() {
 
                                         <td className=" border border-gray-400 px-4 py-2 justify-center items-center gap-4">
                                             <div className='flex flex-row justify-center items-center gap-4'>
-                                                <FormEditarEliminarUsuario />
+                                                <FormEditarEliminarUsuario >
+                                                    <input type="hidden" name="usuarioId" value={usuario._id} />
+                                                </FormEditarEliminarUsuario>
                                             </div>
 
                                         </td>
@@ -95,19 +92,11 @@ async function usuarios() {
                 </section>
 
             </div >
-
-            <ModalAgregarUsuario    />
-
         </div >
-
-
-
-
     )
 }
 
 export default usuarios
-
 
 
 

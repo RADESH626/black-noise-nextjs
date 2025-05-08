@@ -11,7 +11,7 @@ import {
 
 import { BotonGeneral } from '@/components/common/botones';
 
-import {RegistrarUsuario} from "@/app/acciones/UsuariosCRUD";
+import {RegistrarUsuario} from "@/app/acciones/UsuariosActions";
 
 
 function FormRegistro() {
@@ -140,7 +140,7 @@ function FormRegistro() {
           <label htmlFor="genero" className="block mb-1 text-sm font-medium text-bn-accent">Género</label>
           <div className="relative">
 
-            <InputGenero id="genero" name="genero" required />
+            <InputGenero  />
             <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
 
           </div>
