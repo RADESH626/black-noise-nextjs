@@ -7,10 +7,11 @@ function indexPage() {
     <div className='pt-16'>
       <HeaderPrincipal />
 
+      hola
       <main className="flex flex-col justify-between h-full ">
 
         {/* seccion 1 */}
-        <section className=' flex h-screen flex-col justify-center items-center gap-4 p-10 bg-gradient-to-b from-pink-300 to-black text-white'>
+        <section className=' flex h-screen flex-col justify-center items-center gap-4 p-10 bg-gradient-to-bl from-white to-pink-400 text-white'>
 
           <h1 className='font-bold text-5xl'>DISEÑA TU PROPIA ROPA</h1>
 
