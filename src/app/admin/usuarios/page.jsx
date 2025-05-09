@@ -21,9 +21,9 @@ async function usuarios() {
     return (
 
         <div className='flex flex-col justify-center w-screen  bg-gray-200 '>
-
+            
             <HeaderAdminDashboard >
-
+                hola
                 <IconoPersona className="text-white" />
 
             </HeaderAdminDashboard>

@@ -9,7 +9,7 @@ import {
 
 function FormAdminDashboardUsuarios() {
     return (
-        <form >
+        <form  >
 
             <section className="flex flex-col gap-2 bg-black rounded-lg justify-center items-top p-4 w-full h-full text-white">
 
