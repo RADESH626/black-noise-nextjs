@@ -7,7 +7,7 @@ function indexPage() {
     <div className='pt-16'>
       <HeaderPrincipal />
 
-      hola
+
       <main className="flex flex-col justify-between h-full ">
 
         {/* seccion 1 */}
