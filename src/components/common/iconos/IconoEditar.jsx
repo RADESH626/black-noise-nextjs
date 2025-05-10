@@ -1,6 +1,6 @@
 function IconoEditar() {
   return (
-    <img src="/icons/icono-editar.svg" alt="icono editar" className="w-auto h-auto "/>
+    <img src="/icons/icono-editar.svg" alt="icono editar" className="h-5 w-5"/>
   )
 }
 

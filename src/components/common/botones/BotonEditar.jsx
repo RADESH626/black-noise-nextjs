@@ -1,15 +1,19 @@
 import IconoEditar from '@/components/common/iconos/IconoEditar'
 
-function BotonEditar() {
+function BotonEditar({ children }) {
     return (
         <button
             type="submit"
             className="
+            h-full
+            w-full
+            flex
+            flex-row
             items-center
-            px-4
-            py-2
+            justify-center
+            gap-2
             bg-blue-500
-            text-white
+            text-black
             font-semibold
             rounded-lg
             shadow-md
@@ -17,10 +21,12 @@ function BotonEditar() {
             focus:outline-none
             focus:ring-2
             focus:ring-blue-400 
-            focus:ring-opacity-75"
-            title="Editar"
+            focus:ring-opacity-75
+            p-3
+            "
         >
-           <IconoEditar />
+            editar
+            <IconoEditar />
         </button>
     )
 }

@@ -38,13 +38,14 @@ async function guardarUsuarios(data) {
 //obtener usuarios de la base de datos
 async function obtenerUsuarios() {
     "use server"
+    
     try {
 
         const response = await AxiosInstance.get('/usuarios');
 
         const result = response.data;
 
-        console.log('Resultado de la API con Axios:', result);
+        // console.log('Resultado de la API con Axios:', result);
 
         if (result.error) { // Asumiendo que tu API devuelve un campo 'error'
 
@@ -149,9 +150,14 @@ async function RegistroMasivoUsuario(formData) {
 
 }
 
-async function encontrarUsuarioPorId(id) {
+async function BuscarUsuarioPorId(formData){
+
     try {
-        const response = await axios.get(`http://localhost:3000/api/usuarios/${id}`);
+
+        console.log('id:', id);
+
+        const response = await AxiosInstance.get(`/usuarios/${id}`);
+
         const result = response.data;
 
         console.log('Resultado de la API con Axios:', result);
@@ -164,6 +170,7 @@ async function encontrarUsuarioPorId(id) {
         }
 
         return result;
+
     } catch (error) {
         console.error('Error en la petición Axios para encontrar el usuario:', error.message);
         // Manejo de errores de red o errores del servidor que no devuelven JSON con 'error'
@@ -187,6 +194,6 @@ async function IniciarSesion(formData) {
 
 }
 
-export { RegistrarUsuario, IniciarSesion, encontrarUsuarioPorId, obtenerUsuarios, RegistroMasivoUsuario };
+export { RegistrarUsuario, IniciarSesion, BuscarUsuarioPorId, obtenerUsuarios, RegistroMasivoUsuario };
 
 

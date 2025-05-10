@@ -1,15 +1,15 @@
-import { BotonAgregarUsuarios, BotonEnviarCorreo, BotonExportarPDF } from '@/components/common/botones'
+import { BotonAgregarUsuarios, BotonEditar, BotonEnviarCorreo, BotonExportarPDF } from '@/components/common/botones'
 import FormBuscarUsuarios from '@/components/layout/admin/usuarios/forms/FormBuscarUsuarios'
 import TdGeneral from '@/components/common/tablas/TdGeneral'
 import THUsuarios from '@/components/layout/admin/usuarios/THUsuarios'
-import { obtenerUsuarios } from '@/app/acciones/UsuariosActions'
 import Link from 'next/link'
 import AdminPage from '@/components/layout/admin/AdminPage'
 import SeccionAcciones from '@/components/layout/admin/secciones/acciones/SeccionAcciones'
 import SeccionFooter from '@/components/layout/admin/secciones/acciones/SeccionFooter'
 import SeccionHeader from '@/components/layout/admin/secciones/acciones/SeccionHeader'
-import FormEditarEliminarUsuario from '@/components/layout/admin/usuarios/forms/FormEditarEliminarUsuario'
 import SeccionLista from '@/components/layout/admin/secciones/lista/SeccionLista'
+import FormEditarUsuario from '@/components/layout/admin/usuarios/forms/FormEditarUsuario'
+import { obtenerUsuarios } from '@/app/acciones/UsuariosActions'
 
 
 async function usuarios() {
@@ -76,12 +76,8 @@ async function usuarios() {
                             <TdGeneral>{usuario.foto}</TdGeneral>
                             <TdGeneral>{usuario.habilitado}</TdGeneral>
 
-                            <td className=" border border-gray-400 px-4 py-2 justify-center items-center gap-4">
-                                <div className='flex flex-row justify-center items-center gap-4'>
-                                    <FormEditarEliminarUsuario >
-                                        <input type="hidden" name="usuarioId" value={usuario._id} />
-                                    </FormEditarEliminarUsuario>
-                                </div>
+                            <td className=" border border-gray-400 px-4 justify-center items-center h-full w-full gap-2">
+                                <FormEditarUsuario id={usuario._id} />
 
                             </td>
                         </tr>

@@ -8,13 +8,17 @@ export async function GET(request, { params }) {
 
     try {
 
+        const params = await params
+
+        console.log('params:', params)
+
         //nos conectamos a la base de datos 
         connectDB()
 
         //obtenemos el usuario por id especifico
-        const UsuarioEncontrado = await Usuario.findById(params.id)
+        const UsuarioEncontrado = await Usuario.findById(id)
 
-        //verificamos que hayamos encontrado el usuario 
+        //verificamos que hayamos encontrado el usuario
         if (!UsuarioEncontrado) {
             return NextResponse.json({ message: 'usuario no encontrado' })
         }
