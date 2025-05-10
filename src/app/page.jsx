@@ -1,5 +1,5 @@
-import HeaderPrincipal from '@/components/layout/headers/HeaderPrincipal';
-import Footer from '@/components/layout/footer/Footer';
+import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
+import Footer from '@/components/layout/general/footer/Footer';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 function indexPage() {
@@ -12,7 +12,7 @@ function indexPage() {
 
 
         {/* seccion 1 */}
-        <section className=' flex h-screen flex-col justify-center items-center gap-4 p-10 bg-gradient-to-bl from-white to-pink-400 text-white'>
+        <section className=' flex h-screen flex-col justify-center items-center gap-4 p-10 bg-gradient-to-b from-black to-pink-300 text-white'>
 
           <h1 className='font-bold text-5xl'>DISEÑA TU PROPIA ROPA</h1>
 

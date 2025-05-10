@@ -1,4 +1,4 @@
-import FormRegistro from "@/components/layout/forms/FormRegistro"
+import FormRegistro from "@/components/layout/general/forms/FormRegistro"
 
 function registro() {
     return (
@@ -51,4 +51,3 @@ function registro() {
 export default registro
 
 //TODO:corregir los colores de los forms
-// TODO: centrar el boton de registrarse  

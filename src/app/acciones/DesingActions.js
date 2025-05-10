@@ -1,4 +1,3 @@
-
 import axios from 'axios'; // Importar Axios
 import Papa from 'papaparse'; // Importar PapaParse
 
@@ -7,40 +6,40 @@ const AxiosInstance = axios.create({
     baseURL: 'http://localhost:3000/api',
 });
 
-async function guardarUsuarios(data) {
+async function guardarDesings(data) {
     try {
 
-        // peticion tipo post a la api de usuarios para guardar el usuario en la base de datos
-        const response = await AxiosInstance.post('/usuarios', data);
+        // peticion tipo post a la api de diseños para guardar el diseño en la base de datos
+        const response = await AxiosInstance.post('/disenos', data);
 
         const result = response.data;
 
         console.log('Resultado de la API con Axios:', result);
 
         if (result.error) { // Asumiendo que tu API devuelve un campo 'error'
-            console.error('Error al registrar el usuario con Axios:', result.error);
+            console.error('Error al registrar el diseño con Axios:', result.error);
             // Considera cómo quieres manejar los errores aquí.
             // Podrías lanzar un error o devolver un objeto de error específico.
             // Para Server Actions, devolver un objeto con una propiedad 'error' es común.
-            return { error: 'Error al registrar el usuario' };
+            return { error: 'Error al registrar el diseño' };
         }
         // Si no hay error, puedes devolver los datos o un mensaje de éxito
         return { success: true, data: result };
 
     } catch (error) {
-        console.error('Error en la petición Axios para registrar el usuario:', error.message);
+        console.error('Error en la petición Axios para registrar el diseño:', error.message);
         // Manejo de errores de red o errores del servidor que no devuelven JSON con 'error'
         // Devuelve un objeto de error para que el llamador pueda manejarlo.
-        return { error: 'Error al conectar con la API para registrar el usuario' };
+        return { error: 'Error al conectar con la API para registrar el diseño' };
     }
 }
 
-//obtener usuarios de la base de datos
-async function obtenerUsuarios() {
+//obtener diseños de la base de datos
+async function obtenerDesings() {
     "use server"
     try {
 
-        const response = await AxiosInstance.get('/usuarios');
+        const response = await AxiosInstance.get('/disenos');
 
         const result = response.data;
 
@@ -48,7 +47,7 @@ async function obtenerUsuarios() {
 
         if (result.error) { // Asumiendo que tu API devuelve un campo 'error'
 
-            console.error('Error al obtener los usuarios con Axios:', result.error);
+            console.error('Error al obtener los diseños con Axios:', result.error);
 
             // Considera cómo quieres manejar los errores aquí.
 
@@ -56,27 +55,27 @@ async function obtenerUsuarios() {
 
             // Para Server Actions, devolver un objeto con una propiedad 'error' es común.
 
-            return { error: 'Error al obtener los usuarios' };
+            return { error: 'Error al obtener los diseños' };
 
         }
 
         // Si no hay error, puedes devolver los datos o un mensaje de éxito
-        return { data: result.usuarios };
+        return { data: result.disenos };
 
     } catch (error) {
 
-        console.error('Error en la petición Axios para obtener los usuarios:', error);
+        console.error('Error en la petición Axios para obtener los diseños:', error);
 
         // Manejo de errores de red o errores del servidor que no devuelven JSON con 'error'
 
         // Devuelve un objeto de error para que el llamador pueda manejarlo.
 
-        return { error: 'Error al conectar con la API para obtener los usuarios' };
+        return { error: 'Error al conectar con la API para obtener los diseños' };
 
     }
 }
 
-async function RegistrarUsuario(formData) {
+async function RegistrarDesing(formData) {
     "use server"
 
     //se define la variable genero y se le asigna el valor del formulario
@@ -108,7 +107,7 @@ async function RegistrarUsuario(formData) {
     guardarUsuarios(data);
 }
 
-async function RegistroMasivoUsuario(formData) {
+async function RegistroMasivoDesings(formData) {
     "use server"
 
     const file = formData.get('file');
@@ -133,13 +132,13 @@ async function RegistroMasivoUsuario(formData) {
         if (resultadoParseo.errors.length > 0) {
             console.error("Errores al parsear CSV:", resultadoParseo.errors);
         } else {
-            const usuarios = resultadoParseo.data;
+            const diseños = resultadoParseo.data;
 
-            console.log("usuarios:",usuarios);
-            
-            usuarios.forEach(async (usuario) => {
-                // Aquí puedes llamar a la función para guardar cada usuario
-                const resultado = await guardarUsuarios(usuario);
+            console.log("diseños:", diseños);
+
+            diseños.forEach(async (diseño) => {
+                // Aquí puedes llamar a la función para guardar cada diseño
+                const resultado = await guardarDesings(diseño);
                 console.log('Resultado de la API con Axios:', resultado);
             });
         }
@@ -149,15 +148,15 @@ async function RegistroMasivoUsuario(formData) {
 
 }
 
-async function encontrarUsuarioPorId(id) {
+async function encontrarDesingsPorId(id) {
     try {
-        const response = await axios.get(`http://localhost:3000/api/usuarios/${id}`);
+        const response = await axios.get(`http://localhost:3000/api/disenos/${id}`);
         const result = response.data;
 
         console.log('Resultado de la API con Axios:', result);
 
         if (result.error) { // Asumiendo que tu API devuelve un campo 'error'
-            console.error('Error al encontrar el usuario con Axios:', result.error);
+            console.error('Error al encontrar el diseño con Axios:', result.error);
             // Considera cómo quieres manejar los errores aquí.
             // Podrías lanzar un error o devolver un objeto de error específico.
             throw new Error(result.error);
@@ -165,28 +164,16 @@ async function encontrarUsuarioPorId(id) {
 
         return result;
     } catch (error) {
-        console.error('Error en la petición Axios para encontrar el usuario:', error.message);
+        console.error('Error en la petición Axios para encontrar el diseño:', error.message);
         // Manejo de errores de red o errores del servidor que no devuelven JSON con 'error'
         // Lanza el error para que el llamador pueda manejarlo o devuelve un objeto de error.
-        throw new Error('Error al conectar con la API para encontrar el usuario');
+        throw new Error('Error al conectar con la API para encontrar el diseño');
     }
 }
 
-async function IniciarSesion(formData) {
-    "use server"
 
-    console.log('formData:', formData);
 
-    //guardar los datos en un objeto para enviarlos a la api
-    const data = {
-        email: formData.get('email'),
-        password: formData.get('password')
-    };
+export { guardarDesings, obtenerDesings, RegistrarDesing, RegistroMasivoDesings,encontrarDesingsPorId };
 
-    console.log('data:', data);
-
-}
-
-export { RegistrarUsuario, IniciarSesion, encontrarUsuarioPorId, obtenerUsuarios, RegistroMasivoUsuario };
 
 

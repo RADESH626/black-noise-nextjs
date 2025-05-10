@@ -1,13 +1,12 @@
-import FormLayoutAdmin from '@/components/layout/forms/FormLayoutAdmin'
-import FormCargaMasivaUsuarios from '@/components/layout/forms/FormCargaMasiva'
+import AdminFormPage from '@/components/layout/admin/AdminFormPage'
+import FormCargaMasivaUsuarios from '@/components/layout/admin/forms/FormCargaMasiva'
 
 function archivo() {
   return (
     <div>
-        <FormLayoutAdmin>
-            <FormCargaMasivaUsuarios className="w-full"  />
-
-        </FormLayoutAdmin>
+        <AdminFormPage>
+            <FormCargaMasivaUsuarios className="w-full" />
+        </AdminFormPage>
     </div>
   )
 }

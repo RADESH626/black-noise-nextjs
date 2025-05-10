@@ -7,9 +7,9 @@ import {
     InputTextoGeneral
 } from '@/components/common/inputs'
 
-function FormAdminDashboardUsuarios() {
+function FormBuscarUsuarios() {
     return (
-        <form  >
+        <form >
 
             <section className="flex flex-col gap-2 bg-black rounded-lg justify-center items-top p-4 w-full h-full text-white">
 
@@ -68,4 +68,4 @@ function FormAdminDashboardUsuarios() {
     )
 }
 
-export default FormAdminDashboardUsuarios
+export default FormBuscarUsuarios

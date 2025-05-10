@@ -1,5 +1,5 @@
 import { BotonGeneral } from '@/components/common/botones';
-import IconoPersona from '../../common/iconos/IconoPersona';
+import IconoPersona from '../../../../common/iconos/IconoPersona';
 
 import {
     InputTipoDocumentoIdentidad,
@@ -13,6 +13,7 @@ import {
 
 
 } from '@/components/common/inputs';
+import Link from 'next/link';
 
 
 function FormAgregarUsuarios() {
@@ -183,7 +184,10 @@ function FormAgregarUsuarios() {
             <div className="flex flex-row gap-2 items-center justify-center mt-5">
 
                 <BotonGeneral type="submit">agregar usuario</BotonGeneral>
-                <BotonGeneral type="button" >cargar usuarios</BotonGeneral>
+
+                <Link href="/admin/usuarios/agregar/archivo">
+                    <BotonGeneral type="button" >cargar usuarios</BotonGeneral>
+                </Link>
 
             </div>
 
@@ -192,3 +196,5 @@ function FormAgregarUsuarios() {
 }
 
 export default FormAgregarUsuarios
+
+//:agregar el icono de x para salir

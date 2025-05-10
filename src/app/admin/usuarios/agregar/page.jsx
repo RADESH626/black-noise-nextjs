@@ -1,12 +1,11 @@
-import FormAgregarUsuarios from '@/components/layout/forms/FormAgregarUsuarios'
-import FormLayoutAdmin from '@/components/layout/forms/FormLayoutAdmin'
-import React from 'react'
+import FormAgregarUsuarios from '@/components/layout/admin/usuarios/forms/FormAgregarUsuarios'
+import AdminFormPage from '@/components/layout/admin/AdminFormPage'
 
 function nuevo() {
     return (
-        <FormLayoutAdmin>
+        <AdminFormPage>
             <FormAgregarUsuarios className="w-full" />
-        </FormLayoutAdmin>
+        </AdminFormPage>
     )
 }
 

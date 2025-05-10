@@ -1,4 +1,4 @@
-import FormAgregarUsuarios from '@/components/layout/forms/FormAgregarUsuarios'
+import FormAgregarUsuarios from '@/components/layout/admin/usuarios/forms/FormAgregarUsuarios'
 import React from 'react'
 
 

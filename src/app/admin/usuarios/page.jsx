@@ -1,98 +1,97 @@
-import HeaderAdminDashboard from '@/components/layout/headers/HeaderAdminDashBoard'
 import { BotonAgregarUsuarios, BotonEnviarCorreo, BotonExportarPDF } from '@/components/common/botones'
-import FormAdminDashboardUsuarios from '@/components/layout/forms/FormAdminDashboardUsuarios'
+import FormBuscarUsuarios from '@/components/layout/admin/usuarios/forms/FormBuscarUsuarios'
 import TdGeneral from '@/components/common/tablas/TdGeneral'
-import THeader from '@/components/layout/tablas/AdminDashboard/THeader'
-import FormEditarEliminarUsuario from '@/components/layout/forms/FormEditarEliminarUsuario'
-import { IconoPersona } from '@/components/common/iconos'
-import {obtenerUsuarios} from '@/app/acciones/UsuariosActions'
+import THUsuarios from '@/components/layout/admin/usuarios/THUsuarios'
+import { obtenerUsuarios } from '@/app/acciones/UsuariosActions'
+import Link from 'next/link'
+import AdminPage from '@/components/layout/admin/AdminPage'
+import SeccionAcciones from '@/components/layout/admin/secciones/acciones/SeccionAcciones'
+import SeccionFooter from '@/components/layout/admin/secciones/acciones/SeccionFooter'
+import SeccionHeader from '@/components/layout/admin/secciones/acciones/SeccionHeader'
+import FormEditarEliminarUsuario from '@/components/layout/admin/usuarios/forms/FormEditarEliminarUsuario'
+import SeccionLista from '@/components/layout/admin/secciones/lista/SeccionLista'
 
 
 async function usuarios() {
 
     const data = await obtenerUsuarios();
 
-    if(data.error){ 
+    if (data.error) {
         alert(data.error)
     }
 
     const usuarios = data || [];
 
     return (
+        <AdminPage>
 
-        <div className='flex flex-col justify-center w-screen  bg-gray-200 '>
-            
-            <HeaderAdminDashboard >
-                
-                <IconoPersona className="text-white" />
+            <SeccionAcciones>
 
-            </HeaderAdminDashboard>
+                <SeccionHeader>
 
-            <div className="flex flex-col items-center justify-center  h-full   p-4 ">
+                    <h4 className='font-bold text-2xl text-black' >Buscar Usuarios</h4>
 
-                <h1 className='font-bold text-3xl text-black' >Bienvenido Administrador</h1>
+                    <FormBuscarUsuarios className="w-full" />
 
+                </SeccionHeader>
 
-                <section className="flex flex-col items-center justify-center w-full h-full bg-white rounded-2xl  ">
+                <SeccionFooter>
 
-                    <header className='bg-gray-300 w-full flex flex-col justify-center items-center p-4 gap-4 rounded-t-2xl ' >
-
-                        <h4 className='font-bold text-2xl text-black' >Buscar Usuarios</h4>
-
-                        <FormAdminDashboardUsuarios className="w-full" />
-
-                    </header>
-
-                    <footer className="flex flex-row  justify-r w-full h-full bg-gray-600  p-4 gap-4">
-
+                    <Link href="/admin/usuarios/agregar" className="flex flex-row justify-center items-center gap-4">
                         <BotonAgregarUsuarios />
+                    </Link>
+
+                    <Link href="/admin/usuarios/exportar" className="flex flex-row justify-center items-center gap-4">
                         <BotonExportarPDF />
+                    </Link>
+
+                    <Link href="/admin/usuarios/enviar" className="flex flex-row justify-center items-center gap-4">
                         <BotonEnviarCorreo />
+                    </Link>
 
-                    </footer>
+                </SeccionFooter>
 
-                </section>
+            </SeccionAcciones>
 
-                <section className="flex flex-col items-center justify-center w-full h-full bg-white rounded-2xl">
-                    <div className="overflow-auto max-h-[400px] w-full">
-                        <table className="table-auto text-left w-full border-gray-400">
-                            <THeader className="bg-gray-300" />
-                            <tbody>
-                                {usuarios.data.map((usuario) => (
-                                    <tr key={usuario._id}>
-                                        <TdGeneral>{usuario.nombreUsuario}</TdGeneral>
-                                        <TdGeneral>{usuario.primerNombre}</TdGeneral>
-                                        <TdGeneral>{usuario.primerApellido}</TdGeneral>
-                                        <TdGeneral>{usuario.segundoApellido}</TdGeneral>
-                                        <TdGeneral>{usuario.tipoDocumento}</TdGeneral>
-                                        <TdGeneral>{usuario.numeroDocumento}</TdGeneral>
-                                        <TdGeneral>{usuario.genero}</TdGeneral>
-                                        <TdGeneral>{new Date(usuario.fechaNacimiento).toLocaleDateString()}</TdGeneral>
-                                        <TdGeneral>{usuario.numeroTelefono}</TdGeneral>
-                                        <TdGeneral>{usuario.direccion}</TdGeneral>
-                                        <TdGeneral>{usuario.correo}</TdGeneral>
-                                        <TdGeneral>{usuario.rol}</TdGeneral>
-                                        <TdGeneral>{new Date(usuario.createdAt).toLocaleDateString()}</TdGeneral>
-                                        <TdGeneral>{usuario.foto}</TdGeneral>
-                                        <TdGeneral>{usuario.habilitado}</TdGeneral>
+            <SeccionLista>
 
-                                        <td className=" border border-gray-400 px-4 py-2 justify-center items-center gap-4">
-                                            <div className='flex flex-row justify-center items-center gap-4'>
-                                                <FormEditarEliminarUsuario >
-                                                    <input type="hidden" name="usuarioId" value={usuario._id} />
-                                                </FormEditarEliminarUsuario>
-                                            </div>
+                <THUsuarios />
 
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
+                <tbody className='bg-gray-300 overflow-auto max-w-[400px] '>
+                    {usuarios.data.map((usuario) => (
+                        <tr key={usuario._id}>
+                            <TdGeneral>{usuario.nombreUsuario}</TdGeneral>
+                            <TdGeneral>{usuario.primerNombre}</TdGeneral>
+                            <TdGeneral>{usuario.primerApellido}</TdGeneral>
+                            <TdGeneral>{usuario.segundoApellido}</TdGeneral>
+                            <TdGeneral>{usuario.tipoDocumento}</TdGeneral>
+                            <TdGeneral>{usuario.numeroDocumento}</TdGeneral>
+                            <TdGeneral>{usuario.genero}</TdGeneral>
+                            <TdGeneral>{new Date(usuario.fechaNacimiento).toLocaleDateString()}</TdGeneral>
+                            <TdGeneral>{usuario.numeroTelefono}</TdGeneral>
+                            <TdGeneral>{usuario.direccion}</TdGeneral>
+                            <TdGeneral>{usuario.correo}</TdGeneral>
+                            <TdGeneral>{usuario.rol}</TdGeneral>
+                            <TdGeneral>{new Date(usuario.createdAt).toLocaleDateString()}</TdGeneral>
+                            <TdGeneral>{usuario.foto}</TdGeneral>
+                            <TdGeneral>{usuario.habilitado}</TdGeneral>
 
-            </div >
-        </div >
+                            <td className=" border border-gray-400 px-4 py-2 justify-center items-center gap-4">
+                                <div className='flex flex-row justify-center items-center gap-4'>
+                                    <FormEditarEliminarUsuario >
+                                        <input type="hidden" name="usuarioId" value={usuario._id} />
+                                    </FormEditarEliminarUsuario>
+                                </div>
+
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </SeccionLista>
+
+
+        </AdminPage>
+
     )
 }
 
@@ -100,24 +99,16 @@ export default usuarios
 
 
 
-
-
-{/* TODO:navbar
-    hacer el pop-up para navegabilidad 
-*/}
-
 {/* TODO:form busqueda
     agregar funcionalidad para el form de busqueda
 */}
 
 {/* TODO:form botones agregar,exportar, enviar correo
-    agregar modal para agregar usuario
     agregar funcionalidad para exportar a pdf
     agregar funcionalidad para enviar correo
 */}
 
 {/* TODO:lista de usuarios
-    agregar nombre del usuario
     agregar foto de los usuarios
     arreglar boton de editar
 

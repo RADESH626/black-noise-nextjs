@@ -1,4 +1,4 @@
-import FormLogin from "@/components/layout/forms/FormLogin"
+import FormLogin from "@/components/layout/general/forms/FormLogin"
 import { IniciarSesion } from "@/app/acciones/UsuariosActions"
 
 
@@ -35,5 +35,3 @@ function login() {
 }
 
 export default login
-
-//TODO: arreglar el boton para ir al index
