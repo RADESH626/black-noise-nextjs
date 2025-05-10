@@ -5,7 +5,7 @@ function archivo() {
   return (
     <div>
         <FormLayoutAdmin>
-            <FormCargaMasivaUsuarios className="w-full" />
+            <FormCargaMasivaUsuarios className="w-full"  />
 
         </FormLayoutAdmin>
     </div>

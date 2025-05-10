@@ -12,8 +12,8 @@ const conn = {
 export default async function connectDB() {
     if (conn.isConnected) return;
     const db = await connect("mongodb://localhost:27017/BlackNoise");
-    console.log(db.connection.db.databaseName);
     conn.isConnected = db.connections[0].readyState;
+   console.log("Estado de la conexión a la base de datos:", conn.isConnected);
 }
 
 

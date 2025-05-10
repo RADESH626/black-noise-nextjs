@@ -1,6 +1,7 @@
 
 import axios from 'axios'; // Importar Axios
-import usuarios from '../admin/usuarios/page';
+import Papa from 'papaparse'; // Importar PapaParse
+
 
 const AxiosInstance = axios.create({
     baseURL: 'http://localhost:3000/api',
@@ -75,8 +76,6 @@ async function obtenerUsuarios() {
     }
 }
 
-
-
 async function RegistrarUsuario(formData) {
     "use server"
 
@@ -112,8 +111,6 @@ async function RegistrarUsuario(formData) {
 async function RegistroMasivoUsuario(formData) {
     "use server"
 
-    console.log('formData:', formData);
-
     const file = formData.get('file');
 
     if (!file) {
@@ -122,50 +119,35 @@ async function RegistroMasivoUsuario(formData) {
 
     // Leer el archivo como texto (asumiendo que es un archivo CSV o similar)
     const buffer = await file.arrayBuffer();
+
     const text = new TextDecoder().decode(buffer);
 
-    // Aquí puedes procesar el texto, por ejemplo, parsear CSV o JSON
-    // Ejemplo simple: dividir por líneas
-    const lineas = text.split('\n');
-
-    // Procesar cada línea según tu formato de datos
-    // Por ejemplo, podrías mapear a objetos de usuario si es un CSV
-    // const usuarios = lineas.map(linea => { ... });
-
-    // Luego puedes enviar los usuarios a la API o hacer el procesamiento necesario
-
-    console.log('file:', file);
-
     try {
+        const resultadoParseo = Papa.parse(text, {
+            header: true,         // La primera fila son los encabezados
+            skipEmptyLines: true, // Omite líneas vacías
+            transformHeader: header => header.trim(),
+            transform: value => typeof value === 'string' ? value.trim() : value,
+        });
 
-        // peticion tipo post a la api de usuarios para guardar el usuario en la base de datos
-        const response = await AxiosInstance.post('/usuarios', data);
+        if (resultadoParseo.errors.length > 0) {
+            console.error("Errores al parsear CSV:", resultadoParseo.errors);
+        } else {
+            const usuarios = resultadoParseo.data;
 
-        const result = response.data;
-
-        console.log('Resultado de la API con Axios:', result);
-
-        if (result.error) { // Asumiendo que tu API devuelve un campo 'error'
-            console.error('Error al registrar el usuario con Axios:', result.error);
-            // Considera cómo quieres manejar los errores aquí.
-            // Podrías lanzar un error o devolver un objeto de error específico.
-            // Para Server Actions, devolver un objeto con una propiedad 'error' es común.
-            return { error: 'Error al registrar el usuario' };
+            console.log("usuarios:",usuarios);
+            
+            usuarios.forEach(async (usuario) => {
+                // Aquí puedes llamar a la función para guardar cada usuario
+                const resultado = await guardarUsuarios(usuario);
+                console.log('Resultado de la API con Axios:', resultado);
+            });
         }
-        // Si no hay error, puedes devolver los datos o un mensaje de éxito
-        return { success: true, data: result };
-
     } catch (error) {
-        console.error('Error en la petición Axios para registrar el usuario:', error.message);
-        // Manejo de errores de red o errores del servidor que no devuelven JSON con 'error'
-        // Devuelve un objeto de error para que el llamador pueda manejarlo.
-        return { error: 'Error al conectar con la API para registrar el usuario' };
+        console.error("Error general al usar PapaParse:", error);
     }
+
 }
-
-
-
-
 
 async function encontrarUsuarioPorId(id) {
     try {
@@ -205,7 +187,7 @@ async function IniciarSesion(formData) {
 
 }
 
-export { RegistrarUsuario, IniciarSesion, encontrarUsuarioPorId, obtenerUsuarios , RegistroMasivoUsuario };
+export { RegistrarUsuario, IniciarSesion, encontrarUsuarioPorId, obtenerUsuarios, RegistroMasivoUsuario };
 
 //TODO: terminar de hacer el crud
 

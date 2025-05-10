@@ -21,6 +21,7 @@ function InputFiles(props) {
                 file:bg-gray-200
                 file:text-gray-700
                 hover:file:bg-gray-300"
+                accept=".csv"
 
                 {...props}
             />

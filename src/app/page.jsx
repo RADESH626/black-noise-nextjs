@@ -8,7 +8,8 @@ function indexPage() {
       <HeaderPrincipal />
 
 
-      <main className="flex flex-col justify-between h-full ">
+      <main className="flex flex-col justify-between h-full">
+
 
         {/* seccion 1 */}
         <section className=' flex h-screen flex-col justify-center items-center gap-4 p-10 bg-gradient-to-bl from-white to-pink-400 text-white'>
@@ -118,6 +119,8 @@ function indexPage() {
 
         {/* footer */}
         <Footer />
+
+
 
       </main>
 
