@@ -15,3 +15,5 @@ async function page(searchParams) {
 }
 
 export default page
+
+//TODO:agregar logica de la pagina

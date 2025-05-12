@@ -226,7 +226,7 @@ function FormRegistro() {
       
 
       <div className="text-center mt-5 text-white">
-        <p>¿Ya tienes una cuenta? <a href="#" id="showLogin" className="font-medium text-white no-underline hover:underline">Iniciar Sesión</a></p>
+        <p>¿Ya tienes una cuenta? <a href="/login" id="showLogin" className="font-medium text-white no-underline hover:underline">Iniciar Sesión</a></p>
       </div>
     </form>
   )

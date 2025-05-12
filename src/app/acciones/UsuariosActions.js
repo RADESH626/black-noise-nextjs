@@ -1,31 +1,35 @@
+//este archivo funciona como un service de java
 
-import axios from 'axios'; // Importar Axios
 import Papa from 'papaparse'; // Importar PapaParse
-
-
-const AxiosInstance = axios.create({
-    baseURL: 'http://localhost:3000/api',
-});
+import bcrypt from "bcryptjs"; // Importa bcryptjs
+import connectDB from '@/utils/DBconection';
+import Usuario from '@/models/Usuario';
 
 async function guardarUsuarios(data) {
+
     try {
 
-        // peticion tipo post a la api de usuarios para guardar el usuario en la base de datos
-        const response = await AxiosInstance.post('/usuarios', data);
+        console.log('datos de usuario obtenidos:', data);
 
-        const result = response.data;
+        connectDB();
 
-        console.log('Resultado de la API con Axios:', result);
+        const NuevoUsuario = new Usuario(data);
 
-        if (result.error) { // Asumiendo que tu API devuelve un campo 'error'
-            console.error('Error al registrar el usuario con Axios:', result.error);
-            // Considera cómo quieres manejar los errores aquí.
-            // Podrías lanzar un error o devolver un objeto de error específico.
-            // Para Server Actions, devolver un objeto con una propiedad 'error' es común.
-            return { error: 'Error al registrar el usuario' };
+        console.log('usuario para guardar en la base de datos:', NuevoUsuario);
+
+        const UsuarioGuardado = await NuevoUsuario.save();
+
+        console.log('Usuario guardado en la base de datos:', UsuarioGuardado);
+
+
+        if (UsuarioGuardado.error) { // Asumiendo que tu API devuelve un campo 'error'
+            console.error('Error al registrar el usuario en la base de datos:', UsuarioGuardado.error);
+            return { error: 'Error al registrar el usuario en la base de datos' };
         }
+
         // Si no hay error, puedes devolver los datos o un mensaje de éxito
-        return { success: true, data: result };
+        return { success: true, data: UsuarioGuardado };
+        
 
     } catch (error) {
         console.error('Error en la petición Axios para registrar el usuario:', error.message);
@@ -38,7 +42,7 @@ async function guardarUsuarios(data) {
 //obtener usuarios de la base de datos
 async function obtenerUsuarios() {
     "use server"
-    
+
     try {
 
         const response = await AxiosInstance.get('/usuarios');
@@ -78,15 +82,8 @@ async function obtenerUsuarios() {
 }
 
 async function RegistrarUsuario(formData) {
+
     "use server"
-
-    //se define la variable genero y se le asigna el valor del formulario
-    var genero = formData.get('genero');
-
-    if (genero === null || genero === '') {
-        genero = 'OTRO';
-    }
-
 
     const data = {
         // Obtener los datos del formulario
@@ -97,7 +94,7 @@ async function RegistrarUsuario(formData) {
         primerApellido: formData.get('primerApellido'),
         segundoApellido: formData.get('segundoApellido'),
         fechaNacimiento: formData.get('fechaNacimiento'),
-        genero,
+        genero: formData.get('genero'),
         numeroTelefono: formData.get('numeroTelefono'),
         direccion: formData.get('direccion'),
         correo: formData.get('correo'),
@@ -105,6 +102,16 @@ async function RegistrarUsuario(formData) {
     }
 
     console.log('data:', data);
+
+    //hasheamos la contraseña
+
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
+    data.password = hashedPassword;
+
+    console.log('contraseña hassheada:', hashedPassword);
+
+    // Guardar el usuario en la base de datos(con la contraseña hasheada)
 
     guardarUsuarios(data);
 }
@@ -136,8 +143,8 @@ async function RegistroMasivoUsuario(formData) {
         } else {
             const usuarios = resultadoParseo.data;
 
-            console.log("usuarios:",usuarios);
-            
+            console.log("usuarios:", usuarios);
+
             usuarios.forEach(async (usuario) => {
                 // Aquí puedes llamar a la función para guardar cada usuario
                 const resultado = await guardarUsuarios(usuario);
@@ -150,7 +157,7 @@ async function RegistroMasivoUsuario(formData) {
 
 }
 
-async function BuscarUsuarioPorId(formData){
+async function ObtenerUsuarioPorId(id) {
 
     try {
 
@@ -179,21 +186,31 @@ async function BuscarUsuarioPorId(formData){
     }
 }
 
-async function IniciarSesion(formData) {
-    "use server"
+async function ObtenerUsuarioPorCorreo(email) {
 
-    console.log('formData:', formData);
+    try {
 
-    //guardar los datos en un objeto para enviarlos a la api
-    const data = {
-        email: formData.get('email'),
-        password: formData.get('password')
-    };
+        connectDB()
 
-    console.log('data:', data);
+        const user = await Usuario.findOne({ correo: email });
+
+
+        console.log('Resultado de la API con Axios:', user);
+
+        if (user.error) { // Asumiendo que tu API devuelve un campo 'error'
+            console.error('Error al encontrar el usuario con Axios:', user.error);
+            // Considera cómo quieres manejar los errores aquí.
+            // Podrías lanzar un error o devolver un objeto de error específico.
+            throw new Error(user.error);
+        }
+
+        return user;
+
+    } catch (error) {
+        console.error('Error al encontrar el usuario:', error.message);
+    }
 
 }
-
-export { RegistrarUsuario, IniciarSesion, BuscarUsuarioPorId, obtenerUsuarios, RegistroMasivoUsuario };
+export { RegistrarUsuario, ObtenerUsuarioPorId, ObtenerUsuarioPorCorreo, RegistroMasivoUsuario };
 
 

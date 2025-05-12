@@ -1,11 +1,16 @@
 import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
 import Footer from '@/components/layout/general/footer/Footer';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // Asegúrate que la ruta a tus authOptions sea correcta
+import { getServerSession } from "next-auth/next";
 
-function indexPage() {
+async function indexPage() {
+
+  const session = await getServerSession(authOptions);
+
   return (
     <div className='pt-16'>
-      <HeaderPrincipal />
+      <HeaderPrincipal session={session} />
 
 
       <main className="flex flex-col justify-between h-full">
@@ -132,3 +137,4 @@ export default indexPage
 
 // TODO:poner las imagenes de tipos de prendas
 // TODO: poner las redes socicales
+// TODO: validar que exista una sesion activa
