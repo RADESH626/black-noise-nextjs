@@ -6,11 +6,13 @@ async function page(searchParams) {
 
     console.log('parametros:', id);
 
+
+
     
 
 
     return (
-        <div>page</div>
+        <div>page {id}</div>
     )
 }
 
