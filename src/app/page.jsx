@@ -25,7 +25,7 @@ async function indexPage() {
             Con nuestro innovador software de edición de ropa, diseñar nunca ha sido tan fácil. Crea tu propio
             estilo acomodado a tu forma de ser.
           </p>
-          <a href="/login">
+          <a href="/registro">
             <BotonGeneral>
               REGISTRARSE AHORA
             </BotonGeneral>
@@ -137,4 +137,3 @@ export default indexPage
 
 // TODO:poner las imagenes de tipos de prendas
 // TODO: poner las redes socicales
-// TODO: validar que exista una sesion activa

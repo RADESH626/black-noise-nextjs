@@ -49,5 +49,3 @@ function registro() {
 }
 
 export default registro
-
-//TODO:corregir los colores de los forms
