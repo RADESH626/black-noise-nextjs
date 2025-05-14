@@ -2,10 +2,44 @@
 
 import Papa from 'papaparse'; // Importar PapaParse
 import bcrypt from "bcryptjs"; // Importa bcryptjs
+import nodemailer from 'nodemailer'; // Importar Nodemailer
 import connectDB from '@/utils/DBconection';
 import Usuario from '@/models/Usuario';
 
-async function guardarUsuarios(data) {
+// Función para enviar correos electrónicos
+async function enviarCorreoElectronico(to, subject, html) {
+    try {
+        // Configura el transportador de Nodemailer
+        // Reemplaza con tu configuración de SMTP y credenciales (idealmente desde variables de entorno)
+        const transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST || 'smtp.example.com', // Servidor SMTP de tu proveedor
+            port: parseInt(process.env.SMTP_PORT) || 587, // Puerto SMTP (587 para TLS, 465 para SSL)
+            secure: (parseInt(process.env.SMTP_PORT) || 587) === 465, // true para puerto 465, false para otros puertos
+            auth: {
+                user: process.env.EMAIL_USER, // Tu dirección de correo
+                pass: process.env.EMAIL_PASS, // Tu contraseña de correo o contraseña de aplicación
+            },
+        });
+
+        const mailOptions = {
+            from: `"Black Noise" <${process.env.EMAIL_USER}>`, // Dirección del remitente
+            to: to, // Lista de destinatarios
+            subject: subject, // Asunto del correo
+            html: html, // Cuerpo del correo en HTML
+        };
+
+        // Envía el correo
+        await transporter.sendMail(mailOptions);
+        console.log(`Correo enviado exitosamente a: ${to}`);
+        return { success: true, message: 'Correo enviado exitosamente' };
+    } catch (error) {
+        console.error('Error al enviar el correo:', error);
+        // Devuelve un objeto de error para que el llamador pueda manejarlo.
+        return { error: `Error al enviar el correo: ${error.message}` };
+    }
+}
+
+async function guardarUsuarios(data, enviarCorreo = false) { // Añadir parámetro enviarCorreo con valor por defecto
 
     try {
 
@@ -28,8 +62,26 @@ async function guardarUsuarios(data) {
         }
 
         // Si no hay error, puedes devolver los datos o un mensaje de éxito
+        if (enviarCorreo && UsuarioGuardado && !UsuarioGuardado.error && UsuarioGuardado.correo) {
+            const asunto = 'Bienvenido/a a Black Noise';
+            const contenidoHtml = `
+                <h1>¡Hola ${UsuarioGuardado.primerNombre}!</h1>
+                <p>Gracias por registrarte en Black Noise.</p>
+                <p>Tu cuenta ha sido creada exitosamente.</p>
+                <p>Usuario: ${UsuarioGuardado.correo}</p>
+                <p>¡Esperamos que disfrutes de nuestra plataforma!</p>
+                <br>
+                <p>Atentamente,</p>
+                <p>El equipo de Black Noise</p>
+            `;
+            // Llama a la función de envío de correo
+            const resultadoEnvioCorreo = await enviarCorreoElectronico(UsuarioGuardado.correo, asunto, contenidoHtml);
+            if (resultadoEnvioCorreo.error) {
+                console.error("Error al enviar correo de bienvenida:", resultadoEnvioCorreo.error);
+                // Podrías querer manejar este error de alguna manera, aunque el usuario ya fue guardado.
+            }
+        }
         return { success: true, data: UsuarioGuardado };
-        
 
     } catch (error) {
         console.error('Error en la petición Axios para registrar el usuario:', error.message);
@@ -113,7 +165,7 @@ async function RegistrarUsuario(formData) {
 
     // Guardar el usuario en la base de datos(con la contraseña hasheada)
 
-    guardarUsuarios(data);
+    guardarUsuarios(data, true); // Enviar correo al registrar un solo usuario
 }
 
 async function RegistroMasivoUsuario(formData) {
@@ -147,7 +199,7 @@ async function RegistroMasivoUsuario(formData) {
 
             usuarios.forEach(async (usuario) => {
                 // Aquí puedes llamar a la función para guardar cada usuario
-                const resultado = await guardarUsuarios(usuario);
+                const resultado = await guardarUsuarios(usuario, false); // No enviar correo en registro masivo
                 console.log('Resultado de la API con Axios:', resultado);
             });
         }
@@ -212,5 +264,3 @@ async function ObtenerUsuarioPorCorreo(email) {
 
 }
 export { RegistrarUsuario, ObtenerUsuarioPorId, ObtenerUsuarioPorCorreo, RegistroMasivoUsuario };
-
-
