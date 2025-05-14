@@ -78,26 +78,22 @@ async function obtenerUsuarios() {
 }
 
 async function RegistrarUsuario(formData) {
+
     "use server"
 
     //se define la variable genero y se le asigna el valor del formulario
-    var genero = formData.get('genero');
-
-    if (genero === null || genero === '') {
-        genero = 'OTRO';
-    }
-
-
+    
     const data = {
         // Obtener los datos del formulario
         tipoDocumento: formData.get('tipoDocumento'),
         numeroDocumento: formData.get('numeroDocumento'),
         primerNombre: formData.get('primerNombre'),
+        nombreUsuario: formData.get('primerNombre'), // Asignar primerNombre a nombreUsuario
         segundoNombre: formData.get('segundoNombre'),
         primerApellido: formData.get('primerApellido'),
         segundoApellido: formData.get('segundoApellido'),
         fechaNacimiento: formData.get('fechaNacimiento'),
-        genero,
+        genero: formData.get('genero'),
         numeroTelefono: formData.get('numeroTelefono'),
         direccion: formData.get('direccion'),
         correo: formData.get('correo'),
@@ -195,5 +191,3 @@ async function IniciarSesion(formData) {
 }
 
 export { RegistrarUsuario, IniciarSesion, BuscarUsuarioPorId, obtenerUsuarios, RegistroMasivoUsuario };
-
-
