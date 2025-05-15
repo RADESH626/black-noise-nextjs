@@ -1,5 +1,4 @@
 import { BotonGeneral } from '@/components/common/botones';
-import IconoPersona from '../../../../common/iconos/IconoPersona';
 
 import {
     InputTipoDocumentoIdentidad,

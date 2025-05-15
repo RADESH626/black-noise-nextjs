@@ -1,5 +1,7 @@
 //este archivo funciona como un service de java
 
+"use server"
+
 import Papa from 'papaparse'; // Importar PapaParse
 import bcrypt from "bcryptjs"; // Importa bcryptjs
 import nodemailer from 'nodemailer'; // Importar Nodemailer
@@ -94,8 +96,6 @@ async function guardarUsuarios(data, enviarCorreo = false) { // Añadir parámet
 //obtener usuarios de la base de datos
 async function obtenerUsuarios() {
 
-    "use server"
-
     try {
 
         connectDB()
@@ -118,9 +118,81 @@ async function obtenerUsuarios() {
     }
 }
 
+async function obtenerUsuariosHabilitados() {
+
+
+    try {
+
+        connectDB()
+
+        const data = {usuarios:await Usuario.find({ habilitado: true })}
+
+        if (data.error) {
+            console.error('Error al encontrar el usuario ', data.error);
+            throw new Error(data.error);
+        }
+
+        return data;
+
+    } catch (error) {
+        console.error('Error al encontrar el usuario:', error.message);
+    }
+}
+
+async function ObtenerUsuarioPorId(id) {
+
+    try {
+        
+        connectDB()
+
+        console.log('id:', id);
+
+        const response = await Usuario.findById(id);
+
+
+
+        if (!response) { 
+            console.log('Error al encontrar el usuario', result.error);
+        }
+
+        return response;
+
+    } catch (error) {
+        console.log('Error al encontrar el usuario:', error.message);
+        // Manejo de errores de red o errores del servidor que no devuelven JSON con 'error'
+        // Lanza el error para que el llamador pueda manejarlo o devuelve un objeto de error.
+        
+    }
+}
+
+async function ObtenerUsuarioPorCorreo(email) {
+
+    try {
+
+        connectDB()
+
+        const user = await Usuario.findOne({ correo: email });
+
+
+        console.log('Resultado de la API con Axios:', user);
+
+        if (user.error) { // Asumiendo que tu API devuelve un campo 'error'
+            console.error('Error al encontrar el usuario con Axios:', user.error);
+            // Considera cómo quieres manejar los errores aquí.
+            // Podrías lanzar un error o devolver un objeto de error específico.
+            throw new Error(user.error);
+        }
+
+        return user;
+
+    } catch (error) {
+        console.error('Error al encontrar el usuario:', error.message);
+    }
+
+}
+
 async function RegistrarUsuario(formData) {
 
-    "use server"
 
     const data = {
         // Obtener los datos del formulario
@@ -155,7 +227,6 @@ async function RegistrarUsuario(formData) {
 }
 
 async function RegistroMasivoUsuario(formData) {
-    "use server"
 
     const file = formData.get('file');
 
@@ -195,63 +266,7 @@ async function RegistroMasivoUsuario(formData) {
 
 }
 
-async function ObtenerUsuarioPorId(id) {
-
-    try {
-
-        console.log('id:', id);
-
-        const response = await AxiosInstance.get(`/usuarios/${id}`);
-
-        const result = response.data;
-
-        console.log('Resultado de la API con Axios:', result);
-
-        if (result.error) { // Asumiendo que tu API devuelve un campo 'error'
-            console.error('Error al encontrar el usuario con Axios:', result.error);
-            // Considera cómo quieres manejar los errores aquí.
-            // Podrías lanzar un error o devolver un objeto de error específico.
-            throw new Error(result.error);
-        }
-
-        return result;
-
-    } catch (error) {
-        console.error('Error en la petición Axios para encontrar el usuario:', error.message);
-        // Manejo de errores de red o errores del servidor que no devuelven JSON con 'error'
-        // Lanza el error para que el llamador pueda manejarlo o devuelve un objeto de error.
-        throw new Error('Error al conectar con la API para encontrar el usuario');
-    }
-}
-
-async function ObtenerUsuarioPorCorreo(email) {
-
-    try {
-
-        connectDB()
-
-        const user = await Usuario.findOne({ correo: email });
-
-
-        console.log('Resultado de la API con Axios:', user);
-
-        if (user.error) { // Asumiendo que tu API devuelve un campo 'error'
-            console.error('Error al encontrar el usuario con Axios:', user.error);
-            // Considera cómo quieres manejar los errores aquí.
-            // Podrías lanzar un error o devolver un objeto de error específico.
-            throw new Error(user.error);
-        }
-
-        return user;
-
-    } catch (error) {
-        console.error('Error al encontrar el usuario:', error.message);
-    }
-
-}
-
 async function buscarUsuarios(formData) {
-    "use server"
 
     const textoBusqueda = formData.get('textoBusqueda');
     const rol = formData.get('rol');
@@ -315,4 +330,74 @@ async function buscarUsuarios(formData) {
     return { data: [], message: "Búsqueda simulada completada. Implementar lógica de BD." };
 }
 
-export { RegistrarUsuario, ObtenerUsuarioPorId, ObtenerUsuarioPorCorreo, RegistroMasivoUsuario, buscarUsuarios, obtenerUsuarios };
+async function DeshabilitarUsuario(formData) {
+
+
+    const id = formData.get('id');
+
+    console.log('id:', id);
+
+    try {
+
+        connectDB()
+
+        const usuario = await Usuario.findByIdAndUpdate(id, { habilitado: false });
+
+        console.log('Resultado del cambio:', usuario);
+
+        if (usuario) { // Asumiendo que tu API devuelve un campo 'error'
+            return { error: 'Error al encontrar el usuario' };
+        }
+
+        return null;
+
+    } catch (error) {
+        console.error('Error al encontrar el usuario:', error.message);
+    }
+}
+
+async function EditarUsuario(formData) {
+
+
+    const id = formData.get('id');
+
+    //
+
+    console.log('id:', id);
+
+    try {
+
+        connectDB()
+
+        const usuario = await Usuario.findByIdAndUpdate(id, { habilitado: false });
+
+        console.log('Resultado del cambio:', usuario);
+
+        if (usuario.error) { // Asumiendo que tu API devuelve un campo 'error'
+            console.error('Error al encontrar el usuario con Axios:', usuario.error);
+            // Considera cómo quieres manejar los errores aquí.
+            // Podrías lanzar un error o devolver un objeto de error específico.
+            throw new Error(usuario.error);
+        }
+
+        return usuario;
+
+    } catch (error) {
+        console.error('Error al encontrar el usuario:', error.message);
+    }
+
+
+    
+}
+
+export { 
+    RegistrarUsuario, 
+    ObtenerUsuarioPorId, 
+    ObtenerUsuarioPorCorreo, 
+    RegistroMasivoUsuario, 
+    buscarUsuarios, 
+    obtenerUsuarios, 
+    DeshabilitarUsuario, 
+    EditarUsuario,
+    obtenerUsuariosHabilitados
+};

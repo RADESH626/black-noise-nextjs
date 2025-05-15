@@ -1,3 +1,5 @@
+"use client";
+
 import {
     InputRol,
     InputGenero,
@@ -10,7 +12,7 @@ import { buscarUsuarios } from '@/app/acciones/UsuariosActions';
 
 function FormBuscarUsuarios() {
     return (
-        <form action={buscarUsuarios} >
+        <form  >
 
             <section className="flex flex-col gap-2 bg-black rounded-lg justify-center items-top p-4 w-full h-full text-white">
 

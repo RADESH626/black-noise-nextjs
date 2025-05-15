@@ -1,6 +1,8 @@
-function AdminFormPage({ children }) {
-    return (
-        <div className='flex flex-col justify-center w-screen  bg-white text-white '>
+
+function GeneralFormLayout({children}) {
+  return (
+    <div className='flex flex-col justify-center w-screen  bg-white text-white '>
+
 
             <div className="flex flex-col items-center justify-center  h-full   p-4 ">
 
@@ -18,7 +20,7 @@ function AdminFormPage({ children }) {
 
 
         </div >
-    )
+  )
 }
 
-export default AdminFormPage
+export default GeneralFormLayout

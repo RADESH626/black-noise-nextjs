@@ -1,8 +1,10 @@
-import React from 'react'
 
-function InputRol() {
+function InputRol(props) {
     return (
-        <select id="rol" name="rol" className='
+        <select 
+        id="rol" 
+        name="rol" 
+        className='
             w-full 
             p-3 
             border
@@ -15,7 +17,11 @@ function InputRol() {
             focus:ring-bn-accent-opaque
             focus:border-bn-accent-opaque
             placeholder:text-bn-accent
-            overflow-hidden' defaultValue={"CLIENTE"}>
+            overflow-hidden' 
+            defaultValue={"CLIENTE"}
+            {...props}
+
+            >
             <option value={"cliente"}>CLIENTE</option>
             <option value={"PROVEEDOR"}>PROVEEDOR</option>
             <option value={"EMPLEADO"}>EMPLEADO</option>
