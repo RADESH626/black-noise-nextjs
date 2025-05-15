@@ -8,17 +8,6 @@ async function page(searchParams) {
 
     const { id } = params;
 
-<<<<<<< HEAD
-    console.log('parametros:', id);
-
-
-
-    
-
-
-    return (
-        <div>page {id}</div>
-=======
     return (
 
         <div>
@@ -33,8 +22,6 @@ async function page(searchParams) {
 
         </div>
 
-
->>>>>>> sesiones
     )
 }
 

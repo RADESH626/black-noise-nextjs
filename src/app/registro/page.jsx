@@ -17,8 +17,6 @@ function registro() {
 
                     </div>
 
-
-
                     <div className="flex flex- flex-col bg-gradient-to-r from-black to-gray-900 text-white p-8 justify-center text-center">
 
                         <div id="registerInfo">
@@ -44,16 +42,9 @@ function registro() {
             </div>
         </main>
 
-
     )
 }
 
 export default registro
 
-<<<<<<< HEAD
-//TODO:corregir los colores de los forms
-
-//TODO: registrar el nombre de usuario
-=======
 //TODO: redirigir a la pagina de inicio al registrarse
->>>>>>> sesiones

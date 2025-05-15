@@ -57,7 +57,6 @@ async function guardarUsuarios(data, enviarCorreo = false) { // Añadir parámet
 
         console.log('Usuario guardado en la base de datos:', UsuarioGuardado);
 
-
         if (UsuarioGuardado.error) { // Asumiendo que tu API devuelve un campo 'error'
             console.error('Error al registrar el usuario en la base de datos:', UsuarioGuardado.error);
             return { error: 'Error al registrar el usuario en la base de datos' };
@@ -95,114 +94,59 @@ async function guardarUsuarios(data, enviarCorreo = false) { // Añadir parámet
 
 //obtener usuarios de la base de datos
 async function obtenerUsuarios() {
-
     try {
-
-        connectDB()
-
-        const data = {usuarios:await Usuario.find({})}
-
-        // console.log('Resultado de la busqueda', data);
-
-        if (data.error) { // Asumiendo que tu API devuelve un campo 'error'
+        connectDB();
+        const data = { usuarios: await Usuario.find({}) };
+        if (data.error) {
             console.error('Error al encontrar el usuario ', user.error);
-            // Considera cómo quieres manejar los errores aquí.
-            // Podrías lanzar un error o devolver un objeto de error específico.
             throw new Error(user.error);
         }
-
         return data;
-
     } catch (error) {
         console.error('Error al encontrar el usuario:', error.message);
     }
 }
-
-<<<<<<< HEAD
-async function RegistrarUsuario(formData) {
-
-    "use server"
-
-    //se define la variable genero y se le asigna el valor del formulario
-    
-=======
 async function obtenerUsuariosHabilitados() {
-
-
     try {
-
-        connectDB()
-
-        const data = {usuarios:await Usuario.find({ habilitado: true })}
-
+        connectDB();
+        const data = { usuarios: await Usuario.find({ habilitado: true }) };
         if (data.error) {
             console.error('Error al encontrar el usuario ', data.error);
             throw new Error(data.error);
         }
-
         return data;
-
     } catch (error) {
         console.error('Error al encontrar el usuario:', error.message);
     }
 }
-
 async function ObtenerUsuarioPorId(id) {
-
     try {
-        
-        connectDB()
-
+        connectDB();
         console.log('id:', id);
-
         const response = await Usuario.findById(id);
-
-
-
-        if (!response) { 
+        if (!response) {
             console.log('Error al encontrar el usuario', result.error);
         }
-
         return response;
-
     } catch (error) {
         console.log('Error al encontrar el usuario:', error.message);
-        // Manejo de errores de red o errores del servidor que no devuelven JSON con 'error'
-        // Lanza el error para que el llamador pueda manejarlo o devuelve un objeto de error.
-        
     }
 }
-
 async function ObtenerUsuarioPorCorreo(email) {
-
     try {
-
-        connectDB()
-
+        connectDB();
         const user = await Usuario.findOne({ correo: email });
-
-
         console.log('Resultado de la API con Axios:', user);
-
-        if (user.error) { // Asumiendo que tu API devuelve un campo 'error'
+        if (user.error) {
             console.error('Error al encontrar el usuario con Axios:', user.error);
-            // Considera cómo quieres manejar los errores aquí.
-            // Podrías lanzar un error o devolver un objeto de error específico.
             throw new Error(user.error);
         }
-
         return user;
-
     } catch (error) {
         console.error('Error al encontrar el usuario:', error.message);
     }
-
 }
-
 async function RegistrarUsuario(formData) {
-
-
->>>>>>> sesiones
     const data = {
         // Obtener los datos del formulario
         tipoDocumento: formData.get('tipoDocumento'),
@@ -299,7 +243,6 @@ async function buscarUsuarios(formData) {
 
     console.log(`Incluir Deshabilitados: ${incluirDeshabilitados}`);
 
-
     // Aquí irá la lógica para construir la consulta a la base de datos
     // y obtener los usuarios según los filtros.
     // Ejemplo:
@@ -337,11 +280,10 @@ async function buscarUsuarios(formData) {
     return { data: usuariosEncontrados, message: "Búsqueda completada." };
 
     // Simulación de una respuesta (deberás reemplazar esto con tu lógica de base de datos)
-    return { data: [], message: "Búsqueda simulada completada. Implementar lógica de BD." };
+    return { data: [], message: "Búsqueda simulada completada." };
 }
 
 async function DeshabilitarUsuario(formData) {
-
 
     const id = formData.get('id');
 
@@ -367,7 +309,6 @@ async function DeshabilitarUsuario(formData) {
 }
 
 async function EditarUsuario(formData) {
-
 
     const id = formData.get('id');
 
@@ -396,22 +337,17 @@ async function EditarUsuario(formData) {
         console.error('Error al encontrar el usuario:', error.message);
     }
 
-
     
 }
 
-<<<<<<< HEAD
-export { RegistrarUsuario, IniciarSesion, BuscarUsuarioPorId, obtenerUsuarios, RegistroMasivoUsuario };
-=======
 export { 
-    RegistrarUsuario, 
+    RegistrarUsuario,
+    obtenerUsuarios, 
+    RegistroMasivoUsuario,
     ObtenerUsuarioPorId, 
     ObtenerUsuarioPorCorreo, 
-    RegistroMasivoUsuario, 
     buscarUsuarios, 
-    obtenerUsuarios, 
     DeshabilitarUsuario, 
     EditarUsuario,
     obtenerUsuariosHabilitados
 };
->>>>>>> sesiones
