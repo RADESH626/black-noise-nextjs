@@ -21,6 +21,8 @@ async function usuarios() {
         alert(data.error)
     }
 
+
+
     
 
     return (
@@ -33,6 +35,8 @@ async function usuarios() {
                     <h4 className='font-bold text-2xl text-black' >Buscar Usuarios</h4>
 
                     <FormBuscarUsuarios className="w-full" />
+
+
 
                 </SeccionHeader>
 
@@ -75,7 +79,8 @@ async function usuarios() {
                             <TdGeneral>{usuario.rol}</TdGeneral>
                             <TdGeneral>{new Date(usuario.createdAt).toLocaleDateString()}</TdGeneral>
                             <TdGeneral>{usuario.foto}</TdGeneral>
-                            <TdGeneral>{usuario.habilitado}</TdGeneral>
+
+                            <TdGeneral>{usuario.habilitado ? "habilitado" : "deshabilitado "}</TdGeneral>
 
                             <td className=" border border-gray-400 px-4 justify-center items-center h-full w-full gap-2">
 
