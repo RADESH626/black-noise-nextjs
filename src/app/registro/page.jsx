@@ -50,6 +50,10 @@ function registro() {
 
 export default registro
 
+<<<<<<< HEAD
 //TODO:corregir los colores de los forms
 
 //TODO: registrar el nombre de usuario
+=======
+//TODO: redirigir a la pagina de inicio al registrarse
+>>>>>>> sesiones

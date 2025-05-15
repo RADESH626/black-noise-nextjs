@@ -1,8 +1,11 @@
-import React from 'react'
-
-function InputTipoDocumentoIdentidad() {
+function InputTipoDocumentoIdentidad(props) {
     return (
-        <select required name="tipoDocumento" id="tipoDocumento" className='
+        <select 
+        
+        required 
+        name="tipoDocumento" 
+        id="tipoDocumento" 
+        className='
             w-full
             p-3
             bg-black
@@ -13,8 +16,11 @@ function InputTipoDocumentoIdentidad() {
             focus:outline-none
             focus:ring-1
             focus:ring-bn-accent-opaque
-            focus:border-bn-accent-opaque"
-        '>
+            focus:border-bn-accent-opaque
+        '
+        {...props}
+
+        >
             <option value="" disabled>selecione un tipo de documento</option>
             <option value="CC">CC</option>
             <option value="Tarjeta de Identidad">TI</option>

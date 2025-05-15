@@ -1,6 +1,6 @@
 function InputEmail(props) {
     return (
-        <input type="email" id="correo-login" name="correo"
+        <input type="email" id="correo" name="correo"
             className="
             w-full 
             p-3

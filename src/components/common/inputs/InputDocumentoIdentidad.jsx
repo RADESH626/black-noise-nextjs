@@ -1,7 +1,8 @@
 
-function inputDocumentoIdentidad(porps) {
+function InputDocumentoIdentidad(props) {
     return (
-        <input type="text" pattern="[0-9]{6,12}"
+        <input type="text" 
+        pattern="[0-9]{6,12}"
             className="w-full
             p-3
             bg-bn-input-bg
@@ -15,9 +16,9 @@ function inputDocumentoIdentidad(porps) {
             focus:border-bn-accent-opaque
             placeholder:text-bn-accent "
             placeholder="Número de documento"
-            {...porps}
+            {...props}
         />
     )
 }
 
-export default inputDocumentoIdentidad
+export default InputDocumentoIdentidad

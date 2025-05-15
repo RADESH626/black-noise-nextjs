@@ -1,10 +1,11 @@
-import React from 'react'
-
-function InputGenero() {
+function InputGenero(props) {
     return (
 
-        <select  name="genero" id="genero"
-            className="
+        <select  
+        name="genero" 
+        id="genero"
+            
+        className="
             w-full
             p-3
             bg-black
@@ -17,6 +18,7 @@ function InputGenero() {
             focus:ring-bn-accent-opaque
             focus:border-bn-accent-opaque"
             defaultValue=""
+            {...props}
         >
             <option value="" disabled>Seleccione una opción</option>
             <option value="MASCULINO">Masculino</option>

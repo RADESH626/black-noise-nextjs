@@ -1,31 +1,89 @@
+//este archivo funciona como un service de java
 
-import axios from 'axios'; // Importar Axios
+"use server"
+
 import Papa from 'papaparse'; // Importar PapaParse
+import bcrypt from "bcryptjs"; // Importa bcryptjs
+import nodemailer from 'nodemailer'; // Importar Nodemailer
+import connectDB from '@/utils/DBconection';
+import Usuario from '@/models/Usuario';
 
+// Función para enviar correos electrónicos
+async function enviarCorreoElectronico(to, subject, html) {
+    try {
+        // Configura el transportador de Nodemailer
+        // Reemplaza con tu configuración de SMTP y credenciales (idealmente desde variables de entorno)
+        const transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST || 'smtp.example.com', // Servidor SMTP de tu proveedor
+            port: parseInt(process.env.SMTP_PORT) || 587, // Puerto SMTP (587 para TLS, 465 para SSL)
+            secure: (parseInt(process.env.SMTP_PORT) || 587) === 465, // true para puerto 465, false para otros puertos
+            auth: {
+                user: process.env.EMAIL_USER, // Tu dirección de correo
+                pass: process.env.EMAIL_PASS, // Tu contraseña de correo o contraseña de aplicación
+            },
+        });
 
-const AxiosInstance = axios.create({
-    baseURL: 'http://localhost:3000/api',
-});
+        const mailOptions = {
+            from: `"Black Noise" <${process.env.EMAIL_USER}>`, // Dirección del remitente
+            to: to, // Lista de destinatarios
+            subject: subject, // Asunto del correo
+            html: html, // Cuerpo del correo en HTML
+        };
 
-async function guardarUsuarios(data) {
+        // Envía el correo
+        await transporter.sendMail(mailOptions);
+        console.log(`Correo enviado exitosamente a: ${to}`);
+        return { success: true, message: 'Correo enviado exitosamente' };
+    } catch (error) {
+        console.error('Error al enviar el correo:', error);
+        // Devuelve un objeto de error para que el llamador pueda manejarlo.
+        return { error: `Error al enviar el correo: ${error.message}` };
+    }
+}
+
+async function guardarUsuarios(data, enviarCorreo = false) { // Añadir parámetro enviarCorreo con valor por defecto
+
     try {
 
-        // peticion tipo post a la api de usuarios para guardar el usuario en la base de datos
-        const response = await AxiosInstance.post('/usuarios', data);
+        console.log('datos de usuario obtenidos:', data);
 
-        const result = response.data;
+        connectDB();
 
-        console.log('Resultado de la API con Axios:', result);
+        const NuevoUsuario = new Usuario(data);
 
-        if (result.error) { // Asumiendo que tu API devuelve un campo 'error'
-            console.error('Error al registrar el usuario con Axios:', result.error);
-            // Considera cómo quieres manejar los errores aquí.
-            // Podrías lanzar un error o devolver un objeto de error específico.
-            // Para Server Actions, devolver un objeto con una propiedad 'error' es común.
-            return { error: 'Error al registrar el usuario' };
+        console.log('usuario para guardar en la base de datos:', NuevoUsuario);
+
+        const UsuarioGuardado = await NuevoUsuario.save();
+
+        console.log('Usuario guardado en la base de datos:', UsuarioGuardado);
+
+
+        if (UsuarioGuardado.error) { // Asumiendo que tu API devuelve un campo 'error'
+            console.error('Error al registrar el usuario en la base de datos:', UsuarioGuardado.error);
+            return { error: 'Error al registrar el usuario en la base de datos' };
         }
+
         // Si no hay error, puedes devolver los datos o un mensaje de éxito
-        return { success: true, data: result };
+        if (enviarCorreo && UsuarioGuardado && !UsuarioGuardado.error && UsuarioGuardado.correo) {
+            const asunto = 'Bienvenido/a a Black Noise';
+            const contenidoHtml = `
+                <h1>¡Hola ${UsuarioGuardado.primerNombre}!</h1>
+                <p>Gracias por registrarte en Black Noise.</p>
+                <p>Tu cuenta ha sido creada exitosamente.</p>
+                <p>Usuario: ${UsuarioGuardado.correo}</p>
+                <p>¡Esperamos que disfrutes de nuestra plataforma!</p>
+                <br>
+                <p>Atentamente,</p>
+                <p>El equipo de Black Noise</p>
+            `;
+            // Llama a la función de envío de correo
+            const resultadoEnvioCorreo = await enviarCorreoElectronico(UsuarioGuardado.correo, asunto, contenidoHtml);
+            if (resultadoEnvioCorreo.error) {
+                console.error("Error al enviar correo de bienvenida:", resultadoEnvioCorreo.error);
+                // Podrías querer manejar este error de alguna manera, aunque el usuario ya fue guardado.
+            }
+        }
+        return { success: true, data: UsuarioGuardado };
 
     } catch (error) {
         console.error('Error en la petición Axios para registrar el usuario:', error.message);
@@ -37,52 +95,114 @@ async function guardarUsuarios(data) {
 
 //obtener usuarios de la base de datos
 async function obtenerUsuarios() {
-    "use server"
-    
+
     try {
 
-        const response = await AxiosInstance.get('/usuarios');
+        connectDB()
 
-        const result = response.data;
+        const data = {usuarios:await Usuario.find({})}
 
-        // console.log('Resultado de la API con Axios:', result);
+        // console.log('Resultado de la busqueda', data);
 
-        if (result.error) { // Asumiendo que tu API devuelve un campo 'error'
-
-            console.error('Error al obtener los usuarios con Axios:', result.error);
-
+        if (data.error) { // Asumiendo que tu API devuelve un campo 'error'
+            console.error('Error al encontrar el usuario ', user.error);
             // Considera cómo quieres manejar los errores aquí.
-
             // Podrías lanzar un error o devolver un objeto de error específico.
-
-            // Para Server Actions, devolver un objeto con una propiedad 'error' es común.
-
-            return { error: 'Error al obtener los usuarios' };
-
+            throw new Error(user.error);
         }
 
-        // Si no hay error, puedes devolver los datos o un mensaje de éxito
-        return { data: result.usuarios };
+        return data;
 
     } catch (error) {
-
-        console.error('Error en la petición Axios para obtener los usuarios:', error);
-
-        // Manejo de errores de red o errores del servidor que no devuelven JSON con 'error'
-
-        // Devuelve un objeto de error para que el llamador pueda manejarlo.
-
-        return { error: 'Error al conectar con la API para obtener los usuarios' };
-
+        console.error('Error al encontrar el usuario:', error.message);
     }
 }
 
+<<<<<<< HEAD
 async function RegistrarUsuario(formData) {
 
     "use server"
 
     //se define la variable genero y se le asigna el valor del formulario
     
+=======
+async function obtenerUsuariosHabilitados() {
+
+
+    try {
+
+        connectDB()
+
+        const data = {usuarios:await Usuario.find({ habilitado: true })}
+
+        if (data.error) {
+            console.error('Error al encontrar el usuario ', data.error);
+            throw new Error(data.error);
+        }
+
+        return data;
+
+    } catch (error) {
+        console.error('Error al encontrar el usuario:', error.message);
+    }
+}
+
+async function ObtenerUsuarioPorId(id) {
+
+    try {
+        
+        connectDB()
+
+        console.log('id:', id);
+
+        const response = await Usuario.findById(id);
+
+
+
+        if (!response) { 
+            console.log('Error al encontrar el usuario', result.error);
+        }
+
+        return response;
+
+    } catch (error) {
+        console.log('Error al encontrar el usuario:', error.message);
+        // Manejo de errores de red o errores del servidor que no devuelven JSON con 'error'
+        // Lanza el error para que el llamador pueda manejarlo o devuelve un objeto de error.
+        
+    }
+}
+
+async function ObtenerUsuarioPorCorreo(email) {
+
+    try {
+
+        connectDB()
+
+        const user = await Usuario.findOne({ correo: email });
+
+
+        console.log('Resultado de la API con Axios:', user);
+
+        if (user.error) { // Asumiendo que tu API devuelve un campo 'error'
+            console.error('Error al encontrar el usuario con Axios:', user.error);
+            // Considera cómo quieres manejar los errores aquí.
+            // Podrías lanzar un error o devolver un objeto de error específico.
+            throw new Error(user.error);
+        }
+
+        return user;
+
+    } catch (error) {
+        console.error('Error al encontrar el usuario:', error.message);
+    }
+
+}
+
+async function RegistrarUsuario(formData) {
+
+
+>>>>>>> sesiones
     const data = {
         // Obtener los datos del formulario
         tipoDocumento: formData.get('tipoDocumento'),
@@ -90,6 +210,7 @@ async function RegistrarUsuario(formData) {
         primerNombre: formData.get('primerNombre'),
         nombreUsuario: formData.get('primerNombre'), // Asignar primerNombre a nombreUsuario
         segundoNombre: formData.get('segundoNombre'),
+        nombreUsuario: formData.get('primerNombre'),
         primerApellido: formData.get('primerApellido'),
         segundoApellido: formData.get('segundoApellido'),
         fechaNacimiento: formData.get('fechaNacimiento'),
@@ -102,11 +223,20 @@ async function RegistrarUsuario(formData) {
 
     console.log('data:', data);
 
-    guardarUsuarios(data);
+    //hasheamos la contraseña
+
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
+    data.password = hashedPassword;
+
+    console.log('contraseña hassheada:', hashedPassword);
+
+    // Guardar el usuario en la base de datos(con la contraseña hasheada)
+
+    guardarUsuarios(data, true); // Enviar correo al registrar un solo usuario
 }
 
 async function RegistroMasivoUsuario(formData) {
-    "use server"
 
     const file = formData.get('file');
 
@@ -132,11 +262,11 @@ async function RegistroMasivoUsuario(formData) {
         } else {
             const usuarios = resultadoParseo.data;
 
-            console.log("usuarios:",usuarios);
-            
+            console.log("usuarios:", usuarios);
+
             usuarios.forEach(async (usuario) => {
                 // Aquí puedes llamar a la función para guardar cada usuario
-                const resultado = await guardarUsuarios(usuario);
+                const resultado = await guardarUsuarios(usuario, false); // No enviar correo en registro masivo
                 console.log('Resultado de la API con Axios:', resultado);
             });
         }
@@ -146,48 +276,142 @@ async function RegistroMasivoUsuario(formData) {
 
 }
 
-async function BuscarUsuarioPorId(formData){
+async function buscarUsuarios(formData) {
+
+    const textoBusqueda = formData.get('textoBusqueda');
+    const rol = formData.get('rol');
+    const genero = formData.get('generoFiltro');
+    const tipoDocumento = formData.get('tipoDocumentoFiltro');
+    const edad = formData.get('edadFiltro');
+    const incluirDeshabilitados = formData.get('incluirDeshabilitados') === 'on'; // Checkbox value is 'on' when checked
+
+    console.log("Buscando usuarios con los siguientes filtros:");
+
+    if (textoBusqueda) console.log(`Texto Busqueda: ${textoBusqueda}`);
+
+    if (rol) console.log(`Rol: ${rol}`);
+
+    if (genero) console.log(`Genero: ${genero}`);
+
+    if (tipoDocumento) console.log(`Tipo Documento: ${tipoDocumento}`);
+
+    if (edad) console.log(`Edad: ${edad}`);
+
+    console.log(`Incluir Deshabilitados: ${incluirDeshabilitados}`);
+
+
+    // Aquí irá la lógica para construir la consulta a la base de datos
+    // y obtener los usuarios según los filtros.
+    // Ejemplo:
+
+    await connectDB();
+
+    const query = {};
+
+    if (textoBusqueda) {
+
+        query.$or = [
+            { primerNombre: { $regex: textoBusqueda, $options: 'i' } },
+            { primerApellido: { $regex: textoBusqueda, $options: 'i' } },
+            { correo: { $regex: textoBusqueda, $options: 'i' } },
+        ];
+
+    }
+
+    if (rol) query.rol = rol;
+
+    if (genero) query.genero = genero;
+
+    if (tipoDocumento) query.tipoDocumento = tipoDocumento;
+
+    if (edad) { /* Lógica para filtrar por edad, puede requerir conversión a número y rangos */ }
+
+    if (!incluirDeshabilitados) query.habilitado = 'true'; // Asumiendo que tienes un campo 'estado'
+
+    console.log("Consulta a la base de datos:", query);
+
+    const usuariosEncontrados = await Usuario.find(query);
+
+    console.log("Usuarios encontrados:", usuariosEncontrados);
+
+    return { data: usuariosEncontrados, message: "Búsqueda completada." };
+
+    // Simulación de una respuesta (deberás reemplazar esto con tu lógica de base de datos)
+    return { data: [], message: "Búsqueda simulada completada. Implementar lógica de BD." };
+}
+
+async function DeshabilitarUsuario(formData) {
+
+
+    const id = formData.get('id');
+
+    console.log('id:', id);
 
     try {
 
-        console.log('id:', id);
+        connectDB()
 
-        const response = await AxiosInstance.get(`/usuarios/${id}`);
+        const usuario = await Usuario.findByIdAndUpdate(id, { habilitado: false });
 
-        const result = response.data;
+        console.log('Resultado del cambio:', usuario);
 
-        console.log('Resultado de la API con Axios:', result);
-
-        if (result.error) { // Asumiendo que tu API devuelve un campo 'error'
-            console.error('Error al encontrar el usuario con Axios:', result.error);
-            // Considera cómo quieres manejar los errores aquí.
-            // Podrías lanzar un error o devolver un objeto de error específico.
-            throw new Error(result.error);
+        if (usuario) { // Asumiendo que tu API devuelve un campo 'error'
+            return { error: 'Error al encontrar el usuario' };
         }
 
-        return result;
+        return null;
 
     } catch (error) {
-        console.error('Error en la petición Axios para encontrar el usuario:', error.message);
-        // Manejo de errores de red o errores del servidor que no devuelven JSON con 'error'
-        // Lanza el error para que el llamador pueda manejarlo o devuelve un objeto de error.
-        throw new Error('Error al conectar con la API para encontrar el usuario');
+        console.error('Error al encontrar el usuario:', error.message);
     }
 }
 
-async function IniciarSesion(formData) {
-    "use server"
+async function EditarUsuario(formData) {
 
-    console.log('formData:', formData);
 
-    //guardar los datos en un objeto para enviarlos a la api
-    const data = {
-        email: formData.get('email'),
-        password: formData.get('password')
-    };
+    const id = formData.get('id');
 
-    console.log('data:', data);
+    //
 
+    console.log('id:', id);
+
+    try {
+
+        connectDB()
+
+        const usuario = await Usuario.findByIdAndUpdate(id, { habilitado: false });
+
+        console.log('Resultado del cambio:', usuario);
+
+        if (usuario.error) { // Asumiendo que tu API devuelve un campo 'error'
+            console.error('Error al encontrar el usuario con Axios:', usuario.error);
+            // Considera cómo quieres manejar los errores aquí.
+            // Podrías lanzar un error o devolver un objeto de error específico.
+            throw new Error(usuario.error);
+        }
+
+        return usuario;
+
+    } catch (error) {
+        console.error('Error al encontrar el usuario:', error.message);
+    }
+
+
+    
 }
 
+<<<<<<< HEAD
 export { RegistrarUsuario, IniciarSesion, BuscarUsuarioPorId, obtenerUsuarios, RegistroMasivoUsuario };
+=======
+export { 
+    RegistrarUsuario, 
+    ObtenerUsuarioPorId, 
+    ObtenerUsuarioPorCorreo, 
+    RegistroMasivoUsuario, 
+    buscarUsuarios, 
+    obtenerUsuarios, 
+    DeshabilitarUsuario, 
+    EditarUsuario,
+    obtenerUsuariosHabilitados
+};
+>>>>>>> sesiones

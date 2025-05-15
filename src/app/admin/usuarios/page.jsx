@@ -8,21 +8,22 @@ import SeccionAcciones from '@/components/layout/admin/secciones/acciones/Seccio
 import SeccionFooter from '@/components/layout/admin/secciones/acciones/SeccionFooter'
 import SeccionHeader from '@/components/layout/admin/secciones/acciones/SeccionHeader'
 import SeccionLista from '@/components/layout/admin/secciones/lista/SeccionLista'
-import FormEditarUsuario from '@/components/layout/admin/usuarios/forms/FormEditarUsuario'
-import { obtenerUsuarios } from '@/app/acciones/UsuariosActions'
+import { obtenerUsuariosHabilitados } from '@/app/acciones/UsuariosActions'
+import FormDeshabilitarusuarios from '@/components/layout/admin/usuarios/forms/FormDeshabilitarusuarios'
+
+
 
 
 async function usuarios() {
 
-    const data = await obtenerUsuarios();
+    const data = await obtenerUsuariosHabilitados();
 
     if (data.error) {
         alert(data.error)
     }
 
-    const usuarios = data || [];
-
     return (
+
         <AdminPage>
 
             <SeccionAcciones>
@@ -53,12 +54,18 @@ async function usuarios() {
 
             </SeccionAcciones>
 
+
+
+
+
             <SeccionLista>
 
                 <THUsuarios />
 
                 <tbody className='bg-gray-300 overflow-auto max-w-[400px] '>
-                    {usuarios.data.map((usuario) => (
+                    {data.usuarios.map((usuario) => (
+
+
                         <tr key={usuario._id}>
                             <TdGeneral>{usuario.nombreUsuario}</TdGeneral>
                             <TdGeneral>{usuario.primerNombre}</TdGeneral>
@@ -74,18 +81,27 @@ async function usuarios() {
                             <TdGeneral>{usuario.rol}</TdGeneral>
                             <TdGeneral>{new Date(usuario.createdAt).toLocaleDateString()}</TdGeneral>
                             <TdGeneral>{usuario.foto}</TdGeneral>
-                            <TdGeneral>{usuario.habilitado}</TdGeneral>
+                            <TdGeneral>{usuario.habilitado ? "habilitado" : "deshabilitado "}</TdGeneral>
 
                             <td className=" border border-gray-400 px-4 justify-center items-center h-full w-full gap-2">
-                                <FormEditarUsuario id={usuario._id} />
+
+
+
+                                <form action={`/admin/usuarios/editar/${usuario._id.toString()}`} >
+
+                                    <input type="hidden" name="id" value={usuario._id.toString()} />
+                                    <BotonEditar className="flex flex-row justify-center items-center " />
+
+                                </form>
+
+
+                                <FormDeshabilitarusuarios UserId={usuario._id.toString()} />
 
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </SeccionLista>
-
-
         </AdminPage>
 
     )
