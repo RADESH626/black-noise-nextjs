@@ -19,11 +19,12 @@ export default withAuth(
     }
 
 
-
     // Si la ruta es /admin/* y el usuario no tiene el rol 'ADMINISTRADOR', se redirige al index.
-    if (req.nextUrl.pathname.startsWith("/admin") && req.nextauth.token?.rol !== "ADMINISTRADOR") {
+    if (req.nextauth.token?.rol !== "ADMINISTRADOR") {
+
       console.log("error ")
-        return NextResponse.redirect(new URL("/", req.url));
+
+      return NextResponse.redirect(new URL("/", req.url));
 
     }
 

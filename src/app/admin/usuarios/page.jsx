@@ -12,6 +12,7 @@ import FormEditarUsuario from '@/components/layout/admin/usuarios/forms/FormEdit
 import { obtenerUsuarios } from '@/app/acciones/UsuariosActions'
 
 
+
 async function usuarios() {
 
     const data = await obtenerUsuarios();
@@ -20,7 +21,7 @@ async function usuarios() {
         alert(data.error)
     }
 
-    const usuarios = data || [];
+    
 
     return (
         <AdminPage>
@@ -58,7 +59,7 @@ async function usuarios() {
                 <THUsuarios />
 
                 <tbody className='bg-gray-300 overflow-auto max-w-[400px] '>
-                    {usuarios.data.map((usuario) => (
+                    {data.usuarios.map((usuario) => (
                         <tr key={usuario._id}>
                             <TdGeneral>{usuario.nombreUsuario}</TdGeneral>
                             <TdGeneral>{usuario.primerNombre}</TdGeneral>
@@ -77,6 +78,7 @@ async function usuarios() {
                             <TdGeneral>{usuario.habilitado}</TdGeneral>
 
                             <td className=" border border-gray-400 px-4 justify-center items-center h-full w-full gap-2">
+
                                 <FormEditarUsuario id={usuario._id} />
 
                             </td>

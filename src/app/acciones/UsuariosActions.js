@@ -93,43 +93,28 @@ async function guardarUsuarios(data, enviarCorreo = false) { // Añadir parámet
 
 //obtener usuarios de la base de datos
 async function obtenerUsuarios() {
+
     "use server"
 
     try {
 
-        const response = await AxiosInstance.get('/usuarios');
+        connectDB()
 
-        const result = response.data;
+        const data = {usuarios:await Usuario.find({})}
 
-        // console.log('Resultado de la API con Axios:', result);
+        // console.log('Resultado de la busqueda', data);
 
-        if (result.error) { // Asumiendo que tu API devuelve un campo 'error'
-
-            console.error('Error al obtener los usuarios con Axios:', result.error);
-
+        if (data.error) { // Asumiendo que tu API devuelve un campo 'error'
+            console.error('Error al encontrar el usuario ', user.error);
             // Considera cómo quieres manejar los errores aquí.
-
             // Podrías lanzar un error o devolver un objeto de error específico.
-
-            // Para Server Actions, devolver un objeto con una propiedad 'error' es común.
-
-            return { error: 'Error al obtener los usuarios' };
-
+            throw new Error(user.error);
         }
 
-        // Si no hay error, puedes devolver los datos o un mensaje de éxito
-        return { data: result.usuarios };
+        return data;
 
     } catch (error) {
-
-        console.error('Error en la petición Axios para obtener los usuarios:', error);
-
-        // Manejo de errores de red o errores del servidor que no devuelven JSON con 'error'
-
-        // Devuelve un objeto de error para que el llamador pueda manejarlo.
-
-        return { error: 'Error al conectar con la API para obtener los usuarios' };
-
+        console.error('Error al encontrar el usuario:', error.message);
     }
 }
 
@@ -143,6 +128,7 @@ async function RegistrarUsuario(formData) {
         numeroDocumento: formData.get('numeroDocumento'),
         primerNombre: formData.get('primerNombre'),
         segundoNombre: formData.get('segundoNombre'),
+        nombreUsuario: formData.get('primerNombre'),
         primerApellido: formData.get('primerApellido'),
         segundoApellido: formData.get('segundoApellido'),
         fechaNacimiento: formData.get('fechaNacimiento'),
@@ -263,4 +249,70 @@ async function ObtenerUsuarioPorCorreo(email) {
     }
 
 }
-export { RegistrarUsuario, ObtenerUsuarioPorId, ObtenerUsuarioPorCorreo, RegistroMasivoUsuario };
+
+async function buscarUsuarios(formData) {
+    "use server"
+
+    const textoBusqueda = formData.get('textoBusqueda');
+    const rol = formData.get('rol');
+    const genero = formData.get('generoFiltro');
+    const tipoDocumento = formData.get('tipoDocumentoFiltro');
+    const edad = formData.get('edadFiltro');
+    const incluirDeshabilitados = formData.get('incluirDeshabilitados') === 'on'; // Checkbox value is 'on' when checked
+
+    console.log("Buscando usuarios con los siguientes filtros:");
+
+    if (textoBusqueda) console.log(`Texto Busqueda: ${textoBusqueda}`);
+
+    if (rol) console.log(`Rol: ${rol}`);
+
+    if (genero) console.log(`Genero: ${genero}`);
+
+    if (tipoDocumento) console.log(`Tipo Documento: ${tipoDocumento}`);
+
+    if (edad) console.log(`Edad: ${edad}`);
+
+    console.log(`Incluir Deshabilitados: ${incluirDeshabilitados}`);
+
+
+    // Aquí irá la lógica para construir la consulta a la base de datos
+    // y obtener los usuarios según los filtros.
+    // Ejemplo:
+
+    await connectDB();
+
+    const query = {};
+
+    if (textoBusqueda) {
+
+        query.$or = [
+            { primerNombre: { $regex: textoBusqueda, $options: 'i' } },
+            { primerApellido: { $regex: textoBusqueda, $options: 'i' } },
+            { correo: { $regex: textoBusqueda, $options: 'i' } },
+        ];
+
+    }
+
+    if (rol) query.rol = rol;
+
+    if (genero) query.genero = genero;
+
+    if (tipoDocumento) query.tipoDocumento = tipoDocumento;
+
+    if (edad) { /* Lógica para filtrar por edad, puede requerir conversión a número y rangos */ }
+
+    if (!incluirDeshabilitados) query.habilitado = 'true'; // Asumiendo que tienes un campo 'estado'
+
+    console.log("Consulta a la base de datos:", query);
+
+    const usuariosEncontrados = await Usuario.find(query);
+
+    console.log("Usuarios encontrados:", usuariosEncontrados);
+
+    return { data: usuariosEncontrados, message: "Búsqueda completada." };
+
+    // Simulación de una respuesta (deberás reemplazar esto con tu lógica de base de datos)
+    return { data: [], message: "Búsqueda simulada completada. Implementar lógica de BD." };
+}
+
+export { RegistrarUsuario, ObtenerUsuarioPorId, ObtenerUsuarioPorCorreo, RegistroMasivoUsuario, buscarUsuarios, obtenerUsuarios };

@@ -52,6 +52,7 @@ export const authOptions = {
 
                 // Verificamos la contraseña del usuario que existe 
                 const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
+
                 if (isPasswordValid) {
                     // Si la contraseña es correcta, devolvemos el objeto 'user'.
                     return user;
@@ -96,7 +97,7 @@ export const authOptions = {
                 
                 // Añadimos propiedades del objeto 'user' al 'token' JWT.
                 token.id = user.id;   // Añade el ID del usuario al token.
-                token.role = user.rol; // Añade el rol del usuario al token.
+                token.rol = user.rol; // Añade el rol del usuario al token.
                 token.name = user.primerNombre; // Añade el nombre del usuario al token.
                 token.email = user.correo; // Añade el correo del usuario al token.
                 // Puedes añadir más propiedades si lo necesitas.

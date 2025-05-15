@@ -49,3 +49,5 @@ function registro() {
 }
 
 export default registro
+
+//TODO: redirigir a la pagina de inicio al registrarse
