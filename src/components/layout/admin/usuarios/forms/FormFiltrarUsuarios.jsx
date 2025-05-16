@@ -12,8 +12,10 @@ import {
 import TdGeneral from '@/components/common/tablas/TdGeneral';
 import THUsuarios from '@/components/layout/admin/usuarios/THUsuarios';
 import FormDeshabilitarusuarios from '@/components/layout/admin/usuarios/forms/FormDeshabilitarusuarios';
+import FormHabilitarUsuario from '@/components/layout/admin/usuarios/forms/FormHabilitarUsuario'; // Importar el nuevo componente
 import Link from 'next/link';
 import { BotonEditar } from '@/components/common/botones';
+import BotonExportarPDF from '@/components/common/botones/BotonExportarPDF'; // Added import
 import SeccionLista from '@/components/layout/admin/secciones/lista/SeccionLista';
 import { FiltrarUsuarios, obtenerUsuariosHabilitados, ObtenerTodosLosUsuarios } from '@/app/acciones/UsuariosActions';
 
@@ -159,6 +161,7 @@ function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
                         >
                             Limpiar Filtros
                         </button>
+                        <BotonExportarPDF usuarios={usersToDisplay} /> {/* Added PDF export button */}
                     </footer>
                 </section>
             </form>
@@ -177,6 +180,7 @@ function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
                                 <TdGeneral>{usuario.nombreUsuario}</TdGeneral>
                                 <TdGeneral>{usuario.primerNombre}</TdGeneral>
                                 <TdGeneral>{usuario.primerApellido}</TdGeneral>
+                                <TdGeneral>{usuario.segundoApellido}</TdGeneral>
                                 <TdGeneral>{usuario.tipoDocumento}</TdGeneral>
                                 <TdGeneral>{usuario.numeroDocumento}</TdGeneral>
                                 <TdGeneral>{usuario.genero}</TdGeneral>
@@ -192,7 +196,12 @@ function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
                                     <Link href={`/admin/usuarios/editar/${usuario._id.toString()}`} passHref>
                                         <BotonEditar className="w-full md:w-auto text-sm">Editar</BotonEditar>
                                     </Link>
-                                    <FormDeshabilitarusuarios UserId={usuario._id.toString()} />
+                                    {/* Renderizar condicionalmente el botón de habilitar/deshabilitar */}
+                                    {usuario.habilitado ? (
+                                        <FormDeshabilitarusuarios UserId={usuario._id.toString()} />
+                                    ) : (
+                                        <FormHabilitarUsuario UserId={usuario._id.toString()} />
+                                    )}
                                 </td>
                             </tr>
                         ))

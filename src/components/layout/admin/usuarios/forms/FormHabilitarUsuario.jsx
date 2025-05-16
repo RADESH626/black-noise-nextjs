@@ -1,12 +1,10 @@
-"use client"; // Make it a client component
+"use client";
 
 import { useState } from 'react';
-import { DeshabilitarUsuario } from "@/app/acciones/UsuariosActions";
+import { HabilitarUsuario } from "@/app/acciones/UsuariosActions";
 
-function FormDeshabilitarusuarios({ UserId }) {
-
+function FormHabilitarUsuario({ UserId }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
-    
     const [message, setMessage] = useState(null);
 
     const handleSubmit = async (event) => {
@@ -15,21 +13,16 @@ function FormDeshabilitarusuarios({ UserId }) {
         setMessage(null);
 
         const formData = new FormData(event.currentTarget);
-
-        const result = await DeshabilitarUsuario(formData);
+        const result = await HabilitarUsuario(formData);
 
         if (result?.error) {
             setMessage({ type: 'error', text: result.error });
         } else if (result?.success) {
             setMessage({ type: 'success', text: result.message });
-            // No need to manually refresh here if revalidatePath is working as expected
-            // The page should re-fetch data and update.
         } else {
             setMessage({ type: 'error', text: 'Ocurrió un error inesperado.' });
         }
-
         setIsSubmitting(false);
-
     };
 
     return (
@@ -37,10 +30,10 @@ function FormDeshabilitarusuarios({ UserId }) {
             <input type="hidden" name="id" value={UserId} />
             <button 
                 type="submit" 
-                className="px-3 py-1 bg-red-500 text-white text-xs font-semibold rounded-md shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 disabled:opacity-50"
+                className="px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-md shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75 disabled:opacity-50"
                 disabled={isSubmitting}
             > 
-                {isSubmitting ? 'Deshabilitando...' : 'Deshabilitar'}
+                {isSubmitting ? 'Habilitando...' : 'Habilitar'}
             </button>
             {message && (
                 <p className={`mt-2 text-xs ${message.type === 'error' ? 'text-red-600' : 'text-green-600'}`}>
@@ -51,4 +44,4 @@ function FormDeshabilitarusuarios({ UserId }) {
     );
 }
 
-export default FormDeshabilitarusuarios;
+export default FormHabilitarUsuario;

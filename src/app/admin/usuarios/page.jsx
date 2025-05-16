@@ -10,15 +10,21 @@ import { obtenerUsuariosHabilitados } from '@/app/acciones/UsuariosActions'; // 
 
 async function UsuariosAdminPage() {
     // Carga inicial de usuarios cuando la página se renderiza por primera vez en el servidor
-    const initialDataResult = await obtenerUsuariosHabilitados();
+    const initialUsersArray = await obtenerUsuariosHabilitados();
 
-    // console.log("Resultado de la carga inicial de usuarios:", initialDataResult);
+    // console.log("Resultado de la carga inicial de usuarios:", initialUsersArray);
     let serverLoadedUsers = [];
 
-    if (initialDataResult && !initialDataResult.error && initialDataResult.usuarios) {
-        serverLoadedUsers = initialDataResult.usuarios.map(user => JSON.parse(JSON.stringify(user)));
-    } else if (initialDataResult?.error) {
-        console.error("Error al cargar usuarios iniciales en page.jsx:", initialDataResult.error);
+    // initialUsersArray is expected to be an array of users directly
+    // or undefined/null if an error occurred within obtenerUsuariosHabilitados
+    if (initialUsersArray && Array.isArray(initialUsersArray)) {
+        serverLoadedUsers = initialUsersArray.map(user => JSON.parse(JSON.stringify(user)));
+    } else {
+        // This covers cases where initialUsersArray is undefined, null, or not an array.
+        // Errors during the fetch in obtenerUsuariosHabilitados are logged there.
+        // We log here if the expected array wasn't received.
+        console.error("Error al cargar usuarios iniciales en page.jsx: No se recibió un array de usuarios o está vacío.");
+        // serverLoadedUsers remains []
     }
 
     return (
@@ -38,7 +44,7 @@ async function UsuariosAdminPage() {
             {/*
               FormFiltrarUsuarios ahora será responsable de:
               1. Mostrar los inputs de filtro.
-              2. Tener un botón "Buscar".
+              2. Tener un b otón "Buscar".
               3. Al buscar, llamar a la server action buscarUsuarios.
               4. Mantener su propio estado para la lista de usuarios a mostrar.
               5. Renderizar la lista de usuarios.

@@ -3,6 +3,7 @@
 "use server"
 
 import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 import Papa from 'papaparse'; // Importar PapaParse
 import bcrypt from "bcryptjs"; // Importa bcryptjs
 import nodemailer from 'nodemailer'; // Importar Nodemailer
@@ -327,24 +328,69 @@ async function DeshabilitarUsuario(formData) {
 
     const id = formData.get('id');
 
-    console.log('id:', id);
+    console.log('Intentando deshabilitar usuario con id:', id);
+
+    if (!id) {
+        console.error('Error: ID de usuario no proporcionado para deshabilitar.');
+
+        return { error: 'ID de usuario no proporcionado.' };
+    }
 
     try {
 
-        connectDB()
+        await connectDB();
+        
+        const usuarioActualizado = await Usuario.findByIdAndUpdate(
+            id,
+            { habilitado: false },
+            { new: true } // Devuelve el documento modificado
+        );
 
-        const usuario = await Usuario.findByIdAndUpdate(id, { habilitado: false });
-
-        console.log('Resultado del cambio:', usuario);
-
-        if (usuario) { // Asumiendo que tu API devuelve un campo 'error'
-            return { error: 'Error al encontrar el usuario' };
+        if (!usuarioActualizado) {
+            console.error(`Error: No se encontró ningún usuario con el ID ${id} para deshabilitar.`);
+            return { error: `No se encontró ningún usuario con el ID ${id}.` };
         }
 
-        return null;
+        console.log('Usuario deshabilitado exitosamente:', usuarioActualizado);
+        revalidatePath('/admin/usuarios'); // Revalida la página de usuarios para reflejar el cambio
+        return { success: true, message: 'Usuario deshabilitado exitosamente.', data: JSON.parse(JSON.stringify(usuarioActualizado)) };
 
     } catch (error) {
-        console.error('Error al encontrar el usuario:', error.message);
+        console.error(`Error al deshabilitar el usuario con ID ${id}:`, error.message);
+        // Considera si quieres devolver un mensaje de error más genérico al cliente
+        return { error: `Error al procesar la solicitud: ${error.message}` };
+    }
+}
+
+async function HabilitarUsuario(formData) {
+    const id = formData.get('id');
+    console.log('Intentando habilitar usuario con id:', id);
+
+    if (!id) {
+        console.error('Error: ID de usuario no proporcionado para habilitar.');
+        return { error: 'ID de usuario no proporcionado.' };
+    }
+
+    try {
+        await connectDB();
+        const usuarioActualizado = await Usuario.findByIdAndUpdate(
+            id,
+            { habilitado: true }, // Set habilitado to true
+            { new: true } // Devuelve el documento modificado
+        );
+
+        if (!usuarioActualizado) {
+            console.error(`Error: No se encontró ningún usuario con el ID ${id} para habilitar.`);
+            return { error: `No se encontró ningún usuario con el ID ${id}.` };
+        }
+
+        console.log('Usuario habilitado exitosamente:', usuarioActualizado);
+        revalidatePath('/admin/usuarios'); // Revalida la página de usuarios para reflejar el cambio
+        return { success: true, message: 'Usuario habilitado exitosamente.', data: JSON.parse(JSON.stringify(usuarioActualizado)) };
+
+    } catch (error) {
+        console.error(`Error al habilitar el usuario con ID ${id}:`, error.message);
+        return { error: `Error al procesar la solicitud: ${error.message}` };
     }
 }
 
@@ -435,6 +481,7 @@ export {
     ObtenerUsuarioPorCorreo,
     FiltrarUsuarios,
     DeshabilitarUsuario,
+    HabilitarUsuario, // Add the new action
     EditarUsuario,
     obtenerUsuariosHabilitados,
     ObtenerTodosLosUsuarios
