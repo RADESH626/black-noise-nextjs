@@ -2,8 +2,8 @@ function InputGenero(props) {
     return (
 
         <select  
-        name="genero" 
-        id="genero"
+        name={props.name || "genero"} 
+        id={props.id || "genero"}
             
         className="
             w-full
@@ -17,10 +17,9 @@ function InputGenero(props) {
             focus:ring-1
             focus:ring-bn-accent-opaque
             focus:border-bn-accent-opaque"
-            defaultValue=""
             {...props}
         >
-            <option value="" disabled>Seleccione una opción</option>
+            <option value="">Seleccione una opción</option>
             <option value="MASCULINO">Masculino</option>
             <option value="FEMENINO">Femenino</option>
             <option value="OTRO">Otro</option>

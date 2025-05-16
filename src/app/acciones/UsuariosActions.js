@@ -2,6 +2,7 @@
 
 "use server"
 
+import { redirect } from 'next/navigation';
 import Papa from 'papaparse'; // Importar PapaParse
 import bcrypt from "bcryptjs"; // Importa bcryptjs
 import nodemailer from 'nodemailer'; // Importar Nodemailer
@@ -85,7 +86,7 @@ async function guardarUsuarios(data, enviarCorreo = false) { // Añadir parámet
         return { success: true, data: UsuarioGuardado };
 
     } catch (error) {
-        console.error('Error en la petición Axios para registrar el usuario:', error.message);
+        console.error('Error en la función guardarUsuarios:', error.message);
         // Manejo de errores de red o errores del servidor que no devuelven JSON con 'error'
         // Devuelve un objeto de error para que el llamador pueda manejarlo.
         return { error: 'Error al conectar con la API para registrar el usuario' };
@@ -109,12 +110,15 @@ async function obtenerUsuarios() {
 async function obtenerUsuariosHabilitados() {
     try {
         connectDB();
-        const data = { usuarios: await Usuario.find({ habilitado: true }) };
+        const data = { usuarios: await Usuario.find({ habilitado: true }).lean() };
+
         if (data.error) {
             console.error('Error al encontrar el usuario ', data.error);
             throw new Error(data.error);
         }
-        return data;
+        // console.log("Datos retornados por ObtenerTodosLosUsuarios:", data.usuarios); // Log para depuración
+        return data.usuarios;
+
     } catch (error) {
         console.error('Error al encontrar el usuario:', error.message);
     }
@@ -154,7 +158,6 @@ async function RegistrarUsuario(formData) {
         primerNombre: formData.get('primerNombre'),
         nombreUsuario: formData.get('primerNombre'), // Asignar primerNombre a nombreUsuario
         segundoNombre: formData.get('segundoNombre'),
-        nombreUsuario: formData.get('primerNombre'),
         primerApellido: formData.get('primerApellido'),
         segundoApellido: formData.get('segundoApellido'),
         fechaNacimiento: formData.get('fechaNacimiento'),
@@ -178,9 +181,11 @@ async function RegistrarUsuario(formData) {
     // Guardar el usuario en la base de datos(con la contraseña hasheada)
 
     guardarUsuarios(data, true); // Enviar correo al registrar un solo usuario
+
+    redirect('/login');
 }
 
-async function RegistroMasivoUsuario(formData) {
+async function RegistroMasivoUsuario(formData, userId) {
 
     const file = formData.get('file');
 
@@ -213,6 +218,17 @@ async function RegistroMasivoUsuario(formData) {
                 const resultado = await guardarUsuarios(usuario, false); // No enviar correo en registro masivo
                 console.log('Resultado de la API con Axios:', resultado);
             });
+
+            // Obtener el usuario que realizó la carga masiva
+            connectDB();
+            const user = await Usuario.findById(userId);
+
+            // Verificar si el usuario es un administrador
+            if (user && user.rol === 'admin') {
+                redirect('/admin/usuarios');
+            } else {
+                redirect('/login');
+            }
         }
     } catch (error) {
         console.error("Error general al usar PapaParse:", error);
@@ -220,7 +236,7 @@ async function RegistroMasivoUsuario(formData) {
 
 }
 
-async function buscarUsuarios(formData) {
+async function FiltrarUsuarios(formData) {
 
     const textoBusqueda = formData.get('textoBusqueda');
     const rol = formData.get('rol');
@@ -271,11 +287,35 @@ async function buscarUsuarios(formData) {
 
     if (!incluirDeshabilitados) query.habilitado = 'true'; // Asumiendo que tienes un campo 'estado'
 
-    console.log("Consulta a la base de datos:", query);
+    const usuariosEncontradosRaw = await Usuario.find(query).lean(); // Use .lean() here too
 
-    const usuariosEncontrados = await Usuario.find(query);
+    // Manually convert to plain objects with string IDs and dates
+    const usuariosEncontrados = usuariosEncontradosRaw.map(user => {
+        const plainUser = { ...user };
+        if (plainUser._id) {
+            plainUser._id = plainUser._id.toString();
+        }
+        if (plainUser.fechaNacimiento && typeof plainUser.fechaNacimiento !== 'string') {
+             if (plainUser.fechaNacimiento instanceof Date) {
+                plainUser.fechaNacimiento = plainUser.fechaNacimiento.toISOString().split('T')[0];
+             } else {
+                try {
+                    plainUser.fechaNacimiento = new Date(plainUser.fechaNacimiento).toISOString().split('T')[0];
+                } catch (e) {
+                    plainUser.fechaNacimiento = null; 
+                }
+             }
+        }
+        if (plainUser.createdAt instanceof Date) {
+            plainUser.createdAt = plainUser.createdAt.toISOString();
+        }
+        if (plainUser.updatedAt instanceof Date) {
+            plainUser.updatedAt = plainUser.updatedAt.toISOString();
+        }
+        return plainUser;
+    });
 
-    console.log("Usuarios encontrados:", usuariosEncontrados);
+    console.log("Usuarios encontrados (plain):", usuariosEncontrados);
 
     return { data: usuariosEncontrados, message: "Búsqueda completada." };
 
@@ -340,14 +380,62 @@ async function EditarUsuario(formData) {
     
 }
 
-export { 
+async function ObtenerTodosLosUsuarios() {
+    try {
+        connectDB();
+        const data = { usuarios: await Usuario.find({}).lean() };
+
+        if (data.error) {
+            console.error('Error al encontrar el usuario ', data.error);
+            throw new Error(data.error);
+        }
+
+        // Manually convert to plain objects with string IDs and dates
+        const plainUsers = data.usuarios.map(user => {
+            const plainUser = { ...user }; // Create a shallow copy from the lean object
+            if (plainUser._id) {
+                plainUser._id = plainUser._id.toString();
+            }
+            // Ensure fechaNacimiento is handled correctly, it might already be a string or null
+            if (plainUser.fechaNacimiento && typeof plainUser.fechaNacimiento !== 'string') {
+                 if (plainUser.fechaNacimiento instanceof Date) {
+                    plainUser.fechaNacimiento = plainUser.fechaNacimiento.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+                 } else {
+                    // If it's an object but not a Date (e.g., from bad data), try to convert or nullify
+                    try {
+                        plainUser.fechaNacimiento = new Date(plainUser.fechaNacimiento).toISOString().split('T')[0];
+                    } catch (e) {
+                        plainUser.fechaNacimiento = null; // Or handle as an error
+                    }
+                 }
+            }
+            if (plainUser.createdAt instanceof Date) {
+                plainUser.createdAt = plainUser.createdAt.toISOString();
+            }
+            if (plainUser.updatedAt instanceof Date) {
+                plainUser.updatedAt = plainUser.updatedAt.toISOString();
+            }
+            // Add any other date fields you might have
+            return plainUser;
+        });
+        
+        // console.log("Datos retornados por ObtenerTodosLosUsuarios (plain):", plainUsers); // Log para depuración
+        return plainUsers;
+
+    } catch (error) {
+        console.error('Error al encontrar el usuario:', error.message);
+    }
+}
+
+export {
     RegistrarUsuario,
-    obtenerUsuarios, 
+    obtenerUsuarios,
     RegistroMasivoUsuario,
-    ObtenerUsuarioPorId, 
-    ObtenerUsuarioPorCorreo, 
-    buscarUsuarios, 
-    DeshabilitarUsuario, 
+    ObtenerUsuarioPorId,
+    ObtenerUsuarioPorCorreo,
+    FiltrarUsuarios,
+    DeshabilitarUsuario,
     EditarUsuario,
-    obtenerUsuariosHabilitados
+    obtenerUsuariosHabilitados,
+    ObtenerTodosLosUsuarios
 };

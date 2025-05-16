@@ -1,10 +1,8 @@
 function InputTipoDocumentoIdentidad(props) {
     return (
         <select 
-        
-        required 
-        name="tipoDocumento" 
-        id="tipoDocumento" 
+        name={props.name || "tipoDocumento"} 
+        id={props.id || "tipoDocumento"}
         className='
             w-full
             p-3
@@ -21,12 +19,12 @@ function InputTipoDocumentoIdentidad(props) {
         {...props}
 
         >
-            <option value="" disabled>selecione un tipo de documento</option>
-            <option value="CC">CC</option>
-            <option value="Tarjeta de Identidad">TI</option>
-            <option value="Pasaporte">Pasaporte</option>
-            <option value="Cédula de Extranjería">Cédula de Extranjería</option>
-            <option value="Registro Civil">otro</option>
+            <option value="">Seleccione un tipo de documento</option>
+            <option value="CC">Cédula de Ciudadanía (CC)</option>
+            <option value="TI">Tarjeta de Identidad (TI)</option>
+            <option value="PASAPORTE">Pasaporte</option>
+            <option value="CE">Cédula de Extranjería (CE)</option>
+            <option value="OTRO">Otro (Ej: Registro Civil)</option> 
         </select>
     )
 }

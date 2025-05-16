@@ -2,8 +2,8 @@
 function InputRol(props) {
     return (
         <select 
-        id="rol" 
-        name="rol" 
+        id={props.id || "rol"} 
+        name={props.name || "rol"} 
         className='
             w-full 
             p-3 
@@ -17,12 +17,11 @@ function InputRol(props) {
             focus:ring-bn-accent-opaque
             focus:border-bn-accent-opaque
             placeholder:text-bn-accent
-            overflow-hidden' 
-            defaultValue={"CLIENTE"}
+            overflow-hidden'
             {...props}
-
             >
-            <option value={"cliente"}>CLIENTE</option>
+            <option value="">Todos los roles</option>
+            <option value={"CLIENTE"}>CLIENTE</option>
             <option value={"PROVEEDOR"}>PROVEEDOR</option>
             <option value={"EMPLEADO"}>EMPLEADO</option>
             <option value={"ADMINISTRADOR"}>ADMINISTRADOR</option>

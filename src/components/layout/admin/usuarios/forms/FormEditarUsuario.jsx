@@ -25,7 +25,7 @@ async function FormEditarUsuario({ UserId }) {
 
   return (
 
-    <form className="space-y-5">
+    <form className="space-y-5" >
 
 
       {/* ==================================================================================================== */}
@@ -202,11 +202,7 @@ async function FormEditarUsuario({ UserId }) {
 
       <div className="flex flex-row gap-2 items-center justify-center mt-5">
 
-        <BotonGeneral type="submit">agregar usuario</BotonGeneral>
-
-        <Link href="/admin/usuarios/agregar/archivo">
-          <BotonGeneral type="button" >cargar usuarios</BotonGeneral>
-        </Link>
+        <BotonGeneral type="submit">Editar usuario</BotonGeneral>
 
       </div>
 
