@@ -1,6 +1,2 @@
-import IconoAgregarUsuario from "./IconoAgregarUsuario";
-import IconoEditar from "./IconoEditar";
-import IconoEnviarCorreo from "./IconoEnviarCorreo";
-import IconoPersona from "./IconoPersona";
-
-export { IconoAgregarUsuario, IconoEditar, IconoEnviarCorreo, IconoPersona };
+export { default as IconoEditar } from './IconoEditar';
+export { default as IconoPersona } from './IconoPersona';

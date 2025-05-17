@@ -1,12 +1,12 @@
 // src/app/admin/usuarios/page.jsx
-import { BotonAgregarUsuarios } from '@/components/common/botones';
-import FormFiltrarUsuarios from '@/components/layout/admin/usuarios/forms/FormFiltrarUsuarios'; // O FormBuscarUsuarios
+import FormFiltrarUsuarios from './components/FormFiltrarUsuarios';
 import Link from 'next/link';
 import AdminPage from '@/components/layout/admin/AdminPage';
 import SeccionAcciones from '@/components/layout/admin/secciones/acciones/SeccionAcciones';
 import SeccionFooter from '@/components/layout/admin/secciones/acciones/SeccionFooter';
 import SeccionHeader from '@/components/layout/admin/secciones/acciones/SeccionHeader';
 import { obtenerUsuariosHabilitados } from '@/app/acciones/UsuariosActions'; // Para la carga inicial
+import BotonAgregarUsuarios from '@/components/common/botones/BotonAgregarUsuarios';
 
 async function UsuariosAdminPage() {
     // Carga inicial de usuarios cuando la página se renderiza por primera vez en el servidor

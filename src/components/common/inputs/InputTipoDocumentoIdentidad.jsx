@@ -15,7 +15,8 @@ function InputTipoDocumentoIdentidad(props) {
             focus:ring-1
             focus:ring-bn-accent-opaque
             focus:border-bn-accent-opaque
-        '
+            '
+            
         {...props}
 
         >

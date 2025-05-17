@@ -1,6 +1,5 @@
 
-import Thgeneral from '@/components/common/tablas/Thgeneral'
-import TablaHeader from '../../../common/tablas/TablaHeader'
+import { Thgeneral, TablaHeader } from '@/components/common/tablas';
 
 function THUsuarios() {
     return (

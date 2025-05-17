@@ -116,7 +116,7 @@ export const authOptions = {
             // esté disponible en el objeto 'session.user' en el cliente.
             if (token && session.user) { // Asegurarse de que 'token' y 'session.user' existen.
                 session.user.id = token.id;   // Asigna el 'id' del token a 'session.user.id'.
-                session.user.role = token.role; // Asigna el 'role' del token a 'session.user.role'.
+                session.user.rol = token.rol; // Asigna el 'rol' del token a 'session.user.rol'.
                 // 'session.user.name' y 'session.user.email' suelen ser poblados automáticamente por NextAuth
                 // si están presentes en el objeto 'user' original de 'authorize' y en el 'token'.
             }
@@ -136,4 +136,3 @@ const handler = NextAuth(authOptions);
 // Exporta los manejadores para las solicitudes GET y POST.
 // Esto permite que Next.js dirija las solicitudes a /api/auth/* a NextAuth.
 export { handler as GET, handler as POST };
-

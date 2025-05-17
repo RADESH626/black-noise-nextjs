@@ -1,8 +1,9 @@
 import React from 'react';
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable'; // Changed import
+import autoTable from 'jspdf-autotable';
+import { BotonAccion } from './BotonAccion'; // Importar BotonAccion
 
-function BotonExportarPDF({ usuarios = [], ...props }) { // Added usuarios prop, defaulting to empty array
+function BotonExportarPDF({ usuarios = [], ...props }) {
     const handleExportPDF = () => {
         if (!usuarios || usuarios.length === 0) {
             alert("No hay usuarios para exportar.");
@@ -74,19 +75,19 @@ function BotonExportarPDF({ usuarios = [], ...props }) { // Added usuarios prop,
             body: body,
             theme: 'striped',
             headStyles: { fillColor: [22, 160, 133], cellPadding: { top: 3, right: 2, bottom: 3, left: 2 } },
-            styles: { fontSize: 7, cellPadding: { top: 3, right: 2, bottom: 3, left: 2 } }, // Adjusted cellPadding for more height
-            columnStyles: { // Ajustar anchos si es necesario, ejemplo:
-                0: { cellWidth: 9 }, // Tipo Doc.
-                1: { cellWidth: 18 }, // N° Doc.
-                2: { cellWidth: 15 }, // P. Nombre
-                3: { cellWidth: 16 }, // P. Apellido
-                4: { cellWidth: 16 }, // F. Nacimiento
-                5: { cellWidth: 19 }, // Género
-                6: { cellWidth: 18 }, // Teléfono
-                7: { cellWidth: 18 }, // Dirección
-                8: { cellWidth: 18 }, // Correo
-                9: { cellWidth: 20 }, // Rol
-                10: { cellWidth: 20 }  // Estado
+            styles: { fontSize: 7, cellPadding: { top: 3, right: 2, bottom: 3, left: 2 } },
+            columnStyles: {
+                0: { cellWidth: 9 },
+                1: { cellWidth: 18 },
+                2: { cellWidth: 15 },
+                3: { cellWidth: 16 },
+                4: { cellWidth: 16 },
+                5: { cellWidth: 19 },
+                6: { cellWidth: 18 },
+                7: { cellWidth: 18 },
+                8: { cellWidth: 18 },
+                9: { cellWidth: 20 },
+                10: { cellWidth: 20 }
             }
         });
 
@@ -94,14 +95,12 @@ function BotonExportarPDF({ usuarios = [], ...props }) { // Added usuarios prop,
     };
 
     return (
-        <button
-            type="button"
-            className="flex items-center gap-2 px-4 py-2 rounded shadow-sm bg-gray-400 text-black font-bold text-base transition-colors duration-300 hover:bg-green-700"
-            onClick={handleExportPDF} // Added onClick handler
+        <BotonAccion
+            texto="Exportar a PDF"
+            tipo="secundario" // Usar tipo secundario para el color gris
+            onClick={handleExportPDF}
             {...props}
-        >
-            Exportar a PDF
-        </button>
+        />
     );
 }
 

@@ -1,32 +1,27 @@
-import IconoEditar from '@/components/common/iconos/IconoEditar'
+import { IconoEditar } from '@/components/common/iconos'
 
 function BotonEditar({ children }) {
     return (
         <button
             type="submit"
             className="
+            px-2 py-2
+            font-semibold 
+            rounded-lg 
+            shadow-md 
+            focus:outline-none 
+            focus:ring-2 
+            focus:ring-opacity-75
+            bg-blue-600 
+            text-white 
+            hover:bg-blue-700 
+            focus:ring-green-500
             h-full
             w-full
-            flex
-            flex-row
-            items-center
-            justify-center
-            gap-2
-            bg-blue-500
-            text-black
-            font-semibold
-            rounded-lg
-            shadow-md
-            hover:bg-blue-600
-            focus:outline-none
-            focus:ring-2
-            focus:ring-blue-400 
-            focus:ring-opacity-75
-            p-3
             "
         >
             editar
-            <IconoEditar />
+            {/* <IconoEditar /> */}
         </button>
     )
 }

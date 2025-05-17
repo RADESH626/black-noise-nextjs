@@ -1,8 +1,8 @@
 import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
 import Footer from '@/components/layout/general/footer/Footer';
-import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // Asegúrate que la ruta a tus authOptions sea correcta
 import { getServerSession } from "next-auth/next";
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 async function indexPage() {
 

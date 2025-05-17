@@ -1,4 +1,5 @@
 import InputCheckBox from "./InputCheckBox";
+import InputSelectGeneral from "./InputSelectGeneral";
 import InputEmail from "./InputEmail";
 import InputPassword from "./InputPassword";
 import InputDocumentoIdentidad from "./InputDocumentoIdentidad";
@@ -9,11 +10,14 @@ import InputGenero from "./InputGenero";
 import InputRol from "./InputRol";
 import InputNumerosGeneral from "./InputNumerosGeneral";
 import InputTextoGeneral from "./InputTextoGeneral";
+import  InputFiles from './InputFiles';
+
 
 
 
 export { 
-    InputCheckBox, 
+    InputCheckBox,
+    InputSelectGeneral, 
     InputEmail, 
     InputPassword, 
     InputDocumentoIdentidad, 
@@ -23,5 +27,7 @@ export {
     InputGenero, 
     InputRol, 
     InputNumerosGeneral, 
-    InputTextoGeneral 
+    InputTextoGeneral,
+    InputFiles
 };
+

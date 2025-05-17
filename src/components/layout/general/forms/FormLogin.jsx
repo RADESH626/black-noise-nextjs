@@ -1,10 +1,10 @@
 "use client"
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { signIn, getSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { BotonGeneral } from '@/components/common/botones/index';
 import { InputEmail, InputPassword } from "@/components/common/inputs";
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 function FormLogin() {
 
@@ -27,9 +27,14 @@ function FormLogin() {
 
         if (result?.ok && !result?.error) {
             console.log("Inicio de sesión exitoso, redirigiendo...");
-            // Redirige a la página principal o dashboard después de un inicio de sesión exitoso.
-            // Puedes cambiar '/' por la ruta que necesites.
-            router.push('/');
+            
+            // Obtener la sesión después del inicio de sesión exitoso
+            const session = await getSession();
+            
+            // Redirigir según el rol del usuario
+            const destination = session?.user?.rol === 'ADMINISTRADOR' ? '/admin' : '/';
+            console.log("Rol del usuario:", session?.user?.rol);
+            router.push(destination);
             router.refresh(); // Para asegurar que el estado de la sesión se actualice en el layout/navbar
         } else {
             // Aquí es donde manejarías los errores en el futuro
@@ -76,7 +81,9 @@ function FormLogin() {
             </div>
             <div className="relative mb-5 items-center flex justify-center">
 
-                <BotonGeneral type="submit">Iniciar Sesión</BotonGeneral>
+                <BotonGeneral 
+                type="submit"
+                >Iniciar Sesión</BotonGeneral>
 
             </div>
 

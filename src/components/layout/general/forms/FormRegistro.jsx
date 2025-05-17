@@ -9,9 +9,9 @@ import {
   InputTextoGeneral
 } from "@/components/common/inputs";
 
-import { BotonGeneral } from '@/components/common/botones';
 
 import {RegistrarUsuario} from "@/app/acciones/UsuariosActions";
+import BotonGeneral from "@/components/common/botones/BotonGeneral";
 
 
 function FormRegistro() {
@@ -219,7 +219,9 @@ function FormRegistro() {
 
       <div className="flex items-center justify-center mt-5">
 
-        <BotonGeneral type="submit" >Registrarse</BotonGeneral>
+        <BotonGeneral 
+        // type="submit" 
+        >Registrarse</BotonGeneral>
 
       </div>
 

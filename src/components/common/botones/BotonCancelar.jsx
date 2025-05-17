@@ -1,11 +1,14 @@
-import React from 'react'
+// src/components/common/botones/BotonCancelar.jsx
+import { BotonAccion } from './BotonAccion';
 
 function BotonCancelar() {
     return (
-        <button type="button" class="btn btn-secondary" >
-            Cancelar
-        </button>
+        <BotonAccion
+            texto="Cancelar"
+            tipo="secundario"
+            type="button"
+        />
     )
 }
 
-export default BotonCancelar
+export default BotonCancelar;

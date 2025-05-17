@@ -1,6 +1,6 @@
 import AdminFormPage from "@/components/layout/admin/AdminFormPage";
 import HeaderAdminDashboard from "@/components/layout/admin/AdminHeader";
-import FormEditarUsuario from "@/components/layout/admin/usuarios/forms/FormEditarUsuario";
+import FormEditarUsuario from "@/app/admin/usuarios/FormEditarUsuario";
 
 async function page(searchParams) {
 

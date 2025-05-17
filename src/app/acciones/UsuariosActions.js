@@ -166,7 +166,9 @@ async function RegistrarUsuario(formData) {
         numeroTelefono: formData.get('numeroTelefono'),
         direccion: formData.get('direccion'),
         correo: formData.get('correo'),
-        password: formData.get('password')
+        password: formData.get('password'),
+        rol: 'cliente', // Asignar rol de cliente por defecto
+        habilitado: true // Asegurar que el usuario está habilitado por defecto
     }
 
     console.log('data:', data);
@@ -181,9 +183,14 @@ async function RegistrarUsuario(formData) {
 
     // Guardar el usuario en la base de datos(con la contraseña hasheada)
 
-    guardarUsuarios(data, true); // Enviar correo al registrar un solo usuario
+    const resultado = await guardarUsuarios(data, true); // Enviar correo al registrar un solo usuario
 
-    redirect('/login');
+    // Verificar si el usuario fue guardado exitosamente y es un cliente
+    if (resultado.success && resultado.data.rol === 'cliente') {
+        redirect('/'); // Redirigir a index si es cliente
+    } else {
+        redirect('/login'); // Mantener la redirección a login para otros roles
+    }
 }
 
 async function RegistroMasivoUsuario(formData, userId) {
