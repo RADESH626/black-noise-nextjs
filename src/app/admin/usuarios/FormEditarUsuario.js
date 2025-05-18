@@ -1,5 +1,5 @@
-import { BotonGeneral } from '@/components/common/botones';
 import { ObtenerUsuarioPorId } from "@/app/acciones/UsuariosActions";
+import BotonGeneral from "@/components/common/botones/BotonGeneral";
 import {
   InputTipoDocumentoIdentidad,
   InputDocumentoIdentidad,
@@ -9,13 +9,10 @@ import {
   InputTelefono,
   InputEmail,
   InputRol
-
-
 } from '@/components/common/inputs';
 
-async function FormEditarUsuario({ UserId }) {
-
-  const id = UserId;
+async function FormEditarUsuario({ UserId, usuarioId, isProfile }) {
+  const id = UserId || usuarioId;
 
   const usuario = await ObtenerUsuarioPorId(id);
   // usuario = usuario && typeof usuario.toObject === "function" ? usuario.toObject() : JSON.parse(JSON.stringify(usuario));
@@ -201,7 +198,9 @@ async function FormEditarUsuario({ UserId }) {
 
       <div className="flex flex-row gap-2 items-center justify-center mt-5">
 
-        <BotonGeneral type="submit">Editar usuario</BotonGeneral>
+        <BotonGeneral >
+          {isProfile ? 'Guardar cambios' : 'Editar usuario'}
+        </BotonGeneral>
 
       </div>
 

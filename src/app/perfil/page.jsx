@@ -2,19 +2,20 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
+import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions";
+import Link from "next/link";
 
 async function Perfil() {
-
   const session = await getServerSession(authOptions);
-
-  console.log(session);
-
   const user = session?.user;
 
   if (!session) {
-
     return redirect("/");
   }
+
+  // Obtener los diseños del usuario directamente
+  const { designs, error } = await obtenerDesignsPorUsuarioId(user.id);
+  const userDesigns = designs || [];
 
   return (
 
@@ -47,10 +48,11 @@ async function Perfil() {
             {/* botones */}
             <div className="flex flex-col sm:flex-row justify-center md:justify-start space-y-2 sm:space-y-0 sm:space-x-3">
 
-              <BotonGeneral>
-                EDITAR PERFIL
-
-              </BotonGeneral>
+              <Link href={"/perfil/editar"}>
+                <BotonGeneral>
+                  EDITAR PERFIL
+                </BotonGeneral>
+              </Link>
 
               <button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-lg transition duration-150">
                 CERRAR SESIÓN
@@ -78,52 +80,38 @@ async function Perfil() {
       </nav>
 
       <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
-        <div className="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-          <div className="w-full h-56 bg-gray-700 relative">
-            <div className="absolute top-0 right-0 m-3">
-              <button className="bg-white text-purple-700 font-semibold py-1 px-4 rounded-md text-sm hover:bg-gray-200 transition duration-150">
-                EDITAR
-              </button>
+        {error ? (
+          <div className="col-span-full text-red-500 text-center">
+            Error al cargar los diseños: {error}
+          </div>
+        ) : userDesigns.length === 0 ? (
+          <div className="col-span-full text-center text-gray-400">
+            No tienes diseños publicados aún.
+          </div>
+        ) : (
+          userDesigns.map((design) => (
+            <div key={design._id} className="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+              <div className="w-full h-56 bg-gray-700 relative">
+                <img 
+                  src={design.imagenDesing} 
+                  alt={design.nombreDesing}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute top-0 right-0 m-3">
+                  <button className="bg-white text-purple-700 font-semibold py-1 px-4 rounded-md text-sm hover:bg-gray-200 transition duration-150">
+                    EDITAR
+                  </button>
+                </div>
+              </div>
+              <div className="p-4 gradient-text-bg">
+                <p className="font-semibold">nombre: {design.nombreDesing}</p>
+                <p className="font-semibold">precio: ${design.valorDesing}</p>
+                <p className="font-semibold">categoría: {design.categoria}</p>
+                <p className="font-semibold text-purple-400">likes: {design.likes}</p>
+              </div>
             </div>
-          </div>
-          <div className="p-4 gradient-text-bg">
-            <p className="font-semibold">nombre: camisa azul</p>
-            <p className="font-semibold">precio: camisa azul</p>
-            <p className="font-semibold">categoría: camisa</p>
-          </div>
-        </div>
-
-        <div className="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-          <div className="w-full h-56 bg-gray-700 relative">
-            <div className="absolute top-0 right-0 m-3">
-              <button className="bg-white text-purple-700 font-semibold py-1 px-4 rounded-md text-sm hover:bg-gray-200 transition duration-150">
-                EDITAR
-              </button>
-            </div>
-          </div>
-          <div className="p-4 gradient-text-bg">
-            <p className="font-semibold">nombre: diseño moderno</p>
-            <p className="font-semibold">precio: $25.00</p>
-            <p className="font-semibold">categoría: abstracto</p>
-          </div>
-        </div>
-
-        <div className="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-          <div className="w-full h-56 bg-gray-700 relative">
-            <div className="absolute top-0 right-0 m-3">
-              <button className="bg-white text-purple-700 font-semibold py-1 px-4 rounded-md text-sm hover:bg-gray-200 transition duration-150">
-                EDITAR
-              </button>
-            </div>
-          </div>
-          <div className="p-4 gradient-text-bg">
-            <p className="font-semibold">nombre: ilustración vector</p>
-            <p className="font-semibold">precio: $15.99</p>
-            <p className="font-semibold">categoría: ilustración</p>
-          </div>
-        </div>
-
+          ))
+        )}
       </main>
     </div>
 

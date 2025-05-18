@@ -30,6 +30,18 @@ async function obtenerDesigns() {
     }
 }
 
+// Obtener diseños por usuario ID
+async function obtenerDesignsPorUsuarioId(usuarioId) {
+    try {
+        await connectDB();
+        const designs = await Design.find({ usuarioId }).lean();
+        return { designs: JSON.parse(JSON.stringify(designs)) };
+    } catch (error) {
+        console.error('Error al obtener los diseños del usuario:', error);
+        return { error: 'Error al obtener los diseños del usuario: ' + error.message };
+    }
+}
+
 // Obtener diseño por ID
 async function ObtenerDesignPorId(id) {
     try {
@@ -81,6 +93,7 @@ async function EliminarDesign(id) {
 export {
     guardarDesign,
     obtenerDesigns,
+    obtenerDesignsPorUsuarioId,
     ObtenerDesignPorId,
     EditarDesign,
     EliminarDesign
