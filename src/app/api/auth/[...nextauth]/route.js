@@ -36,14 +36,18 @@ export const authOptions = {
             // Se ejecuta cuando un usuario intenta iniciar sesión con este proveedor.
             // Recibe las 'credentials' enviadas desde el formulario y el objeto 'req' (la solicitud HTTP).
             async authorize(credentials, req) {
+                console.log("Authorize function called.");
+                console.log("Credentials received:", { correo: credentials?.correo, password: credentials?.password ? '[REDACTED]' : 'N/A' });
 
                 //validamos que las credenciales no sean nulas 
                 if (!credentials || !credentials.correo || !credentials.password) {
+                    console.log("Missing credentials.");
                     return null;
                 }
 
                 // se obtiene el usuario por correo
                 const user = await ObtenerUsuarioPorCorreo(credentials.correo);
+                console.log("Result of ObtenerUsuarioPorCorreo:", user ? 'User found' : 'User not found');
 
                 //si el usuario no existe, se retorna null
                 if (!user) {
@@ -52,11 +56,14 @@ export const authOptions = {
 
                 // Verificamos la contraseña del usuario que existe 
                 const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
+                console.log("Password comparison result (isPasswordValid):", isPasswordValid);
 
                 if (isPasswordValid) {
                     // Si la contraseña es correcta, devolvemos el objeto 'user'.
+                    console.log("Login successful for user:", user.correo);
                     return user;
                 }
+                console.log("Invalid password for user:", user.correo);
                 return null;
                                 
             }

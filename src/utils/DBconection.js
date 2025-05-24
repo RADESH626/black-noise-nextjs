@@ -1,19 +1,30 @@
 //este archivo contiene la conexion a la base de datos 
 
-//este import es para importar una libreria que nos permite conectarnos de una forma mas facil a mongo db 
-import { connect, Connection } from 'mongoose'
+import mongoose from 'mongoose';
 
-//esta constante sera la variable que guardara el estado de la conecion (que inicialmente es false)
-const conn = {
-    isConnected: false
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://Emanuel:Emanuelgalvis123@clusteremanuelgalvis.djph7.mongodb.net/BlackNoise?retryWrites=true&w=majority&appName=ClusterEmanuelGalvis";
+
+if (!mongoose.connection.readyState) {
+    mongoose.set('strictQuery', false);
 }
 
-//al llamar esta funcion se establece la conexion a la base de datos
 export default async function connectDB() {
-    if (conn.isConnected) return;
-    const db = await connect("mongodb://localhost:27017/BlackNoise");
-    conn.isConnected = db.connections[0].readyState;
-   console.log("Estado de la conexión a la base de datos:", conn.isConnected);
+    try {
+        if (mongoose.connection.readyState) {
+            console.log('Using existing database connection');
+            return;
+        }
+
+        const db = await mongoose.connect(MONGODB_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+
+        console.log('Database connected successfully');
+        return db;
+    } catch (error) {
+        console.error('Error connecting to database:', error);
+        // Don't exit the process, let the error handling cascade up
+        throw error;
+    }
 }
-
-

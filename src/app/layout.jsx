@@ -2,6 +2,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import SessionProviderWrapper from './SessionProviderWrapper' // Ajusta la ruta si tu estructura es diferente
 import { getServerSession } from 'next-auth/next'
+import { PopUpProvider } from '../context/PopUpContext'
+import { ModalProvider } from '../context/ModalContext'
 // Asegúrate de que la ruta a authOptions es correcta.
 // Si tu API route está en src/app/api/auth/[...nextauth]/route.js
 // y layout.jsx está en src/app/layout.jsx, la ruta es './api/auth/[...nextauth]/route'
@@ -30,9 +32,13 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="es">
       <body>
-        <SessionProviderWrapper session={session}>
-          {children}
-        </SessionProviderWrapper>
+        <PopUpProvider>
+          <ModalProvider>
+            <SessionProviderWrapper session={session}>
+              {children}
+            </SessionProviderWrapper>
+          </ModalProvider>
+        </PopUpProvider>
       </body>
     </html>
   )

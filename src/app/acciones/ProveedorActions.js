@@ -8,6 +8,7 @@ import { Disponibilidad } from '@/models/enums/proveedor'; // Para cambiar dispo
 
 // Crear un nuevo proveedor
 async function guardarProveedor(data) {
+    console.log('Iniciando la función guardarProveedor');
     try {
         await connectDB();
         // Convertir metodosPagoAceptados a array si viene como string
@@ -32,6 +33,7 @@ async function guardarProveedor(data) {
 
 // Obtener todos los proveedores
 async function obtenerProveedores() {
+    console.log('Iniciando la función obtenerProveedores');
     try {
         await connectDB();
         const proveedores = await Proveedor.find({})
@@ -46,6 +48,7 @@ async function obtenerProveedores() {
 
 // Obtener todos los proveedores habilitados (disponibilidad = DISPONIBLE)
 async function obtenerProveedoresHabilitados() {
+    console.log('Iniciando la función obtenerProveedoresHabilitados');
     try {
         await connectDB();
         const proveedores = await Proveedor.find({ disponibilidad: Disponibilidad.DISPONIBLE })
@@ -61,6 +64,7 @@ async function obtenerProveedoresHabilitados() {
 
 // Obtener proveedor por ID
 async function ObtenerProveedorPorId(id) {
+    console.log('Iniciando la función ObtenerProveedorPorId');
     try {
         await connectDB();
         const proveedor = await Proveedor.findById(id)
@@ -78,6 +82,7 @@ async function ObtenerProveedorPorId(id) {
 
 // Editar proveedor
 async function EditarProveedor(id, data) {
+    console.log('Iniciando la función EditarProveedor');
     try {
         await connectDB();
         
@@ -111,6 +116,7 @@ async function EditarProveedor(id, data) {
 
 // Cambiar disponibilidad de un proveedor (Habilitar/Deshabilitar)
 async function CambiarDisponibilidadProveedor(id, nuevaDisponibilidad) {
+    console.log('Iniciando la función CambiarDisponibilidadProveedor');
     try {
         await connectDB();
         if (!Object.values(Disponibilidad).includes(nuevaDisponibilidad)) {

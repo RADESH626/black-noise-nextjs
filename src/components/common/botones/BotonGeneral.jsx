@@ -1,5 +1,5 @@
 
-function BotonGeneral({children,props}) {
+function BotonGeneral({children, ...props}) {
     return (
         <button className="
         inline-flex

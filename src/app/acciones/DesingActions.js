@@ -7,6 +7,7 @@ const AxiosInstance = axios.create({
 });
 
 async function guardarDesings(data) {
+    console.log('Iniciando la función guardarDesings');
     try {
 
         // peticion tipo post a la api de diseños para guardar el diseño en la base de datos
@@ -36,6 +37,7 @@ async function guardarDesings(data) {
 
 //obtener diseños de la base de datos
 async function obtenerDesings() {
+    console.log('Iniciando la función obtenerDesings');
     "use server"
     try {
 
@@ -76,6 +78,7 @@ async function obtenerDesings() {
 }
 
 async function RegistrarDesing(formData) {
+    console.log('Iniciando la función RegistrarDesing');
     "use server"
 
     //se define la variable genero y se le asigna el valor del formulario
@@ -108,6 +111,7 @@ async function RegistrarDesing(formData) {
 }
 
 async function RegistroMasivoDesings(formData) {
+    console.log('Iniciando la función RegistroMasivoDesings');
     "use server"
 
     const file = formData.get('file');
@@ -149,6 +153,7 @@ async function RegistroMasivoDesings(formData) {
 }
 
 async function encontrarDesingsPorId(id) {
+    console.log('Iniciando la función encontrarDesingsPorId');
     try {
         const response = await axios.get(`http://localhost:3000/api/disenos/${id}`);
         const result = response.data;
@@ -174,6 +179,3 @@ async function encontrarDesingsPorId(id) {
 
 
 export { guardarDesings, obtenerDesings, RegistrarDesing, RegistroMasivoDesings,encontrarDesingsPorId };
-
-
-

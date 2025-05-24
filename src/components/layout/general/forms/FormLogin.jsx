@@ -3,16 +3,18 @@
 import { useState } from 'react';
 import { signIn, getSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { usePopUp } from '@/context/PopUpContext';
 import { InputEmail, InputPassword } from "@/components/common/inputs";
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 function FormLogin() {
-
+    const { showPopUp } = usePopUp();
     const router = useRouter();
     const [correo, setCorreo] = useState('');
     const [password, setPassword] = useState('');
 
     const handleSubmit = async (event) => {
+
         event.preventDefault();
 
         console.log("Intentando iniciar sesión con:", { correo, password });
@@ -36,10 +38,10 @@ function FormLogin() {
             console.log("Rol del usuario:", session?.user?.rol);
             router.push(destination);
             router.refresh(); // Para asegurar que el estado de la sesión se actualice en el layout/navbar
+            showPopUp('¡Inicio de sesión exitoso!', 'success');
         } else {
-            // Aquí es donde manejarías los errores en el futuro
-            console.error("Error en el inicio de sesión:", result?.error);
-            alert("Error al iniciar sesión: " + (result?.error || "Credenciales incorrectas"));
+            console.log("Error en el inicio de sesión:", result?.error);
+            showPopUp(result?.error || "Credenciales incorrectas", 'error');
         }
     };
 

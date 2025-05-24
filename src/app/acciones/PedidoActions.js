@@ -8,6 +8,7 @@ import { revalidatePath } from 'next/cache';
 
 // Crear un nuevo pedido
 async function guardarPedido(data) {
+    console.log('Iniciando la función guardarPedido');
     try {
         await connectDB();
         // Convertir desingIds y detallesPedido a arrays si vienen como strings separados por comas
@@ -30,6 +31,7 @@ async function guardarPedido(data) {
 
 // Obtener todos los pedidos
 async function obtenerPedidos() {
+    console.log('Iniciando la función obtenerPedidos');
     try {
         await connectDB();
         const pedidos = await Pedido.find({})
@@ -45,6 +47,7 @@ async function obtenerPedidos() {
 
 // Obtener pedido por ID
 async function ObtenerPedidoPorId(id) {
+    console.log('Iniciando la función ObtenerPedidoPorId');
     try {
         await connectDB();
         const pedido = await Pedido.findById(id)
@@ -63,6 +66,7 @@ async function ObtenerPedidoPorId(id) {
 
 // Editar pedido (principalmente para cambiar estado, fecha estimada, detalles)
 async function EditarPedido(id, data) {
+    console.log('Iniciando la función EditarPedido');
     try {
         await connectDB();
         

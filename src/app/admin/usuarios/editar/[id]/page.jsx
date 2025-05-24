@@ -1,6 +1,6 @@
 import AdminFormPage from "@/components/layout/admin/AdminFormPage";
-import HeaderAdminDashboard from "@/components/layout/admin/AdminHeader";
-import FormEditarUsuario from "@/app/admin/usuarios/FormEditarUsuario";
+import HeaderPrincipal from "@/components/layout/general/HeaderPrincipal";
+import FormEditarUsuario from "@/app/admin/usuarios/components/FormEditarUsuario";
 
 async function page(searchParams) {
 
@@ -12,7 +12,7 @@ async function page(searchParams) {
 
         <div>
 
-            <HeaderAdminDashboard />
+            <HeaderPrincipal />
 
             <AdminFormPage>
 
@@ -27,4 +27,3 @@ async function page(searchParams) {
 
 export default page
 
-//TODO:agregar logica de la pagina

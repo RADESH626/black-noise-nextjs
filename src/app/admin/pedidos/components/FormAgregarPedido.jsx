@@ -42,6 +42,9 @@ export default function FormAgregarPedido() {
 
         if (result.error) {
             setAlert({ show: true, type: 'error', message: `Error al guardar el pedido: ${result.error}` });
+            setTimeout(() => {
+                setAlert({ show: false, type: '', message: '' });
+            }, 2000);
         } else {
             setAlert({ show: true, type: 'success', message: 'Pedido guardado exitosamente.' });
             setTimeout(() => {

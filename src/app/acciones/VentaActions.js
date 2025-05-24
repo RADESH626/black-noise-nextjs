@@ -8,6 +8,7 @@ import { revalidatePath } from 'next/cache';
 
 // Crear una nueva venta
 async function guardarVenta(data) {
+    console.log('Iniciando la función guardarVenta');
     try {
         await connectDB();
         // Convertir pagoIds y detallesVenta a arrays si vienen como strings
@@ -34,6 +35,7 @@ async function guardarVenta(data) {
 
 // Obtener todas las ventas
 async function obtenerVentas() {
+    console.log('Iniciando la función obtenerVentas');
     try {
         await connectDB();
         const ventas = await Venta.find({})
@@ -53,6 +55,7 @@ async function obtenerVentas() {
 
 // Obtener venta por ID
 async function ObtenerVentaPorId(id) {
+    console.log('Iniciando la función ObtenerVentaPorId');
     try {
         await connectDB();
         const venta = await Venta.findById(id)
@@ -78,6 +81,7 @@ async function ObtenerVentaPorId(id) {
 
 // Editar venta (principalmente para cambiar estado, detalles, o asociar/desasociar pagos)
 async function EditarVenta(id, data) {
+    console.log('Iniciando la función EditarVenta');
     try {
         await connectDB();
         

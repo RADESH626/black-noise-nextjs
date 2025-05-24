@@ -3,9 +3,37 @@ import { NextResponse }  from 'next/server'
 import connectDB from '@/utils/DBconection'
 
 export async function GET() {
-    connectDB()
-    const usuarios = await Usuario.find()
-    return NextResponse.json({ usuarios })
+    try {
+        await connectDB();
+        
+        // Ensure we're using the model after connection
+        const usuarios = await Usuario.find({})
+            .lean()
+            .sort({ createdAt: -1 }) // Sort by most recent first
+            .exec();
+            
+        console.log('Found usuarios:', usuarios ? usuarios.length : 0);
+        
+        // Transform the data to ensure proper serialization
+        const serializedUsers = usuarios.map(user => ({
+            ...user,
+            _id: user._id.toString(),
+            fechaNacimiento: user.fechaNacimiento ? user.fechaNacimiento.toISOString().split('T')[0] : null,
+            createdAt: user.createdAt ? user.createdAt.toISOString() : null,
+            updatedAt: user.updatedAt ? user.updatedAt.toISOString() : null
+        }));
+
+        return NextResponse.json({ 
+            usuarios: serializedUsers,
+            count: serializedUsers.length 
+        });
+    } catch (error) {
+        console.error('Error fetching usuarios:', error);
+        return NextResponse.json(
+            { error: 'Error fetching users', usuarios: [] }, 
+            { status: 500 }
+        );
+    }
 }
 
 

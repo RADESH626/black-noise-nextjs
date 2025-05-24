@@ -57,6 +57,9 @@ export default function FormAgregarProveedor() {
 
         if (result.error) {
             setAlert({ show: true, type: 'error', message: `Error al guardar el proveedor: ${result.error}` });
+            setTimeout(() => {
+                setAlert({ show: false, type: '', message: '' });
+            }, 2000);
         } else {
             setAlert({ show: true, type: 'success', message: 'Proveedor guardado exitosamente.' });
             setTimeout(() => {

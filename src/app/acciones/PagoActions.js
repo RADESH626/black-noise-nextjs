@@ -8,6 +8,7 @@ import { revalidatePath } from 'next/cache';
 
 // Crear un nuevo pago
 async function guardarPago(data) {
+    console.log('Iniciando la función guardarPago');
     try {
         await connectDB();
         const nuevoPago = new Pago(data);
@@ -22,6 +23,7 @@ async function guardarPago(data) {
 
 // Obtener todos los pagos
 async function obtenerPagos() {
+    console.log('Iniciando la función obtenerPagos');
     try {
         await connectDB();
         const pagos = await Pago.find({})
@@ -37,6 +39,7 @@ async function obtenerPagos() {
 
 // Obtener pago por ID
 async function ObtenerPagoPorId(id) {
+    console.log('Iniciando la función ObtenerPagoPorId');
     try {
         await connectDB();
         const pago = await Pago.findById(id)
@@ -55,6 +58,7 @@ async function ObtenerPagoPorId(id) {
 
 // Editar pago (principalmente para cambiar estado)
 async function EditarPago(id, data) {
+    console.log('Iniciando la función EditarPago');
     try {
         await connectDB();
         // Asegurarse de que solo se actualicen campos permitidos, ej. estadoPago

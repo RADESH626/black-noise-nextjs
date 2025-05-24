@@ -37,8 +37,14 @@ const FormAgregarSolicitudProveedor = () => {
 
     if (result.error) {
       setAlert({ show: true, type: 'error', message: `Error al crear solicitud: ${result.error}` });
+      setTimeout(() => {
+        setAlert({ show: false, type: '', message: '' });
+      }, 2000);
     } else {
       setAlert({ show: true, type: 'success', message: 'Solicitud de Proveedor creada exitosamente.' });
+      setTimeout(() => {
+        setAlert({ show: false, type: '', message: '' });
+      }, 2000);
       // Clear form or redirect on success
       setFormData({
         nombreProveedor: '',

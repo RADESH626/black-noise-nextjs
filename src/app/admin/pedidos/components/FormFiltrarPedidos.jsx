@@ -64,6 +64,9 @@ export default function FormFiltrarPedidos({ initialPedidosFromPage = [] }) {
             setPedidosToDisplay(filtered);
         } else {
             setAlert({ show: true, type: 'error', message: result.error || 'Error al cargar pedidos.' });
+            setTimeout(() => {
+                setAlert({ show: false, type: '', message: '' });
+            }, 2000);
             setPedidosToDisplay([]);
         }
         setIsLoading(false);
@@ -83,6 +86,9 @@ export default function FormFiltrarPedidos({ initialPedidosFromPage = [] }) {
             setPedidosToDisplay(result.pedidos);
         } else {
             setAlert({ show: true, type: 'error', message: result.error || 'Error al cargar pedidos.' });
+            setTimeout(() => {
+                setAlert({ show: false, type: '', message: '' });
+            }, 2000);
             setPedidosToDisplay(initialPedidosFromPage);
         }
         setIsLoading(false);

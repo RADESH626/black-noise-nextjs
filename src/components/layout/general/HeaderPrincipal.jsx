@@ -21,7 +21,13 @@ function HeaderPrincipal({ session }) {
                             <div className='flex flex-row items-center justify-center gap-4'>
                                 <span className='text-white'>¡Bienvenido {user?.name}!</span>
                                 <Link href="/perfil">
-                                    <IconoPersona className="text-white" />
+                                    <div className="w-8 h-8 rounded-full overflow-hidden">
+                                        <img 
+                                            src={user?.image || "/img/perfil/FotoPerfil.webp"} 
+                                            alt="Foto de perfil" 
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
                                 </Link>
                             </div>
                             <button 

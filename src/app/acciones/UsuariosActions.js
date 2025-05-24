@@ -10,42 +10,19 @@ import nodemailer from 'nodemailer'; // Importar Nodemailer
 import connectDB from '@/utils/DBconection';
 import Usuario from '@/models/Usuario';
 
-// Función para enviar correos electrónicos
-async function enviarCorreoElectronico(to, subject, html) {
-    try {
-        // Configura el transportador de Nodemailer
-        // Reemplaza con tu configuración de SMTP y credenciales (idealmente desde variables de entorno)
-        const transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST || 'smtp.example.com', // Servidor SMTP de tu proveedor
-            port: parseInt(process.env.SMTP_PORT) || 587, // Puerto SMTP (587 para TLS, 465 para SSL)
-            secure: (parseInt(process.env.SMTP_PORT) || 587) === 465, // true para puerto 465, false para otros puertos
-            auth: {
-                user: process.env.EMAIL_USER, // Tu dirección de correo
-                pass: process.env.EMAIL_PASS, // Tu contraseña de correo o contraseña de aplicación
-            },
-        });
+const DEFAULT_PROFILE_PICTURE_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAKwAAACUCAMAAAA5xjIqAAAAMFBMVEXk5ueutLenrrHn6eqrsbTq7O3Lz9Hh4+S4vcDGyszT1tjP09Te4OKyuLvCx8nW2dvDGAcOAAAECUlEQVR4nO2c23LjIAxAbcTVBvP/f7vQZLNJ47SAsGTPcp4605czqpC4yJ2mwWAwGAwGg8FgMBgMBq+AUmDisizR5x+5dT4Dk4kuiAfSOm+mUworv25ByPkZKcK2mNPpqsmF+dX07jvbByfTdWLP9O4r9XmSAaY1fFbNiLCcxBYm+7PqV3DdKVIX4i9hvesGz28LukQ124p4Gdesu/LGtsY12ypWV1HhmqoCY2xhrYnrV2wjly3EStVEMEyy5vf6+h5ay+MKW71rSlvHkQgQW1xTbDmaAzSp8iQCuLbA5mpLLutDoytHaKta1ytiIXY1zYHN0HZdWOr67LfQ0vYxZTGBlRtpaA0msKnpekLXup3hDpRHMkBlQcoDR+eKKLJ3WUu3+UpnRJxs2iDQyWJTdqY8PDbvCx6R1WQrzDTtZF9k6SqtQRaDRKCTxa6vmXB74PGukk4Wm7KpHJAtsCE7ZKeLLbBLla5rNYWGS65XpKU72FxpI3OpLSIsSFfKzTf6WDNbQln0gXGjc73WUfxSlxyTwiUtYZWd8qPShS7mLnXliWpi9O+MiFIbiFVRDyCaXHaaWmUJL+UewNL4aMfy1tz2HEp8Rf+gZY1xPTQ3JQLfWI+q3s9Ixvmu2rQVdKeZPapsJcuswQOosSU8JX7SLe5kgv7p/t22bARJcq6tf4AvuPOQ2ykGJ3Piut053yfVoM8z8AvG/jDsO4uzhPWO8jbI3TFqGTbDOYK4B4B3dv4+oC5nq08wN/tOysqvgXohZCLP/odt8eY8yfoGpAjHVWu9Rn9izRtJFtSN/CO3zgeynfFxyVF1Ce30usTov37BLfcMgInOhqd19VQYgt3WU2QE5M9pVmfzovqhJaTVNm86si42NUW9vZWrj8bSbi7y+ILyLsy/tNn3BhHsQq2bKqqTZRF9Qwgb6T68SjFd7W5rLQ2wsC7SxFeZbf9jqirf2R5/1wF584p/Zr75xkOTASBunVQzwq7HbR3BbOi//wupmh2WDLqv6g17RHAhBtwLzQek0L11cwYcRcqFricJ8EdkwMO25+0HYEbnixC219mn6oqoERn6lAXAz22U2M493psgHpmuz7r4K0Yy1w4fX+FnNipAxrb1+ajVdkPYtnykiEK0vzsd2wp2aW4PNDXrO61Xzsf3gj2aeln7szcKGRpkATmz027rGhZZh7HTRuq3CZrNtf4rIfQAH8a28sFM8VSCO6LKFTzT6rpRN0ChONrBMxVnSOgwLo+iZv/VNv3Sk4r52g7T8khk+RfatLvYXdnynS17FiTb4sgyNoS/FI/bc21hnikttfivELpQJov7wr4Xsmw3o7g9bxQmLbfmjbKjY+P/h+lNWcddxCmwRbLmJJS4Dv5D/gBmFDnwIIZzJgAAAABJRU5ErkJggg==';
 
-        const mailOptions = {
-            from: `"Black Noise" <${process.env.EMAIL_USER}>`, // Dirección del remitente
-            to: to, // Lista de destinatarios
-            subject: subject, // Asunto del correo
-            html: html, // Cuerpo del correo en HTML
-        };
-
-        // Envía el correo
-        await transporter.sendMail(mailOptions);
-        console.log(`Correo enviado exitosamente a: ${to}`);
-        return { success: true, message: 'Correo enviado exitosamente' };
-    } catch (error) {
-        console.error('Error al enviar el correo:', error);
-        // Devuelve un objeto de error para que el llamador pueda manejarlo.
-        return { error: `Error al enviar el correo: ${error.message}` };
-    }
-}
-
+// Función para guardar usuarios en la base de datos
 async function guardarUsuarios(data, enviarCorreo = false) { // Añadir parámetro enviarCorreo con valor por defecto
 
     try {
+
+        //aqui se asigna la imagen de perfil por defecto
+
+        // Si no se proporciona fotoPerfil o está vacía, usa la imagen por defecto
+        if (!data.fotoPerfil) {
+            data.fotoPerfil = `data:image/webp;base64,${DEFAULT_PROFILE_PICTURE_BASE64}`;
+        } 
 
         console.log('datos de usuario obtenidos:', data);
 
@@ -84,13 +61,64 @@ async function guardarUsuarios(data, enviarCorreo = false) { // Añadir parámet
                 // Podrías querer manejar este error de alguna manera, aunque el usuario ya fue guardado.
             }
         }
-        return { success: true, data: UsuarioGuardado };
-
+        // Convertir el documento de Mongoose a un objeto plano
+        const usuarioPlano = {
+            tipoDocumento: UsuarioGuardado.tipoDocumento,
+            numeroDocumento: UsuarioGuardado.numeroDocumento,
+            primerNombre: UsuarioGuardado.primerNombre,
+            segundoNombre: UsuarioGuardado.segundoNombre,
+            primerApellido: UsuarioGuardado.primerApellido,
+            segundoApellido: UsuarioGuardado.segundoApellido,
+            nombreUsuario: UsuarioGuardado.nombreUsuario,
+            fechaNacimiento: UsuarioGuardado.fechaNacimiento,
+            genero: UsuarioGuardado.genero,
+            numeroTelefono: UsuarioGuardado.numeroTelefono,
+            direccion: UsuarioGuardado.direccion,
+            correo: UsuarioGuardado.correo,
+            rol: UsuarioGuardado.rol,
+            habilitado: UsuarioGuardado.habilitado,
+            _id: UsuarioGuardado._id.toString()
+        };
+        return { success: true, data: usuarioPlano };
+        
     } catch (error) {
         console.error('Error en la función guardarUsuarios:', error.message);
         // Manejo de errores de red o errores del servidor que no devuelven JSON con 'error'
         // Devuelve un objeto de error para que el llamador pueda manejarlo.
-        return { error: 'Error al conectar con la API para registrar el usuario' };
+        return { error: 'Error al registrar el usuario' };
+    }
+}
+
+// Función para enviar correos electrónicos
+async function enviarCorreoElectronico(to, subject, html) {
+    try {
+        // Configura el transportador de Nodemailer
+        // Reemplaza con tu configuración de SMTP y credenciales (idealmente desde variables de entorno)
+        const transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST || 'smtp.example.com', // Servidor SMTP de tu proveedor
+            port: parseInt(process.env.SMTP_PORT) || 587, // Puerto SMTP (587 para TLS, 465 para SSL)
+            secure: (parseInt(process.env.SMTP_PORT) || 587) === 465, // true para puerto 465, false para otros puertos
+            auth: {
+                user: process.env.EMAIL_USER, // Tu dirección de correo
+                pass: process.env.EMAIL_PASS, // Tu contraseña de correo o contraseña de aplicación
+            },
+        });
+
+        const mailOptions = {
+            from: `"Black Noise" <${process.env.EMAIL_USER}>`, // Dirección del remitente
+            to: to, // Lista de destinatarios
+            subject: subject, // Asunto del correo
+            html: html, // Cuerpo del correo en HTML
+        };
+
+        // Envía el correo
+        await transporter.sendMail(mailOptions);
+        console.log(`Correo enviado exitosamente a: ${to} en usuarioActions.enviarCorreoElectronico`);
+        return { success: true, message: 'Correo enviado exitosamente' };
+    } catch (error) {
+        console.error('Error al enviar el correo en usuarioActions.enviarCorreoElectronico:', error);
+        // Devuelve un objeto de error para que el llamador pueda manejarlo.
+        return { error: `Error al enviar el correo: ${error.message}` };
     }
 }
 
@@ -98,16 +126,21 @@ async function guardarUsuarios(data, enviarCorreo = false) { // Añadir parámet
 async function obtenerUsuarios() {
     try {
         connectDB();
+
         const data = { usuarios: await Usuario.find({}) };
+
         if (data.error) {
-            console.error('Error al encontrar el usuario ', user.error);
-            throw new Error(user.error);
+            console.error('Error al encontrar el usuario ', data.error);
         }
+        
         return data;
+
     } catch (error) {
         console.error('Error al encontrar el usuario:', error.message);
     }
 }
+
+//obtener usuarios habilitados de la base de datos
 async function obtenerUsuariosHabilitados() {
     try {
         connectDB();
@@ -124,40 +157,71 @@ async function obtenerUsuariosHabilitados() {
         console.error('Error al encontrar el usuario:', error.message);
     }
 }
+
+//obtener usuario por id
 async function ObtenerUsuarioPorId(id) {
     try {
         connectDB();
         console.log('id:', id);
-        const response = await Usuario.findById(id);
+        const response = await Usuario.findById(id).lean();
         if (!response) {
-            console.log('Error al encontrar el usuario', result.error);
+            console.log('Error al encontrar el usuario');
+            return null;
         }
-        return response;
+        // Convert MongoDB specific types to plain JavaScript types
+        const plainUser = {
+            ...response,
+            _id: response._id.toString(),
+            fechaNacimiento: response.fechaNacimiento ? 
+                new Date(response.fechaNacimiento).toISOString().split('T')[0] : null,
+            createdAt: response.createdAt ? 
+                new Date(response.createdAt).toISOString() : null,
+            updatedAt: response.updatedAt ? 
+                new Date(response.updatedAt).toISOString() : null
+        };
+        return plainUser;
     } catch (error) {
         console.log('Error al encontrar el usuario:', error.message);
+        return null;
     }
 }
+
+//obtener usuario por correo
 async function ObtenerUsuarioPorCorreo(email) {
     try {
+        
+        
+        console.log('Iniciando la función ObtenerUsuarioPorCorreo para el correo:', email);
+
         connectDB();
-        const user = await Usuario.findOne({ correo: email });
-        console.log('Resultado de la API con Axios:', user);
-        if (user.error) {
-            console.error('Error al encontrar el usuario con Axios:', user.error);
-            throw new Error(user.error);
+
+        // Realizar la búsqueda de correo electrónico de forma insensible a mayúsculas y minúsculas y eliminando espacios
+        const user = await Usuario.findOne({ correo: { $regex: new RegExp(`^${email.trim()}$`, 'i') } });
+
+        if (!user) {
+            console.error('Usuario no encontrado por correo:', email);
         }
+
         return user;
+        
     } catch (error) {
         console.error('Error al encontrar el usuario:', error.message);
     }
 }
+
+// Función para registrar un nuevo usuario
 async function RegistrarUsuario(formData) {
+
+
+
     const data = {
+
         // Obtener los datos del formulario
         tipoDocumento: formData.get('tipoDocumento'),
         numeroDocumento: formData.get('numeroDocumento'),
         primerNombre: formData.get('primerNombre'),
-        nombreUsuario: formData.get('primerNombre'), // Asignar primerNombre a nombreUsuario
+        // Generar nombre de usuario con primer nombre y un número aleatorio de 4 cifras
+        nombreUsuario: `${formData.get('primerNombre')}${Math.floor(1000 + Math.random() * 9000)}`,
         segundoNombre: formData.get('segundoNombre'),
         primerApellido: formData.get('primerApellido'),
         segundoApellido: formData.get('segundoApellido'),
@@ -167,8 +231,9 @@ async function RegistrarUsuario(formData) {
         direccion: formData.get('direccion'),
         correo: formData.get('correo'),
         password: formData.get('password'),
-        rol: 'cliente', // Asignar rol de cliente por defecto
+        rol: 'CLIENTE', // Asignar rol de cliente por defecto
         habilitado: true // Asegurar que el usuario está habilitado por defecto
+
     }
 
     console.log('data:', data);
@@ -179,20 +244,15 @@ async function RegistrarUsuario(formData) {
 
     data.password = hashedPassword;
 
-    console.log('contraseña hassheada:', hashedPassword);
 
     // Guardar el usuario en la base de datos(con la contraseña hasheada)
 
     const resultado = await guardarUsuarios(data, true); // Enviar correo al registrar un solo usuario
 
-    // Verificar si el usuario fue guardado exitosamente y es un cliente
-    if (resultado.success && resultado.data.rol === 'cliente') {
-        redirect('/'); // Redirigir a index si es cliente
-    } else {
-        redirect('/login'); // Mantener la redirección a login para otros roles
-    }
+    return resultado;
 }
 
+// Función para registrar un usuario masivo
 async function RegistroMasivoUsuario(formData, userId) {
 
     const file = formData.get('file');
@@ -244,6 +304,7 @@ async function RegistroMasivoUsuario(formData, userId) {
 
 }
 
+// Función para filtrar usuarios
 async function FiltrarUsuarios(formData) {
 
     const textoBusqueda = formData.get('textoBusqueda');
@@ -251,7 +312,7 @@ async function FiltrarUsuarios(formData) {
     const genero = formData.get('generoFiltro');
     const tipoDocumento = formData.get('tipoDocumentoFiltro');
     const edad = formData.get('edadFiltro');
-    const incluirDeshabilitados = formData.get('incluirDeshabilitados') === 'on'; // Checkbox value is 'on' when checked
+    const incluirDeshabilitados = formData.get('incluirDeshabilitados') === 'true'; // Checkbox value is 'true' when checked
 
     console.log("Buscando usuarios con los siguientes filtros:");
 
@@ -293,7 +354,11 @@ async function FiltrarUsuarios(formData) {
 
     if (edad) { /* Lógica para filtrar por edad, puede requerir conversión a número y rangos */ }
 
-    if (!incluirDeshabilitados) query.habilitado = 'true'; // Asumiendo que tienes un campo 'estado'
+    // Si no se deben incluir deshabilitados, se filtra por habilitado: true
+    // Si se deben incluir deshabilitados, no se añade el filtro de habilitado, trayendo todos.
+    if (!incluirDeshabilitados) {
+        query.habilitado = true;
+    }
 
     const usuariosEncontradosRaw = await Usuario.find(query).lean(); // Use .lean() here too
 
@@ -331,14 +396,15 @@ async function FiltrarUsuarios(formData) {
     return { data: [], message: "Búsqueda simulada completada." };
 }
 
-async function DeshabilitarUsuario(formData) {
+// Función para cambiar el estado de habilitado de un usuario
+async function toggleUsuarioHabilitado(formData) {
 
     const id = formData.get('id');
 
-    console.log('Intentando deshabilitar usuario con id:', id);
+    console.log('Intentando cambiar el estado de habilitado del usuario con id:', id);
 
     if (!id) {
-        console.error('Error: ID de usuario no proporcionado para deshabilitar.');
+        console.error('Error: ID de usuario no proporcionado para cambiar el estado.');
 
         return { error: 'ID de usuario no proporcionado.' };
     }
@@ -346,61 +412,42 @@ async function DeshabilitarUsuario(formData) {
     try {
 
         await connectDB();
-        
-        const usuarioActualizado = await Usuario.findByIdAndUpdate(
-            id,
-            { habilitado: false },
-            { new: true } // Devuelve el documento modificado
-        );
 
-        if (!usuarioActualizado) {
-            console.error(`Error: No se encontró ningún usuario con el ID ${id} para deshabilitar.`);
+        const usuario = await Usuario.findById(id);
+
+        if (!usuario) {
+
+            console.error(`Error: No se encontró ningún usuario con el ID ${id}.`);
+
             return { error: `No se encontró ningún usuario con el ID ${id}.` };
+
         }
 
-        console.log('Usuario deshabilitado exitosamente:', usuarioActualizado);
+        const nuevoEstadoHabilitado = !usuario.habilitado; // Toggle the current state
+
+        const usuarioActualizado = await Usuario.findByIdAndUpdate(
+
+            id,
+
+            { habilitado: nuevoEstadoHabilitado },
+
+            { new: true } // Devuelve el documento modificado
+
+        );
+
+        console.log(`Usuario ${nuevoEstadoHabilitado ? 'habilitado' : 'deshabilitado'} exitosamente:`, usuarioActualizado);
+
         revalidatePath('/admin/usuarios'); // Revalida la página de usuarios para reflejar el cambio
-        return { success: true, message: 'Usuario deshabilitado exitosamente.', data: JSON.parse(JSON.stringify(usuarioActualizado)) };
+
+        return { success: true, message: `Usuario ${nuevoEstadoHabilitado ? 'habilitado' : 'deshabilitado'} exitosamente.`, data: JSON.parse(JSON.stringify(usuarioActualizado)) };
 
     } catch (error) {
-        console.error(`Error al deshabilitar el usuario con ID ${id}:`, error.message);
-        // Considera si quieres devolver un mensaje de error más genérico al cliente
+        console.error(`Error al cambiar el estado de habilitado del usuario con ID ${id}:`, error.message);
         return { error: `Error al procesar la solicitud: ${error.message}` };
     }
 }
 
-async function HabilitarUsuario(formData) {
-    const id = formData.get('id');
-    console.log('Intentando habilitar usuario con id:', id);
-
-    if (!id) {
-        console.error('Error: ID de usuario no proporcionado para habilitar.');
-        return { error: 'ID de usuario no proporcionado.' };
-    }
-
-    try {
-        await connectDB();
-        const usuarioActualizado = await Usuario.findByIdAndUpdate(
-            id,
-            { habilitado: true }, // Set habilitado to true
-            { new: true } // Devuelve el documento modificado
-        );
-
-        if (!usuarioActualizado) {
-            console.error(`Error: No se encontró ningún usuario con el ID ${id} para habilitar.`);
-            return { error: `No se encontró ningún usuario con el ID ${id}.` };
-        }
-
-        console.log('Usuario habilitado exitosamente:', usuarioActualizado);
-        revalidatePath('/admin/usuarios'); // Revalida la página de usuarios para reflejar el cambio
-        return { success: true, message: 'Usuario habilitado exitosamente.', data: JSON.parse(JSON.stringify(usuarioActualizado)) };
-
-    } catch (error) {
-        console.error(`Error al habilitar el usuario con ID ${id}:`, error.message);
-        return { error: `Error al procesar la solicitud: ${error.message}` };
-    }
-}
-
+// Función para editar un usuario
 async function EditarUsuario(formData) {
 
     const id = formData.get('id');
@@ -487,8 +534,7 @@ export {
     ObtenerUsuarioPorId,
     ObtenerUsuarioPorCorreo,
     FiltrarUsuarios,
-    DeshabilitarUsuario,
-    HabilitarUsuario, // Add the new action
+    toggleUsuarioHabilitado,
     EditarUsuario,
     obtenerUsuariosHabilitados,
     ObtenerTodosLosUsuarios

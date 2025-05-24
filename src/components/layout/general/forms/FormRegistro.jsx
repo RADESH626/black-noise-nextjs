@@ -1,3 +1,7 @@
+
+"use client";
+import { useRouter } from 'next/navigation';
+import { usePopUp } from '@/context/PopUpContext';
 import {
   InputPassword,
   InputTipoDocumentoIdentidad,
@@ -10,16 +14,55 @@ import {
 } from "@/components/common/inputs";
 
 
-import {RegistrarUsuario} from "@/app/acciones/UsuariosActions";
+import { RegistrarUsuario } from "@/app/acciones/UsuariosActions";
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
 
 
 function FormRegistro() {
-  
+  const router = useRouter();
+  const { showPopUp } = usePopUp();
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+    const password = formData.get('password');
+    const confirmPassword = formData.get('confirmPassword');
+
+    if (password !== confirmPassword) {
+      showPopUp('Las contraseñas no coinciden', 'error');
+      return;
+    }
+
+    try {
+      const result = await RegistrarUsuario(formData);
+
+      if (result.success) {
+        // Mostrar primer mensaje de éxito
+        showPopUp('¡Registro exitoso!', 'success');
+        
+        // Esperar 2 segundos
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Mostrar segundo mensaje sobre inicio de sesión
+        showPopUp('Ya puedes iniciar sesión con tu cuenta', 'success');
+        
+        // Esperar otro segundo antes de redirigir
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Redirigir a la página de login
+        router.push('/login');
+      } else {
+        showPopUp(result.error || 'Error en el registro. Inténtalo de nuevo.', 'error');
+      }
+    } catch (error) {
+      showPopUp('Error en el registro. Inténtalo de nuevo.', 'error');
+    }
+  };
 
   return (
 
-    <form className="space-y-5" action={RegistrarUsuario} >
+    <form className="space-y-5" onSubmit={handleSubmit}>
 
 
       {/* ==================================================================================================== */}
@@ -210,22 +253,17 @@ function FormRegistro() {
 
         <label htmlFor="confirmPassword" className="block mb-1 text-sm font-medium text-bn-accent">Confirmar Contraseña</label>
         <div className="relative">
-
+          <InputPassword id="confirmPassword" name="confirmPassword" required />
           <i className='bx bxs-lock-alt absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
-
         </div>
 
       </div>
 
       <div className="flex items-center justify-center mt-5">
 
-        <BotonGeneral 
-        // type="submit" 
-        >Registrarse</BotonGeneral>
+        <BotonGeneral>Registrarse</BotonGeneral>
 
       </div>
-
-      
 
       <div className="text-center mt-5 text-white">
         <p>¿Ya tienes una cuenta? <a href="/login" id="showLogin" className="font-medium text-white no-underline hover:underline">Iniciar Sesión</a></p>

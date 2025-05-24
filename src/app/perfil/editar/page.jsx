@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
-import FormEditarUsuario from "@/app/admin/usuarios/FormEditarUsuario";
+import FormEditarUsuario from "@/app/admin/usuarios/components/FormEditarUsuario";
 
 async function EditarPerfil() {
   const session = await getServerSession(authOptions);

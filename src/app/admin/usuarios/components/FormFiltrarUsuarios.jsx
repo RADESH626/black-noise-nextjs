@@ -2,18 +2,34 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { InputTextoGeneral } from '@/components/common/inputs';
 import { TdGeneral } from '@/components/common/tablas';
 import SeccionLista from '@/components/layout/admin/secciones/lista/SeccionLista';
-import { FiltrarUsuarios, DeshabilitarUsuario, HabilitarUsuario } from '@/app/acciones/UsuariosActions';
+import PopUpMessage from '@/components/common/modales/PopUpMessage';
+import { FiltrarUsuarios, toggleUsuarioHabilitado } from '@/app/acciones/UsuariosActions';
 import THUsuarios from '@/components/layout/admin/usuarios/THUsuarios';
 import BotonEditar from '@/components/common/botones/BotonEditar';
+import BotonExportarPDF from '@/components/common/botones/BotonExportarPDF'; // Importar BotonExportarPDF
+import { Rol } from '@/models/enums/usuario/Rol'; // Importar el enum Rol
+import { Genero } from '@/models/enums/usuario/Genero'; // Importar el enum Genero
+import { TipoDocumentoIdentidad } from '@/models/enums/usuario/TipoDocumentoIdentidad'; // Importar el enum TipoDocumentoIdentidad
 
-export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
+export default function FormFiltrarUsuarios({ initialUsersFromPage = [], isLoading: parentIsLoading = false }) {
+    // Estado para almacenar los usuarios a mostrar
     const [usersToDisplay, setUsersToDisplay] = useState(initialUsersFromPage);
-    const [isLoading, setIsLoading] = useState(false);
+
+    // Estado para manejar el loading
+    const [localIsLoading, setLocalIsLoading] = useState(false);
+    const isLoading = localIsLoading || parentIsLoading;
+
+    // Estado para manejar el formulario
     const [formKey, setFormKey] = useState(Date.now());
-    const [alert, setAlert] = useState({ show: false, type: '', message: '' });
+
+    // Estado para manejar el pop-up
+    const [popUp, setPopUp] = useState(null);
+
+    // Estado para manejar los filtros
     const [filters, setFilters] = useState({
         textoBusqueda: '', // Para buscar por nombre, apellido o correo
         rol: '',
@@ -22,10 +38,24 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
         incluirDeshabilitados: false
     });
 
+    // Efecto para inicializar los usuarios a mostrar cuando cambian los usuarios iniciales
     useEffect(() => {
+        console.log('initialUsersFromPage:', initialUsersFromPage);
+        if (!Array.isArray(initialUsersFromPage)) {
+            console.warn('initialUsersFromPage is not an array:', initialUsersFromPage);
+            setUsersToDisplay([]);
+            return;
+        }
+        console.log('Setting usersToDisplay with length:', initialUsersFromPage.length);
         setUsersToDisplay(initialUsersFromPage);
     }, [initialUsersFromPage]);
 
+    // Debug effect to monitor usersToDisplay changes
+    useEffect(() => {
+        console.log('usersToDisplay updated:', usersToDisplay);
+    }, [usersToDisplay]);
+
+    // Función para manejar el cambio en los filtros
     const handleFilterChange = (e) => {
         const { name, value, type, checked } = e.target;
         setFilters(prev => ({
@@ -34,11 +64,19 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
         }));
     };
 
+    // Función para manejar el envío del formulario de búsqueda
     const handleSearchSubmit = async (event) => {
-        event.preventDefault();
-        setIsLoading(true);
-        setAlert({ show: false, type: '', message: '' });
 
+        // Evitar el comportamiento por defecto del formulario (recargar la pagina)
+        event.preventDefault();
+
+        // Mostrar loading y ocultar alertas
+        setLocalIsLoading(true);
+
+        // Limpiar el pop-up antes de realizar la búsqueda
+        setPopUp(null);
+
+        // Crear un objeto FormData para enviar los filtros
         const formData = new FormData();
         Object.keys(filters).forEach(key => {
             if (filters[key] !== '') {
@@ -49,16 +87,18 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
         try {
             const result = await FiltrarUsuarios(formData);
             if (result.error) {
-                setAlert({ show: true, type: 'error', message: result.error });
+                setPopUp({ type: 'error', message: result.error });
                 setUsersToDisplay([]);
+            } else if (result.data) {
+                setUsersToDisplay(Array.isArray(result.data) ? result.data : []);
             } else {
-                setUsersToDisplay(result.data || []);
+                setUsersToDisplay([]);
             }
         } catch (error) {
-            setAlert({ show: true, type: 'error', message: 'Error al filtrar usuarios.' });
+            setPopUp({ type: 'error', message: 'Error al filtrar usuarios.' });
             setUsersToDisplay([]);
         }
-        setIsLoading(false);
+        setLocalIsLoading(false);
     };
 
     const handleResetFilters = () => {
@@ -70,20 +110,24 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
             tipoDocumentoFiltro: '',
             incluirDeshabilitados: false
         });
-        setUsersToDisplay(initialUsersFromPage);
+        setUsersToDisplay(Array.isArray(initialUsersFromPage) ? initialUsersFromPage : []);
+        setPopUp(null); // Ensure pop-up is cleared on reset
+    };
+
+    const handleClosePopUp = () => {
+        setPopUp(null);
     };
 
     const handleToggleUserStatus = async (userId, currentStatus) => {
-        setIsLoading(true);
+        setLocalIsLoading(true);
         const formData = new FormData();
         formData.append('id', userId);
 
         try {
-            const result = currentStatus ? await DeshabilitarUsuario(formData) : await HabilitarUsuario(formData);
+            const result = await toggleUsuarioHabilitado(formData);
 
             if (result.error) {
-                setAlert({
-                    show: true,
+                setPopUp({
                     type: 'error',
                     message: result.error
                 });
@@ -96,20 +140,18 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
                             : user
                     )
                 );
-                setAlert({
-                    show: true,
+                setPopUp({
                     type: 'success',
                     message: `Usuario ${currentStatus ? 'deshabilitado' : 'habilitado'} exitosamente.`
                 });
             }
         } catch (error) {
-            setAlert({
-                show: true,
+            setPopUp({
                 type: 'error',
                 message: `Error al ${currentStatus ? 'deshabilitar' : 'habilitar'} el usuario.`
             });
         }
-        setIsLoading(false);
+        setLocalIsLoading(false);
     };
 
     const formatDate = (dateString) => {
@@ -123,7 +165,9 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
                 <section className="flex flex-col gap-2 bg-black rounded-lg justify-center items-top p-4 w-full text-white mb-4">
                     <header className='flex flex-wrap gap-4 items-end'>
                         <div>
+
                             <label htmlFor="textoBusqueda" className="block text-sm font-medium mb-1">Buscar (Nombre, Apellido, Correo):</label>
+
                             <InputTextoGeneral
                                 id="textoBusqueda"
                                 name="textoBusqueda"
@@ -131,20 +175,28 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
                                 onChange={handleFilterChange}
                                 placeholder="Buscar usuario..."
                             />
+
                         </div>
                         <div>
                             <label htmlFor="rol" className="block text-sm font-medium mb-1">Rol:</label>
                             <select
+
                                 name="rol"
+
                                 id="rol"
+
                                 value={filters.rol}
+
                                 onChange={handleFilterChange}
+                                
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
                             >
                                 <option value="">Todos</option>
-                                <option value="admin">Administrador</option>
-                                <option value="cliente">Cliente</option>
-                                <option value="proveedor">Proveedor</option>
+                                {Object.values(Rol).map((rolValue) => (
+                                    <option key={rolValue} value={rolValue}>
+                                        {rolValue.charAt(0).toUpperCase() + rolValue.slice(1).toLowerCase()}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                         <div>
@@ -157,9 +209,11 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
                             >
                                 <option value="">Todos</option>
-                                <option value="M">Masculino</option>
-                                <option value="F">Femenino</option>
-                                <option value="O">Otro</option>
+                                {Object.entries(Genero).map(([key, value]) => (
+                                    <option key={key} value={value}>
+                                        {key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                         <div>
@@ -172,10 +226,11 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
                             >
                                 <option value="">Todos</option>
-                                <option value="CC">Cédula de Ciudadanía</option>
-                                <option value="CE">Cédula de Extranjería</option>
-                                <option value="TI">Tarjeta de Identidad</option>
-                                <option value="PP">Pasaporte</option>
+                                {Object.entries(TipoDocumentoIdentidad).map(([key, value]) => (
+                                    <option key={key} value={value}>
+                                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                         <div className="flex items-center mt-4">
@@ -200,6 +255,7 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
                         >
                             {isLoading ? 'Buscando...' : 'Buscar Usuarios'}
                         </button>
+
                         <button
                             type="button"
                             onClick={handleResetFilters}
@@ -208,17 +264,12 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
                         >
                             Limpiar Filtros
                         </button>
+
+                        <BotonExportarPDF usuarios={usersToDisplay} />
+
                     </footer>
                 </section>
             </form>
-
-            {alert.show && (
-                <div className={`p-4 mb-4 text-sm rounded-lg ${alert.type === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
-                    }`} role="alert">
-                    {alert.message}
-                    <button onClick={() => setAlert({ show: false })} className="ml-4 float-right font-bold">X</button>
-                </div>
-            )}
 
             <SeccionLista>
                 <THUsuarios />
@@ -243,7 +294,19 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
                                 <TdGeneral>{user.correo}</TdGeneral>
                                 <TdGeneral>{user.rol}</TdGeneral>
                                 <TdGeneral>{formatDate(user.createdAt)}</TdGeneral>
-                                <TdGeneral>{user.fotoPerfil || 'N/A'}</TdGeneral>
+                                <TdGeneral>
+                                    {user.fotoPerfil ? (
+                                        <Image
+                                            src={user.fotoPerfil}
+                                            alt={`Foto de perfil de ${user.nombreUsuario}`}
+                                            width={50}
+                                            height={50}
+                                            className="rounded-full object-cover"
+                                        />
+                                    ) : (
+                                        'N/A'
+                                    )}
+                                </TdGeneral>
                                 <TdGeneral>{user.habilitado ? 'Activo' : 'Inactivo'}</TdGeneral>
 
                                 <TdGeneral>
@@ -273,6 +336,13 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
                     )}
                 </tbody>
             </SeccionLista>
+            {popUp && (
+                <PopUpMessage
+                    message={popUp.message}
+                    type={popUp.type}
+                    onClose={handleClosePopUp}
+                />
+            )}
         </>
     );
 }

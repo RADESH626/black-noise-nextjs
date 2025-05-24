@@ -65,6 +65,9 @@ export default function FormFiltrarVentas({ initialVentasFromPage = [] }) {
             setVentasToDisplay(filtered);
         } else {
             setAlert({ show: true, type: 'error', message: result.error || 'Error al cargar ventas.' });
+            setTimeout(() => {
+                setAlert({ show: false, type: '', message: '' });
+            }, 2000);
             setVentasToDisplay([]);
         }
         setIsLoading(false);
@@ -84,6 +87,9 @@ export default function FormFiltrarVentas({ initialVentasFromPage = [] }) {
             setVentasToDisplay(result.ventas);
         } else {
             setAlert({ show: true, type: 'error', message: result.error || 'Error al cargar ventas.' });
+            setTimeout(() => {
+                setAlert({ show: false, type: '', message: '' });
+            }, 2000);
             setVentasToDisplay(initialVentasFromPage);
         }
         setIsLoading(false);

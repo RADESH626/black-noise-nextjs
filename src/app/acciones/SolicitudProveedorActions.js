@@ -10,6 +10,7 @@ import { Disponibilidad } from '@/models/enums/proveedor'; // Para el nuevo prov
 
 // Crear una nueva solicitud de proveedor (generalmente por un usuario no admin)
 async function crearSolicitudProveedor(data) {
+    console.log('Iniciando la función crearSolicitudProveedor');
     try {
         await connectDB();
         const nuevaSolicitud = new SolicitudProveedor(data);
@@ -27,6 +28,7 @@ async function crearSolicitudProveedor(data) {
 
 // Obtener todas las solicitudes de proveedor
 async function obtenerSolicitudesProveedor() {
+    console.log('Iniciando la función obtenerSolicitudesProveedor');
     try {
         await connectDB();
         const solicitudes = await SolicitudProveedor.find({})
@@ -43,6 +45,7 @@ async function obtenerSolicitudesProveedor() {
 
 // Obtener solicitud de proveedor por ID
 async function ObtenerSolicitudProveedorPorId(id) {
+    console.log('Iniciando la función ObtenerSolicitudProveedorPorId');
     try {
         await connectDB();
         const solicitud = await SolicitudProveedor.findById(id)
@@ -61,6 +64,7 @@ async function ObtenerSolicitudProveedorPorId(id) {
 
 // Revisar/Actualizar estado de una solicitud de proveedor (Aprobar/Rechazar)
 async function revisarSolicitudProveedor(id, revisorId, nuevoEstado, comentariosAdmin, datosProveedorAdicionales = {}) {
+    console.log('Iniciando la función revisarSolicitudProveedor');
     try {
         await connectDB();
         if (!Object.values(EstadoSolicitud).includes(nuevoEstado)) {
@@ -126,6 +130,7 @@ export {
 
 // Eliminar una solicitud de proveedor por ID
 async function eliminarSolicitudProveedor(id) {
+    console.log('Iniciando la función eliminarSolicitudProveedor');
     try {
         await connectDB();
         const deletedSolicitud = await SolicitudProveedor.findByIdAndDelete(id);
