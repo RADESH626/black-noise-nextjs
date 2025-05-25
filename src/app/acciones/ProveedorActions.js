@@ -1,145 +1,70 @@
-"use server"
+"use server";
 
-import connectDB from '@/utils/DBconection';
-import Proveedor from '@/models/Proveedor';
-import Usuario from '@/models/Usuario'; // Necesario para popular
-import { revalidatePath } from 'next/cache';
-import { Disponibilidad } from '@/models/enums/proveedor'; // Para cambiar disponibilidad
-
-// Crear un nuevo proveedor
-async function guardarProveedor(data) {
-    console.log('Iniciando la función guardarProveedor');
+export async function obtenerProveedores() {
     try {
-        await connectDB();
-        // Convertir metodosPagoAceptados a array si viene como string
-        if (data.metodosPagoAceptados && typeof data.metodosPagoAceptados === 'string') {
-            data.metodosPagoAceptados = data.metodosPagoAceptados.split(',').map(metodo => metodo.trim()).filter(metodo => metodo);
-        } else if (!data.metodosPagoAceptados) {
-            data.metodosPagoAceptados = []; // Asegurar que sea un array
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/proveedores`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            cache: 'no-store', // No cachear esta petición
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al obtener los proveedores.');
         }
 
-        const nuevoProveedor = new Proveedor(data);
-        const proveedorGuardado = await nuevoProveedor.save();
-        revalidatePath('/admin/proveedores');
-        return { success: true, data: JSON.parse(JSON.stringify(proveedorGuardado)) };
+        const proveedores = await response.json();
+        return { proveedores };
     } catch (error) {
-        console.error('Error al guardar el proveedor:', error);
-        if (error.code === 11000) { // Error de duplicado (ej. NIT)
-            return { error: 'Error al guardar el proveedor: Ya existe un proveedor con ese NIT.' };
-        }
-        return { error: 'Error al guardar el proveedor: ' + error.message };
+        console.error("Error en obtenerProveedores:", error);
+        return { error: error.message };
     }
 }
 
-// Obtener todos los proveedores
-async function obtenerProveedores() {
-    console.log('Iniciando la función obtenerProveedores');
+export async function obtenerMiPerfilProveedor() {
     try {
-        await connectDB();
-        const proveedores = await Proveedor.find({})
-            .populate('usuarioId', 'nombreUsuario correo') // Popula algunos campos de Usuario
-            .lean();
-        return { proveedores: JSON.parse(JSON.stringify(proveedores)) };
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/proveedores/mi-perfil`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            cache: 'no-store',
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al obtener el perfil del proveedor.');
+        }
+
+        const proveedor = await response.json();
+        return { proveedor };
     } catch (error) {
-        console.error('Error al obtener los proveedores:', error);
-        return { error: 'Error al obtener los proveedores: ' + error.message };
+        console.error("Error en obtenerMiPerfilProveedor:", error);
+        return { error: error.message };
     }
 }
 
-// Obtener todos los proveedores habilitados (disponibilidad = DISPONIBLE)
-async function obtenerProveedoresHabilitados() {
-    console.log('Iniciando la función obtenerProveedoresHabilitados');
+export async function actualizarPerfilProveedor(data) {
     try {
-        await connectDB();
-        const proveedores = await Proveedor.find({ disponibilidad: Disponibilidad.DISPONIBLE })
-            .populate('usuarioId', 'nombreUsuario correo')
-            .lean();
-        return { proveedores: JSON.parse(JSON.stringify(proveedores)) };
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/proveedores/mi-perfil`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al actualizar el perfil del proveedor.');
+        }
+
+        const result = await response.json();
+        return { success: true, proveedor: result.proveedor };
     } catch (error) {
-        console.error('Error al obtener proveedores habilitados:', error);
-        return { error: 'Error al obtener proveedores habilitados: ' + error.message };
+        console.error("Error en actualizarPerfilProveedor:", error);
+        return { error: error.message };
     }
 }
-
-
-// Obtener proveedor por ID
-async function ObtenerProveedorPorId(id) {
-    console.log('Iniciando la función ObtenerProveedorPorId');
-    try {
-        await connectDB();
-        const proveedor = await Proveedor.findById(id)
-            .populate('usuarioId', 'nombreUsuario correo')
-            .lean();
-        if (!proveedor) {
-            return { error: 'Proveedor no encontrado' };
-        }
-        return JSON.parse(JSON.stringify(proveedor));
-    } catch (error) {
-        console.error('Error al obtener el proveedor:', error);
-        return { error: 'Error al obtener el proveedor: ' + error.message };
-    }
-}
-
-// Editar proveedor
-async function EditarProveedor(id, data) {
-    console.log('Iniciando la función EditarProveedor');
-    try {
-        await connectDB();
-        
-        const updateData = { ...data };
-        if (updateData.metodosPagoAceptados && typeof updateData.metodosPagoAceptados === 'string') {
-            updateData.metodosPagoAceptados = updateData.metodosPagoAceptados.split(',').map(metodo => metodo.trim()).filter(metodo => metodo);
-        } else if (updateData.hasOwnProperty('metodosPagoAceptados') && !updateData.metodosPagoAceptados) {
-             updateData.metodosPagoAceptados = [];
-        }
-
-
-        // NIT y usuarioId no deberían ser editables fácilmente.
-        // delete updateData.nit;
-        // delete updateData.usuarioId;
-
-        const proveedorActualizado = await Proveedor.findByIdAndUpdate(id, updateData, { new: true }).lean();
-        if (!proveedorActualizado) {
-            return { error: 'Proveedor no encontrado para actualizar' };
-        }
-        revalidatePath('/admin/proveedores');
-        revalidatePath(`/admin/proveedores/editar/${id}`);
-        return { success: true, data: JSON.parse(JSON.stringify(proveedorActualizado)) };
-    } catch (error) {
-        console.error('Error al editar el proveedor:', error);
-         if (error.code === 11000) { 
-            return { error: 'Error al editar el proveedor: Ya existe un proveedor con ese NIT.' };
-        }
-        return { error: 'Error al editar el proveedor: ' + error.message };
-    }
-}
-
-// Cambiar disponibilidad de un proveedor (Habilitar/Deshabilitar)
-async function CambiarDisponibilidadProveedor(id, nuevaDisponibilidad) {
-    console.log('Iniciando la función CambiarDisponibilidadProveedor');
-    try {
-        await connectDB();
-        if (!Object.values(Disponibilidad).includes(nuevaDisponibilidad)) {
-            return { error: 'Estado de disponibilidad no válido.' };
-        }
-        const proveedor = await Proveedor.findByIdAndUpdate(id, { disponibilidad: nuevaDisponibilidad }, { new: true }).lean();
-        if (!proveedor) {
-            return { error: 'Proveedor no encontrado.' };
-        }
-        revalidatePath('/admin/proveedores');
-        return { success: true, message: `Proveedor ${nuevaDisponibilidad === Disponibilidad.DISPONIBLE ? 'habilitado' : 'deshabilitado'} correctamente.` };
-    } catch (error) {
-        console.error(`Error al cambiar disponibilidad del proveedor: ${error.message}`);
-        return { error: `Error al cambiar disponibilidad del proveedor: ${error.message}` };
-    }
-}
-
-
-export {
-    guardarProveedor,
-    obtenerProveedores,
-    obtenerProveedoresHabilitados,
-    ObtenerProveedorPorId,
-    EditarProveedor,
-    CambiarDisponibilidadProveedor
-};

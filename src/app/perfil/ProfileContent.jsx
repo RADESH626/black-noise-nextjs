@@ -1,6 +1,7 @@
 "use client";
 
 import { useModal } from "@/context/ModalContext";
+import { signOut } from "next-auth/react"; // Import signOut
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
 import FormEditarUsuario from "@/app/admin/usuarios/components/FormEditarUsuario";
 
@@ -53,13 +54,13 @@ function ProfileContent({ user, designs: userDesigns, error }) {
                 EDITAR PERFIL
               </BotonGeneral>
 
-              {/* <button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-lg transition duration-150">
+              <BotonGeneral onClick={() => signOut({ callbackUrl: '/login' })}>
                 CERRAR SESIÓN
-              </button> */}
-              <BotonGeneral onClick={}>
-                EDITAR DISEÑO
               </BotonGeneral>
 
+              <BotonGeneral onClick={() => { /* Add logic for editing/adding designs */ }}>
+                EDITAR DISEÑO
+              </BotonGeneral>
 
             </div>
           </div>
@@ -120,3 +121,6 @@ function ProfileContent({ user, designs: userDesigns, error }) {
 }
 
 export default ProfileContent;
+
+
+//TODO: Implementar función para cerrar sesión

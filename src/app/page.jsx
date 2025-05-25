@@ -1,17 +1,11 @@
 import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
 import Footer from '@/components/layout/general/footer/Footer';
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // Asegúrate que la ruta a tus authOptions sea correcta
-import { getServerSession } from "next-auth/next";
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 async function indexPage() {
-
-  const session = await getServerSession(authOptions);
-
   return (
     <div className='pt-16'>
-      <HeaderPrincipal session={session} />
-
+      <HeaderPrincipal />
 
       <main className="flex flex-col justify-between h-full">
 

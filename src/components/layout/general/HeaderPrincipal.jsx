@@ -1,37 +1,32 @@
 "use client"; // Required for onClick events
-import Link from 'next/link'
-import IconoPersona from '../../common/iconos/IconoPersona'
-import { signOut } from "next-auth/react"
+import Link from 'next/link';
+import { useSession, signOut } from 'next-auth/react';
+import IconoPersona from '../../common/iconos/IconoPersona';
 
-function HeaderPrincipal({ session }) {
-
-    console.log(session);
-
-    const user = session?.user;
+function HeaderPrincipal() {
+    const { data: session } = useSession();
 
     return (
         <div>
-            
-            <header className='bg-black flex flex-row justify-between items-center p-4 top-0 fixed w-full h-16 z-50'>
+            <header className='bg-black flex flex-row justify-between items-center p-10 top-0 fixed w-full h-16 z-50'>
                 <h1 className='font-bold text-3xl hover:text-white transition-colors duration-500 text-pink-400'>BLACK NOISE</h1>
                 <div className='flex flex-row items-center gap-4'>
-
-                    {user ? (
+                    {session ? (
                         <>
                             <div className='flex flex-row items-center justify-center gap-4'>
-                                <span className='text-white'>¡Bienvenido {user?.name}!</span>
+                                <span className='text-white'>¡Bienvenido {session.user?.name}!</span>
                                 <Link href="/perfil">
                                     <div className="w-8 h-8 rounded-full overflow-hidden">
                                         <img 
-                                            src={user?.image || "/img/perfil/FotoPerfil.webp"} 
+                                            src={session.user?.image || "/img/perfil/FotoPerfil.webp"} 
                                             alt="Foto de perfil" 
                                             className="w-full h-full object-cover"
                                         />
                                     </div>
                                 </Link>
                             </div>
-                            <button 
-                                onClick={() => signOut({ callbackUrl: '/login' })} 
+                            <button
+                                onClick={() => signOut({ callbackUrl: '/login' })}
                                 className='bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded transition-colors duration-300'
                             >
                                 Cerrar Sesión
@@ -42,12 +37,10 @@ function HeaderPrincipal({ session }) {
                             Iniciar Sesión
                         </Link>
                     )}
-
-
                 </div>
             </header>
         </div>
-    )
+    );
 }
 
 export default HeaderPrincipal

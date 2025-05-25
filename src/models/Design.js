@@ -1,5 +1,6 @@
 import { Schema, model, models } from 'mongoose'
-import { CategoriaDesing, EstadoDesing } from './enums/design'
+import { CategoriaProducto } from './enums/CategoriaProducto'
+import { EstadoDesing } from './enums/design/EstadoDesing'
 
 const DesignSchema = new Schema({
     usuarioId: {
@@ -13,7 +14,7 @@ const DesignSchema = new Schema({
     },
     categoria: {
         type: String,
-        enum: Object.values(CategoriaDesing),
+        enum: Object.values(CategoriaProducto),
         required: true
     },
     palabrasClave: [{
@@ -34,7 +35,8 @@ const DesignSchema = new Schema({
     estadoDesing: {
         type: String,
         enum: Object.values(EstadoDesing),
-        required: true
+        required: true,
+        default: EstadoDesing.PRIVADO
     },
     elementoIds: [{
         type: Schema.Types.ObjectId,

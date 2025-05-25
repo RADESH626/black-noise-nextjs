@@ -1,18 +1,19 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions";
 import ProfileContent from "./ProfileContent";
 
 async function ProfileData() {
   const session = await getServerSession(authOptions);
-  const user = session?.user;
 
-  if (!session) {
-    return redirect("/");
+  if (!session || !session.user) {
+    return redirect("/login");
   }
 
-  // Obtener los diseños del usuario directamente
+  const user = session.user;
+
+  // Obtener los diseños del usuario
   const { designs, error } = await obtenerDesignsPorUsuarioId(user.id);
   const userDesigns = designs || [];
 
