@@ -1,0 +1,193 @@
+"use client";
+
+import React, { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
+import InputGeneral from '@/components/common/inputs/InputGeneral';
+import { CategoriaProducto } from '@/models/enums/CategoriaProducto';
+import { MetodoPago } from '@/models/enums/pago/MetodoPago';
+
+function FormSolicitudProveedor() {
+    const { data: session } = useSession();
+    const [formData, setFormData] = useState({
+        nombreEmpresa: '',
+        nit: '',
+        direccionEmpresa: '',
+        especialidad: '',
+        metodosPagoAceptados: [],
+        comisionPropuesta: '',
+        mensajeAdicional: '',
+    });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(false);
+
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        if (type === 'checkbox') {
+            setFormData((prevData) => ({
+                ...prevData,
+                metodosPagoAceptados: checked
+                    ? [...prevData.metodosPagoAceptados, value]
+                    : prevData.metodosPagoAceptados.filter((method) => method !== value),
+            }));
+        } else {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError(null);
+        setSuccess(false);
+
+        if (!session?.user?.id) {
+            setError('Usuario no autenticado. Por favor, inicia sesión.');
+            setLoading(false);
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/solicitudes-proveedor', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ...formData,
+                    usuarioId: session.user.id,
+                    comisionPropuesta: parseFloat(formData.comisionPropuesta), // Convertir a número
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Error al enviar la solicitud.');
+            }
+
+            setSuccess(true);
+            setFormData({ // Reset form
+                nombreEmpresa: '',
+                nit: '',
+                direccionEmpresa: '',
+                especialidad: '',
+                metodosPagoAceptados: [],
+                comisionPropuesta: '',
+                mensajeAdicional: '',
+            });
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="max-w-2xl mx-auto p-6 bg-black text-white rounded-lg shadow-lg">
+            <h2 className="text-3xl font-bold text-center mb-6 text-purple-400">Solicitud para ser Proveedor</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <InputGeneral
+                    label="Nombre de la Empresa"
+                    name="nombreEmpresa"
+                    type="text"
+                    value={formData.nombreEmpresa}
+                    onChange={handleChange}
+                    required
+                />
+                <InputGeneral
+                    label="NIT"
+                    name="nit"
+                    type="text"
+                    value={formData.nit}
+                    onChange={handleChange}
+                    required
+                />
+                <InputGeneral
+                    label="Dirección de la Empresa"
+                    name="direccionEmpresa"
+                    type="text"
+                    value={formData.direccionEmpresa}
+                    onChange={handleChange}
+                    required
+                />
+
+                <div>
+                    <label htmlFor="especialidad" className="block text-sm font-medium text-gray-300 mb-1">
+                        Especialidad
+                    </label>
+                    <select
+                        id="especialidad"
+                        name="especialidad"
+                        value={formData.especialidad}
+                        onChange={handleChange}
+                        required
+                        className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:ring-purple-500 focus:border-purple-500"
+                    >
+                        <option value="">Selecciona una especialidad</option>
+                        {Object.values(CategoriaProducto).map((cat) => (
+                            <option key={cat} value={cat}>
+                                {cat}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Métodos de Pago Aceptados
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                        {Object.values(MetodoPago).map((method) => (
+                            <div key={method} className="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    id={method}
+                                    name="metodosPagoAceptados"
+                                    value={method}
+                                    checked={formData.metodosPagoAceptados.includes(method)}
+                                    onChange={handleChange}
+                                    className="h-4 w-4 text-purple-600 bg-gray-800 border-gray-700 rounded focus:ring-purple-500"
+                                />
+                                <label htmlFor={method} className="ml-2 text-sm text-gray-300">
+                                    {method.replace(/_/g, ' ')}
+                                </label>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <InputGeneral
+                    label="Comisión Propuesta (%)"
+                    name="comisionPropuesta"
+                    type="number"
+                    value={formData.comisionPropuesta}
+                    onChange={handleChange}
+                    required
+                    min="0"
+                    step="0.01"
+                />
+                <InputGeneral
+                    label="Mensaje Adicional (Opcional)"
+                    name="mensajeAdicional"
+                    type="textarea"
+                    value={formData.mensajeAdicional}
+                    onChange={handleChange}
+                />
+
+                {error && <p className="text-red-500 text-center">{error}</p>}
+                {success && <p className="text-green-500 text-center">¡Solicitud enviada con éxito! Te notificaremos pronto.</p>}
+
+                <BotonGeneral type="submit" disabled={loading}>
+                    {loading ? 'Enviando...' : 'Enviar Solicitud'}
+                </BotonGeneral>
+            </form>
+        </div>
+    );
+}
+
+export default FormSolicitudProveedor;

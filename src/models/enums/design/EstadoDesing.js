@@ -3,9 +3,10 @@
  */
 
 export const EstadoDesing = {
-    EN_PROCESO_CREATIVO: 'EN_PROCESO_CREATIVO',
-    TERMINADO: 'TERMINADO',
-    HECHO_POR_PROVEEDOR: 'HECHO_POR_PROVEEDOR'
-}
+    PRIVADO: 'PRIVADO', // Estado inicial por defecto para diseños subidos por el usuario
+    PUBLICADO: 'PUBLICADO',
+    EN_REVISION: 'EN_REVISION',
+    DESHABILITADO: 'DESHABILITADO',
+};
 
-export default EstadoDesing
+export default EstadoDesing;
