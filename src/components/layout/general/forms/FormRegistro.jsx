@@ -1,5 +1,6 @@
 
 "use client";
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePopUp } from '@/context/PopUpContext';
 import {
@@ -21,43 +22,80 @@ import BotonGeneral from "@/components/common/botones/BotonGeneral";
 function FormRegistro() {
   const router = useRouter();
   const { showPopUp } = usePopUp();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+        const handleSubmit = async (event) => {
+            event.preventDefault();
+            if (isSubmitting) return;
+            
+            setIsSubmitting(true);
+            try {
+                // Recolectar manualmente los datos del formulario
+                const data = {
+                    tipoDocumento: event.target.querySelector('[name="tipoDocumento"]').value,
+                    numeroDocumento: event.target.querySelector('[name="numeroDocumento"]').value,
+                    primerNombre: event.target.querySelector('[name="primerNombre"]').value,
+                    segundoNombre: event.target.querySelector('[name="segundoNombre"]').value,
+                    primerApellido: event.target.querySelector('[name="primerApellido"]').value,
+                    segundoApellido: event.target.querySelector('[name="segundoApellido"]').value,
+                    fechaNacimiento: event.target.querySelector('[name="fechaNacimiento"]').value,
+                    genero: event.target.querySelector('[name="genero"]').value,
+                    numeroTelefono: event.target.querySelector('[name="numeroTelefono"]').value,
+                    direccion: event.target.querySelector('[name="direccion"]').value,
+                    correo: event.target.querySelector('[name="correo"]').value,
+                    password: event.target.querySelector('[name="password"]').value
+                };
 
-    const formData = new FormData(event.currentTarget);
-    const password = formData.get('password');
-    const confirmPassword = formData.get('confirmPassword');
+                const confirmPassword = event.target.querySelector('[name="confirmPassword"]').value;
 
-    if (password !== confirmPassword) {
-      showPopUp('Las contraseñas no coinciden', 'error');
-      return;
-    }
+                // Validaciones
+                if (!data.password || data.password !== confirmPassword) {
+                    showPopUp('Las contraseñas no coinciden', 'error');
+                    return;
+                }
 
-    try {
-      const result = await RegistrarUsuario(formData);
+                // Validar campos requeridos
+                for (const [key, value] of Object.entries(data)) {
+                    if (!value && key !== 'segundoNombre') {  // segundoNombre es opcional
+                        showPopUp(`El campo ${key} es requerido`, 'error');
+                        return;
+                    }
+                }
 
-      if (result.success) {
-        // Mostrar primer mensaje de éxito
-        showPopUp('¡Registro exitoso!', 'success');
-        
-        // Esperar 2 segundos
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Mostrar segundo mensaje sobre inicio de sesión
-        showPopUp('Ya puedes iniciar sesión con tu cuenta', 'success');
-        
-        // Esperar otro segundo antes de redirigir
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Redirigir a la página de login
-        router.push('/login');
-      } else {
-        showPopUp(result.error || 'Error en el registro. Inténtalo de nuevo.', 'error');
-      }
-    } catch (error) {
-      showPopUp('Error en el registro. Inténtalo de nuevo.', 'error');
-    }
+                console.log('Enviando datos:', data);
+
+                const response = await fetch('/api/usuarios', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+            console.log('Respuesta del servidor:', response.status);
+            const result = await response.json();
+            console.log('Datos de respuesta:', result);
+
+            if (response.ok) {
+                console.log('Registro exitoso:', result);
+                showPopUp('¡Registro exitoso!', 'success');
+                
+                setTimeout(() => {
+                    showPopUp('Ya puedes iniciar sesión con tu cuenta', 'success');
+                    
+                    setTimeout(() => {
+                        router.push('/login');
+                    }, 2000);
+                }, 2000);
+            } else {
+                showPopUp(result.error || 'Error en el registro. Inténtalo de nuevo.', 'error');
+            }
+        } catch (error) {
+            console.error('Error en el registro:', error);
+            showPopUp('Error en el registro. Inténtalo de nuevo.', 'error');
+        } finally {
+            setIsSubmitting(false);
+        }
   };
 
   return (
@@ -183,7 +221,7 @@ function FormRegistro() {
           <label htmlFor="genero" className="block mb-1 text-sm font-medium text-bn-accent">Género</label>
           <div className="relative">
 
-            <InputGenero  />
+            <InputGenero required name="genero" />
             <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
 
           </div>
@@ -238,7 +276,7 @@ function FormRegistro() {
         <label htmlFor="password-registro" className="block mb-1 text-sm font-medium text-bn-accent">Contraseña</label>
         <div className="relative">
 
-          <InputPassword id="password-registro" name="password" />
+          <InputPassword id="password-registro" name="password" required />
           <i className='bx bxs-lock-alt absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
 
         </div>
@@ -261,12 +299,22 @@ function FormRegistro() {
 
       <div className="flex items-center justify-center mt-5">
 
-        <BotonGeneral>Registrarse</BotonGeneral>
+        <BotonGeneral 
+            type="submit"
+            disabled={isSubmitting}
+        >
+            {isSubmitting ? 'Registrando...' : 'Registrarse'}
+        </BotonGeneral>
 
       </div>
 
       <div className="text-center mt-5 text-white">
-        <p>¿Ya tienes una cuenta? <a href="/login" id="showLogin" className="font-medium text-white no-underline hover:underline">Iniciar Sesión</a></p>
+        <p className="mb-4">¿Ya tienes una cuenta?</p>
+        <a href="/login" id="showLogin">
+          <BotonGeneral>
+            Iniciar Sesión
+          </BotonGeneral>
+        </a>
       </div>
     </form>
   )

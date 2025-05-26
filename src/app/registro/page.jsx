@@ -1,4 +1,5 @@
 import FormRegistro from "@/components/layout/general/forms/FormRegistro"
+import BotonGeneral from "@/components/common/botones/BotonGeneral"
 
 function registro() {
     return (
@@ -28,11 +29,14 @@ function registro() {
                             </p>
 
                             <div className="mt-6">
-
-                                <a href="/" className="inline-flex items-center gap-2 border border-white rounded-xl py-2.5 px-5 font-medium text-white transition-colors duration-300 ease-in-out hover:bg-[rgba(255,255,255,0.13)]">
-                                    <i className='bx bx-home-alt-2 text-xl'></i> Ir al inicio
+                                <a href="/">
+                                    <BotonGeneral>
+                                        <span className="flex items-center gap-2">
+                                            <i className='bx bx-home-alt-2 text-xl'></i>
+                                            Ir al inicio
+                                        </span>
+                                    </BotonGeneral>
                                 </a>
-
                             </div>
 
                         </div>

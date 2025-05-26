@@ -1,6 +1,7 @@
 import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
 import Footer from '@/components/layout/general/footer/Footer';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+import ProveedorButton from '@/components/layout/general/ProveedorButton';
 
 async function indexPage() {
   return (
@@ -101,16 +102,15 @@ async function indexPage() {
         </section>
 
 
-        {/* seccion 5 */}
+        {/* seccion 5 - Registro de Proveedores */}
+        <section className='flex h-screen flex-col justify-center items-center gap-4 p-10 bg-gradient-to-b from-black to-pink-300 text-white'>
+          <h1 className='font-bold text-5xl text-center'>¿ERES UN PROVEEDOR?</h1>
+          
+          <p className='text-center text-2xl max-w-2xl'>
+            Únete a nuestra red de proveedores y haz crecer tu negocio. Conecta con diseñadores y clientes que buscan calidad en la producción de sus diseños.
+          </p>
 
-        <section className=' flex h-screen flex-col justify-center items-center gap-4 p-10 bg-gradient-to-b from-black to-pink-300 text-white'>
-
-          <h1 className='font-bold text-5xl'>COMUNIDAD DE DISEÑADORES</h1>
-
-          <BotonGeneral>
-            DESCARGAR APLICACION
-          </BotonGeneral>
-
+          <ProveedorButton />
         </section>
 
 

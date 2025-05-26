@@ -30,6 +30,49 @@ export async function obtenerSolicitudesProveedor() {
     }
 }
 
+export async function CrearSolicitudProveedor(data) {
+    console.log('DEBUG: Entering CrearSolicitudProveedor with data:', data);
+    try {
+        const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/administrador/solicitudes-proveedor`;
+        console.log('DEBUG: Making POST request to:', apiUrl, 'with body:', data);
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+        console.log('DEBUG: Fetch response received (ok:', response.ok, 'status:', response.status, ').');
+
+        if (!response.ok) {
+            let errorInfo = 'Error desconocido al crear la solicitud de proveedor.';
+            let responseBody = '';
+            try {
+                responseBody = await response.text();
+                console.error('DEBUG: API response not OK. Response body:', responseBody);
+                try {
+                    const errorData = JSON.parse(responseBody);
+                    errorInfo = errorData.message || JSON.stringify(errorData);
+                    console.error('DEBUG: API response not OK. Parsed error data:', errorData);
+                } catch (jsonError) {
+                    errorInfo = `API response not OK. Could not parse as JSON. Response body: ${responseBody}`;
+                    console.error('DEBUG: API response not OK. Could not parse as JSON.', jsonError);
+                }
+            } catch (textError) {
+                errorInfo = `API response not OK. Could not read response body.`;
+                console.error('DEBUG: API response not OK. Could not read response body.', textError);
+            }
+            throw new Error(errorInfo);
+        }
+
+        const result = await response.json();
+        console.log('DEBUG: Create request result:', result);
+        return { success: true, message: result.message, solicitud: result.solicitud };
+    } catch (error) {
+        console.error("ERROR in CrearSolicitudProveedor:", error);
+        return { error: error.message };
+    }
+}
 export async function procesarSolicitudProveedor(solicitudId, action, adminNotas) {
     console.log('DEBUG: Entering procesarSolicitudProveedor with ID:', solicitudId, 'action:', action, 'adminNotas:', adminNotas);
     try {

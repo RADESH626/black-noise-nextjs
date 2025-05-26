@@ -1,24 +1,40 @@
 # Active Context
 
 ## Current Work Focus
-Initializing the memory bank for the "Black Noise Next.js E-commerce" project.
+Debugging authentication issue where providers can't access `/proveedor/solicitud` route despite being logged in.
 
 ## Recent Changes
-- Created `projectbrief.md` with an overview, core goals, key features, technologies, stakeholders, and future considerations.
-- Created `productContext.md` detailing the project's purpose, problems it solves, how it should work for different user roles, and user experience goals.
+- **Authentication Investigation**: Discovered dual authentication systems running in parallel:
+  1. NextAuth.js system (used by middleware and pages)
+  2. Custom cookie-based system (used by some API routes and UserContext)
+- **Debug Implementation**: Added comprehensive debugging logs to:
+  - `/proveedor/solicitud/page.jsx` - Shows session data and user role
+  - `src/middleware.js` - Shows token validation and role checking
+- **Environment Fix**: Updated `NEXTAUTH_URL` from port 3000 to 3001 to match running server
+- **Route Fix**: Corrected redirect from `/proveedores` to `/proveedor` in solicitud page
 
 ## Next Steps
-- Continue creating the remaining core memory bank files: `systemPatterns.md`, `techContext.md`, and `progress.md`.
-- Once all core files are created, the memory bank initialization will be complete.
+- Monitor console logs to identify the exact authentication flow issue
+- Remove duplicate authentication systems if needed
+- Test the `/proveedor/solicitud` route with a logged-in provider user
+- Clean up debug logs once issue is resolved
 
 ## Active Decisions and Considerations
-- The memory bank will serve as the primary source of truth for project context and progress.
-- All significant changes, new patterns, and insights will be documented here.
-- Cuando se agreguen funcionalidades, se debe añadir una forma de depuración (debug) como `console.log` para mostrar el uso de la función o el comportamiento esperado.
+- **Authentication Conflict**: The project has two separate auth systems that may be conflicting:
+  - NextAuth.js handles login form (`FormLogin.jsx` uses `signIn('credentials')`)
+  - Custom system in `UserContext.jsx` calls `/api/auth/user` route
+  - Middleware expects NextAuth tokens but custom routes use cookies
+- **Port Configuration**: Server runs on port 3001, environment variables updated accordingly
+- **Role Validation**: Middleware properly checks for `PROVEEDOR` or `ADMINISTRADOR` roles for `/proveedor/*` routes
+
+## Important Patterns and Preferences
+- **Debug Strategy**: Always add comprehensive console.log statements when debugging auth issues
+- **Environment Consistency**: Ensure NEXTAUTH_URL matches the actual running port
+- **Role-based Access**: Use enum values from `src/models/enums/usuario/Rol.js` for consistency
 
 ## Learnings and Project Insights
-- The project structure indicates a clear separation of concerns with `src/app` for Next.js pages and API routes, `src/components` for UI components, `src/context` for React contexts, `src/models` for Mongoose models, and `src/utils` for utility functions.
-- Authentication is handled via NextAuth.js, as indicated by `src/app/api/auth/[...nextauth]/route.js` and `src/context/UserContext.jsx`.
-- Database interaction is likely through Mongoose, given the presence of `src/models` and `src/utils/DBconection.js`.
-- The project uses a mix of `jsx` and `js` extensions for components and API routes, suggesting a JavaScript/React environment.
-- There are distinct sections for `admin` and `proveedor` (supplier) functionalities, aligning with the user roles defined in `productContext.md`.
+- **Authentication Architecture**: NextAuth.js is the primary authentication system, but there's legacy custom auth code
+- **Role System**: Uses string-based roles: 'CLIENTE', 'EMPLEADO', 'ADMINISTRADOR', 'PROVEEDOR'
+- **Route Protection**: Middleware protects `/admin/*`, `/proveedor/*`, and `/perfil/*` routes
+- **Session Management**: NextAuth session includes user ID, name, email, image, and rol
+- **Database Integration**: MongoDB with Mongoose, user data properly structured in `UsuariosActions.js`

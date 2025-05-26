@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signIn } from "next-auth/react";
 import { usePopUp } from '@/context/PopUpContext';
 import { InputEmail, InputPassword } from "@/components/common/inputs";
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
@@ -14,27 +15,30 @@ function FormLogin() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        console.log('Frontend Login: handleSubmit iniciado.');
+        console.log('Frontend Login: Intentando iniciar sesión con correo:', correo);
 
         try {
-            // TODO: Implement your new authentication logic here
-            // For example:
-            const response = await fetch('http://localhost:3001/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ correo, password })
+            const result = await signIn('credentials', {
+                email: correo,
+                password: password,
+                redirect: false
             });
 
-            const data = await response.json();
+            console.log('Frontend Login: Resultado de signIn:', result);
 
-            if (response.ok) {
-                router.push('/'); // Or wherever you want to redirect after login
-                showPopUp('¡Inicio de sesión exitoso!', 'success');
-            } else {
-                showPopUp(data.message || "Error al iniciar sesión", 'error');
+            if (result.error) {
+                console.log('Frontend Login: Error en signIn:', result.error);
+                showPopUp('Credenciales incorrectas', 'error');
+                return;
             }
+
+            console.log('Frontend Login: Inicio de sesión exitoso.');
+            showPopUp('¡Inicio de sesión exitoso!', 'success');
+            router.push('/'); // Redirigir al inicio después del login exitoso
         } catch (error) {
-            console.error('Error during login:', error);
-            showPopUp("Error al iniciar sesión", 'error');
+            console.error('Frontend Login: Error durante el inicio de sesión:', error);
+            showPopUp('Error al iniciar sesión', 'error');
         }
     };
 
@@ -83,10 +87,13 @@ function FormLogin() {
             </div>
 
 
-            <div className="text-center mt-5 ">
-                <p>¿No tienes una cuenta?
-                    <a href="/registro" id="showRegister" className="font-medium  no-underline hover:underline">Regístrate ahora</a>
-                </p>
+            <div className="text-center mt-5">
+                <p className="mb-4">¿No tienes una cuenta?</p>
+                <a href="/registro" id="showRegister">
+                    <BotonGeneral>
+                        Regístrate ahora
+                    </BotonGeneral>
+                </a>
             </div>
 
         </form>

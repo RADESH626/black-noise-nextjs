@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import IconoPersona from '../../common/iconos/IconoPersona';
+import BotonGeneral from '../../common/botones/BotonGeneral';
 
 function HeaderPrincipal() {
     const { data: session } = useSession();
@@ -25,16 +26,15 @@ function HeaderPrincipal() {
                                     </div>
                                 </Link>
                             </div>
-                            <button
-                                onClick={() => signOut({ callbackUrl: '/login' })}
-                                className='bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded transition-colors duration-300'
-                            >
+                            <BotonGeneral onClick={() => signOut({ callbackUrl: '/login' })}>
                                 Cerrar Sesión
-                            </button>
+                            </BotonGeneral>
                         </>
                     ) : (
-                        <Link href="/login" className='bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded transition-colors duration-300'>
-                            Iniciar Sesión
+                        <Link href="/login">
+                            <BotonGeneral>
+                                Iniciar Sesión
+                            </BotonGeneral>
                         </Link>
                     )}
                 </div>

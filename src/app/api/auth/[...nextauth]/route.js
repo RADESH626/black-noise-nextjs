@@ -1,22 +1,47 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
+import { ObtenerUsuarioPorCorreo } from "@/app/acciones/UsuariosActions";
 
 export const authOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" },
+        email: { label: "Email", type: "email", placeholder: "tu@email.com" },
+        password: { label: "Contraseña", type: "password" }
       },
+      id: "credentials",
       async authorize(credentials, req) {
-        // This is a placeholder for your actual authentication logic.
-        // You should replace this with a call to your backend to validate credentials.
-        // For now, it will always return a dummy user.
-        if (credentials.email === "test@example.com" && credentials.password === "password") {
-          return { id: "1", name: "Test User", email: "test@example.com", image: "/img/perfil/FotoPerfil.webp" };
+        console.log("Attempting authentication with credentials:", credentials);
+        
+        try {
+
+          const user = await ObtenerUsuarioPorCorreo(credentials.email);
+          
+          if (!user) {
+            return null;
+          }
+
+          const isValid = await bcrypt.compare(credentials.password, user.password);
+
+          console.log("User found:", user);
+          
+          if (!isValid) {
+            return null;
+          }
+
+          return {
+            id: user._id.toString(),
+            name: user.primerNombre + ' ' + user.primerApellido,
+            email: user.correo,
+            image: user.fotoPerfil || "/img/perfil/FotoPerfil.webp",
+            rol: user.rol || "CLIENTE"
+          };
+        } catch (error) {
+          console.error("Auth error:", error);
+          return null;
         }
-        return null;
       },
     }),
   ],
@@ -27,11 +52,13 @@ export const authOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.rol = user.rol;
       }
       return token;
     },
     async session({ session, token }) {
       session.user.id = token.id;
+      session.user.rol = token.rol;
       return session;
     },
   },

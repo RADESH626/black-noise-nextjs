@@ -1,26 +1,20 @@
+"use client";
 
-function BotonGeneral({children, ...props}) {
+import React from 'react';
+
+function BotonGeneral({ children, onClick, type = 'button', disabled = false, className = '' }) {
     return (
-        <button className="
-        inline-flex
-        items-center
-        py-4 px-12
-        bg-gradient-to-r from-white to-[#d89ceb]
-        text-black
-        font-bold text-[1.1rem]
-        border-none
-        rounded-xl
-        cursor-pointer
-        transition-all duration-300 ease-in-out
-        shadow-[0_8px_20px_rgba(0,0,0,0.3)]
-        hover:scale-105 hover:shadow-[0_12px_25px_rgba(196,121,206,0.5)] hover:brightness-110
-        "
-        {...props}>
-
-           {children}
+        <button
+            type={type}
+            onClick={onClick}
+            disabled={disabled}
+            className={`px-8 py-2 bg-gradient-to-r from-white to-pink-500 text-black font-semibold 
+            ${!disabled ? 'hover:from-pink-500 hover:to-white' : 'opacity-50 cursor-not-allowed'} 
+            rounded-[20px] transition duration-300 ${className}`}
+        >
+            {children}
         </button>
-
-    )
+    );
 }
 
-export default BotonGeneral
+export default BotonGeneral;

@@ -23,7 +23,9 @@
 The project is in its early stages of development. The foundational structure is in place, and the memory bank has been initialized to document the project's context and progress. Core functionalities like authentication and database interaction are set up at a basic level, but require full implementation.
 
 ## Known Issues
-- No known issues at this initial stage, as core features are not yet fully implemented or tested.
+- **Authentication Route Access**: Providers cannot access `/proveedor/solicitud` despite being logged in - debugging in progress
+- **Dual Authentication Systems**: Project has both NextAuth.js and custom cookie-based auth running simultaneously 
+- **Port Mismatch**: Server runs on port 3001 but NEXTAUTH_URL was set to 3000 (now fixed)
 
 ## Evolution of Project Decisions
 - The decision to use Next.js for a full-stack approach is confirmed, simplifying the tech stack.

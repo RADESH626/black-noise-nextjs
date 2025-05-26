@@ -48,6 +48,16 @@
    `npm run dev` or `yarn dev`
    The application should be accessible at `http://localhost:3000`.
 
+## Test Credentials
+
+### Client User
+- **Email:** `vscodeCliente@gmail.com`
+- **Password:** `Contraseña123@`
+
+### Provider User
+- **Email:** `vscodeProveedor@gmail.com`
+- **Password:** `Contraseña123@`
+
 ## Technical Constraints
 - **Next.js API Route Limitations:** API routes are serverless functions, which might have cold start issues or execution time limits in certain deployment environments.
 - **MongoDB Schema Flexibility:** While flexible, lack of strict schema enforcement can lead to data inconsistencies if not managed carefully with Mongoose schemas.

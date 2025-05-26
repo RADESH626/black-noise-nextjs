@@ -45,14 +45,18 @@ function FormSolicitudProveedor() {
         setError(null);
         setSuccess(false);
 
+        console.log('Frontend: handleSubmit iniciado.');
+
         if (!session?.user?.id) {
+            console.log('Frontend: Usuario no autenticado. Redirigiendo o mostrando error.');
             setError('Usuario no autenticado. Por favor, inicia sesión.');
             setLoading(false);
             return;
         }
 
+        console.log('Frontend: Usuario autenticado. Enviando solicitud...');
         try {
-            const response = await fetch('/api/solicitudes-proveedor', {
+            const response = await fetch('/api/solicitud-proveedor', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -64,11 +68,17 @@ function FormSolicitudProveedor() {
                 }),
             });
 
-            const data = await response.json();
+            console.log('Frontend: Respuesta de la API recibida. Status:', response.status);
 
+            // Check if response is OK before trying to parse JSON
             if (!response.ok) {
-                throw new Error(data.message || 'Error al enviar la solicitud.');
+                const errorData = await response.json().catch(() => ({ message: 'Error desconocido del servidor.' }));
+                console.log('Frontend: Error en la respuesta de la API:', errorData.message);
+                throw new Error(errorData.message || 'Error al enviar la solicitud.');
             }
+
+            const data = await response.json();
+            console.log('Frontend: Datos de respuesta de la API:', data);
 
             setSuccess(true);
             setFormData({ // Reset form
@@ -80,17 +90,22 @@ function FormSolicitudProveedor() {
                 comisionPropuesta: '',
                 mensajeAdicional: '',
             });
+            console.log('Frontend: Solicitud enviada con éxito. Formulario reseteado.');
         } catch (err) {
+            console.log('Frontend: Error en handleSubmit:', err.message);
             setError(err.message);
         } finally {
             setLoading(false);
+            console.log('Frontend: handleSubmit finalizado. Loading a false.');
         }
     };
 
     return (
-        <div className="max-w-2xl mx-auto p-6 bg-black text-white rounded-lg shadow-lg">
-            <h2 className="text-3xl font-bold text-center mb-6 text-purple-400">Solicitud para ser Proveedor</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="max-w-2xl mx-auto p-8 bg-gray-900 text-white rounded-xl shadow-2xl border border-purple-700">
+
+            <h2 className="text-4xl font-extrabold text-center mb-8 text-purple-400">Solicitud para ser Proveedor</h2>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
                 <InputGeneral
                     label="Nombre de la Empresa"
                     name="nombreEmpresa"
@@ -98,6 +113,7 @@ function FormSolicitudProveedor() {
                     value={formData.nombreEmpresa}
                     onChange={handleChange}
                     required
+                    className="mb-4"
                 />
                 <InputGeneral
                     label="NIT"
@@ -106,6 +122,7 @@ function FormSolicitudProveedor() {
                     value={formData.nit}
                     onChange={handleChange}
                     required
+                    className="mb-4"
                 />
                 <InputGeneral
                     label="Dirección de la Empresa"
@@ -114,10 +131,11 @@ function FormSolicitudProveedor() {
                     value={formData.direccionEmpresa}
                     onChange={handleChange}
                     required
+                    className="mb-4"
                 />
 
-                <div>
-                    <label htmlFor="especialidad" className="block text-sm font-medium text-gray-300 mb-1">
+                <div className="mb-4">
+                    <label htmlFor="especialidad" className="block text-sm font-medium text-gray-300 mb-2">
                         Especialidad
                     </label>
                     <select
@@ -137,13 +155,13 @@ function FormSolicitudProveedor() {
                     </select>
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-300 mb-3">
                         Métodos de Pago Aceptados
                     </label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {Object.values(MetodoPago).map((method) => (
-                            <div key={method} className="flex items-center">
+                            <div key={method} className="flex items-center bg-gray-800 p-3 rounded-md border border-gray-700">
                                 <input
                                     type="checkbox"
                                     id={method}
@@ -151,9 +169,9 @@ function FormSolicitudProveedor() {
                                     value={method}
                                     checked={formData.metodosPagoAceptados.includes(method)}
                                     onChange={handleChange}
-                                    className="h-4 w-4 text-purple-600 bg-gray-800 border-gray-700 rounded focus:ring-purple-500"
+                                    className="h-5 w-5 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500 cursor-pointer"
                                 />
-                                <label htmlFor={method} className="ml-2 text-sm text-gray-300">
+                                <label htmlFor={method} className="ml-3 text-sm text-gray-300 cursor-pointer">
                                     {method.replace(/_/g, ' ')}
                                 </label>
                             </div>
@@ -170,6 +188,7 @@ function FormSolicitudProveedor() {
                     required
                     min="0"
                     step="0.01"
+                    className="mb-4"
                 />
                 <InputGeneral
                     label="Mensaje Adicional (Opcional)"
@@ -177,6 +196,7 @@ function FormSolicitudProveedor() {
                     type="textarea"
                     value={formData.mensajeAdicional}
                     onChange={handleChange}
+                    className="mb-6"
                 />
 
                 {error && <p className="text-red-500 text-center">{error}</p>}
