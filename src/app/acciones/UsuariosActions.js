@@ -160,12 +160,16 @@ async function obtenerUsuariosHabilitados() {
 
 //obtener usuario por id
 async function ObtenerUsuarioPorId(id) {
+    console.log('DEBUG: Entering ObtenerUsuarioPorId with ID:', id);
     try {
-        connectDB();
-        console.log('id:', id);
+        await connectDB(); // Ensure DB connection is awaited
+        console.log('DEBUG: Database connected for ObtenerUsuarioPorId.');
+        
         const response = await Usuario.findById(id).lean();
+        console.log('DEBUG: Raw response from DB for ObtenerUsuarioPorId:', response);
+
         if (!response) {
-            console.log('Error al encontrar el usuario');
+            console.log('DEBUG: User not found for ID:', id);
             return null;
         }
         // Convert MongoDB specific types to plain JavaScript types
@@ -179,9 +183,10 @@ async function ObtenerUsuarioPorId(id) {
             updatedAt: response.updatedAt ? 
                 new Date(response.updatedAt).toISOString() : null
         };
+        console.log('DEBUG: Exiting ObtenerUsuarioPorId with plain user:', plainUser);
         return plainUser;
     } catch (error) {
-        console.log('Error al encontrar el usuario:', error.message);
+        console.error('ERROR in ObtenerUsuarioPorId:', error.message);
         return null;
     }
 }
