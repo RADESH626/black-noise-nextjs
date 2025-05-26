@@ -1,9 +1,11 @@
 /**
- * Enumeraciones relacionadas con el modelo SolicitudProveedor
+ * Estados de una solicitud de proveedor
  */
 
-export const EstadoSolicitud = {
+export const EstadoSolicitudProveedor = {
     PENDIENTE: 'PENDIENTE',
-    ACEPTADA: 'ACEPTADA',
-    RECHAZADA: 'RECHAZADA'
-}
+    APROBADA: 'APROBADA',
+    RECHAZADA: 'RECHAZADA',
+};
+
+export default EstadoSolicitudProveedor;

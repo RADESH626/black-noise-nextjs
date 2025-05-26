@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from 'react';
-import { signIn, getSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { usePopUp } from '@/context/PopUpContext';
 import { InputEmail, InputPassword } from "@/components/common/inputs";
@@ -14,34 +13,28 @@ function FormLogin() {
     const [password, setPassword] = useState('');
 
     const handleSubmit = async (event) => {
-
         event.preventDefault();
 
-        console.log("Intentando iniciar sesión con:", { correo, password });
+        try {
+            // TODO: Implement your new authentication logic here
+            // For example:
+            const response = await fetch('http://localhost:3001/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ correo, password })
+            });
 
-        const result = await signIn('credentials', {
-            redirect: false, // Es buena práctica mantenerlo en false para controlar el flujo
-            correo: correo,
-            password: password,
-        });
+            const data = await response.json();
 
-        console.log("Resultado de signIn:", result);
-
-        if (result?.ok && !result?.error) {
-            console.log("Inicio de sesión exitoso, redirigiendo...");
-            
-            // Obtener la sesión después del inicio de sesión exitoso
-            const session = await getSession();
-            
-            // Redirigir según el rol del usuario
-            const destination = session?.user?.rol === 'ADMINISTRADOR' ? '/admin' : '/';
-            console.log("Rol del usuario:", session?.user?.rol);
-            router.push(destination);
-            router.refresh(); // Para asegurar que el estado de la sesión se actualice en el layout/navbar
-            showPopUp('¡Inicio de sesión exitoso!', 'success');
-        } else {
-            console.log("Error en el inicio de sesión:", result?.error);
-            showPopUp(result?.error || "Credenciales incorrectas", 'error');
+            if (response.ok) {
+                router.push('/'); // Or wherever you want to redirect after login
+                showPopUp('¡Inicio de sesión exitoso!', 'success');
+            } else {
+                showPopUp(data.message || "Error al iniciar sesión", 'error');
+            }
+        } catch (error) {
+            console.error('Error during login:', error);
+            showPopUp("Error al iniciar sesión", 'error');
         }
     };
 

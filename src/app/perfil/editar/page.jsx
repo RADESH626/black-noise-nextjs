@@ -1,16 +1,25 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "../../api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import FormEditarUsuario from "@/app/admin/usuarios/components/FormEditarUsuario";
 
 async function EditarPerfil() {
-  const session = await getServerSession(authOptions);
+  const getUserData = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/auth/user', {
+        cache: 'no-store'
+      });
+      if (!response.ok) return null;
+      return response.json();
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      return null;
+    }
+  };
 
-  if (!session) {
-    return redirect("/");
+  const { user } = await getUserData() || {};
+
+  if (!user) {
+    return redirect("/login");
   }
-
-  const user = session?.user;
 
   return (
     <div className="min-h-screen bg-white p-4">

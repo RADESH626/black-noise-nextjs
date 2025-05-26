@@ -1,59 +1,21 @@
-import { Schema, model, models } from 'mongoose'
-import { EstadoSolicitud } from './enums/SolicitudProveedorEnums'
-import { Especialidad } from './enums/proveedor'
+import { Schema, model, models } from 'mongoose';
+import { CategoriaProducto } from './enums/CategoriaProducto';
+import { MetodoPago } from './enums/pago/MetodoPago';
+import { EstadoSolicitudProveedor } from './enums/SolicitudProveedorEnums';
 
 const SolicitudProveedorSchema = new Schema({
-    solicitanteId: {
-        type: Schema.Types.ObjectId,
-        ref: 'Usuario',
-        required: true
-    },
-    nombreProveedor: {
-        type: String,
-        required: true
-    },
-    nit: {
-        type: String,
-        required: true
-    },
-    direccionEmpresa: {
-        type: String,
-        required: true
-    },
-    rut: {
-        type: String,
-        required: true
-    },
-    especialidad: {
-        type: String,
-        enum: Object.values(Especialidad),
-        required: true
-    },
-    fechaSolicitud: {
-        type: Date,
-        default: Date.now
-    },
-    estadoSolicitud: {
-        type: String,
-        enum: Object.values(EstadoSolicitud),
-        default: EstadoSolicitud.PENDIENTE
-    },
-    fechaRevision: {
-        type: Date
-    },
-    revisorId: {
-        type: Schema.Types.ObjectId,
-        ref: 'Usuario'
-    },
-    comentariosAdmin: {
-        type: String
-    },
-    datosProveedorSolicitados: {
-        type: Schema.Types.Mixed
-    }
-}, {
-    timestamps: true
-})
+    usuarioId: { type: Schema.Types.ObjectId, ref: 'Usuario', required: true },
+    nombreEmpresa: { type: String, required: true },
+    nit: { type: String, required: true }, // NIT no es único en solicitudes
+    direccionEmpresa: { type: String, required: true },
+    especialidad: { type: String, enum: Object.values(CategoriaProducto), required: true },
+    metodosPagoAceptados: [{ type: String, enum: Object.values(MetodoPago) }],
+    comisionPropuesta: { type: Number, required: true }, // Asumimos porcentaje
+    mensajeAdicional: { type: String },
+    estadoSolicitud: { type: String, enum: Object.values(EstadoSolicitudProveedor), default: EstadoSolicitudProveedor.PENDIENTE },
+    fechaSolicitud: { type: Date, default: Date.now },
+    fechaRevision: { type: Date },
+    adminNotas: { type: String },
+}, { timestamps: true });
 
-// Check if the model exists before creating a new one
-export default models.SolicitudProveedor || model('SolicitudProveedor', SolicitudProveedorSchema)
+export default models.SolicitudProveedor || model('SolicitudProveedor', SolicitudProveedorSchema);

@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { signOut } from 'next-auth/react';
 
 const AdminLayout = ({ children }) => {
   const navItems = [
@@ -38,13 +37,13 @@ const AdminLayout = ({ children }) => {
           </ul>
         </nav>
         <div className="mt-auto">
-          <button
-            onClick={() => signOut({ callbackUrl: '/login' })}
+          <Link
+            href="/login"
             className="flex items-center p-2 hover:bg-gray-700 rounded-md transition-colors w-full text-left"
           >
             <Image src="/icons/icono-salida.svg" alt="Cerrar Sesión" width={24} height={24} className="mr-3 filter invert" />
             <span>Cerrar Sesión</span>
-          </button>
+          </Link>
         </div>
       </aside>
 

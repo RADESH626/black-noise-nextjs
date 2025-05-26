@@ -1,5 +1,6 @@
 import { Schema, model, models } from 'mongoose'
-import { Disponibilidad, Especialidad } from './enums/proveedor'
+import { Disponibilidad } from './enums/proveedor/Disponibilidad'
+import { CategoriaProducto } from './enums/CategoriaProducto'
 import { MetodoPago } from './enums/pago'
 
 const ProveedorSchema = new Schema({
@@ -27,7 +28,7 @@ const ProveedorSchema = new Schema({
     },
     especialidad: {
         type: String,
-        enum: Object.values(Especialidad),
+        enum: Object.values(CategoriaProducto),
         required: true
     },
     disponibilidad: {
