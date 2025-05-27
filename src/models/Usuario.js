@@ -1,5 +1,6 @@
 import { Schema, model, models } from 'mongoose'
-import { TipoDocumentoIdentidad, Rol } from './enums/usuario'
+import { TipoDocumentoIdentidad } from './enums/usuario/TipoDocumentoIdentidad';
+import { Rol } from './enums/usuario/Rol';
 
 // Removed the `id` field causing duplicate key errors by ensuring it is not part of the schema.
 // MongoDB already provides a unique `_id` field by default.
