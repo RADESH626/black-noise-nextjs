@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect } from 'react'; // Import useEffect
+import React, { useEffect, useActionState } from 'react'; // Import useEffect and useActionState
 import { useSession } from 'next-auth/react';
-import { useActionState, useFormStatus } from 'react-dom'; // Import hooks
+import { useFormStatus } from 'react-dom'; // Import hooks
 import { usePopUp } from '@/context/PopUpContext';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import InputGeneral from '@/components/common/inputs/InputGeneral';
@@ -29,6 +29,7 @@ const initialState = {
 
 function FormSolicitudProveedor() {
     const { data: session } = useSession(); // Keep useSession for client-side checks if needed
+    const { showPopUp } = usePopUp(); // Add usePopUp hook
 
     // Usar useActionState para manejar el estado de la acción
     const [state, formAction] = useActionState(submitSupplierApplicationAction, initialState);

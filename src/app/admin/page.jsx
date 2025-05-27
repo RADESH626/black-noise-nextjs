@@ -17,7 +17,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (status === 'loading') return;
 
-    if (!session || session.user?.role !== 'ADMINISTRADOR') {
+    if (!session || session.user?.rol !== 'ADMINISTRADOR') {
       router.push('/login');
       return;
     }
@@ -45,7 +45,7 @@ export default function AdminDashboard() {
             </div>
             <div className="flex items-center space-x-4">
               <div className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
-                {session?.user?.role}
+                {session?.user?.rol}
               </div>
             </div>
           </div>

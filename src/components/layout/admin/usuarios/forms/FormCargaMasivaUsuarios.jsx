@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from 'react';
-import { useActionState, useFormStatus } from 'react-dom';
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { usePopUp } from '@/context/PopUpContext';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 // Import the Server Action for bulk upload

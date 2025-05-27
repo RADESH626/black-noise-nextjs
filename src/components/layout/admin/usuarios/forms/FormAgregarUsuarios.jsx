@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
-import { useActionState, useFormStatus } from 'react-dom';
+import { useEffect, useActionState } from "react";
+import { useFormStatus } from 'react-dom';
 import { usePopUp } from '@/context/PopUpContext';
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
 import {

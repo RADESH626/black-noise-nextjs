@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from 'react'; // Import useEffect and useState
+import { useEffect, useState, useActionState, useRef } from 'react'; // Import useEffect, useState, useActionState, and useRef
 import Link from 'next/link';
 import Image from 'next/image';
-import { useActionState, useFormStatus } from 'react-dom'; // Import hooks
+import { useFormStatus } from 'react-dom'; // Import useFormStatus from react-dom
 import { usePopUp } from '@/context/PopUpContext'; // Import PopUpContext
 import { InputTextoGeneral } from '@/components/common/inputs';
 import { TdGeneral } from '@/components/common/tablas';
@@ -42,50 +42,45 @@ const initialState = {
 export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
     const { showPopUp } = usePopUp(); // Use PopUpContext
 
+    // State to hold the users currently being displayed (either initial or filtered)
+    // Initialize using function initializer to ensure it only runs once on initial render
+    const [displayedUsers, setDisplayedUsers] = useState(() => initialUsersFromPage);
+    
+    // Define usersToDisplay from displayedUsers
+    const usersToDisplay = displayedUsers;
+
     // Use useActionState to manage the state of the filtering action
     const [state, formAction] = useActionState(FiltrarUsuarios, initialState);
 
-    // State for form key to force reset
-    const [formKey, setFormKey] = useState(Date.now());
+    // Ref to access the form element for resetting it
+    const formRef = useRef(null);
 
-    // Effect to show pop-up based on the state
+    // Effect to update displayedUsers when filter action returns data or show pop-up
     useEffect(() => {
         if (state.message) {
             showPopUp(state.message, state.error ? 'error' : 'success');
         }
-    }, [state, showPopUp]); // Dependencias del useEffect
+        // Only update displayedUsers if the state is not the initial state and data is present
+        if (state !== initialState && state.data && Array.isArray(state.data)) {
+            setDisplayedUsers(state.data);
+        }
+    }, [state, showPopUp]); // initialState is a constant, no need to include it in dependencies
 
     // Function to handle reset filters
     const handleResetFilters = () => {
-        setFormKey(Date.now()); // Change key to force form reset
-        // The form will reset to its initial state due to the key change
-        // We also need to reset the displayed users to the initial list
-        // This might require passing the initial list through the state or re-fetching
-        // For simplicity now, let's assume the initial list is available or re-fetched by the page
-        // If initialUsersFromPage is always the full list, we can use it here.
-        // If not, the page component might need to trigger a re-fetch or pass the full list via state.
-        // Let's rely on the initialUsersFromPage prop for now.
-        // Note: useActionState's state will also reset to initialState
+        // Reset the form fields
+        if (formRef.current) {
+            formRef.current.reset();
+        }
+        // Reset displayed users to the initial list
+        setDisplayedUsers(initialUsersFromPage);
     };
 
     // Keep handleToggleUserStatus as it calls a separate Server Action
     const handleToggleUserStatus = async (userId, currentStatus) => {
-        // This function already uses a Server Action (toggleUsuarioHabilitado)
-        // We need to handle the response and update the UI (usersToDisplay)
-        // This might require re-fetching the filtered list after the toggle
-        // Or, if toggleUsuarioHabilitado returns the updated user, update the local state.
-        // Let's keep the current logic for now, assuming it works with the Server Action.
-        // The loading state for this action is not tied to the filter form's useFormStatus.
-        // A separate loading state or useTransition could be used here if needed.
-
-        // For now, let's just call the action and rely on revalidatePath in the action
-        // to potentially update the data displayed by the page component.
-        // If the page component fetches data and passes it down, revalidatePath should trigger a re-render.
-
         const formData = new FormData();
         formData.append('id', userId);
 
-        // Call the Server Action directly
         const result = await toggleUsuarioHabilitado(formData);
 
         if (result.error) {
@@ -96,31 +91,23 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
         }
     };
 
-
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
-        // Ensure dateString is a valid date format before creating Date object
         const date = new Date(dateString);
         if (isNaN(date.getTime())) {
-            return 'Fecha inválida'; // Handle invalid date strings
+            return 'Fecha inválida';
         }
         return date.toLocaleDateString();
     };
 
-
-    // Determine which list of users to display: filtered results or initial list
-    const usersToDisplay = state.data && Array.isArray(state.data) ? state.data : (Array.isArray(initialUsersFromPage) ? initialUsersFromPage : []);
-    const isLoading = useFormStatus().pending; // Use useFormStatus for the form's pending state
-
+    const isLoading = useFormStatus().pending;
 
     return (
         <>
-            {/* Add key prop to the form for reset functionality */}
-            <form action={formAction} className="flex flex-col gap-2 bg-black rounded-lg justify-center items-top p-4 w-full text-white mb-4" key={formKey}>
+            <form ref={formRef} action={formAction} className="flex flex-col gap-2 bg-black rounded-lg justify-center items-top p-4 w-full text-white mb-4">
                 <header className='flex flex-wrap gap-4 items-end'>
                     <div>
                         <label htmlFor="textoBusqueda" className="block text-sm font-medium mb-1">Buscar (Nombre, Apellido, Correo):</label>
-                        {/* Ensure name attribute is present */}
                         <InputTextoGeneral
                             id="textoBusqueda"
                             name="textoBusqueda"
@@ -129,7 +116,6 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
                     </div>
                     <div>
                         <label htmlFor="rol" className="block text-sm font-medium mb-1">Rol:</label>
-                        {/* Ensure name attribute is present */}
                         <select
                             name="rol"
                             id="rol"
@@ -145,7 +131,6 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
                     </div>
                     <div>
                         <label htmlFor="generoFiltro" className="block text-sm font-medium mb-1">Género:</label>
-                        {/* Ensure name attribute is present */}
                         <select
                             name="generoFiltro"
                             id="generoFiltro"
@@ -161,7 +146,6 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
                     </div>
                     <div>
                         <label htmlFor="tipoDocumentoFiltro" className="block text-sm font-medium mb-1">Tipo de Documento:</label>
-                        {/* Ensure name attribute is present */}
                         <select
                             name="tipoDocumentoFiltro"
                             id="tipoDocumentoFiltro"
@@ -176,7 +160,6 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
                         </select>
                     </div>
                     <div className="flex items-center mt-4">
-                         {/* Ensure name attribute is present */}
                         <input
                             type="checkbox"
                             id="incluirDeshabilitados"
@@ -189,9 +172,7 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
                     </div>
                 </header>
                 <footer className='flex flex-wrap gap-4 items-center mt-2'>
-                    {/* Use the SubmitButton component */}
                     <SubmitButton />
-
                     <button
                         type="button"
                         onClick={handleResetFilters}
@@ -200,16 +181,14 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
                     >
                         Limpiar Filtros
                     </button>
-
-                    {/* Pass the currently displayed users to the PDF export button */}
                     <BotonExportarPDF usuarios={usersToDisplay} />
-
                 </footer>
             </form>
 
             <SeccionLista>
                 <THUsuarios />
                 <tbody className='bg-gray-300'>
+                    {console.log('FormFiltrarUsuarios: Rendering table. usersToDisplay:', usersToDisplay?.length || 0, usersToDisplay)}
                     {isLoading ? (
                         <tr><TdGeneral colSpan="16" className="text-center py-4">Cargando...</TdGeneral></tr>
                     ) : usersToDisplay.length === 0 ? (
@@ -254,7 +233,7 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
                                         </Link>
                                         <button
                                             onClick={() => handleToggleUserStatus(user._id, user.habilitado)}
-                                            disabled={isLoading} // Use the form's pending state for simplicity, or a separate state
+                                            disabled={isLoading}
                                             className={`px-4 py-2 font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75 text-sm ${user.habilitado
                                                 ? 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500'
                                                 : 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500'
@@ -272,14 +251,6 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
                     )}
                 </tbody>
             </SeccionLista>
-            {/* Pop-up messages are now handled by PopUpContext */}
-            {/* {popUp && (
-                <PopUpMessage
-                    message={popUp.message}
-                    type={popUp.type}
-                    onClose={handleClosePopUp}
-                />
-            )} */}
         </>
     );
 }

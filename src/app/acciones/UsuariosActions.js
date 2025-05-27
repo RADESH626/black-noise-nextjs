@@ -15,6 +15,7 @@ const DEFAULT_PROFILE_PICTURE_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAKwAAACUCAMAAAA5
 
 // Server Action para manejar el login
 export async function loginAction(prevState, formData) {
+    
   const email = formData.get('correo');
   const password = formData.get('password');
 
@@ -26,8 +27,36 @@ export async function loginAction(prevState, formData) {
     return { message: 'Por favor, ingresa correo y contraseña.', success: false };
   }
 
-  // Return the credentials to the client for signIn
-  return { email, password, message: null, success: false, readyForSignIn: true };
+  try {
+    // Get user from database to check role
+    const user = await ObtenerUsuarioPorCorreo(email);
+    
+    if (!user) {
+      return { message: 'Usuario no encontrado.', success: false };
+    }
+
+    // Verify password
+    const isValid = await bcrypt.compare(password, user.password);
+    
+    if (!isValid) {
+      return { message: 'Credenciales incorrectas.', success: false };
+    }
+
+    console.log('Server Action Login: Usuario autenticado, rol:', user.rol);
+
+    // Return the credentials and user role to the client for signIn
+    return { 
+      email, 
+      password, 
+      userRole: user.rol,
+      message: null, 
+      success: false, 
+      readyForSignIn: true 
+    };
+  } catch (error) {
+    console.error('Server Action Login: Error:', error);
+    return { message: 'Error del servidor durante el login.', success: false };
+  }
 }
 
 // Server Action para manejar la adición de un solo usuario (Admin)
@@ -359,7 +388,7 @@ async function RegistroMasivoUsuario(formData, userId) {
 }
 
 // Función para filtrar usuarios
-async function FiltrarUsuarios(formData) {
+async function FiltrarUsuarios(prevState, formData) {
 
     const textoBusqueda = formData.get('textoBusqueda');
     const rol = formData.get('rol');
@@ -560,7 +589,7 @@ async function EditarUsuario(id, formData) {
     }
 }
 
-async function ObtenerTodosLosUsuarios() {
+export async function ObtenerTodosLosUsuarios() {
     try {
         connectDB();
         const data = { usuarios: await Usuario.find({}).lean() };
@@ -613,7 +642,7 @@ export {
     RegistroMasivoUsuario,
     ObtenerUsuarioPorId,
     ObtenerUsuarioPorCorreo,
-    FiltrarUsuarios,
+    FiltrarUsuarios, // Export as Server Action compatible function
     toggleUsuarioHabilitado,
     EditarUsuario, // Export the updated function
     obtenerUsuariosHabilitados,

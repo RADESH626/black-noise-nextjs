@@ -71,6 +71,7 @@ export const mockUsuarios = [
     numeroTelefono: "3155566778",
     direccion: "Calle 50 #78-90, Barranquilla",
     correo: "luis.ramirez@email.com",
+    password: "$2b$10$0Ak7TvlAF7JpVT4xgXpbk.lkb0McqNo6U2TwYUHVCrBN8/JvS5OE6", // contraseña: "admin123"
     rol: "ADMINISTRADOR",
     fotoPerfil: "/img/perfil/FotoPerfil.webp",
     habilitado: true,

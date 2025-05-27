@@ -1,6 +1,20 @@
 # System Patterns and Best Practices
 
-## Server Actions Pattern (Next.js 14+) - ESTABLISHED ✅
+## Server Actions Pattern (Next.js 14+ / React 19+) - ESTABLISHED ✅
+
+### React 19 Hook Changes - UPDATED ✅
+**Important:** In React 19, `useActionState` has moved from `react-dom` to `react`. Update imports accordingly:
+
+```jsx
+// ✅ Correct for React 19
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
+
+// ❌ Incorrect for React 19
+import { useActionState, useFormStatus } from 'react-dom';
+```
+
+## Server Actions Pattern (Next.js 14+ / React 19+) - ESTABLISHED ✅
 
 ### Form Component Structure
 All forms in the application now follow this standardized pattern:

@@ -29,6 +29,7 @@ const initialState = {
   success: false,
   email: null,
   password: null,
+  userRole: null,
   readyForSignIn: false,
 };
 
@@ -41,8 +42,12 @@ function FormLogin() {
 
   // Efecto para manejar la respuesta de la Server Action y llamar a signIn
   useEffect(() => {
+    console.log('Frontend Login: State changed:', state);
+    
     if (state.readyForSignIn && state.email && state.password) {
       console.log('Frontend Login: Datos recibidos de Server Action, intentando signIn.');
+      console.log('Frontend Login: User role from state:', state.userRole);
+      
       const handleSignIn = async () => {
         const result = await signIn('credentials', {
           email: state.email,
@@ -57,8 +62,20 @@ function FormLogin() {
           showPopUp('Credenciales incorrectas', 'error');
         } else {
           console.log('Frontend Login: Inicio de sesión exitoso.');
+          console.log('Frontend Login: Verificando rol para redirección:', state.userRole);
           showPopUp('¡Inicio de sesión exitoso!', 'success');
-          router.push('/'); // Redirigir al inicio después del login exitoso
+          
+          // Redirección basada en el rol del usuario
+          if (state.userRole === 'ADMINISTRADOR') {
+            console.log('Frontend Login: Redirigiendo administrador al panel de admin.');
+            router.push('/admin');
+          } else if (state.userRole === 'PROVEEDOR') {
+            console.log('Frontend Login: Redirigiendo proveedor al panel de proveedor.');
+            router.push('/proveedor');
+          } else {
+            console.log('Frontend Login: Redirigiendo cliente al inicio. Rol actual:', state.userRole);
+            router.push('/');
+          }
         }
       };
       handleSignIn();
