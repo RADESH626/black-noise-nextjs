@@ -1,5 +1,5 @@
 import AdminFormPage from '@/components/layout/admin/AdminFormPage'
-import FormCargaMasivaUsuarios from '@/components/layout/admin/forms/FormCargaMasiva'
+import FormCargaMasivaUsuarios from '@/components/layout/admin/usuarios/forms/FormCargaMasivaUsuarios'
 
 function archivo() {
   return (

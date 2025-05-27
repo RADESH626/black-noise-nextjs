@@ -9,8 +9,56 @@ import bcrypt from "bcryptjs"; // Importa bcryptjs
 import nodemailer from 'nodemailer'; // Importar Nodemailer
 import connectDB from '@/utils/DBconection';
 import Usuario from '@/models/Usuario';
+import { signIn } from "next-auth/react"; // Import signIn
 
-const DEFAULT_PROFILE_PICTURE_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAKwAAACUCAMAAAA5xjIqAAAAMFBMVEXk5ueutLenrrHn6eqrsbTq7O3Lz9Hh4+S4vcDGyszT1tjP09Te4OKyuLvCx8nW2dvDGAcOAAAECUlEQVR4nO2c23LjIAxAbcTVBvP/f7vQZLNJ47SAsGTPcp4605czqpC4yJ2mwWAwGAwGg8FgMBgMBq+AUmDisizR5x+5dT4Dk4kuiAfSOm+mUworv25ByPkZKcK2mNPpqsmF+dX07jvbByfTdWLP9O4r9XmSAaY1fFbNiLCcxBYm+7PqV3DdKVIX4i9hvesGz28LukQ124p4Gdesu/LGtsY12ypWV1HhmqoCY2xhrYnrV2wjly3EStVEMEyy5vf6+h5ay+MKW71rSlvHkQgQW1xTbDmaAzSp8iQCuLbA5mpLLutDoytHaKta1ytiIXY1zYHN0HZdWOr67LfQ0vYxZTGBlRtpaA0msKnpekLXup3hDpRHMkBlQcoDR+eKKLJ3WUu3+UpnRJxs2iDQyWJTdqY8PDbvCx6R1WQrzDTtZF9k6SqtQRaDRKCTxa6vmXB74PGukk4Wm7KpHJAtsCE7ZKeLLbBLla5rNYWGS65XpKU72FxpI3OpLSIsSFfKzTf6WDNbQln0gXGjc73WUfxSlxyTwiUtYZWd8qPShS7mLnXliWpi9O+MiFIbiFVRDyCaXHaaWmUJL+UewNL4aMfy1tz2HEp8Rf+gZY1xPTQ3JQLfWI+q3s9Ixvmu2rQVdKeZPapsJcuswQOosSU8JX7SLe5kgv7p/t22bARJcq6tf4AvuPOQ2ykGJ3Piut053yfVoM8z8AvG/jDsO4uzhPWO8jbI3TFqGTbDOYK4B4B3dv4+oC5nq08wN/tOysqvgXohZCLP/odt8eY8yfoGpAjHVWu9Rn9izRtJFtSN/CO3zgeynfFxyVF1Ce30usTov37BLfcMgInOhqd19VQYgt3WU2QE5M9pVmfzovqhJaTVNm86si42NUW9vZWrj8bSbi7y+ILyLsy/tNn3BhHsQq2bKqqTZRF9Qwgb6T68SjFd7W5rLQ2wsC7SxFeZbf9jqirf2R5/1wF584p/Zr75xkOTASBunVQzwq7HbR3BbOi//wupmh2WDLqv6g17RHAhBtwLzQek0L11cwYcRcqFricJ8EdkwMO25+0HYEbnixC219mn6oqoERn6lAXAz22U2M493psgHpmuz7r4K0Yy1w4fX+FnNipAxrb1+ajVdkPYtnykiEK0vzsd2wp2aW4PNDXrO61Xzsf3gj2aeln7szcKGRpkATmz027rGhZZh7HTRuq3CZrNtf4rIfQAH8a28sFM8VSCO6LKFTzT6rpRN0ChONrBMxVnSOgwLo+iZv/VNv3Sk4r52g7T8khk+RfatLvYXdnynS17FiTb4sgyNoS/FI/bc21hnikttfivELpQJov7wr4Xsmw3o7g9bxQmLbfmjbKjY+P/h+lNWcddxCmwRbLmJJS4Dv5D/gBmFDnwIIZzJgAAAABJRU5ErkJggg==';
+const DEFAULT_PROFILE_PICTURE_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAKwAAACUCAMAAAA5xjIqAAAAMFBMVEXk5ueutLenrrHn6eqrsbTq7O3Lz9Hh4+S4vcDGyszT1tjP09Te4OKyuLvCx8nW2dvDGAcOAAAECUlEQVR4nO2c23LjIAxAbcTVBvP/f7vQZLNJx7SAsGTPcp4605czqpC4yJ2mwWAwGAwGg8FgMBgMBq+AUmDisizR5x+5dT4Dk4kuiAfSOm+mUworv25ByPkZKcK2mNPpqsmF+dX07jvbByfTdWLP9O4r9XmSAaY1fFbNiLCcxBYm+7PqV3DdKVIX4i9hvesGz28LukQ124p4Gdesu/LGtsY12ypWV1HhmqoCY2xhrYnrV2wjly3EStVEMEyy5vf6+h5ay+MKW71rSlvHkQgQW1xTbDmaAzSp8iQCuLbA5mpLLutDoytHaKta1ytiIXY1zYHN0HZdWOr67LfQ0vYxZTGBlRtpaA0msKnpekLXup3hDpRHMkBlQcoDR+eKKLJ3WUu3+UpnRJxs2iDQyWJTdqY8PDbvCx6R1WQrzDTtZF9k6SqtQRaDRKCTxa6vmXB74PGukk4Wm7KpHJAtsCE7ZKeLLbBLla5rNYWGS65XpKU72FxpI3OpLSIsSFfKzTf6WDNbQln0gXGnc73WUfxSlxyTwiUtYZWd8qPShS7mLnXliWpi9O+MiFIbiFVRDyCaXHaaWmUJL+UewNL4aMfy1tz2HEp8Rf+gZY1xPTQ3JQLfWI+q3s9Ixvmu2rQVdKeZPapsJcuswQOosSU8JX7SLe5kgv7p/t22bARJcq6tf4AvuPOQ2ykGJ3Piut053yfVoM8z8AvG/jDsO4uzhPWO8jbI3TFqGTbDOYK4B4B3dv4+oC5nq08wN/tOysqvgXohZCLP/odt8eY8yfoGpAjHVWu9Rn9izRtJFtSN/CO3zgeynfFxyVF1Ce30usTov37BLfcMgInOhqd19VQYgt3WU2QE5M9pVmfzovqhJaTVNm86si42NUW9vZWrx8bSbi7y+ILyLsy/tNn3BhHsQq2bKqqTZRF9Qwgb6T68SjFd7W5rLQ2wsC7SxFeZbf9jqirf2R5/1wF584p/Zr75xkOTASBunVQzwq7HbR3BbOi//wupmh2WDLqv6g17RHAhBtwLzQek0L11cwYcRcqFricJ8EdkwMO25+0HYEbnixC219mn6oqoERn6lAXAz22U2M493psgHpmuz7r4K0Yy1w4fX+FnNipAxrb1+ajVdkPYtnykiEK0vzsd2wp2aW4PNDXrO61Xzsf3gj2aeln7szcKGRpkATmz027rGhZZh7HTRuq3CZrNtf4rIfQAH8a28sFM8VSCO6LKFTzT6rpRN0ChONrBMxVnSOgwLo+iZv/VNv3Sk4r52g7T8khk+RfatLvYXdnynS17FiTb4sgyNoS/FI/bc21hnikttfivELpQJov7wr4Xsmw3o7g9bxQmLbfmjbKjY+P/h+lNWcddxCmwRbLmJJS4Dv5D/gBmFDnwIIZzJgAAAABJRU5ErkJggg==';
+
+// Server Action para manejar el login
+export async function loginAction(prevState, formData) {
+  const email = formData.get('correo');
+  const password = formData.get('password');
+
+  console.log('Server Action Login: Iniciado.');
+  console.log('Server Action Login: Datos recibidos.');
+
+  // Perform basic server-side validation if needed
+  if (!email || !password) {
+    return { message: 'Por favor, ingresa correo y contraseña.', success: false };
+  }
+
+  // Return the credentials to the client for signIn
+  return { email, password, message: null, success: false, readyForSignIn: true };
+}
+
+// Server Action para manejar la adición de un solo usuario (Admin)
+export async function addSingleUserAction(prevState, formData) {
+    console.log('Server Action Add Single User: Iniciado.');
+
+    // RegistrarUsuario expects formData with password field named 'password'
+    // Ensure the password field from the form (named 'contrasena') is correctly mapped
+    const password = formData.get('contrasena');
+    if (password) {
+        formData.set('password', password); // Set the correct name for RegistrarUsuario
+        formData.delete('contrasena'); // Remove the old name
+    } else {
+         // Handle case where password is missing if needed
+         return { message: 'La contraseña es requerida.', success: false };
+    }
+
+    // Call the existing RegistrarUsuario function
+    const result = await RegistrarUsuario(formData);
+
+    // RegistrarUsuario already returns { success: true, data: ... } or { error: ... }
+    // Map the result to the state structure expected by useActionState
+    if (result.success) {
+        // Revalidate path for admin user list after adding a user
+        revalidatePath('/admin/usuarios');
+        return { message: result.message || 'Usuario agregado exitosamente.', success: true, data: result.data };
+    } else {
+        return { message: result.error || 'Error al agregar el usuario.', success: false };
+    }
+}
+
 
 // Función para guardar usuarios en la base de datos
 async function guardarUsuarios(data, enviarCorreo = false) { // Añadir parámetro enviarCorreo con valor por defecto
@@ -61,6 +109,7 @@ async function guardarUsuarios(data, enviarCorreo = false) { // Añadir parámet
                 // Podrías querer manejar este error de alguna manera, aunque el usuario ya fue guardado.
             }
         }
+        
         // Convertir el documento de Mongoose a un objeto plano
         const usuarioPlano = {
             tipoDocumento: UsuarioGuardado.tipoDocumento,
@@ -453,36 +502,62 @@ async function toggleUsuarioHabilitado(formData) {
 }
 
 // Función para editar un usuario
-async function EditarUsuario(formData) {
-
-    const id = formData.get('id');
-
-    //
-
-    console.log('id:', id);
-
+async function EditarUsuario(id, formData) {
+    console.log('DEBUG: Entering EditarUsuario with ID:', id);
     try {
+        await connectDB(); // Ensure DB connection is awaited
+        console.log('DEBUG: Database connected for EditarUsuario.');
 
-        connectDB()
+        const updateData = {
+            tipoDocumento: formData.get('tipoDocumento'),
+            numeroDocumento: formData.get('numeroDocumento'),
+            primerNombre: formData.get('primerNombre'),
+            segundoNombre: formData.get('segundoNombre'),
+            primerApellido: formData.get('primerApellido'),
+            segundoApellido: formData.get('segundoApellido'),
+            fechaNacimiento: formData.get('fechaNacimiento'),
+            genero: formData.get('genero'),
+            numeroTelefono: formData.get('telefono'), // Note: name is 'telefono' in the form
+            direccion: formData.get('direccion'),
+            correo: formData.get('correo'),
+            rol: formData.get('rol'), // Include rol update
+            // Password update would need separate handling if included
+        };
 
-        const usuario = await Usuario.findByIdAndUpdate(id, { habilitado: false });
+        console.log('DEBUG: Update data for user:', id, updateData);
 
-        console.log('Resultado del cambio:', usuario);
+        const usuarioActualizado = await Usuario.findByIdAndUpdate(
+            id,
+            updateData,
+            { new: true, runValidators: true } // Return the modified document and run schema validators
+        ).lean(); // Use lean() to get a plain object
 
-        if (usuario.error) { // Asumiendo que tu API devuelve un campo 'error'
-            console.error('Error al encontrar el usuario con Axios:', usuario.error);
-            // Considera cómo quieres manejar los errores aquí.
-            // Podrías lanzar un error o devolver un objeto de error específico.
-            throw new Error(usuario.error);
+        console.log('DEBUG: Usuario actualizado en la base de datos:', usuarioActualizado);
+
+        if (!usuarioActualizado) {
+            console.error(`Error: No se encontró ningún usuario con el ID ${id}.`);
+            return { error: `No se encontró ningún usuario con el ID ${id}.` };
         }
 
-        return usuario;
+        // Manually convert to plain object with string ID and dates
+        const plainUser = {
+            ...usuarioActualizado,
+            _id: usuarioActualizado._id.toString(),
+            fechaNacimiento: usuarioActualizado.fechaNacimiento ?
+                new Date(usuarioActualizado.fechaNacimiento).toISOString().split('T')[0] : null,
+            createdAt: usuarioActualizado.createdAt ?
+                new Date(usuarioActualizado.createdAt).toISOString() : null,
+            updatedAt: usuarioActualizado.updatedAt ?
+                new Date(usuarioActualizado.updatedAt).toISOString() : null
+        };
+
+        console.log('DEBUG: Exiting EditarUsuario with plain user:', plainUser);
+        return { success: true, message: 'Usuario actualizado exitosamente.', data: plainUser };
 
     } catch (error) {
-        console.error('Error al encontrar el usuario:', error.message);
+        console.error(`ERROR al editar el usuario con ID ${id}:`, error.message);
+        return { error: `Error al procesar la solicitud: ${error.message}` };
     }
-
-    
 }
 
 async function ObtenerTodosLosUsuarios() {
@@ -510,7 +585,7 @@ async function ObtenerTodosLosUsuarios() {
                     try {
                         plainUser.fechaNacimiento = new Date(plainUser.fechaNacimiento).toISOString().split('T')[0];
                     } catch (e) {
-                        plainUser.fechaNacimiento = null; // Or handle as an error
+                        plainUser.fechaNacimiento = null;
                     }
                  }
             }
@@ -523,7 +598,7 @@ async function ObtenerTodosLosUsuarios() {
             // Add any other date fields you might have
             return plainUser;
         });
-        
+
         // console.log("Datos retornados por ObtenerTodosLosUsuarios (plain):", plainUsers); // Log para depuración
         return plainUsers;
 
@@ -540,7 +615,86 @@ export {
     ObtenerUsuarioPorCorreo,
     FiltrarUsuarios,
     toggleUsuarioHabilitado,
-    EditarUsuario,
+    EditarUsuario, // Export the updated function
     obtenerUsuariosHabilitados,
-    ObtenerTodosLosUsuarios
 };
+
+// Server Action para manejar el registro de usuario
+export async function registerAction(prevState, formData) {
+  const password = formData.get('password');
+  const confirmPassword = formData.get('confirmPassword');
+
+  // Password confirmation validation
+  if (!password || password !== confirmPassword) {
+    return { message: 'Las contraseñas no coinciden', success: false };
+  }
+
+  // Call the existing RegistrarUsuario function
+  const result = await RegistrarUsuario(formData);
+
+  // RegistrarUsuario already returns { success: true, data: ... } or { error: ... }
+  // Map the result to the state structure expected by useActionState
+  if (result.success) {
+    return { message: result.message || '¡Registro exitoso!', success: true, data: result.data };
+  } else {
+    return { message: result.error || 'Error en el registro. Inténtalo de nuevo.', success: false };
+  }
+}
+
+// Server Action para manejar la actualización de usuario
+export async function updateUserAction(userId, prevState, formData) {
+    console.log('Server Action Update User: Iniciado para ID:', userId);
+
+    if (!userId) {
+        return { message: 'ID de usuario no proporcionado para actualizar.', success: false };
+    }
+
+    // Call the updated EditarUsuario function
+    const result = await EditarUsuario(userId, formData);
+
+    // EditarUsuario now returns { success: true, data: ... } or { error: ... }
+    // Map the result to the state structure expected by useActionState
+    if (result.success) {
+        // Revalidate path for admin user list if needed
+        revalidatePath('/admin/usuarios');
+        // Revalidate path for the specific user profile page if needed
+        revalidatePath(`/perfil/editar`); // Assuming the profile page path is /perfil/editar
+        revalidatePath(`/admin/usuarios/editar/${userId}`); // Revalidate admin edit page
+
+        return { message: result.message || 'Usuario actualizado exitosamente.', success: true, data: result.data };
+    } else {
+        return { message: result.error || 'Error al actualizar el usuario.', success: false };
+    }
+}
+
+// Server Action para manejar la carga masiva de usuarios
+export async function bulkUploadUsersAction(prevState, formData) {
+    console.log('Server Action Bulk Upload Users: Iniciado.');
+
+    // RegistroMasivoUsuario requires userId, but Server Actions don't directly receive session.
+    // We need to get the session here to pass the userId to RegistroMasivoUsuario.
+    const { getServerSession } = await import("next-auth");
+    const { authOptions } = await import("@/app/api/auth/[...nextauth]/route"); // Adjust path if necessary
+
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.id) {
+        console.log('Server Action Bulk Upload Users: Usuario no autenticado.');
+        return { message: 'Usuario no autenticado. Por favor, inicia sesión.', success: false };
+    }
+
+    const userId = session.user.id;
+
+    // Call the existing RegistroMasivoUsuario function
+    const result = await RegistroMasivoUsuario(formData, userId);
+
+    // RegistroMasivoUsuario already returns { success: true, ... } or { error: ... }
+    // Map the result to the state structure expected by useActionState
+    if (result.success) {
+        // Revalidate path for admin user list after bulk upload
+        revalidatePath('/admin/usuarios');
+        return { message: result.message || 'Carga masiva completada exitosamente.', success: true };
+    } else {
+        return { message: result.error || 'Error durante la carga masiva.', success: false };
+    }
+}

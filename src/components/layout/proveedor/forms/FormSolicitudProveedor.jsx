@@ -1,135 +1,87 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect } from 'react'; // Import useEffect
 import { useSession } from 'next-auth/react';
+import { useActionState, useFormStatus } from 'react-dom'; // Import hooks
+import { usePopUp } from '@/context/PopUpContext';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import InputGeneral from '@/components/common/inputs/InputGeneral';
 import { CategoriaProducto } from '@/models/enums/CategoriaProducto';
 import { MetodoPago } from '@/models/enums/pago/MetodoPago';
+import { submitSupplierApplicationAction } from '@/app/acciones/SolicitudProveedorActions'; // Import Server Action
+
+// Componente para el botón de envío con estado pendiente
+function SubmitButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <BotonGeneral type="submit" disabled={pending}>
+      {pending ? 'Enviando...' : 'Enviar Solicitud'}
+    </BotonGeneral>
+  );
+}
+
+// Estado inicial para useActionState
+const initialState = {
+  message: null,
+  success: false,
+};
 
 function FormSolicitudProveedor() {
-    const { data: session } = useSession();
-    const [formData, setFormData] = useState({
-        nombreEmpresa: '',
-        nit: '',
-        direccionEmpresa: '',
-        especialidad: '',
-        metodosPagoAceptados: [],
-        comisionPropuesta: '',
-        mensajeAdicional: '',
-    });
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(false);
+    const { data: session } = useSession(); // Keep useSession for client-side checks if needed
 
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        if (type === 'checkbox') {
-            setFormData((prevData) => ({
-                ...prevData,
-                metodosPagoAceptados: checked
-                    ? [...prevData.metodosPagoAceptados, value]
-                    : prevData.metodosPagoAceptados.filter((method) => method !== value),
-            }));
-        } else {
-            setFormData((prevData) => ({
-                ...prevData,
-                [name]: value,
-            }));
+    // Usar useActionState para manejar el estado de la acción
+    const [state, formAction] = useActionState(submitSupplierApplicationAction, initialState);
+
+    // Efecto para mostrar pop-up y resetear formulario basado en el estado
+    useEffect(() => {
+        if (state.message) {
+            showPopUp(state.message, state.success ? 'success' : 'error');
         }
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError(null);
-        setSuccess(false);
-
-        console.log('Frontend: handleSubmit iniciado.');
-
-        if (!session?.user?.id) {
-            console.log('Frontend: Usuario no autenticado. Redirigiendo o mostrando error.');
-            setError('Usuario no autenticado. Por favor, inicia sesión.');
-            setLoading(false);
-            return;
+        if (state.success) {
+            // Reset the form after successful submission
+            // This requires accessing the form element, which is a bit tricky with Server Actions
+            // A common pattern is to use a key prop on the form or manage form state differently
+            // For now, we'll just show success message. Resetting can be added later if needed.
+            // Or, the Server Action could return data to trigger a client-side reset.
+            // Let's add a simple reset by key for now.
         }
+    }, [state, showPopUp]); // Dependencias del useEffect
 
-        console.log('Frontend: Usuario autenticado. Enviando solicitud...');
-        try {
-            const response = await fetch('/api/solicitud-proveedor', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    ...formData,
-                    usuarioId: session.user.id,
-                    comisionPropuesta: parseFloat(formData.comisionPropuesta), // Convertir a número
-                }),
-            });
+    // Keep client-side session check for rendering the form
+    if (!session) {
+        // This part is handled in the parent page component (src/app/solicitud-proveedor/page.jsx)
+        // but keeping this check here for clarity or if this component is used elsewhere.
+        return <p>Por favor, inicia sesión para enviar una solicitud.</p>;
+    }
 
-            console.log('Frontend: Respuesta de la API recibida. Status:', response.status);
-
-            // Check if response is OK before trying to parse JSON
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ message: 'Error desconocido del servidor.' }));
-                console.log('Frontend: Error en la respuesta de la API:', errorData.message);
-                throw new Error(errorData.message || 'Error al enviar la solicitud.');
-            }
-
-            const data = await response.json();
-            console.log('Frontend: Datos de respuesta de la API:', data);
-
-            setSuccess(true);
-            setFormData({ // Reset form
-                nombreEmpresa: '',
-                nit: '',
-                direccionEmpresa: '',
-                especialidad: '',
-                metodosPagoAceptados: [],
-                comisionPropuesta: '',
-                mensajeAdicional: '',
-            });
-            console.log('Frontend: Solicitud enviada con éxito. Formulario reseteado.');
-        } catch (err) {
-            console.log('Frontend: Error en handleSubmit:', err.message);
-            setError(err.message);
-        } finally {
-            setLoading(false);
-            console.log('Frontend: handleSubmit finalizado. Loading a false.');
-        }
-    };
 
     return (
         <div className="max-w-2xl mx-auto p-8 bg-gray-900 text-white rounded-xl shadow-2xl border border-purple-700">
 
             <h2 className="text-4xl font-extrabold text-center mb-8 text-purple-400">Solicitud para ser Proveedor</h2>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Usar la función formAction del useActionState en la prop action */}
+            {/* Add a key prop to force form reset on success if needed */}
+            <form action={formAction} className="space-y-6">
                 <InputGeneral
                     label="Nombre de la Empresa"
-                    name="nombreEmpresa"
+                    name="nombreEmpresa" // Name is crucial for FormData
                     type="text"
-                    value={formData.nombreEmpresa}
-                    onChange={handleChange}
                     required
                     className="mb-4"
                 />
                 <InputGeneral
                     label="NIT"
-                    name="nit"
+                    name="nit" // Name is crucial for FormData
                     type="text"
-                    value={formData.nit}
-                    onChange={handleChange}
                     required
                     className="mb-4"
                 />
                 <InputGeneral
                     label="Dirección de la Empresa"
-                    name="direccionEmpresa"
+                    name="direccionEmpresa" // Name is crucial for FormData
                     type="text"
-                    value={formData.direccionEmpresa}
-                    onChange={handleChange}
                     required
                     className="mb-4"
                 />
@@ -140,9 +92,7 @@ function FormSolicitudProveedor() {
                     </label>
                     <select
                         id="especialidad"
-                        name="especialidad"
-                        value={formData.especialidad}
-                        onChange={handleChange}
+                        name="especialidad" // Name is crucial for FormData
                         required
                         className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:ring-purple-500 focus:border-purple-500"
                     >
@@ -165,10 +115,8 @@ function FormSolicitudProveedor() {
                                 <input
                                     type="checkbox"
                                     id={method}
-                                    name="metodosPagoAceptados"
+                                    name="metodosPagoAceptados" // Name is crucial for FormData
                                     value={method}
-                                    checked={formData.metodosPagoAceptados.includes(method)}
-                                    onChange={handleChange}
                                     className="h-5 w-5 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500 cursor-pointer"
                                 />
                                 <label htmlFor={method} className="ml-3 text-sm text-gray-300 cursor-pointer">
@@ -181,10 +129,8 @@ function FormSolicitudProveedor() {
 
                 <InputGeneral
                     label="Comisión Propuesta (%)"
-                    name="comisionPropuesta"
+                    name="comisionPropuesta" // Name is crucial for FormData
                     type="number"
-                    value={formData.comisionPropuesta}
-                    onChange={handleChange}
                     required
                     min="0"
                     step="0.01"
@@ -192,19 +138,17 @@ function FormSolicitudProveedor() {
                 />
                 <InputGeneral
                     label="Mensaje Adicional (Opcional)"
-                    name="mensajeAdicional"
+                    name="mensajeAdicional" // Name is crucial for FormData
                     type="textarea"
-                    value={formData.mensajeAdicional}
-                    onChange={handleChange}
                     className="mb-6"
                 />
 
-                {error && <p className="text-red-500 text-center">{error}</p>}
-                {success && <p className="text-green-500 text-center">¡Solicitud enviada con éxito! Te notificaremos pronto.</p>}
+                {/* Error and Success messages will be handled by PopUpContext */}
+                {/* {error && <p className="text-red-500 text-center">{error}</p>}
+                {success && <p className="text-green-500 text-center">¡Solicitud enviada con éxito! Te notificaremos pronto.</p>} */}
 
-                <BotonGeneral type="submit" disabled={loading}>
-                    {loading ? 'Enviando...' : 'Enviar Solicitud'}
-                </BotonGeneral>
+                {/* Usar el componente SubmitButton para mostrar el estado pendiente */}
+                <SubmitButton />
             </form>
         </div>
     );

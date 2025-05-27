@@ -1,104 +1,117 @@
 "use client"
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signIn } from "next-auth/react";
+import { useEffect, useActionState } from 'react'; // Import hooks
+import { useFormStatus } from 'react-dom'; // Import useFormStatus
+import { signIn } from "next-auth/react"; // Import signIn
 import { usePopUp } from '@/context/PopUpContext';
 import { InputEmail, InputPassword } from "@/components/common/inputs";
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+import { loginAction } from '@/app/acciones/UsuariosActions'; // Import Server Action
+
+// Componente para el botón de envío con estado pendiente
+function SubmitButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <BotonGeneral
+      type="submit"
+      disabled={pending} // Disable button while pending
+    >
+      {pending ? 'Iniciando Sesión...' : 'Iniciar Sesión'}
+    </BotonGeneral>
+  );
+}
+
+// Estado inicial para useActionState
+const initialState = {
+  message: null,
+  success: false,
+  email: null,
+  password: null,
+  readyForSignIn: false,
+};
 
 function FormLogin() {
-    const { showPopUp } = usePopUp();
-    const router = useRouter();
-    const [correo, setCorreo] = useState('');
-    const [password, setPassword] = useState('');
+  const { showPopUp } = usePopUp();
+  const router = useRouter();
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        console.log('Frontend Login: handleSubmit iniciado.');
-        console.log('Frontend Login: Intentando iniciar sesión con correo:', correo);
+  // Usar useActionState para manejar el estado de la acción
+  const [state, formAction] = useActionState(loginAction, initialState);
 
-        try {
-            const result = await signIn('credentials', {
-                email: correo,
-                password: password,
-                redirect: false
-            });
+  // Efecto para manejar la respuesta de la Server Action y llamar a signIn
+  useEffect(() => {
+    if (state.readyForSignIn && state.email && state.password) {
+      console.log('Frontend Login: Datos recibidos de Server Action, intentando signIn.');
+      const handleSignIn = async () => {
+        const result = await signIn('credentials', {
+          email: state.email,
+          password: state.password,
+          redirect: false,
+        });
 
-            console.log('Frontend Login: Resultado de signIn:', result);
+        console.log('Frontend Login: Resultado de signIn:', result);
 
-            if (result.error) {
-                console.log('Frontend Login: Error en signIn:', result.error);
-                showPopUp('Credenciales incorrectas', 'error');
-                return;
-            }
-
-            console.log('Frontend Login: Inicio de sesión exitoso.');
-            showPopUp('¡Inicio de sesión exitoso!', 'success');
-            router.push('/'); // Redirigir al inicio después del login exitoso
-        } catch (error) {
-            console.error('Frontend Login: Error durante el inicio de sesión:', error);
-            showPopUp('Error al iniciar sesión', 'error');
+        if (result.error) {
+          console.log('Frontend Login: Error en signIn:', result.error);
+          showPopUp('Credenciales incorrectas', 'error');
+        } else {
+          console.log('Frontend Login: Inicio de sesión exitoso.');
+          showPopUp('¡Inicio de sesión exitoso!', 'success');
+          router.push('/'); // Redirigir al inicio después del login exitoso
         }
-    };
+      };
+      handleSignIn();
+    } else if (state.message) {
+       // Show messages from server-side validation if any
+       showPopUp(state.message, state.success ? 'success' : 'error');
+    }
+  }, [state, showPopUp, router]); // Dependencias del useEffect
 
-    return (
+  return (
+    // Usar la función formAction del useFormState en la prop action
+    <form className="flex flex-col" action={formAction}>
 
+      <div className="relative mb-5">
+        <label className="block mb-1 text-sm font-medium text-bn-accent">Correo electrónico</label>
+        <div className="relative">
+          {/* InputEmail ahora es uncontrolled o usa name para FormData */}
+          <InputEmail
+            required
+            placeholder="ejemplo@gmail.com"
+            name="correo" // Name is crucial for FormData
+          />
+        </div>
+      </div>
 
-        <form className="flex flex-col" onSubmit={handleSubmit} >
+      <div className="relative mb-5">
+        <label htmlFor="password-login" className="block mb-1 text-sm font-medium text-bn-accent">Contraseña</label>
+        <div className="relative">
+          {/* InputPassword ahora es uncontrolled o usa name para FormData */}
+          <InputPassword
+            required
+            placeholder="contraseña"
+            name="password" // Name is crucial for FormData
+          />
+        </div>
+      </div>
 
-            <div className="relative mb-5">
+      <div className="relative mb-5 items-center flex justify-center">
+        {/* Usar el componente SubmitButton para mostrar el estado pendiente */}
+        <SubmitButton />
+      </div>
 
-                <label className="block mb-1 text-sm font-medium text-bn-accent">Correo electrónico</label>
+      <div className="text-center mt-5">
+        <p className="mb-4">¿No tienes una cuenta?</p>
+        <a href="/registro" id="showRegister">
+          <BotonGeneral>
+            Regístrate ahora
+          </BotonGeneral>
+        </a>
+      </div>
 
-                <div className="relative">
-
-                    <InputEmail required
-                        placeholder="ejemplo@gmail.com"
-                        name="correo"
-                        value={correo}
-                        onChange={(e) => setCorreo(e.target.value)} />
-
-                </div>
-
-            </div>
-
-            <div className="relative mb-5">
-
-                <label htmlFor="password-login" className="block mb-1 text-sm font-medium text-bn-accent">Contraseña</label>
-
-                <div className="relative">
-
-                    <InputPassword required
-                        placeholder="contraseña"
-                        name="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)} />
-
-                </div>
-
-            </div>
-            <div className="relative mb-5 items-center flex justify-center">
-
-                <BotonGeneral 
-                type="submit"
-                >Iniciar Sesión</BotonGeneral>
-
-            </div>
-
-
-            <div className="text-center mt-5">
-                <p className="mb-4">¿No tienes una cuenta?</p>
-                <a href="/registro" id="showRegister">
-                    <BotonGeneral>
-                        Regístrate ahora
-                    </BotonGeneral>
-                </a>
-            </div>
-
-        </form>
-
-    )
+    </form>
+  );
 }
 
 export default FormLogin;

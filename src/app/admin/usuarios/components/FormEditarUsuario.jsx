@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
-import { useActionState, useFormStatus } from 'react-dom';
-import { usePopUp } from '@/context/PopUpContext';
+import { useEffect } from "react"; // Import useEffect
+import { useActionState, useFormStatus } from "react-dom"; // Import hooks
+import { usePopUp } from '@/context/PopUpContext'; // Import PopUpContext
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
 import {
   InputTipoDocumentoIdentidad,
@@ -12,18 +12,18 @@ import {
   InputGenero,
   InputTelefono,
   InputEmail,
-  InputRol,
-  InputPassword
+  InputRol
 } from '@/components/common/inputs';
-import { addSingleUserAction } from "@/app/acciones/UsuariosActions";
+
+import { updateUserAction } from "@/app/acciones/UsuariosActions"; // Import Server Action
 
 // Component for the submit button with pending state
-function SubmitButton() {
+function SubmitButton({ isProfile }) {
   const { pending } = useFormStatus();
 
   return (
     <BotonGeneral type="submit" disabled={pending}>
-      {pending ? 'Creando...' : 'Crear usuario'}
+      {pending ? (isProfile ? 'Guardando...' : 'Editando...') : (isProfile ? 'Guardar cambios' : 'Editar usuario')}
     </BotonGeneral>
   );
 }
@@ -34,25 +34,40 @@ const initialState = {
   success: false,
 };
 
-function FormAgregarUsuarios({ onSuccess }) {
-  const { showPopUp } = usePopUp();
+// Receive initial user data as a prop
+function FormEditarUsuario({ initialUserData, userId, isProfile }) {
+  const { showPopUp } = usePopUp(); // Use PopUpContext
+
+  // Bind the userId to the server action
+  const updateUserActionWithId = updateUserAction.bind(null, userId);
 
   // Use useActionState to manage the state of the action
-  const [state, formAction] = useActionState(addSingleUserAction, initialState);
+  const [state, formAction] = useActionState(updateUserActionWithId, initialState);
 
-  // Effect to show pop-up based on the state and handle success callback
+  // Effect to show pop-up based on the state
   useEffect(() => {
     if (state.message) {
       showPopUp(state.message, state.success ? 'success' : 'error');
-      
-      // If successful and onSuccess callback is provided, call it
-      if (state.success && onSuccess) {
-        onSuccess();
-      }
     }
-  }, [state, showPopUp, onSuccess]);
+    // Optionally, handle redirection or other UI updates on success
+    // if (state.success && !isProfile) {
+    //   // Redirect to admin user list after editing a user in admin section
+    //   // router.push('/admin/usuarios');
+    // }
+  }, [state, showPopUp, isProfile]); // Add isProfile to dependencies
+
+  // No loading state needed here as initial data is passed as prop
+  if (!initialUserData) {
+     return (
+      <div className="text-red-500 text-center p-4">
+        Error cargando datos del usuario
+      </div>
+    );
+  }
+
 
   return (
+    // Use the formAction from useActionState in the action prop
     <form action={formAction} className="space-y-5 text-white">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
@@ -60,7 +75,8 @@ function FormAgregarUsuarios({ onSuccess }) {
             Tipo de Documento
           </label>
           <div className="relative">
-            <InputTipoDocumentoIdentidad />
+            {/* Use defaultValue for uncontrolled inputs */}
+            <InputTipoDocumentoIdentidad name="tipoDocumento" defaultValue={initialUserData.tipoDocumento || ""} />
           </div>
         </div>
 
@@ -69,7 +85,8 @@ function FormAgregarUsuarios({ onSuccess }) {
             Número de Documento
           </label>
           <div className="relative">
-            <InputDocumentoIdentidad required />
+            {/* Use defaultValue for uncontrolled inputs */}
+            <InputDocumentoIdentidad required name="numeroDocumento" defaultValue={initialUserData.numeroDocumento || ""} />
           </div>
         </div>
       </div>
@@ -80,7 +97,8 @@ function FormAgregarUsuarios({ onSuccess }) {
             Primer nombre
           </label>
           <div className="relative">
-            <InputTextoGeneral id="primerNombre" name="primerNombre" required placeholder="Primer nombre" />
+            {/* Use defaultValue for uncontrolled inputs */}
+            <InputTextoGeneral id="primerNombre" name="primerNombre" required placeholder="Primer nombre" defaultValue={initialUserData.primerNombre || ""} />
           </div>
         </div>
 
@@ -89,7 +107,8 @@ function FormAgregarUsuarios({ onSuccess }) {
             Segundo nombre
           </label>
           <div className="relative">
-            <InputTextoGeneral id="segundoNombre" name="segundoNombre" placeholder="Segundo nombre (opcional)" />
+            {/* Use defaultValue for uncontrolled inputs */}
+            <InputTextoGeneral id="segundoNombre" name="segundoNombre" placeholder="Segundo nombre (opcional)" defaultValue={initialUserData.segundoNombre || ""} />
           </div>
         </div>
       </div>
@@ -100,7 +119,8 @@ function FormAgregarUsuarios({ onSuccess }) {
             Primer apellido
           </label>
           <div className="relative">
-            <InputTextoGeneral id="primerApellido" name="primerApellido" required placeholder="Primer apellido" />
+            {/* Use defaultValue for uncontrolled inputs */}
+            <InputTextoGeneral id="primerApellido" name="primerApellido" required placeholder="Primer apellido" defaultValue={initialUserData.primerApellido || ""} />
           </div>
         </div>
 
@@ -109,7 +129,8 @@ function FormAgregarUsuarios({ onSuccess }) {
             Segundo apellido
           </label>
           <div className="relative">
-            <InputTextoGeneral id="segundoApellido" name="segundoApellido" required placeholder="Segundo apellido" />
+            {/* Use defaultValue for uncontrolled inputs */}
+            <InputTextoGeneral id="segundoApellido" name="segundoApellido" required placeholder="Segundo apellido" defaultValue={initialUserData.segundoApellido || ""} />
           </div>
         </div>
       </div>
@@ -120,7 +141,17 @@ function FormAgregarUsuarios({ onSuccess }) {
             Fecha de nacimiento
           </label>
           <div className="relative">
-            <InputFecha id="fechaNacimiento" name="fechaNacimiento" required />
+            {/* Use defaultValue for uncontrolled inputs */}
+            <InputFecha
+              id="fechaNacimiento"
+              name="fechaNacimiento"
+              required
+              defaultValue={
+                initialUserData.fechaNacimiento
+                  ? new Date(initialUserData.fechaNacimiento).toISOString().split('T')[0]
+                  : ""
+              }
+            />
           </div>
         </div>
 
@@ -129,7 +160,8 @@ function FormAgregarUsuarios({ onSuccess }) {
             Género
           </label>
           <div className="relative">
-            <InputGenero id="genero" name="genero" required />
+            {/* Use defaultValue for uncontrolled inputs */}
+            <InputGenero id="genero" name="genero" required defaultValue={initialUserData.genero || ""} />
           </div>
         </div>
       </div>
@@ -140,7 +172,8 @@ function FormAgregarUsuarios({ onSuccess }) {
             Número de teléfono
           </label>
           <div className="relative">
-            <InputTelefono id="numeroTelefono" name="numeroTelefono" required />
+            {/* Use defaultValue for uncontrolled inputs */}
+            <InputTelefono id="telefono" name="telefono" required defaultValue={initialUserData.numeroTelefono || ""} />
           </div>
         </div>
 
@@ -149,7 +182,8 @@ function FormAgregarUsuarios({ onSuccess }) {
             Rol
           </label>
           <div className="relative">
-            <InputRol id="rol" name="rol" required />
+            {/* Only allow changing rol if not in profile view */}
+            <InputRol id="rol" name="rol" required defaultValue={initialUserData.rol || ""} disabled={isProfile} />
           </div>
         </div>
       </div>
@@ -159,7 +193,8 @@ function FormAgregarUsuarios({ onSuccess }) {
           Dirección
         </label>
         <div className="relative">
-          <InputTextoGeneral id="direccion" name="direccion" required placeholder="Dirección" />
+          {/* Use defaultValue for uncontrolled inputs */}
+          <InputTextoGeneral id="direccion" name="direccion" required placeholder="Dirección" defaultValue={initialUserData.direccion || ""} />
         </div>
       </div>
 
@@ -168,24 +203,17 @@ function FormAgregarUsuarios({ onSuccess }) {
           Correo electrónico
         </label>
         <div className="relative">
-          <InputEmail id="correo-registro" name="correo" required placeholder="Correo electrónico" />
-        </div>
-      </div>
-
-      <div className="relative">
-        <label htmlFor="contrasena" className="block mb-1 text-sm font-medium text-purple-400">
-          Contraseña
-        </label>
-        <div className="relative">
-          <InputPassword id="contrasena" name="contrasena" required placeholder="Contraseña" />
+          {/* Use defaultValue for uncontrolled inputs */}
+          <InputEmail id="correo-registro" name="correo" required placeholder="Correo electrónico" defaultValue={initialUserData.correo || ""} />
         </div>
       </div>
 
       <div className="flex flex-row gap-2 items-center justify-center mt-5">
-        <SubmitButton />
+        {/* Use the SubmitButton component */}
+        <SubmitButton isProfile={isProfile} />
       </div>
     </form>
   );
 }
 
-export default FormAgregarUsuarios;
+export default FormEditarUsuario;

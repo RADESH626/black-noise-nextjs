@@ -1,7 +1,9 @@
 
 "use client";
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useActionState } from 'react'; // Import hooks
+import { useFormStatus } from 'react-dom'; // Import useFormStatus
 import { usePopUp } from '@/context/PopUpContext';
 import {
   InputPassword,
@@ -15,92 +17,55 @@ import {
 } from "@/components/common/inputs";
 
 
-import { RegistrarUsuario } from "@/app/acciones/UsuariosActions";
+import { registerAction } from "@/app/acciones/UsuariosActions"; // Import Server Action
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
+
+// Componente para el botón de envío con estado pendiente
+function SubmitButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <BotonGeneral
+      type="submit"
+      disabled={pending} // Disable button while pending
+    >
+      {pending ? 'Registrando...' : 'Registrarse'}
+    </BotonGeneral>
+  );
+}
+
+// Estado inicial para useActionState
+const initialState = {
+  message: null,
+  success: false,
+};
 
 
 function FormRegistro() {
   const router = useRouter();
   const { showPopUp } = usePopUp();
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-        const handleSubmit = async (event) => {
-            event.preventDefault();
-            if (isSubmitting) return;
-            
-            setIsSubmitting(true);
-            try {
-                // Recolectar manualmente los datos del formulario
-                const data = {
-                    tipoDocumento: event.target.querySelector('[name="tipoDocumento"]').value,
-                    numeroDocumento: event.target.querySelector('[name="numeroDocumento"]').value,
-                    primerNombre: event.target.querySelector('[name="primerNombre"]').value,
-                    segundoNombre: event.target.querySelector('[name="segundoNombre"]').value,
-                    primerApellido: event.target.querySelector('[name="primerApellido"]').value,
-                    segundoApellido: event.target.querySelector('[name="segundoApellido"]').value,
-                    fechaNacimiento: event.target.querySelector('[name="fechaNacimiento"]').value,
-                    genero: event.target.querySelector('[name="genero"]').value,
-                    numeroTelefono: event.target.querySelector('[name="numeroTelefono"]').value,
-                    direccion: event.target.querySelector('[name="direccion"]').value,
-                    correo: event.target.querySelector('[name="correo"]').value,
-                    password: event.target.querySelector('[name="password"]').value
-                };
+  // Usar useActionState para manejar el estado de la acción
+  const [state, formAction] = useActionState(registerAction, initialState);
 
-                const confirmPassword = event.target.querySelector('[name="confirmPassword"]').value;
+  // Efecto para mostrar pop-up y redirigir basado en el estado
+  useEffect(() => {
+    if (state.message) {
+      showPopUp(state.message, state.success ? 'success' : 'error');
+    }
+    if (state.success) {
+      // Redirigir al login después del registro exitoso
+      setTimeout(() => {
+        router.push('/login');
+      }, 2000); // Retraso para que el usuario vea el pop-up de éxito
+    }
+  }, [state, showPopUp, router]); // Dependencias del useEffect
 
-                // Validaciones
-                if (!data.password || data.password !== confirmPassword) {
-                    showPopUp('Las contraseñas no coinciden', 'error');
-                    return;
-                }
-
-                // Validar campos requeridos
-                for (const [key, value] of Object.entries(data)) {
-                    if (!value && key !== 'segundoNombre') {  // segundoNombre es opcional
-                        showPopUp(`El campo ${key} es requerido`, 'error');
-                        return;
-                    }
-                }
-
-                console.log('Enviando datos:', data);
-
-                const response = await fetch('/api/usuarios', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
-
-            console.log('Respuesta del servidor:', response.status);
-            const result = await response.json();
-            console.log('Datos de respuesta:', result);
-
-            if (response.ok) {
-                console.log('Registro exitoso:', result);
-                showPopUp('¡Registro exitoso!', 'success');
-                
-                setTimeout(() => {
-                    showPopUp('Ya puedes iniciar sesión con tu cuenta', 'success');
-                    
-                    setTimeout(() => {
-                        router.push('/login');
-                    }, 2000);
-                }, 2000);
-            } else {
-                showPopUp(result.error || 'Error en el registro. Inténtalo de nuevo.', 'error');
-            }
-        } catch (error) {
-            console.error('Error en el registro:', error);
-            showPopUp('Error en el registro. Inténtalo de nuevo.', 'error');
-        } finally {
-            setIsSubmitting(false);
-        }
-  };
 
   return (
 
-    <form className="space-y-5" onSubmit={handleSubmit}>
+    // Usar la función formAction del useActionState en la prop action
+    <form className="space-y-5" action={formAction}>
 
 
       {/* ==================================================================================================== */}
@@ -299,12 +264,8 @@ function FormRegistro() {
 
       <div className="flex items-center justify-center mt-5">
 
-        <BotonGeneral 
-            type="submit"
-            disabled={isSubmitting}
-        >
-            {isSubmitting ? 'Registrando...' : 'Registrarse'}
-        </BotonGeneral>
+        {/* Usar el componente SubmitButton para mostrar el estado pendiente */}
+        <SubmitButton />
 
       </div>
 

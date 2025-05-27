@@ -1,5 +1,9 @@
 "use server";
 
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // Adjust path if necessary
+
+
 export async function obtenerSolicitudesProveedor() {
     console.log('DEBUG: Entering obtenerSolicitudesProveedor.');
     try {
@@ -11,7 +15,7 @@ export async function obtenerSolicitudesProveedor() {
                 'Content-Type': 'application/json',
             },
             // No cachear esta petición para que siempre obtenga los datos más recientes
-            cache: 'no-store', 
+            cache: 'no-store',
         });
         console.log('DEBUG: Fetch response received (ok:', response.ok, 'status:', response.status, ').');
 
@@ -29,6 +33,63 @@ export async function obtenerSolicitudesProveedor() {
         return { error: error.message };
     }
 }
+
+// Server Action para manejar la solicitud de proveedor
+export async function submitSupplierApplicationAction(prevState, formData) {
+  console.log('Server Action Supplier Application: Iniciado.');
+
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    console.log('Server Action Supplier Application: Usuario no autenticado.');
+    return { message: 'Usuario no autenticado. Por favor, inicia sesión.', success: false };
+  }
+
+  const data = {
+    nombreEmpresa: formData.get('nombreEmpresa'),
+    nit: formData.get('nit'),
+    direccionEmpresa: formData.get('direccionEmpresa'),
+    especialidad: formData.get('especialidad'),
+    metodosPagoAceptados: formData.getAll('metodosPagoAceptados'), // Use getAll for multiple checkboxes
+    comisionPropuesta: parseFloat(formData.get('comisionPropuesta')),
+    mensajeAdicional: formData.get('mensajeAdicional'),
+    usuarioId: session.user.id,
+  };
+
+  console.log('Server Action Supplier Application: Datos recibidos:', data);
+
+  try {
+    // Call the API route to create the supplier application
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/solicitud-proveedor`; // Use the user-facing API route
+    console.log('Server Action Supplier Application: Making POST request to:', apiUrl);
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    console.log('Server Action Supplier Application: API response received. Status:', response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Error desconocido del servidor.' }));
+      console.log('Server Action Supplier Application: Error en la respuesta de la API:', errorData.message);
+      return { message: errorData.message || 'Error al enviar la solicitud.', success: false };
+    }
+
+    const result = await response.json();
+    console.log('Server Action Supplier Application: Request result:', result);
+
+    return { message: result.message || '¡Solicitud enviada con éxito!', success: true };
+
+  } catch (error) {
+    console.error("ERROR in submitSupplierApplicationAction:", error);
+    return { message: error.message || 'Error al enviar la solicitud.', success: false };
+  }
+}
+
 
 export async function CrearSolicitudProveedor(data) {
     console.log('DEBUG: Entering CrearSolicitudProveedor with data:', data);

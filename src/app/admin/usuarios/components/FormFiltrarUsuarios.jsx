@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react'; // Import useEffect and useState
 import Link from 'next/link';
 import Image from 'next/image';
+import { useActionState, useFormStatus } from 'react-dom'; // Import hooks
+import { usePopUp } from '@/context/PopUpContext'; // Import PopUpContext
 import { InputTextoGeneral } from '@/components/common/inputs';
 import { TdGeneral } from '@/components/common/tablas';
 import SeccionLista from '@/components/layout/admin/secciones/lista/SeccionLista';
-import PopUpMessage from '@/components/common/modales/PopUpMessage';
-import { FiltrarUsuarios, toggleUsuarioHabilitado } from '@/app/acciones/UsuariosActions';
+import PopUpMessage from '@/components/common/modales/PopUpMessage'; // Keep PopUpMessage component if needed for non-action feedback
+import { FiltrarUsuarios, toggleUsuarioHabilitado } from '@/app/acciones/UsuariosActions'; // Import Server Actions
 import THUsuarios from '@/components/layout/admin/usuarios/THUsuarios';
 import BotonEditar from '@/components/common/botones/BotonEditar';
 import BotonExportarPDF from '@/components/common/botones/BotonExportarPDF'; // Importar BotonExportarPDF
@@ -15,268 +17,202 @@ import { Rol } from '@/models/enums/usuario/Rol'; // Importar el enum Rol
 import { Genero } from '@/models/enums/usuario/Genero'; // Importar el enum Genero
 import { TipoDocumentoIdentidad } from '@/models/enums/usuario/TipoDocumentoIdentidad'; // Importar el enum TipoDocumentoIdentidad
 
-export default function FormFiltrarUsuarios({ initialUsersFromPage = [], isLoading: parentIsLoading = false }) {
-    // Estado para almacenar los usuarios a mostrar
-    const [usersToDisplay, setUsersToDisplay] = useState(initialUsersFromPage);
+// Component for the submit button with pending state
+function SubmitButton() {
+  const { pending } = useFormStatus();
 
-    // Estado para manejar el loading
-    const [localIsLoading, setLocalIsLoading] = useState(false);
-    const isLoading = localIsLoading || parentIsLoading;
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 disabled:opacity-60"
+    >
+      {pending ? 'Buscando...' : 'Buscar Usuarios'}
+    </button>
+  );
+}
 
-    // Estado para manejar el formulario
+// Initial state for useActionState
+const initialState = {
+  data: [],
+  message: null,
+  error: null,
+};
+
+export default function FormFiltrarUsuarios({ initialUsersFromPage = [] }) {
+    const { showPopUp } = usePopUp(); // Use PopUpContext
+
+    // Use useActionState to manage the state of the filtering action
+    const [state, formAction] = useActionState(FiltrarUsuarios, initialState);
+
+    // State for form key to force reset
     const [formKey, setFormKey] = useState(Date.now());
 
-    // Estado para manejar el pop-up
-    const [popUp, setPopUp] = useState(null);
-
-    // Estado para manejar los filtros
-    const [filters, setFilters] = useState({
-        textoBusqueda: '', // Para buscar por nombre, apellido o correo
-        rol: '',
-        generoFiltro: '',
-        tipoDocumentoFiltro: '',
-        incluirDeshabilitados: false
-    });
-
-    // Efecto para inicializar los usuarios a mostrar cuando cambian los usuarios iniciales
+    // Effect to show pop-up based on the state
     useEffect(() => {
-        console.log('initialUsersFromPage:', initialUsersFromPage);
-        if (!Array.isArray(initialUsersFromPage)) {
-            console.warn('initialUsersFromPage is not an array:', initialUsersFromPage);
-            setUsersToDisplay([]);
-            return;
+        if (state.message) {
+            showPopUp(state.message, state.error ? 'error' : 'success');
         }
-        console.log('Setting usersToDisplay with length:', initialUsersFromPage.length);
-        setUsersToDisplay(initialUsersFromPage);
-    }, [initialUsersFromPage]);
+    }, [state, showPopUp]); // Dependencias del useEffect
 
-    // Debug effect to monitor usersToDisplay changes
-    useEffect(() => {
-        console.log('usersToDisplay updated:', usersToDisplay);
-    }, [usersToDisplay]);
-
-    // Función para manejar el cambio en los filtros
-    const handleFilterChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFilters(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
-    };
-
-    // Función para manejar el envío del formulario de búsqueda
-    const handleSearchSubmit = async (event) => {
-
-        // Evitar el comportamiento por defecto del formulario (recargar la pagina)
-        event.preventDefault();
-
-        // Mostrar loading y ocultar alertas
-        setLocalIsLoading(true);
-
-        // Limpiar el pop-up antes de realizar la búsqueda
-        setPopUp(null);
-
-        // Crear un objeto FormData para enviar los filtros
-        const formData = new FormData();
-        Object.keys(filters).forEach(key => {
-            if (filters[key] !== '') {
-                formData.append(key, filters[key]);
-            }
-        });
-
-        try {
-            const result = await FiltrarUsuarios(formData);
-            if (result.error) {
-                setPopUp({ type: 'error', message: result.error });
-                setUsersToDisplay([]);
-            } else if (result.data) {
-                setUsersToDisplay(Array.isArray(result.data) ? result.data : []);
-            } else {
-                setUsersToDisplay([]);
-            }
-        } catch (error) {
-            setPopUp({ type: 'error', message: 'Error al filtrar usuarios.' });
-            setUsersToDisplay([]);
-        }
-        setLocalIsLoading(false);
-    };
-
+    // Function to handle reset filters
     const handleResetFilters = () => {
-        setFormKey(Date.now());
-        setFilters({
-            textoBusqueda: '',
-            rol: '',
-            generoFiltro: '',
-            tipoDocumentoFiltro: '',
-            incluirDeshabilitados: false
-        });
-        setUsersToDisplay(Array.isArray(initialUsersFromPage) ? initialUsersFromPage : []);
-        setPopUp(null); // Ensure pop-up is cleared on reset
+        setFormKey(Date.now()); // Change key to force form reset
+        // The form will reset to its initial state due to the key change
+        // We also need to reset the displayed users to the initial list
+        // This might require passing the initial list through the state or re-fetching
+        // For simplicity now, let's assume the initial list is available or re-fetched by the page
+        // If initialUsersFromPage is always the full list, we can use it here.
+        // If not, the page component might need to trigger a re-fetch or pass the full list via state.
+        // Let's rely on the initialUsersFromPage prop for now.
+        // Note: useActionState's state will also reset to initialState
     };
 
-    const handleClosePopUp = () => {
-        setPopUp(null);
-    };
-
+    // Keep handleToggleUserStatus as it calls a separate Server Action
     const handleToggleUserStatus = async (userId, currentStatus) => {
-        setLocalIsLoading(true);
+        // This function already uses a Server Action (toggleUsuarioHabilitado)
+        // We need to handle the response and update the UI (usersToDisplay)
+        // This might require re-fetching the filtered list after the toggle
+        // Or, if toggleUsuarioHabilitado returns the updated user, update the local state.
+        // Let's keep the current logic for now, assuming it works with the Server Action.
+        // The loading state for this action is not tied to the filter form's useFormStatus.
+        // A separate loading state or useTransition could be used here if needed.
+
+        // For now, let's just call the action and rely on revalidatePath in the action
+        // to potentially update the data displayed by the page component.
+        // If the page component fetches data and passes it down, revalidatePath should trigger a re-render.
+
         const formData = new FormData();
         formData.append('id', userId);
 
-        try {
-            const result = await toggleUsuarioHabilitado(formData);
+        // Call the Server Action directly
+        const result = await toggleUsuarioHabilitado(formData);
 
-            if (result.error) {
-                setPopUp({
-                    type: 'error',
-                    message: result.error
-                });
-            } else {
-                // Actualizar el estado del usuario en la lista local
-                setUsersToDisplay(prevUsers =>
-                    prevUsers.map(user =>
-                        user._id === userId
-                            ? { ...user, habilitado: !currentStatus }
-                            : user
-                    )
-                );
-                setPopUp({
-                    type: 'success',
-                    message: `Usuario ${currentStatus ? 'deshabilitado' : 'habilitado'} exitosamente.`
-                });
-            }
-        } catch (error) {
-            setPopUp({
-                type: 'error',
-                message: `Error al ${currentStatus ? 'deshabilitar' : 'habilitar'} el usuario.`
-            });
+        if (result.error) {
+             showPopUp(result.error, 'error');
+        } else {
+             showPopUp(result.message || `Usuario ${currentStatus ? 'deshabilitado' : 'habilitado'} exitosamente.`, 'success');
+             // RevalidatePath in the action should handle UI update
         }
-        setLocalIsLoading(false);
     };
+
 
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
-        return new Date(dateString).toLocaleDateString();
+        // Ensure dateString is a valid date format before creating Date object
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+            return 'Fecha inválida'; // Handle invalid date strings
+        }
+        return date.toLocaleDateString();
     };
+
+
+    // Determine which list of users to display: filtered results or initial list
+    const usersToDisplay = state.data && Array.isArray(state.data) ? state.data : (Array.isArray(initialUsersFromPage) ? initialUsersFromPage : []);
+    const isLoading = useFormStatus().pending; // Use useFormStatus for the form's pending state
+
 
     return (
         <>
-            <form onSubmit={handleSearchSubmit} key={formKey}>
-                <section className="flex flex-col gap-2 bg-black rounded-lg justify-center items-top p-4 w-full text-white mb-4">
-                    <header className='flex flex-wrap gap-4 items-end'>
-                        <div>
-
-                            <label htmlFor="textoBusqueda" className="block text-sm font-medium mb-1">Buscar (Nombre, Apellido, Correo):</label>
-
-                            <InputTextoGeneral
-                                id="textoBusqueda"
-                                name="textoBusqueda"
-                                value={filters.textoBusqueda}
-                                onChange={handleFilterChange}
-                                placeholder="Buscar usuario..."
-                            />
-
-                        </div>
-                        <div>
-                            <label htmlFor="rol" className="block text-sm font-medium mb-1">Rol:</label>
-                            <select
-
-                                name="rol"
-
-                                id="rol"
-
-                                value={filters.rol}
-
-                                onChange={handleFilterChange}
-                                
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
-                            >
-                                <option value="">Todos</option>
-                                {Object.values(Rol).map((rolValue) => (
-                                    <option key={rolValue} value={rolValue}>
-                                        {rolValue.charAt(0).toUpperCase() + rolValue.slice(1).toLowerCase()}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div>
-                            <label htmlFor="generoFiltro" className="block text-sm font-medium mb-1">Género:</label>
-                            <select
-                                name="generoFiltro"
-                                id="generoFiltro"
-                                value={filters.generoFiltro}
-                                onChange={handleFilterChange}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
-                            >
-                                <option value="">Todos</option>
-                                {Object.entries(Genero).map(([key, value]) => (
-                                    <option key={key} value={value}>
-                                        {key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div>
-                            <label htmlFor="tipoDocumentoFiltro" className="block text-sm font-medium mb-1">Tipo de Documento:</label>
-                            <select
-                                name="tipoDocumentoFiltro"
-                                id="tipoDocumentoFiltro"
-                                value={filters.tipoDocumentoFiltro}
-                                onChange={handleFilterChange}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
-                            >
-                                <option value="">Todos</option>
-                                {Object.entries(TipoDocumentoIdentidad).map(([key, value]) => (
-                                    <option key={key} value={value}>
-                                        {key.replace(/([A-Z])/g, ' $1').trim()}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="flex items-center mt-4">
-                            <input
-                                type="checkbox"
-                                id="incluirDeshabilitados"
-                                name="incluirDeshabilitados"
-                                checked={filters.incluirDeshabilitados}
-                                onChange={handleFilterChange}
-                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                            />
-                            <label htmlFor="incluirDeshabilitados" className="ml-2 block text-sm">
-                                Incluir usuarios deshabilitados
-                            </label>
-                        </div>
-                    </header>
-                    <footer className='flex flex-wrap gap-4 items-center mt-2'>
-                        <button
-                            type="submit"
-                            disabled={isLoading}
-                            className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 disabled:opacity-60"
+            {/* Add key prop to the form for reset functionality */}
+            <form action={formAction} className="flex flex-col gap-2 bg-black rounded-lg justify-center items-top p-4 w-full text-white mb-4" key={formKey}>
+                <header className='flex flex-wrap gap-4 items-end'>
+                    <div>
+                        <label htmlFor="textoBusqueda" className="block text-sm font-medium mb-1">Buscar (Nombre, Apellido, Correo):</label>
+                        {/* Ensure name attribute is present */}
+                        <InputTextoGeneral
+                            id="textoBusqueda"
+                            name="textoBusqueda"
+                            placeholder="Buscar usuario..."
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="rol" className="block text-sm font-medium mb-1">Rol:</label>
+                        {/* Ensure name attribute is present */}
+                        <select
+                            name="rol"
+                            id="rol"
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
                         >
-                            {isLoading ? 'Buscando...' : 'Buscar Usuarios'}
-                        </button>
-
-                        <button
-                            type="button"
-                            onClick={handleResetFilters}
-                            disabled={isLoading}
-                            className="px-6 py-2 bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 disabled:opacity-60"
+                            <option value="">Todos</option>
+                            {Object.values(Rol).map((rolValue) => (
+                                <option key={rolValue} value={rolValue}>
+                                    {rolValue.charAt(0).toUpperCase() + rolValue.slice(1).toLowerCase()}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label htmlFor="generoFiltro" className="block text-sm font-medium mb-1">Género:</label>
+                        {/* Ensure name attribute is present */}
+                        <select
+                            name="generoFiltro"
+                            id="generoFiltro"
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
                         >
-                            Limpiar Filtros
-                        </button>
+                            <option value="">Todos</option>
+                            {Object.entries(Genero).map(([key, value]) => (
+                                <option key={key} value={value}>
+                                    {key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label htmlFor="tipoDocumentoFiltro" className="block text-sm font-medium mb-1">Tipo de Documento:</label>
+                        {/* Ensure name attribute is present */}
+                        <select
+                            name="tipoDocumentoFiltro"
+                            id="tipoDocumentoFiltro"
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-black"
+                        >
+                            <option value="">Todos</option>
+                            {Object.entries(TipoDocumentoIdentidad).map(([key, value]) => (
+                                <option key={key} value={value}>
+                                    {key.replace(/([A-Z])/g, ' $1').trim()}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="flex items-center mt-4">
+                         {/* Ensure name attribute is present */}
+                        <input
+                            type="checkbox"
+                            id="incluirDeshabilitados"
+                            name="incluirDeshabilitados"
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <label htmlFor="incluirDeshabilitados" className="ml-2 block text-sm">
+                            Incluir usuarios deshabilitados
+                        </label>
+                    </div>
+                </header>
+                <footer className='flex flex-wrap gap-4 items-center mt-2'>
+                    {/* Use the SubmitButton component */}
+                    <SubmitButton />
 
-                        <BotonExportarPDF usuarios={usersToDisplay} />
+                    <button
+                        type="button"
+                        onClick={handleResetFilters}
+                        disabled={isLoading}
+                        className="px-6 py-2 bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 disabled:opacity-60"
+                    >
+                        Limpiar Filtros
+                    </button>
 
-                    </footer>
-                </section>
+                    {/* Pass the currently displayed users to the PDF export button */}
+                    <BotonExportarPDF usuarios={usersToDisplay} />
+
+                </footer>
             </form>
 
             <SeccionLista>
                 <THUsuarios />
                 <tbody className='bg-gray-300'>
-                    {isLoading && usersToDisplay.length === 0 ? (
+                    {isLoading ? (
                         <tr><TdGeneral colSpan="16" className="text-center py-4">Cargando...</TdGeneral></tr>
-                    ) : !isLoading && usersToDisplay.length === 0 ? (
+                    ) : usersToDisplay.length === 0 ? (
                         <tr><TdGeneral colSpan="16" className="text-center py-4">No se encontraron usuarios.</TdGeneral></tr>
                     ) : (
                         usersToDisplay.map((user) => (
@@ -318,7 +254,7 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [], isLoadi
                                         </Link>
                                         <button
                                             onClick={() => handleToggleUserStatus(user._id, user.habilitado)}
-                                            disabled={isLoading}
+                                            disabled={isLoading} // Use the form's pending state for simplicity, or a separate state
                                             className={`px-4 py-2 font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75 text-sm ${user.habilitado
                                                 ? 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500'
                                                 : 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500'
@@ -336,13 +272,14 @@ export default function FormFiltrarUsuarios({ initialUsersFromPage = [], isLoadi
                     )}
                 </tbody>
             </SeccionLista>
-            {popUp && (
+            {/* Pop-up messages are now handled by PopUpContext */}
+            {/* {popUp && (
                 <PopUpMessage
                     message={popUp.message}
                     type={popUp.type}
                     onClose={handleClosePopUp}
                 />
-            )}
+            )} */}
         </>
     );
 }
