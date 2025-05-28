@@ -51,7 +51,7 @@ function FormFiltrarSolicitudesProveedor({ initialSolicitudesFromPage }) {
 
         openModal(
             title,
-            <div className="p-4 bg-black text-white">
+            <div className="p-4 bg-neutral-800 text-secondary">
                 <p className="mb-4">¿Estás seguro de que quieres {action} esta solicitud?</p>
                 <InputGeneral
                     label={inputLabel}
@@ -79,7 +79,7 @@ function FormFiltrarSolicitudesProveedor({ initialSolicitudesFromPage }) {
     });
 
     return (
-        <div className="p-6 bg-black text-white rounded-lg shadow-lg">
+        <div className="p-6 bg-neutral-800 text-secondary rounded-lg shadow-lg border border-accent1">
             <div className="mb-6 flex justify-between items-center">
                 <h3 className="text-xl font-semibold">Solicitudes de Proveedor</h3>
                 <div className="flex space-x-2">
@@ -88,7 +88,7 @@ function FormFiltrarSolicitudesProveedor({ initialSolicitudesFromPage }) {
                         id="filterStatus"
                         value={filterStatus}
                         onChange={(e) => setFilterStatus(e.target.value)}
-                        className="p-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:ring-purple-500 focus:border-purple-500"
+                        className="p-2 bg-neutral-700 border border-neutral-600 rounded-md text-secondary focus:ring-accent1 focus:border-accent1"
                     >
                         {Object.values(EstadoSolicitudProveedor).map(status => (
                             <option key={status} value={status}>{status.replace(/_/g, ' ')}</option>
@@ -104,29 +104,29 @@ function FormFiltrarSolicitudesProveedor({ initialSolicitudesFromPage }) {
             {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
             {filteredSolicitudes.length === 0 && !loading ? (
-                <p className="text-center text-gray-400">No hay solicitudes {filterStatus === 'TODOS' ? '' : filterStatus.toLowerCase().replace(/_/g, ' ')}.</p>
+                <p className="text-center text-neutral-400">No hay solicitudes {filterStatus === 'TODOS' ? '' : filterStatus.toLowerCase().replace(/_/g, ' ')}.</p>
             ) : (
                 <div className="overflow-x-auto">
-                    <table className="min-w-full bg-gray-800 rounded-lg overflow-hidden">
-                        <thead className="bg-gray-700">
+                    <table className="min-w-full rounded-lg overflow-hidden">
+                        <thead className="bg-neutral-600">
                             <tr>
-                                <th className="py-3 px-4 text-left text-sm font-medium text-gray-300">Empresa</th>
-                                <th className="py-3 px-4 text-left text-sm font-medium text-gray-300">NIT</th>
-                                <th className="py-3 px-4 text-left text-sm font-medium text-gray-300">Especialidad</th>
-                                <th className="py-3 px-4 text-left text-sm font-medium text-gray-300">Comisión (%)</th>
-                                <th className="py-3 px-4 text-left text-sm font-medium text-gray-300">Estado</th>
-                                <th className="py-3 px-4 text-left text-sm font-medium text-gray-300">Solicitante</th>
-                                <th className="py-3 px-4 text-left text-sm font-medium text-gray-300">Acciones</th>
+                                <th className="py-3 px-4 text-left text-sm font-medium text-neutral-300">Empresa</th>
+                                <th className="py-3 px-4 text-left text-sm font-medium text-neutral-300">NIT</th>
+                                <th className="py-3 px-4 text-left text-sm font-medium text-neutral-300">Especialidad</th>
+                                <th className="py-3 px-4 text-left text-sm font-medium text-neutral-300">Comisión (%)</th>
+                                <th className="py-3 px-4 text-left text-sm font-medium text-neutral-300">Estado</th>
+                                <th className="py-3 px-4 text-left text-sm font-medium text-neutral-300">Solicitante</th>
+                                <th className="py-3 px-4 text-left text-sm font-medium text-neutral-300">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             {filteredSolicitudes.map((solicitud) => (
-                                <tr key={solicitud._id} className="border-b border-gray-700 last:border-b-0">
-                                    <td className="py-3 px-4 text-sm text-gray-300">{solicitud.nombreEmpresa}</td>
-                                    <td className="py-3 px-4 text-sm text-gray-300">{solicitud.nit}</td>
-                                    <td className="py-3 px-4 text-sm text-gray-300">{solicitud.especialidad}</td>
-                                    <td className="py-3 px-4 text-sm text-gray-300">{solicitud.comisionPropuesta}%</td>
-                                    <td className="py-3 px-4 text-sm text-gray-300">
+                                <tr key={solicitud._id} className="border-b border-neutral-600 last:border-b-0">
+                                    <td className="py-3 px-4 text-sm text-neutral-300">{solicitud.nombreEmpresa}</td>
+                                    <td className="py-3 px-4 text-sm text-neutral-300">{solicitud.nit}</td>
+                                    <td className="py-3 px-4 text-sm text-neutral-300">{solicitud.especialidad}</td>
+                                    <td className="py-3 px-4 text-sm text-neutral-300">{solicitud.comisionPropuesta}%</td>
+                                    <td className="py-3 px-4 text-sm text-neutral-300">
                                         <span className={`
                                             px-2 py-1 rounded-full text-xs font-semibold
                                             ${solicitud.estadoSolicitud === EstadoSolicitudProveedor.PENDIENTE ? 'bg-yellow-500 text-yellow-900' : ''}
@@ -136,7 +136,7 @@ function FormFiltrarSolicitudesProveedor({ initialSolicitudesFromPage }) {
                                             {solicitud.estadoSolicitud.replace(/_/g, ' ')}
                                         </span>
                                     </td>
-                                    <td className="py-3 px-4 text-sm text-gray-300">
+                                    <td className="py-3 px-4 text-sm text-neutral-300">
                                         {solicitud.usuarioId ? `${solicitud.usuarioId.primerNombre} ${solicitud.usuarioId.primerApellido} (${solicitud.usuarioId.correo})` : 'N/A'}
                                     </td>
                                     <td className="py-3 px-4 text-sm">
@@ -151,7 +151,7 @@ function FormFiltrarSolicitudesProveedor({ initialSolicitudesFromPage }) {
                                             </div>
                                         )}
                                         {solicitud.estadoSolicitud !== EstadoSolicitudProveedor.PENDIENTE && (
-                                            <span className="text-gray-500">Procesada</span>
+                                            <span className="text-neutral-500">Procesada</span>
                                         )}
                                     </td>
                                 </tr>

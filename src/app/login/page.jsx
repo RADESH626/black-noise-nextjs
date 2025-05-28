@@ -26,7 +26,7 @@ function login() {
               </p>
               <div className="mt-6">
                 <a href="/">
-                  <BotonGeneral>
+                  <BotonGeneral className="text-secondary">
                     <span className="flex items-center gap-2">
                       <i className='bx bx-home-alt-2 text-xl'></i>
                       Ir al inicio

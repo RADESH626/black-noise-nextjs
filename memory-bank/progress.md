@@ -1,6 +1,6 @@
 # Project Progress Tracker
 
-## Current Status: ✅ COMPLETED - Mock Data System Implementation
+## Current Status: 🚧 IN PROGRESS - Color Palette Implementation
 
 ### Recently Completed Tasks
 
@@ -86,6 +86,27 @@
 - Refactored user search and filtering functionality
 - Implemented Server Actions for dynamic user queries
 - Enhanced table display with real-time updates
+
+### 🚧 In Progress Tasks
+
+#### 🚧 Color Palette Implementation
+**Date**: May 27, 2025
+**Branch**: `feature/color-palette`
+**Objective**: Create and apply a color palette to the project based on the "Black Noise" theme.
+
+**Completed Items This Session**:
+- Defined color palette in `globals.css` and `tailwind.config.js`.
+- Applied primary/secondary colors to the main layout (`src/app/layout.jsx`).
+- Applied accent and primary colors to the general button component (`src/components/common/botones/BotonGeneral.jsx`), then reverted to white/pink gradient with black text as requested.
+- Applied neutral and accent colors to the general input component and label (`src/components/common/inputs/InputGeneral.jsx`).
+- Applied neutral and accent colors to the modal component (`src/components/common/modales/Modal.jsx`).
+- Applied neutral and secondary colors to the popup text and icons (`src/components/common/modales/PopUpMessage.jsx`).
+- Applied consistent styling to forms in `src/components/layout/general/forms/`, `src/components/layout/admin/usuarios/forms/`, `src/components/layout/admin/solicitudes-proveedor/forms/`, and `src/components/layout/proveedor/forms/`, including labels, input icons, container backgrounds/borders/text, select inputs, and checkboxes.
+
+**Next Steps**:
+1. Continue applying the color palette to other common components (e.g., tables, navigation).
+2. Apply the color palette to specific pages and sections of the application.
+3. Review the UI to ensure consistent application of the palette and make adjustments as needed.
 
 ### Next Priority Areas for Future Sessions
 
@@ -179,6 +200,7 @@
 ### 🚧 Partially Implemented (70-80%)
 - Product Management (CRUD operations)
 - File Upload Systems (User profiles, product images)
+- Color Palette Implementation
 
 ### 📋 Planned for Future Sessions (0-30%)
 - Provider Management System

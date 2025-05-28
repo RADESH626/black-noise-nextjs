@@ -14,12 +14,12 @@ function InputGeneral({
     className = '',
     ...props
 }) {
-    const inputClasses = `w-full p-3 bg-gray-900 border border-pink-500 rounded-[10px] text-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 outline-none ${className}`;
+    const inputClasses = `w-full p-3 bg-neutral-800 border border-accent1 rounded-[10px] text-secondary focus:ring-2 focus:ring-accent1 focus:border-accent1 outline-none ${className}`;
 
     if (type === 'textarea') {
         return (
             <div>
-                <label htmlFor={name} className="block text-sm font-medium text-gray-300 mb-1">
+                <label htmlFor={name} className="block text-sm font-medium text-neutral-300 mb-1">
                     {label}
                 </label>
                 <textarea

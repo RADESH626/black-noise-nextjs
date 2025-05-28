@@ -56,7 +56,7 @@ function FormAgregarUsuarios({ onSuccess }) {
     <form action={formAction} className="space-y-5 text-white">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
-          <label htmlFor="tipoDocumento" className="block mb-1 text-sm font-medium text-purple-400">
+          <label htmlFor="tipoDocumento" className="block mb-1 text-sm font-medium text-accent1">
             Tipo de Documento
           </label>
           <div className="relative">
@@ -65,7 +65,7 @@ function FormAgregarUsuarios({ onSuccess }) {
         </div>
 
         <div className="relative">
-          <label htmlFor="numeroDocumento" className="block mb-1 text-sm font-medium text-purple-400">
+          <label htmlFor="numeroDocumento" className="block mb-1 text-sm font-medium text-accent1">
             Número de Documento
           </label>
           <div className="relative">
@@ -76,7 +76,7 @@ function FormAgregarUsuarios({ onSuccess }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
-          <label htmlFor="primerNombre" className="block mb-1 text-sm font-medium text-purple-400">
+          <label htmlFor="primerNombre" className="block mb-1 text-sm font-medium text-accent1">
             Primer nombre
           </label>
           <div className="relative">
@@ -85,7 +85,7 @@ function FormAgregarUsuarios({ onSuccess }) {
         </div>
 
         <div className="relative">
-          <label htmlFor="segundoNombre" className="block mb-1 text-sm font-medium text-purple-400">
+          <label htmlFor="segundoNombre" className="block mb-1 text-sm font-medium text-accent1">
             Segundo nombre
           </label>
           <div className="relative">
@@ -96,7 +96,7 @@ function FormAgregarUsuarios({ onSuccess }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
-          <label htmlFor="primerApellido" className="block mb-1 text-sm font-medium text-purple-400">
+          <label htmlFor="primerApellido" className="block mb-1 text-sm font-medium text-accent1">
             Primer apellido
           </label>
           <div className="relative">
@@ -105,7 +105,7 @@ function FormAgregarUsuarios({ onSuccess }) {
         </div>
 
         <div className="relative">
-          <label htmlFor="segundoApellido" className="block mb-1 text-sm font-medium text-purple-400">
+          <label htmlFor="segundoApellido" className="block mb-1 text-sm font-medium text-accent1">
             Segundo apellido
           </label>
           <div className="relative">
@@ -116,7 +116,7 @@ function FormAgregarUsuarios({ onSuccess }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
-          <label htmlFor="fechaNacimiento" className="block mb-1 text-sm font-medium text-purple-400">
+          <label htmlFor="fechaNacimiento" className="block mb-1 text-sm font-medium text-accent1">
             Fecha de nacimiento
           </label>
           <div className="relative">
@@ -125,7 +125,7 @@ function FormAgregarUsuarios({ onSuccess }) {
         </div>
 
         <div className="relative">
-          <label htmlFor="genero" className="block mb-1 text-sm font-medium text-purple-400">
+          <label htmlFor="genero" className="block mb-1 text-sm font-medium text-accent1">
             Género
           </label>
           <div className="relative">
@@ -136,7 +136,7 @@ function FormAgregarUsuarios({ onSuccess }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
-          <label htmlFor="telefono" className="block mb-1 text-sm font-medium text-purple-400">
+          <label htmlFor="telefono" className="block mb-1 text-sm font-medium text-accent1">
             Número de teléfono
           </label>
           <div className="relative">
@@ -145,7 +145,7 @@ function FormAgregarUsuarios({ onSuccess }) {
         </div>
 
         <div className="relative">
-          <label htmlFor="rol" className="block mb-1 text-sm font-medium text-purple-400">
+          <label htmlFor="rol" className="block mb-1 text-sm font-medium text-accent1">
             Rol
           </label>
           <div className="relative">
@@ -155,7 +155,7 @@ function FormAgregarUsuarios({ onSuccess }) {
       </div>
 
       <div className="relative">
-        <label htmlFor="direccion" className="block mb-1 text-sm font-medium text-purple-400">
+        <label htmlFor="direccion" className="block mb-1 text-sm font-medium text-accent1">
           Dirección
         </label>
         <div className="relative">
@@ -164,7 +164,7 @@ function FormAgregarUsuarios({ onSuccess }) {
       </div>
 
       <div className="relative">
-        <label htmlFor="correo-registro" className="block mb-1 text-sm font-medium text-purple-400">
+        <label htmlFor="correo-registro" className="block mb-1 text-sm font-medium text-accent1">
           Correo electrónico
         </label>
         <div className="relative">
@@ -173,7 +173,7 @@ function FormAgregarUsuarios({ onSuccess }) {
       </div>
 
       <div className="relative">
-        <label htmlFor="contrasena" className="block mb-1 text-sm font-medium text-purple-400">
+        <label htmlFor="contrasena" className="block mb-1 text-sm font-medium text-accent1">
           Contraseña
         </label>
         <div className="relative">

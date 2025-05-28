@@ -75,8 +75,8 @@ function FormEditarPerfilProveedor({ perfilInicial }) {
     };
 
     return (
-        <div className="max-w-2xl mx-auto p-6 bg-black text-white rounded-lg shadow-lg">
-            <h2 className="text-3xl font-bold text-center mb-6 text-purple-400">
+        <div className="max-w-2xl mx-auto p-6 bg-neutral-800 text-secondary rounded-lg shadow-lg border border-accent1">
+            <h2 className="text-3xl font-bold text-center mb-6 text-accent1">
                 Editar Perfil de Proveedor
             </h2>
             
@@ -100,7 +100,7 @@ function FormEditarPerfilProveedor({ perfilInicial }) {
                 />
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-neutral-300 mb-2">
                         Métodos de Pago Aceptados
                     </label>
                     <div className="grid grid-cols-2 gap-2">
@@ -113,9 +113,9 @@ function FormEditarPerfilProveedor({ perfilInicial }) {
                                     value={method}
                                     checked={formData.metodosPagoAceptados.includes(method)}
                                     onChange={handleChange}
-                                    className="h-4 w-4 text-purple-600 bg-gray-800 border-gray-700 rounded focus:ring-purple-500"
+                                    className="h-4 w-4 text-accent1 bg-neutral-800 border-neutral-600 rounded focus:ring-accent1"
                                 />
-                                <label htmlFor={method} className="ml-2 text-sm text-gray-300">
+                                <label htmlFor={method} className="ml-2 text-sm text-neutral-300">
                                     {method.replace(/_/g, ' ')}
                                 </label>
                             </div>
@@ -124,7 +124,7 @@ function FormEditarPerfilProveedor({ perfilInicial }) {
                 </div>
 
                 <div>
-                    <label htmlFor="disponibilidad" className="block text-sm font-medium text-gray-300 mb-1">
+                    <label htmlFor="disponibilidad" className="block text-sm font-medium text-neutral-300 mb-1">
                         Disponibilidad
                     </label>
                     <select
@@ -133,7 +133,7 @@ function FormEditarPerfilProveedor({ perfilInicial }) {
                         value={formData.disponibilidad}
                         onChange={handleChange}
                         required
-                        className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:ring-purple-500 focus:border-purple-500"
+                        className="w-full p-3 bg-neutral-800 border border-neutral-600 rounded-md text-secondary focus:ring-accent1 focus:border-accent1"
                     >
                         {Object.values(Disponibilidad).map((disp) => (
                             <option key={disp} value={disp}>
@@ -150,9 +150,9 @@ function FormEditarPerfilProveedor({ perfilInicial }) {
                         name="permisosDetallesCredito"
                         checked={formData.permisosDetallesCredito}
                         onChange={handleChange}
-                        className="h-4 w-4 text-purple-600 bg-gray-800 border-gray-700 rounded focus:ring-purple-500"
+                        className="h-4 w-4 text-accent1 bg-neutral-800 border-neutral-600 rounded focus:ring-accent1"
                     />
-                    <label htmlFor="permisosDetallesCredito" className="ml-2 text-sm text-gray-300">
+                    <label htmlFor="permisosDetallesCredito" className="ml-2 text-sm text-neutral-300">
                         Permitir detalles de crédito
                     </label>
                 </div>

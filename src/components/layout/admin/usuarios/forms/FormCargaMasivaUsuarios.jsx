@@ -40,12 +40,12 @@ function FormCargaMasivaUsuarios() {
   }, [state, showPopUp]);
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-gray-900 text-white rounded-xl shadow-2xl border border-purple-700">
-      <h2 className="text-2xl font-bold mb-6 text-center text-purple-400">Carga Masiva de Usuarios</h2>
+    <div className="max-w-md mx-auto p-6 bg-neutral-800 text-secondary rounded-xl shadow-2xl border border-accent1">
+      <h2 className="text-2xl font-bold mb-6 text-center text-accent1">Carga Masiva de Usuarios</h2>
       {/* Form element with action prop */}
       <form action={formAction} className="space-y-4">
         <div className="relative">
-          <label htmlFor="bulkFile" className="block text-sm font-medium text-purple-400 mb-2">
+          <label htmlFor="bulkFile" className="block text-sm font-medium text-accent1 mb-2">
             Seleccionar archivo (.csv)
           </label>
           <input
@@ -54,12 +54,12 @@ function FormCargaMasivaUsuarios() {
             name="bulkFile" // Name is crucial for FormData
             accept=".csv" // Accept only CSV files
             required
-            className="block w-full text-sm text-white
+            className="block w-full text-sm text-secondary
               file:mr-4 file:py-2 file:px-4
               file:rounded-full file:border-0
               file:text-sm file:font-semibold
-              file:bg-purple-500 file:text-white
-              hover:file:bg-purple-600"
+              file:bg-accent1 file:text-primary
+              hover:file:bg-accent2"
           />
         </div>
 

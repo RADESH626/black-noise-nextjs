@@ -58,9 +58,9 @@ function FormSolicitudProveedor() {
 
 
     return (
-        <div className="max-w-2xl mx-auto p-8 bg-gray-900 text-white rounded-xl shadow-2xl border border-purple-700">
+        <div className="max-w-2xl mx-auto p-8 bg-neutral-800 text-secondary rounded-xl shadow-2xl border border-accent1">
 
-            <h2 className="text-4xl font-extrabold text-center mb-8 text-purple-400">Solicitud para ser Proveedor</h2>
+            <h2 className="text-4xl font-extrabold text-center mb-8 text-accent1">Solicitud para ser Proveedor</h2>
 
             {/* Usar la función formAction del useActionState en la prop action */}
             {/* Add a key prop to force form reset on success if needed */}
@@ -88,14 +88,14 @@ function FormSolicitudProveedor() {
                 />
 
                 <div className="mb-4">
-                    <label htmlFor="especialidad" className="block text-sm font-medium text-gray-300 mb-2">
+                    <label htmlFor="especialidad" className="block text-sm font-medium text-neutral-300 mb-2">
                         Especialidad
                     </label>
                     <select
                         id="especialidad"
                         name="especialidad" // Name is crucial for FormData
                         required
-                        className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:ring-purple-500 focus:border-purple-500"
+                        className="w-full p-3 bg-neutral-800 border border-neutral-600 rounded-md text-secondary focus:ring-accent1 focus:border-accent1"
                     >
                         <option value="">Selecciona una especialidad</option>
                         {Object.values(CategoriaProducto).map((cat) => (
@@ -107,20 +107,20 @@ function FormSolicitudProveedor() {
                 </div>
 
                 <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-300 mb-3">
+                    <label className="block text-sm font-medium text-neutral-300 mb-3">
                         Métodos de Pago Aceptados
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {Object.values(MetodoPago).map((method) => (
-                            <div key={method} className="flex items-center bg-gray-800 p-3 rounded-md border border-gray-700">
+                            <div key={method} className="flex items-center bg-neutral-800 p-3 rounded-md border border-neutral-600">
                                 <input
                                     type="checkbox"
                                     id={method}
                                     name="metodosPagoAceptados" // Name is crucial for FormData
                                     value={method}
-                                    className="h-5 w-5 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500 cursor-pointer"
+                                    className="h-5 w-5 text-accent1 bg-neutral-700 border-neutral-500 rounded focus:ring-accent1 cursor-pointer"
                                 />
-                                <label htmlFor={method} className="ml-3 text-sm text-gray-300 cursor-pointer">
+                                <label htmlFor={method} className="ml-3 text-sm text-neutral-300 cursor-pointer">
                                     {method.replace(/_/g, ' ')}
                                 </label>
                             </div>

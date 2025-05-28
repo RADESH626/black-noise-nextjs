@@ -44,15 +44,15 @@ const Modal = ({ isOpen, onClose, children, title, size = 'default' }) => {
       aria-modal="true"
       aria-labelledby="modal-title"
     >
-      <div className={`bg-black p-4 sm:p-6 rounded-lg shadow-[0_0_25px_rgba(168,85,247,0.15)] relative mx-auto animate-slideUp border border-purple-500 transition-all duration-300 ease-in-out hover:shadow-[0_0_30px_rgba(168,85,247,0.2)] ${sizeClasses[size]}`}>
+      <div className={`bg-neutral-800 p-4 sm:p-6 rounded-lg shadow-[0_0_25px_rgba(255,0,127,0.15)] relative mx-auto animate-slideUp border border-accent1 transition-all duration-300 ease-in-out hover:shadow-[0_0_30px_rgba(255,0,127,0.2)] ${sizeClasses[size]}`}>
         {title && (
-          <h2 id="modal-title" className="text-xl font-semibold mb-4 text-purple-400">
+          <h2 id="modal-title" className="text-xl font-semibold mb-4 text-secondary">
             {title}
           </h2>
         )}
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 text-purple-400 hover:text-purple-300 transition-colors duration-200"
+          className="absolute top-4 right-4 text-secondary hover:text-neutral-300 transition-colors duration-200"
           aria-label="Cerrar modal"
         >
           <svg 
@@ -67,7 +67,7 @@ const Modal = ({ isOpen, onClose, children, title, size = 'default' }) => {
             <path d="M6 18L18 6M6 6l12 12"></path>
           </svg>
         </button>
-        <div className="mt-2 max-h-[calc(100vh-10rem)] overflow-y-auto pr-4 -mr-4 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-black [&::-webkit-scrollbar-thumb]:bg-purple-500 [&::-webkit-scrollbar-thumb]:rounded">
+        <div className="mt-2 max-h-[calc(100vh-10rem)] overflow-y-auto pr-4 -mr-4 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-neutral-900 [&::-webkit-scrollbar-thumb]:bg-accent1 [&::-webkit-scrollbar-thumb]:rounded">
           {children}
         </div>
       </div>

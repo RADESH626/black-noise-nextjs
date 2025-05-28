@@ -90,7 +90,7 @@ function FormLogin() {
     <form className="flex flex-col" action={formAction}>
 
       <div className="relative mb-5">
-        <label className="block mb-1 text-sm font-medium text-bn-accent">Correo electrónico</label>
+        <label className="block mb-1 text-sm font-medium text-accent1">Correo electrónico</label>
         <div className="relative">
           {/* InputEmail ahora es uncontrolled o usa name para FormData */}
           <InputEmail
@@ -102,7 +102,7 @@ function FormLogin() {
       </div>
 
       <div className="relative mb-5">
-        <label htmlFor="password-login" className="block mb-1 text-sm font-medium text-bn-accent">Contraseña</label>
+        <label htmlFor="password-login" className="block mb-1 text-sm font-medium text-accent1">Contraseña</label>
         <div className="relative">
           {/* InputPassword ahora es uncontrolled o usa name para FormData */}
           <InputPassword

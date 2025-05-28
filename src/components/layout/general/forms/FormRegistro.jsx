@@ -75,7 +75,7 @@ function FormRegistro() {
 
         <div className="relative">
 
-          <label htmlFor="tipoDocumento" className="block mb-1 text-sm font-medium text-bn-accent">Tipo de Documento</label>
+          <label htmlFor="tipoDocumento" className="block mb-1 text-sm font-medium text-accent1">Tipo de Documento</label>
           <div className="relative">
             <InputTipoDocumentoIdentidad id="tipoDocumento" name="tipoDocumento" required />
           </div>
@@ -85,7 +85,7 @@ function FormRegistro() {
 
         <div className="relative">
 
-          <label htmlFor="numeroDocumento" className="block mb-1 text-sm font-medium text-bn-accent">Número de Documento</label>
+          <label htmlFor="numeroDocumento" className="block mb-1 text-sm font-medium text-accent1">Número de Documento</label>
           <div className="relative">
             
             <InputDocumentoIdentidad id="numeroDocumento" name="numeroDocumento" required />
@@ -106,11 +106,11 @@ function FormRegistro() {
 
         <div className="relative">
 
-          <label htmlFor="primerNombre" className="block mb-1 text-sm font-medium text-bn-accent">Primer nombre</label>
+          <label htmlFor="primerNombre" className="block mb-1 text-sm font-medium text-accent1">Primer nombre</label>
           <div className="relative">
 
             <InputTextoGeneral id="primerNombre" name="primerNombre" required placeholder="Primer nombre" />
-            <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
+            <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
           </div>
 
@@ -120,11 +120,11 @@ function FormRegistro() {
         <div className="relative">
 
 
-          <label htmlFor="segundoNombre" className="block mb-1 text-sm font-medium text-bn-accent">Segundo nombre</label>
+          <label htmlFor="segundoNombre" className="block mb-1 text-sm font-medium text-accent1">Segundo nombre</label>
           <div className="relative">
 
             <InputTextoGeneral id="segundoNombre" name="segundoNombre" placeholder="Segundo nombre (opcional)" />
-            <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
+            <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
           </div>
 
@@ -140,11 +140,11 @@ function FormRegistro() {
 
         <div className="relative">
 
-          <label htmlFor="primerApellido" className="block mb-1 text-sm font-medium text-bn-accent">Primer apellido</label>
+          <label htmlFor="primerApellido" className="block mb-1 text-sm font-medium text-accent1">Primer apellido</label>
           <div className="relative">
 
             <InputTextoGeneral id="primerApellido" name="primerApellido" required placeholder="Primer apellido" />
-            <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
+            <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
           </div>
 
@@ -153,11 +153,11 @@ function FormRegistro() {
 
         <div className="relative">
 
-          <label htmlFor="segundoApellido" className="block mb-1 text-sm font-medium text-bn-accent">Segundo apellido</label>
+          <label htmlFor="segundoApellido" className="block mb-1 text-sm font-medium text-accent1">Segundo apellido</label>
           <div className="relative">
 
             <InputTextoGeneral id="segundoApellido" name="segundoApellido" required placeholder="Segundo apellido" />
-            <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
+            <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
           </div>
 
@@ -171,7 +171,7 @@ function FormRegistro() {
 
         <div className="relative">
 
-          <label htmlFor="fechaNacimiento" className="block mb-1 text-sm font-medium text-bn-accent">Fecha de nacimiento</label>
+          <label htmlFor="fechaNacimiento" className="block mb-1 text-sm font-medium text-accent1">Fecha de nacimiento</label>
           <div className="relative">
 
             <InputFecha id="fechaNacimiento" name="fechaNacimiento" required />
@@ -183,11 +183,11 @@ function FormRegistro() {
 
         <div className="relative">
 
-          <label htmlFor="genero" className="block mb-1 text-sm font-medium text-bn-accent">Género</label>
+          <label htmlFor="genero" className="block mb-1 text-sm font-medium text-accent1">Género</label>
           <div className="relative">
 
             <InputGenero required name="genero" />
-            <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
+            <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
           </div>
 
@@ -199,11 +199,11 @@ function FormRegistro() {
 
       <div className="relative">
 
-        <label htmlFor="telefono" className="block mb-1 text-sm font-medium text-bn-accent">Número de teléfono</label>
+        <label htmlFor="telefono" className="block mb-1 text-sm font-medium text-accent1">Número de teléfono</label>
         <div className="relative">
 
           <InputTelefono id="numeroTelefono" name="numeroTelefono" required />
-          <i className='bx bxs-phone absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
+          <i className='bx bxs-phone absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
         </div>
 
@@ -211,11 +211,11 @@ function FormRegistro() {
 
       <div className="relative">
 
-        <label htmlFor="direccion" className="block mb-1 text-sm font-medium text-bn-accent">Dirección</label>
+        <label htmlFor="direccion" className="block mb-1 text-sm font-medium text-accent1">Dirección</label>
         <div className="relative">
 
           <InputTextoGeneral id="direccion" name="direccion" required placeholder="Dirección" />
-          <i className='bx bxs-home absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
+          <i className='bx bxs-home absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
         </div>
 
@@ -225,10 +225,10 @@ function FormRegistro() {
 
       <div className="relative">
 
-        <label htmlFor="correo-registro" className="block mb-1 text-sm font-medium text-bn-accent">Correo electrónico</label>
+        <label htmlFor="correo-registro" className="block mb-1 text-sm font-medium text-accent1">Correo electrónico</label>
         <div className="relative">
           <InputEmail id="correo-registro" name="correo" required placeholder="Correo electrónico" />
-          <i className='bx bxs-envelope absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
+          <i className='bx bxs-envelope absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
         </div>
 
@@ -238,11 +238,11 @@ function FormRegistro() {
 
       <div className="relative">
 
-        <label htmlFor="password-registro" className="block mb-1 text-sm font-medium text-bn-accent">Contraseña</label>
+        <label htmlFor="password-registro" className="block mb-1 text-sm font-medium text-accent1">Contraseña</label>
         <div className="relative">
 
           <InputPassword id="password-registro" name="password" required />
-          <i className='bx bxs-lock-alt absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
+          <i className='bx bxs-lock-alt absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
         </div>
 
@@ -254,10 +254,10 @@ function FormRegistro() {
 
       <div className="relative">
 
-        <label htmlFor="confirmPassword" className="block mb-1 text-sm font-medium text-bn-accent">Confirmar Contraseña</label>
+        <label htmlFor="confirmPassword" className="block mb-1 text-sm font-medium text-accent1">Confirmar Contraseña</label>
         <div className="relative">
           <InputPassword id="confirmPassword" name="confirmPassword" required />
-          <i className='bx bxs-lock-alt absolute right-3 top-1/2 transform -translate-y-1/2 text-bn-accent input-icon'></i>
+          <i className='bx bxs-lock-alt absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
         </div>
 
       </div>

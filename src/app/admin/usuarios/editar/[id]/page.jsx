@@ -1,22 +1,41 @@
 import AdminFormPage from "@/components/layout/admin/AdminFormPage";
-import HeaderPrincipal from "@/components/layout/general/HeaderPrincipal";
 import FormEditarUsuario from "@/app/admin/usuarios/components/FormEditarUsuario";
+import { ObtenerUsuarioPorId } from "@/app/acciones/UsuariosActions"; // Import the action
+import HeaderAdminDashboard from "@/components/layout/admin/AdminHeader";
 
-async function page(searchParams) {
-
-    const params = await searchParams.params;
+async function page({ params }) { // Destructure params directly
 
     const { id } = params;
+
+    // Fetch user data using the imported action
+    const initialUserData = await ObtenerUsuarioPorId(id);
+
+    // Handle case where user is not found (optional, FormEditarUsuario already handles null)
+    if (!initialUserData) {
+        // You might want to render an error message or redirect
+        return (
+            <div>
+                <HeaderAdminDashboard />
+                <AdminFormPage>
+                    <div className="text-red-500 text-center p-4">
+                        Usuario no encontrado.
+                    </div>
+                </AdminFormPage>
+            </div>
+        );
+    }
+
 
     return (
 
         <div>
 
-            <HeaderPrincipal />
+            <HeaderAdmin />
 
             <AdminFormPage>
 
-                <FormEditarUsuario UserId={id} />
+                {/* Pass the fetched user data as initialUserData prop */}
+                <FormEditarUsuario initialUserData={initialUserData} userId={id} />
 
             </AdminFormPage>
 
@@ -26,4 +45,3 @@ async function page(searchParams) {
 }
 
 export default page
-
