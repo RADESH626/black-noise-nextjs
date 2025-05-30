@@ -53,31 +53,22 @@ export async function loginAction(prevState, formData) {
       success: false, 
       readyForSignIn: true 
     };
-
   } catch (error) {
-
-    console.log('Server Action Login: Error:', error);
-
+    console.error('Server Action Login: Error:', error);
     return { message: 'Error del servidor durante el login.', success: false };
-
   }
 }
 
 // Server Action para manejar la adición de un solo usuario (Admin)
 export async function addSingleUserAction(prevState, formData) {
-
     console.log('Server Action Add Single User: Iniciado.');
 
     // RegistrarUsuario expects formData with password field named 'password'
-
     // Ensure the password field from the form (named 'contrasena') is correctly mapped
-
     const password = formData.get('contrasena');
-
     if (password) {
-
         formData.set('password', password); // Set the correct name for RegistrarUsuario
-        
+        formData.delete('contrasena'); // Remove the old name
     } else {
          // Handle case where password is missing if needed
          return { message: 'La contraseña es requerida.', success: false };
@@ -91,9 +82,7 @@ export async function addSingleUserAction(prevState, formData) {
     if (result.success) {
         // Revalidate path for admin user list after adding a user
         revalidatePath('/admin/usuarios');
-
         return { message: result.message || 'Usuario agregado exitosamente.', success: true, data: result.data };
-
     } else {
         return { message: result.error || 'Error al agregar el usuario.', success: false };
     }
@@ -112,7 +101,7 @@ async function guardarUsuarios(data, enviarCorreo = false) { // Añadir parámet
             data.fotoPerfil = `data:image/webp;base64,${DEFAULT_PROFILE_PICTURE_BASE64}`;
         } 
 
-        console.log('foto de perfil establecida:', data.fotoPerfil);
+        console.log('datos de usuario obtenidos:', data);
 
         connectDB();
 
@@ -168,7 +157,6 @@ async function guardarUsuarios(data, enviarCorreo = false) { // Añadir parámet
             habilitado: UsuarioGuardado.habilitado,
             _id: UsuarioGuardado._id.toString()
         };
-        
         return { success: true, data: usuarioPlano };
         
     } catch (error) {
@@ -327,8 +315,8 @@ async function RegistrarUsuario(formData) {
         correo: formData.get('correo'),
         password: formData.get('password'),
         rol: 'CLIENTE', // Asignar rol de cliente por defecto
-        habilitado: true, // Asegurar que el usuario está habilitado por defecto
-        fotoPerfil: formData.get('fotoPerfil') // Add fotoPerfil from formData
+        habilitado: true // Asegurar que el usuario está habilitado por defecto
+
     }
 
     console.log('data:', data);

@@ -1,8 +1,8 @@
 // src/app/admin/pedidos/editar/[id]/page.jsx
 "use client"
 
-import AdminFormPage from '@/components/admin/AdminFormPage';
-import FormEditarPedido from '@/components/admin/pedidos/forms/FormEditarPedido';
+import AdminFormPage from '@/components/layout/admin/AdminFormPage';
+import FormEditarPedido from '@/components/layout/admin/pedidos/forms/FormEditarPedido';
 
 export default function EditarPedidoPage({ params }) {
     const pedidoId = params.id;

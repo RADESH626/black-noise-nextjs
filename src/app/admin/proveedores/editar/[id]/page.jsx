@@ -1,8 +1,8 @@
 // src/app/admin/proveedores/editar/[id]/page.jsx
 "use client"
 
-import AdminFormPage from '@/components/admin/AdminFormPage';
-import FormEditarProveedor from '@/components/admin/proveedores/forms/FormEditarProveedor';
+import AdminFormPage from '@/components/layout/admin/AdminFormPage';
+import FormEditarProveedor from '@/components/layout/admin/proveedores/forms/FormEditarProveedor';
 
 export default function EditarProveedorPage({ params }) {
     const proveedorId = params.id;

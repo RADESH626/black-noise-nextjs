@@ -1,11 +1,11 @@
 // src/app/admin/pagos/page.jsx
 import Link from 'next/link';
-import AdminPage from '@/components/admin/AdminPage';
-import SeccionAcciones from '@/components/admin/secciones/acciones/SeccionAcciones';
-import SeccionFooter from '@/components/admin/secciones/acciones/SeccionFooter';
-import SeccionHeader from '@/components/admin/secciones/acciones/SeccionHeader';
+import AdminPage from '@/components/layout/admin/AdminPage';
+import SeccionAcciones from '@/components/layout/admin/secciones/acciones/SeccionAcciones';
+import SeccionFooter from '@/components/layout/admin/secciones/acciones/SeccionFooter';
+import SeccionHeader from '@/components/layout/admin/secciones/acciones/SeccionHeader';
 import { obtenerPagos } from '@/app/acciones/PagoActions';
-import FormFiltrarPagos from '@/components/admin/pagos/forms/FormFiltrarPagos';
+import FormFiltrarPagos from '@/components/layout/admin/pagos/forms/FormFiltrarPagos';
 import BotonAgregarPagos from '@/components/common/botones/BotonAgregarPagos';
 
 async function PagosAdminPage() {

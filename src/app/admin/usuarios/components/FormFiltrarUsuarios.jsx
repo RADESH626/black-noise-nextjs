@@ -7,10 +7,10 @@ import { useFormStatus } from 'react-dom'; // Import useFormStatus from react-do
 import { usePopUp } from '@/context/PopUpContext'; // Import PopUpContext
 import { InputTextoGeneral } from '@/components/common/inputs';
 import { TdGeneral } from '@/components/common/tablas';
-import SeccionLista from '@/components/admin/secciones/lista/SeccionLista';
+import SeccionLista from '@/components/layout/admin/secciones/lista/SeccionLista';
 import PopUpMessage from '@/components/common/modales/PopUpMessage'; // Keep PopUpMessage component if needed for non-action feedback
 import { FiltrarUsuarios, toggleUsuarioHabilitado } from '@/app/acciones/UsuariosActions'; // Import Server Actions
-import THUsuarios from '@/components/admin/usuarios/THUsuarios';
+import THUsuarios from '@/components/layout/admin/usuarios/THUsuarios';
 import BotonEditar from '@/components/common/botones/BotonEditar';
 import BotonExportarPDF from '@/components/common/botones/BotonExportarPDF'; // Importar BotonExportarPDF
 import { Rol } from '@/models/enums/usuario/Rol'; // Importar el enum Rol

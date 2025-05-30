@@ -1,22 +1,18 @@
 "use client";
 
-import { useSession, signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { ObtenerTodosLosUsuarios } from '@/app/acciones/UsuariosActions'; // Import the action
-import DashboardUserList from '@/components/admin/DashboardUserList'; // Import the new component
-import AdminHeader from '@/components/admin/AdminHeader'; // Import AdminHeader
+import MockDataDemo from '@/components/demo/MockDataDemo';
 
 /**
  * Dashboard principal del administrador
- * Muestra un resumen de datos clave, incluyendo usuarios de la base de datos.
+ * Incluye demostración de datos mock para desarrollo visual
  */
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [users, setUsers] = useState([]); // State to store fetched users
-  const [error, setError] = useState(null); // State to store fetch errors
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -26,24 +22,7 @@ export default function AdminDashboard() {
       return;
     }
 
-    // Fetch users from the database
-    const fetchUsers = async () => {
-      try {
-        console.log('Client: Fetching users for dashboard...');
-        const fetchedUsers = await ObtenerTodosLosUsuarios();
-        console.log('Client: Users fetched:', fetchedUsers?.length || 0);
-        setUsers(fetchedUsers || []);
-      } catch (err) {
-        console.error('Client: Error fetching users for dashboard:', err);
-        setError('Error al cargar los usuarios.');
-        setUsers([]); // Set users to empty array on error
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUsers();
-
+    setLoading(false);
   }, [session, status, router]);
 
   if (loading) {
@@ -54,31 +33,24 @@ export default function AdminDashboard() {
     );
   }
 
-  // If there's an error and not loading, display the error
-  if (error) {
-      return (
-          <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-              <div className="text-red-600 font-semibold text-lg">{error}</div>
-          </div>
-      );
-  }
-
-
   return (
-    <div className="min-h-screen bg-black">
-
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-
-        <AdminHeader >
-
-        <button
-          onClick={() => signOut()}
-          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm font-medium transition-colors"
-        >
-          Cerrar Sesión
-        </button>
-
-        </AdminHeader>
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Dashboard Administrativo</h1>
+              <p className="text-gray-600 mt-1">Bienvenido, {session?.user?.name || 'Administrador'}</p>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
+                {session?.user?.rol}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -201,28 +173,26 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Database Users Section */}
+        {/* Mock Data Demo Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
           <div className="border-l-4 border-blue-500 pl-4 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">Usuarios de la Base de Datos</h2>
+            <h2 className="text-xl font-semibold text-gray-900">Vista Previa con Datos de Prueba</h2>
             <p className="text-gray-600 mt-1">
-              Lista de usuarios registrados en la base de datos.
+              Esta sección muestra cómo se verán las diferentes partes de la aplicación con datos realistas.
+              Útil para desarrollo y diseño de la interfaz.
             </p>
           </div>
-
-          {/* Display users using the new component */}
-          <DashboardUserList users={users} />
-
+          
+          <MockDataDemo />
         </div>
-
 
         {/* Additional Admin Tools */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Acciones Rápidas</h3>
             <div className="space-y-3">
-              <a
-                href="/admin/usuarios/agregar"
+              <a 
+                href="/admin/usuarios/agregar" 
                 className="block w-full text-left px-4 py-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
               >
                 <div className="flex items-center">
@@ -233,9 +203,9 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </a>
-
-              <a
-                href="/admin/designs/agregar"
+              
+              <a 
+                href="/admin/designs/agregar" 
                 className="block w-full text-left px-4 py-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors"
               >
                 <div className="flex items-center">
@@ -246,9 +216,9 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </a>
-
-              <a
-                href="/admin/proveedores/agregar"
+              
+              <a 
+                href="/admin/proveedores/agregar" 
                 className="block w-full text-left px-4 py-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors"
               >
                 <div className="flex items-center">
@@ -274,7 +244,7 @@ export default function AdminDashboard() {
                   Generar
                 </button>
               </div>
-
+              
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div>
                   <p className="font-medium text-gray-900">Reporte de Usuarios</p>
@@ -284,11 +254,11 @@ export default function AdminDashboard() {
                   Generar
                 </button>
               </div>
-
+              
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div>
-                  <p className="font-medium text-green-900">Reporte de Proveedores</p>
-                  <p className="text-sm text-green-600">Performance de proveedores</p>
+                  <p className="font-medium text-gray-900">Reporte de Proveedores</p>
+                  <p className="text-sm text-gray-600">Performance de proveedores</p>
                 </div>
                 <button className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
                   Generar

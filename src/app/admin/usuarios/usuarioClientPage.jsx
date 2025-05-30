@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import FormFiltrarUsuarios from './components/FormFiltrarUsuarios';
-import AdminPage from '@/components/admin/AdminPage';
-import SeccionAcciones from '@/components/admin/secciones/acciones/SeccionAcciones';
-import SeccionFooter from '@/components/admin/secciones/acciones/SeccionFooter';
-import SeccionHeader from '@/components/admin/secciones/acciones/SeccionHeader';
+import AdminPage from '@/components/layout/admin/AdminPage';
+import SeccionAcciones from '@/components/layout/admin/secciones/acciones/SeccionAcciones';
+import SeccionFooter from '@/components/layout/admin/secciones/acciones/SeccionFooter';
+import SeccionHeader from '@/components/layout/admin/secciones/acciones/SeccionHeader';
 import BotonAgregarUsuarios from '@/components/common/botones/BotonAgregarUsuarios';
 import ModalAgregarUsuario from '@/components/common/modales/ModalAgregarUsuario';
 

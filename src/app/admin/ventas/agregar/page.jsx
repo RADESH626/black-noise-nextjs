@@ -1,6 +1,6 @@
 // src/app/admin/ventas/agregar/page.jsx
-import AdminFormPage from '@/components/admin/AdminFormPage';
-import FormAgregarVenta from '@/components/admin/ventas/forms/FormAgregarVenta';
+import AdminFormPage from '@/components/layout/admin/AdminFormPage';
+import FormAgregarVenta from '@/components/layout/admin/ventas/forms/FormAgregarVenta';
 
 export default function AgregarVentaPage() {
     return (

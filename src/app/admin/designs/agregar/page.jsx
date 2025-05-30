@@ -1,6 +1,6 @@
 // src/app/admin/designs/agregar/page.jsx
-import AdminFormPage from '@/components/admin/AdminFormPage';
-import FormAgregarDesign from '@/components/admin/designs/forms/FormAgregarDesign';
+import AdminFormPage from '@/components/layout/admin/AdminFormPage';
+import FormAgregarDesign from '@/components/layout/admin/designs/forms/FormAgregarDesign';
 
 export default function AgregarDesignPage() {
     return (

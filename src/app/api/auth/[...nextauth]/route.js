@@ -35,6 +35,7 @@ export const authOptions = {
             id: user._id.toString(),
             name: user.primerNombre + ' ' + user.primerApellido,
             email: user.correo,
+            image: user.fotoPerfil || "/img/perfil/FotoPerfil.webp",
             rol: user.rol || "CLIENTE"
           };
         } catch (error) {

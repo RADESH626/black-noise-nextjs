@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { InputTextoGeneral } from '@/components/common/inputs';
 import { TdGeneral } from '@/components/common/tablas';
 import { BotonEditar } from '@/components/common/botones';
-import SeccionLista from '@/components/admin/secciones/lista/SeccionLista';
+import SeccionLista from '@/components/layout/admin/secciones/lista/SeccionLista';
 import { obtenerPedidos /*, FiltrarPedidos */ } from '@/app/acciones/PedidoActions';
 import { EstadoPedido } from '@/models/enums/PedidoEnums';
 
