@@ -1,3 +1,4 @@
+"use client"
 import { BotonGeneral } from '@/components/common/botones'
 import {RegistroMasivoUsuario} from '@/app/acciones/UsuariosActions'
 import { InputFiles } from '@/components/common/inputs'

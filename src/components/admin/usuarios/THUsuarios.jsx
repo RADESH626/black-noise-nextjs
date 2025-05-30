@@ -3,7 +3,7 @@ import { Thgeneral, TablaHeader } from '@/components/common/tablas';
 
 function THUsuarios() {
     return (
-        <TablaHeader >
+        <TablaHeader className="bg-neutral-800 text-white ">
             <Thgeneral>Nombre de usuario</Thgeneral>
             <Thgeneral>Primer nombre</Thgeneral>
             <Thgeneral>Primer apellido</Thgeneral>

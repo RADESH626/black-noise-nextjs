@@ -1,4 +1,4 @@
-import FormAgregarUsuarios from '@/components/layout/admin/usuarios/forms/FormAgregarUsuarios'
+import FormAgregarUsuarios from '@/components/admin/usuarios/forms/FormAgregarUsuarios'
 import React, { useEffect, useRef } from 'react'
 import BotonGeneral from '@/components/common/botones/BotonGeneral'
 

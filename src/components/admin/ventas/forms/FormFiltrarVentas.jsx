@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { InputTextoGeneral } from '@/components/common/inputs';
 import TdGeneral from '@/components/common/tablas/TdGeneral';
 import { BotonEditar } from '@/components/common/botones';
-import SeccionLista from '@/components/layout/admin/secciones/lista/SeccionLista';
+import SeccionLista from '@/components/admin/secciones/lista/SeccionLista';
 import { obtenerVentas } from '@/app/acciones/VentaActions';
 import { EstadoVenta } from '@/models/enums/VentaEnums';
 

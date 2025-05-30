@@ -1,11 +1,11 @@
 // src/app/admin/ventas/page.jsx
 import Link from 'next/link';
-import AdminPage from '@/components/layout/admin/AdminPage';
-import SeccionAcciones from '@/components/layout/admin/secciones/acciones/SeccionAcciones';
-import SeccionFooter from '@/components/layout/admin/secciones/acciones/SeccionFooter';
-import SeccionHeader from '@/components/layout/admin/secciones/acciones/SeccionHeader';
+import AdminPage from '@/components/admin/AdminPage';
+import SeccionAcciones from '@/components/admin/secciones/acciones/SeccionAcciones';
+import SeccionFooter from '@/components/admin/secciones/acciones/SeccionFooter';
+import SeccionHeader from '@/components/admin/secciones/acciones/SeccionHeader';
 import { obtenerVentas } from '@/app/acciones/VentaActions';
-import FormFiltrarVentas from '@/components/layout/admin/ventas/forms/FormFiltrarVentas';
+import FormFiltrarVentas from '@/components/admin/ventas/forms/FormFiltrarVentas';
 import BotonAgregarVentas from '@/components/common/botones/BotonAgregarVentas';
 
 async function VentasAdminPage() {

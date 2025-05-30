@@ -1,8 +1,8 @@
 // src/app/admin/ventas/editar/[id]/page.jsx
 "use client"
 
-import AdminFormPage from '@/components/layout/admin/AdminFormPage';
-import FormEditarVenta from '@/components/layout/admin/ventas/forms/FormEditarVenta';
+import AdminFormPage from '@/components/admin/AdminFormPage';
+import FormEditarVenta from '@/components/admin/ventas/forms/FormEditarVenta';
 
 export default function EditarVentaPage({ params }) {
     const ventaId = params.id;

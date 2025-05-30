@@ -1,6 +1,6 @@
 // src/app/admin/proveedores/agregar/page.jsx
-import AdminFormPage from '@/components/layout/admin/AdminFormPage';
-import FormAgregarProveedor from '@/components/layout/admin/proveedores/forms/FormAgregarProveedor';
+import AdminFormPage from '@/components/admin/AdminFormPage';
+import FormAgregarProveedor from '@/components/admin/proveedores/forms/FormAgregarProveedor';
 
 export default function AgregarProveedorPage() {
     return (

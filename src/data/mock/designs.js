@@ -139,6 +139,34 @@ export const mockDesigns = [
     elementoIds: [],
     imagenDesing: "/img/Gorras/Gorra 1.jpg",
     createdAt: "2024-01-23T14:55:00Z"
+  },
+  {
+    _id: "mock-design-test-1",
+    usuarioId: "mock-user-2",
+    nombreDesing: "Diseño de Prueba 1 - Camiseta",
+    categoria: "CAMISA",
+    palabrasClave: ["test", "prueba", "camiseta"],
+    likes: 99,
+    valorDesing: 20000,
+    fechaRealizacion: "2025-05-30T10:00:00Z",
+    estadoDesing: "PUBLICO",
+    elementoIds: [],
+    imagenDesing: "/img/Camisetas/Camiseta 1.jpg",
+    createdAt: "2025-05-30T10:00:00Z"
+  },
+  {
+    _id: "mock-design-test-2",
+    usuarioId: "mock-user-2",
+    nombreDesing: "Diseño de Prueba 2 - Hoodie",
+    categoria: "CHAQUETA",
+    palabrasClave: ["test", "prueba", "hoodie"],
+    likes: 88,
+    valorDesing: 30000,
+    fechaRealizacion: "2025-05-30T11:00:00Z",
+    estadoDesing: "PUBLICO",
+    elementoIds: [],
+    imagenDesing: "/img/Hoddie_s/Hoddie 1.jpg",
+    createdAt: "2025-05-30T11:00:00Z"
   }
 ];
 

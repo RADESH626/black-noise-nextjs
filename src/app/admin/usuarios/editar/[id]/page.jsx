@@ -1,7 +1,7 @@
-import AdminFormPage from "@/components/layout/admin/AdminFormPage";
+import AdminFormPage from "@/components/admin/AdminFormPage";
 import FormEditarUsuario from "@/app/admin/usuarios/components/FormEditarUsuario";
 import { ObtenerUsuarioPorId } from "@/app/acciones/UsuariosActions"; // Import the action
-import HeaderAdminDashboard from "@/components/layout/admin/AdminHeader";
+import HeaderAdminDashboard from "@/components/admin/AdminHeader";
 
 async function page({ params }) { // Destructure params directly
 
@@ -30,7 +30,7 @@ async function page({ params }) { // Destructure params directly
 
         <div>
 
-            <HeaderAdmin />
+            <HeaderAdminDashboard /> {/* Corrected component name */}
 
             <AdminFormPage>
 

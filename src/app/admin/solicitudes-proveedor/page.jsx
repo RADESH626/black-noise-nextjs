@@ -1,9 +1,9 @@
 // src/app/admin/solicitudes-proveedor/page.jsx
-import AdminPage from '@/components/layout/admin/AdminPage';
-import SeccionAcciones from '@/components/layout/admin/secciones/acciones/SeccionAcciones';
-import SeccionHeader from '@/components/layout/admin/secciones/acciones/SeccionHeader';
+import AdminPage from '@/components/admin/AdminPage';
+import SeccionAcciones from '@/components/admin/secciones/acciones/SeccionAcciones';
+import SeccionHeader from '@/components/admin/secciones/acciones/SeccionHeader';
 import { obtenerSolicitudesProveedor } from '@/app/acciones/SolicitudProveedorActions';
-import FormFiltrarSolicitudesProveedor from '@/components/layout/admin/solicitudes-proveedor/forms/FormFiltrarSolicitudesProveedor';
+import FormFiltrarSolicitudesProveedor from '@/components/admin/solicitudes-proveedor/forms/FormFiltrarSolicitudesProveedor';
 
 async function SolicitudesProveedorAdminPage() {
     const initialSolicitudesResult = await obtenerSolicitudesProveedor();

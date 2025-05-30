@@ -4,13 +4,14 @@ import { useModal } from "@/context/ModalContext";
 import { signOut } from "next-auth/react"; // Import signOut
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
 import FormEditarUsuario from "@/app/admin/usuarios/components/FormEditarUsuario";
+import Link from 'next/link'; // Import Link
 
 function ProfileContent({ user, designs: userDesigns, error }) {
   const { openModal } = useModal();
 
   const handleEditProfile = () => {
     openModal(
-      "Editar Perfil", 
+      "Editar Perfil",
       <FormEditarUsuario UserId={user?.id} isProfile={true} />,
       'large' // Usamos tamaño grande para el formulario de perfil
     );
@@ -39,7 +40,23 @@ function ProfileContent({ user, designs: userDesigns, error }) {
 
           {/* seccion info */}
           <div className="flex-grow text-center md:text-left">
-            <h1 className="text-3xl md:text-4xl font-bold mb-1">{user?.name.toUpperCase()}</h1>
+
+
+            <div className="flex flex-row justify-between items-center md:items-start mb-4">
+              <h1 className="text-3xl md:text-4xl font-bold mb-1">{user?.name.toUpperCase()}</h1>
+
+              
+
+              <button
+                onClick={() => signOut({ callbackUrl: '/login' })}
+                className="bg-red-500 hover:bg-red-700 transition-colors duration-300 font-bold py-2 px-4 rounded"
+              >
+                CERRAR SESIÓN
+              </button>
+
+            </div>
+
+
 
             {/* info */}
             <div className="text-gray-400 mb-3">
@@ -52,10 +69,6 @@ function ProfileContent({ user, designs: userDesigns, error }) {
             <div className="flex flex-col sm:flex-row justify-center md:justify-start space-y-2 sm:space-y-0 sm:space-x-3">
               <BotonGeneral onClick={handleEditProfile}>
                 EDITAR PERFIL
-              </BotonGeneral>
-
-              <BotonGeneral onClick={() => signOut({ callbackUrl: '/login' })}>
-                CERRAR SESIÓN
               </BotonGeneral>
 
               <BotonGeneral onClick={() => { /* Add logic for editing/adding designs */ }}>
@@ -80,25 +93,34 @@ function ProfileContent({ user, designs: userDesigns, error }) {
       </nav>
 
       <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
         {error ? (
           <div className="col-span-full text-red-500 text-center">
             Error al cargar los diseños: {error}
           </div>
         ) : userDesigns.length === 0 ? (
-          <div className="col-span-full text-center text-gray-400">
-            No tienes diseños publicados aún.
+          <div className="col-span-full text-center text-gray-400  flex  flex-col gap-4 items-center justify-center">
+
+            <div>
+
+              No tienes diseños publicados aún.
+
+            </div>
+
+            <Link href="/designs" className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white text-purple-600 text-sm font-bold ml-2 "> + </Link>
+
           </div>
         ) : (
           userDesigns.map((design) => (
             <div key={design._id} className="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
               <div className="w-full h-56 bg-gray-700 relative">
-                <img 
-                  src={design.imagenDesing} 
+                <img
+                  src={design.imagenDesing}
                   alt={design.nombreDesing}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute top-0 right-0 m-3">
-                  <button 
+                  <button
                     onClick={() => handleEditDesign(design)}
                     className="bg-white text-purple-700 font-semibold py-1 px-4 rounded-md text-sm hover:bg-gray-200 transition duration-150"
                   >

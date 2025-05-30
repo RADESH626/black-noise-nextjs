@@ -1,8 +1,8 @@
 // src/app/admin/pagos/editar/[id]/page.jsx
 "use client"
 
-import AdminFormPage from '@/components/layout/admin/AdminFormPage';
-import FormEditarPago from '@/components/layout/admin/pagos/forms/FormEditarPago';
+import AdminFormPage from '@/components/admin/AdminFormPage';
+import FormEditarPago from '@/components/admin/pagos/forms/FormEditarPago';
 
 export default function EditarPagoPage({ params }) {
     const pagoId = params.id;

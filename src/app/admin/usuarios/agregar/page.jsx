@@ -1,5 +1,5 @@
-import FormAgregarUsuarios from '@/components/layout/admin/usuarios/forms/FormAgregarUsuarios'
-import AdminFormPage from '@/components/layout/admin/AdminFormPage'
+import FormAgregarUsuarios from '@/components/admin/usuarios/forms/FormAgregarUsuarios'
+import AdminFormPage from '@/components/admin/AdminFormPage'
 
 function nuevo() {
     return (
