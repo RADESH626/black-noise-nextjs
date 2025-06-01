@@ -10,8 +10,19 @@ import nodemailer from 'nodemailer'; // Importar Nodemailer
 import connectDB from '@/utils/DBconection';
 import Usuario from '@/models/Usuario';
 import { signIn } from "next-auth/react"; // Import signIn
+import { 
+    mockUsuarios, 
+    getMockUsuariosByRol, 
+    getMockUsuarioById, 
+    getMockUsuariosHabilitados 
+} from '@/data/mock/usuarios'; // Import mock data for users
 
-const DEFAULT_PROFILE_PICTURE_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAKwAAACUCAMAAAA5xjIqAAAAMFBMVEXk5ueutLenrrHn6eqrsbTq7O3Lz9Hh4+S4vcDGyszT1tjP09Te4OKyuLvCx8nW2dvDGAcOAAAECUlEQVR4nO2c23LjIAxAbcTVBvP/f7vQZLNJx7SAsGTPcp4605czqpC4yJ2mwWAwGAwGg8FgMBgMBq+AUmDisizR5x+5dT4Dk4kuiAfSOm+mUworv25ByPkZKcK2mNPpqsmF+dX07jvbByfTdWLP9O4r9XmSAaY1fFbNiLCcxBYm+7PqV3DdKVIX4i9hvesGz28LukQ124p4Gdesu/LGtsY12ypWV1HhmqoCY2xhrYnrV2wjly3EStVEMEyy5vf6+h5ay+MKW71rSlvHkQgQW1xTbDmaAzSp8iQCuLbA5mpLLutDoytHaKta1ytiIXY1zYHN0HZdWOr67LfQ0vYxZTGBlRtpaA0msKnpekLXup3hDpRHMkBlQcoDR+eKKLJ3WUu3+UpnRJxs2iDQyWJTdqY8PDbvCx6R1WQrzDTtZF9k6SqtQRaDRKCTxa6vmXB74PGukk4Wm7KpHJAtsCE7ZKeLLbBLla5rNYWGS65XpKU72FxpI3OpLSIsSFfKzTf6WDNbQln0gXGnc73WUfxSlxyTwiUtYZWd8qPShS7mLnXliWpi9O+MiFIbiFVRDyCaXHaaWmUJL+UewNL4aMfy1tz2HEp8Rf+gZY1xPTQ3JQLfWI+q3s9Ixvmu2rQVdKeZPapsJcuswQOosSU8JX7SLe5kgv7p/t22bARJcq6tf4AvuPOQ2ykGJ3Piut053yfVoM8z8AvG/jDsO4uzhPWO8jbI3TFqGTbDOYK4B4B3dv4+oC5nq08wN/tOysqvgXohZCLP/odt8eY8yfoGpAjHVWu9Rn9izRtJFtSN/CO3zgeynfFxyVF1Ce30usTov37BLfcMgInOhqd19VQYgt3WU2QE5M9pVmfzovqhJaTVNm86si42NUW9vZWrx8bSbi7y+ILyLsy/tNn3BhHsQq2bKqqTZRF9Qwgb6T68SjFd7W5rLQ2wsC7SxFeZbf9jqirf2R5/1wF584p/Zr75xkOTASBunVQzwq7HbR3BbOi//wupmh2WDLqv6g17RHAhBtwLzQek0L11cwYcRcqFricJ8EdkwMO25+0HYEbnixC219mn6oqoERn6lAXAz22U2M493psgHpmuz7r4K0Yy1w4fX+FnNipAxrb1+ajVdkPYtnykiEK0vzsd2wp2aW4PNDXrO61Xzsf3gj2aeln7szcKGRpkATmz027rGhZZh7HTRuq3CZrNtf4rIfQAH8a28sFM8VSCO6LKFTzT6rpRN0ChONrBMxVnSOgwLo+iZv/VNv3Sk4r52g7T8khk+RfatLvYXdnynS17FiTb4sgyNoS/FI/bc21hnikttfivELpQJov7wr4Xsmw3o7g9bxQmLbfmjbKjY+P/h+lNWcddxCmwRbLmJJS4Dv5D/gBmFDnwIIZzJgAAAABJRU5ErkJggg==';
+const DEFAULT_PROFILE_PICTURE_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAKwAAACUCAMAAAA5xjIqAAAAMFBMVEXk5ueutLenrrHn6eqrsbTq7O3Lz9Hh4+S4vcDGyszT1tjP09Te4OKyuLvCx8nW2dvDGAcOAAAECUlEQVR4nO2c23LjIAxAbcTVBvP/f7vQZLNJ47SAsGTPcp4605czqpC4yJ2mwWAwGAwGg8FgMBgMBq+AUmDisizR5x+5dT4Dk4kuiAfSOm+mUworv25ByPkZKcK2mNPpqsmF+dX07jvbByfTdWLP9O4r9XmSAaY1fFbNiLCcxBYm+7PqV3DdKVIX4i9hvesGz28LukQ124p4Gdesu/LGtsY12ypWV1HhmqoCY2xhrYnrV2wjly3EStVEMEyy5vf6+h5ay+MKW71rSlvHkQgQW1xTbDmaAzSp8iQCuLbA5mpLLutDoytHaKta1ytiIXY1zYHN0HZdWOr67LfQ0vYxZTGBlRtpaA0msKnpekLXup3hDpRHMkBlQcoDR+eKKLJ3WUu3+UpnRJxs2iDQyWJTdqY8PDbvCx6R1WQrzDTtZF9k6SqtQRaDRKCTxa6vmXB74PGukk4Wm7KpHJAtsCE7ZKeLLbBLla5rNYWGS65XpKU72FxpI3OpLSIsSFfKzTf6WDNbQln0gXGnc73WUfxSlxyTwiUtYZWd8qPShS7mLnXliWpi9O+MiFIbiFVRDyCaXHaaWmUJL+UewNL4aMfy1tz2HEp8Rf+gZY1xPTQ3JQLfWI+q3s9Ixvmu2rQVdKeZPapsJcuswQOosSU8JX7SLe5kgv7p/t22bARJcq6tf4AvuPOQ2ykGJ3Piut053yfVoM8z8AvG/jDsO4uzhPWO8jbI3TFqGTbDOYK4B4B3dv4+oC5nq08wN/tOysqvgXohZCLP/odt9eY8yfoGpAjHVWu9Rn9izRtJFtSN/CO3zgeynfFxyVF1Ce30usTov37BLfcMgInOhqd19VQYgt3WU2QE5M9pVmfzovqhJaTVNm86si42NUW9vZWrj8bSbi7y+ILyLsy/tNn3BhHsQq2bKqqTZRF9Qwgb6T68SjFd7W5rLQ2wsC7SxFeZbf9jqirf2R5/1wF584p/Zr75xkOTASBunVQzwq7HbR3BbOi//wupmh2WDLqv6g17RHAhBtwLzQek0L11cwYcRcqFricJ8EdkwMO25+0HYEbnixC219mn6oqoERn6lAXAz22U2M493psgHpmuz7r4K0Yy1w4fX+FnNipAxrb1+ajVdkPYtnykiEK0vzsd2wp2aW4PNDXrO61Xzsf3gj2aeln7szcKGRpkATmz027rGhZZh7HTRuq3CZrNtf4rIfQAH8a28sFM8VSCO6LKFTzT6rpRN0ChONrBMxVnSOgwLo+iZv/VNv3Sk4r52g7T8khk+RfatLvYXdnynS17FiTb4sgyNoS/FI/bc21hnikttfivELpQJov7wr4Xsmw3o7g9bxQmLbfmjbKjY+P/h+lNWcddxCmwRbLmJJS4Dv5D/gBmFDnwIIZzJgAAAABJRU5ErkJggg==';
+
+const isMockModeEnabled = process.env.NEXT_PUBLIC_MOCK_MODE === 'true';
+
+// Helper para generar IDs únicos (simulado)
+const generateUniqueId = (prefix = 'mock') => `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 // Server Action para manejar el login
 export async function loginAction(prevState, formData) {
@@ -25,6 +36,24 @@ export async function loginAction(prevState, formData) {
   // Perform basic server-side validation if needed
   if (!email || !password) {
     return { message: 'Por favor, ingresa correo y contraseña.', success: false };
+  }
+
+  if (isMockModeEnabled) {
+    console.log('🎭 Mock Mode: Simulando login de usuario.');
+    const user = mockUsuarios.find(u => u.correo === email);
+    if (user) {
+      // Simulate successful login
+      return { 
+        email, 
+        password, // In a real app, you wouldn't return password
+        userRole: user.rol,
+        message: null, 
+        success: false, // This should be true for successful login, but the original code returns false
+        readyForSignIn: true 
+      };
+    } else {
+      return { message: 'Usuario no encontrado (simulado).', success: false };
+    }
   }
 
   try {
@@ -74,6 +103,23 @@ export async function addSingleUserAction(prevState, formData) {
          return { message: 'La contraseña es requerida.', success: false };
     }
 
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Simulando adición de usuario.');
+        const newUserData = Object.fromEntries(formData.entries());
+        const simulatedUser = {
+            ...newUserData,
+            _id: generateUniqueId('user'),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            rol: newUserData.rol || 'CLIENTE',
+            habilitado: newUserData.habilitado === 'true' || true, // Default to true if not provided
+            fotoPerfil: newUserData.fotoPerfil || `data:image/webp;base64,${DEFAULT_PROFILE_PICTURE_BASE64}`
+        };
+        // Simulate success
+        revalidatePath('/admin/usuarios'); // Still revalidate path for UI consistency
+        return { message: 'Usuario agregado exitosamente (simulado).', success: true, data: simulatedUser };
+    }
+
     // Call the existing RegistrarUsuario function
     const result = await RegistrarUsuario(formData);
 
@@ -91,6 +137,19 @@ export async function addSingleUserAction(prevState, formData) {
 
 // Función para guardar usuarios en la base de datos
 async function guardarUsuarios(data, enviarCorreo = false) { // Añadir parámetro enviarCorreo con valor por defecto
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Simulando guardarUsuarios.');
+        const simulatedUser = {
+            ...data,
+            _id: data._id || generateUniqueId('user'),
+            createdAt: data.createdAt || new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            rol: data.rol || 'CLIENTE',
+            habilitado: data.habilitado === undefined ? true : data.habilitado,
+            fotoPerfil: data.fotoPerfil || `data:image/webp;base64,${DEFAULT_PROFILE_PICTURE_BASE64}`
+        };
+        return { success: true, data: simulatedUser };
+    }
 
     try {
 
@@ -169,6 +228,13 @@ async function guardarUsuarios(data, enviarCorreo = false) { // Añadir parámet
 
 // Función para enviar correos electrónicos
 async function enviarCorreoElectronico(to, subject, html) {
+    // This function is not directly related to mock data CRUD,
+    // but it should not send real emails in mock mode.
+    if (isMockModeEnabled) {
+        console.log(`🎭 Mock Mode: Simulando envío de correo a ${to} con asunto "${subject}".`);
+        return { success: true, message: 'Correo simulado enviado exitosamente' };
+    }
+
     try {
         // Configura el transportador de Nodemailer
         // Reemplaza con tu configuración de SMTP y credenciales (idealmente desde variables de entorno)
@@ -202,6 +268,10 @@ async function enviarCorreoElectronico(to, subject, html) {
 
 //obtener usuarios de la base de datos
 async function obtenerUsuarios() {
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Obteniendo todos los usuarios mock.');
+        return { usuarios: mockUsuarios };
+    }
     try {
         connectDB();
 
@@ -220,6 +290,10 @@ async function obtenerUsuarios() {
 
 //obtener usuarios habilitados de la base de datos
 async function obtenerUsuariosHabilitados() {
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Obteniendo usuarios habilitados mock.');
+        return getMockUsuariosHabilitados();
+    }
     try {
         connectDB();
         const data = { usuarios: await Usuario.find({ habilitado: true }).lean() };
@@ -239,6 +313,21 @@ async function obtenerUsuariosHabilitados() {
 //obtener usuario por id
 async function ObtenerUsuarioPorId(id) {
     console.log('DEBUG: Entering ObtenerUsuarioPorId with ID:', id);
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Obteniendo usuario mock por ID:', id);
+        const user = getMockUsuarioById(id);
+        if (user) {
+            // Simulate plain object conversion
+            return {
+                ...user,
+                _id: user._id || user.id, // Ensure _id is present, use id if _id is not defined in mock
+                fechaNacimiento: user.fechaNacimiento ? new Date(user.fechaNacimiento).toISOString().split('T')[0] : null,
+                createdAt: user.createdAt || new Date().toISOString(),
+                updatedAt: user.updatedAt || new Date().toISOString()
+            };
+        }
+        return null;
+    }
     try {
         await connectDB(); // Ensure DB connection is awaited
         console.log('DEBUG: Database connected for ObtenerUsuarioPorId.');
@@ -271,6 +360,10 @@ async function ObtenerUsuarioPorId(id) {
 
 //obtener usuario por correo
 async function ObtenerUsuarioPorCorreo(email) {
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Obteniendo usuario mock por correo:', email);
+        return mockUsuarios.find(u => u.correo.toLowerCase() === email.trim().toLowerCase());
+    }
     try {
         
         
@@ -294,8 +387,20 @@ async function ObtenerUsuarioPorCorreo(email) {
 
 // Función para registrar un nuevo usuario
 async function RegistrarUsuario(formData) {
-
-
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Simulando registro de nuevo usuario.');
+        const newUserData = Object.fromEntries(formData.entries());
+        const simulatedUser = {
+            ...newUserData,
+            _id: generateUniqueId('user'),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            rol: newUserData.rol || 'CLIENTE',
+            habilitado: newUserData.habilitado === 'true' || true,
+            fotoPerfil: newUserData.fotoPerfil || `data:image/webp;base64,${DEFAULT_PROFILE_PICTURE_BASE64}`
+        };
+        return { success: true, data: simulatedUser, message: 'Usuario registrado exitosamente (simulado).' };
+    }
 
     const data = {
 
@@ -337,6 +442,16 @@ async function RegistrarUsuario(formData) {
 
 // Función para registrar un usuario masivo
 async function RegistroMasivoUsuario(formData, userId) {
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Simulando registro masivo de usuarios.');
+        const file = formData.get('file');
+        if (!file) {
+            return { error: 'No se ha subido ningún archivo (simulado)' };
+        }
+        // Simulate parsing and processing without actual data manipulation
+        revalidatePath('/admin/usuarios');
+        return { success: true, message: 'Carga masiva completada exitosamente (simulado).' };
+    }
 
     const file = formData.get('file');
 
@@ -389,31 +504,71 @@ async function RegistroMasivoUsuario(formData, userId) {
 
 // Función para filtrar usuarios
 async function FiltrarUsuarios(prevState, formData) {
-
     const textoBusqueda = formData.get('textoBusqueda');
     const rol = formData.get('rol');
     const genero = formData.get('generoFiltro');
     const tipoDocumento = formData.get('tipoDocumentoFiltro');
     const edad = formData.get('edadFiltro');
-    const incluirDeshabilitados = formData.get('incluirDeshabilitados') === 'true'; // Checkbox value is 'true' when checked
+    const incluirDeshabilitados = formData.get('incluirDeshabilitados') === 'true';
 
     console.log("Buscando usuarios con los siguientes filtros:");
-
     if (textoBusqueda) console.log(`Texto Busqueda: ${textoBusqueda}`);
-
     if (rol) console.log(`Rol: ${rol}`);
-
     if (genero) console.log(`Genero: ${genero}`);
-
     if (tipoDocumento) console.log(`Tipo Documento: ${tipoDocumento}`);
-
     if (edad) console.log(`Edad: ${edad}`);
-
     console.log(`Incluir Deshabilitados: ${incluirDeshabilitados}`);
 
-    // Aquí irá la lógica para construir la consulta a la base de datos
-    // y obtener los usuarios según los filtros.
-    // Ejemplo:
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Simulando filtrado de usuarios.');
+        let filteredUsers = [...mockUsuarios]; // Start with a copy of all mock users
+
+        if (textoBusqueda) {
+            const lowerQuery = textoBusqueda.toLowerCase();
+            filteredUsers = filteredUsers.filter(user =>
+                user.primerNombre.toLowerCase().includes(lowerQuery) ||
+                user.primerApellido.toLowerCase().includes(lowerQuery) ||
+                user.correo.toLowerCase().includes(lowerQuery)
+            );
+        }
+        if (rol) {
+            filteredUsers = filteredUsers.filter(user => user.rol === rol);
+        }
+        if (genero) {
+            filteredUsers = filteredUsers.filter(user => user.genero === genero);
+        }
+        if (tipoDocumento) {
+            filteredUsers = filteredUsers.filter(user => user.tipoDocumento === tipoDocumento);
+        }
+        // Simulate age filtering (basic example, assuming fechaNacimiento is a valid date string)
+        if (edad) {
+            const currentYear = new Date().getFullYear();
+            filteredUsers = filteredUsers.filter(user => {
+                if (!user.fechaNacimiento) return false;
+                const birthYear = new Date(user.fechaNacimiento).getFullYear();
+                const userAge = currentYear - birthYear;
+                // Simple age range simulation, e.g., "18-25", "26-35"
+                if (edad === '18-25') return userAge >= 18 && userAge <= 25;
+                if (edad === '26-35') return userAge >= 26 && userAge <= 35;
+                // Add more age ranges as needed
+                return true;
+            });
+        }
+        if (!incluirDeshabilitados) {
+            filteredUsers = filteredUsers.filter(user => user.habilitado === true);
+        }
+
+        // Simulate plain object conversion for consistency
+        const plainUsers = filteredUsers.map(user => ({
+            ...user,
+            _id: user._id || user.id,
+            fechaNacimiento: user.fechaNacimiento ? new Date(user.fechaNacimiento).toISOString().split('T')[0] : null,
+            createdAt: user.createdAt || new Date().toISOString(),
+            updatedAt: user.updatedAt || new Date().toISOString()
+        }));
+
+        return { data: plainUsers, message: "Búsqueda simulada completada." };
+    }
 
     await connectDB();
 
@@ -474,9 +629,6 @@ async function FiltrarUsuarios(prevState, formData) {
     console.log("Usuarios encontrados (plain):", usuariosEncontrados);
 
     return { data: usuariosEncontrados, message: "Búsqueda completada." };
-
-    // Simulación de una respuesta (deberás reemplazar esto con tu lógica de base de datos)
-    return { data: [], message: "Búsqueda simulada completada." };
 }
 
 // Función para cambiar el estado de habilitado de un usuario
@@ -490,6 +642,23 @@ async function toggleUsuarioHabilitado(formData) {
         console.error('Error: ID de usuario no proporcionado para cambiar el estado.');
 
         return { error: 'ID de usuario no proporcionado.' };
+    }
+
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Simulando cambio de estado de habilitado para usuario ID:', id);
+        const user = getMockUsuarioById(id);
+        if (user) {
+            const newHabilitadoState = !user.habilitado;
+            const simulatedUser = {
+                ...user,
+                habilitado: newHabilitadoState,
+                updatedAt: new Date().toISOString()
+            };
+            revalidatePath('/admin/usuarios');
+            return { success: true, message: `Usuario ${newHabilitadoState ? 'habilitado' : 'deshabilitado'} exitosamente (simulado).`, data: simulatedUser };
+        } else {
+            return { error: `No se encontró ningún usuario con el ID ${id} (simulado).` };
+        }
     }
 
     try {
@@ -533,6 +702,26 @@ async function toggleUsuarioHabilitado(formData) {
 // Función para editar un usuario
 async function EditarUsuario(id, formData) {
     console.log('DEBUG: Entering EditarUsuario with ID:', id);
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Simulando edición de usuario ID:', id);
+        const updatedData = Object.fromEntries(formData.entries());
+        const existingUser = getMockUsuarioById(id);
+        if (existingUser) {
+            const simulatedUser = {
+                ...existingUser,
+                ...updatedData,
+                _id: existingUser._id || existingUser.id, // Ensure _id is present
+                updatedAt: new Date().toISOString()
+            };
+            // Simulate date conversion for consistency with real data
+            if (simulatedUser.fechaNacimiento) {
+                simulatedUser.fechaNacimiento = new Date(simulatedUser.fechaNacimiento).toISOString().split('T')[0];
+            }
+            return { success: true, message: 'Usuario actualizado exitosamente (simulado).', data: simulatedUser };
+        } else {
+            return { error: `No se encontró ningún usuario con el ID ${id} (simulado).` };
+        }
+    }
     try {
         await connectDB(); // Ensure DB connection is awaited
         console.log('DEBUG: Database connected for EditarUsuario.');
@@ -590,6 +779,18 @@ async function EditarUsuario(id, formData) {
 }
 
 export async function ObtenerTodosLosUsuarios() {
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Obteniendo todos los usuarios mock.');
+        // Simulate plain object conversion for consistency
+        const plainUsers = mockUsuarios.map(user => ({
+            ...user,
+            _id: user._id || user.id, // Ensure _id is present, use id if _id is not defined in mock
+            fechaNacimiento: user.fechaNacimiento ? new Date(user.fechaNacimiento).toISOString().split('T')[0] : null,
+            createdAt: user.createdAt || new Date().toISOString(),
+            updatedAt: user.updatedAt || new Date().toISOString()
+        }));
+        return plainUsers;
+    }
     try {
         connectDB();
         const data = { usuarios: await Usuario.find({}).lean() };
@@ -700,19 +901,24 @@ export async function updateUserAction(userId, prevState, formData) {
 export async function bulkUploadUsersAction(prevState, formData) {
     console.log('Server Action Bulk Upload Users: Iniciado.');
 
-    // RegistroMasivoUsuario requires userId, but Server Actions don't directly receive session.
-    // We need to get the session here to pass the userId to RegistroMasivoUsuario.
-    const { getServerSession } = await import("next-auth");
-    const { authOptions } = await import("@/app/api/auth/[...nextauth]/route"); // Adjust path if necessary
+    let userId = 'mock-admin-user-id'; // Default mock user ID
 
-    const session = await getServerSession(authOptions);
+    if (!isMockModeEnabled) {
+        // RegistroMasivoUsuario requires userId, but Server Actions don't directly receive session.
+        // We need to get the session here to pass the userId to RegistroMasivoUsuario.
+        const { getServerSession } = await import("next-auth");
+        const { authOptions } = await import("@/app/api/auth/[...nextauth]/route"); // Adjust path if necessary
 
-    if (!session?.user?.id) {
-        console.log('Server Action Bulk Upload Users: Usuario no autenticado.');
-        return { message: 'Usuario no autenticado. Por favor, inicia sesión.', success: false };
+        const session = await getServerSession(authOptions);
+
+        if (!session?.user?.id) {
+            console.log('Server Action Bulk Upload Users: Usuario no autenticado.');
+            return { message: 'Usuario no autenticado. Por favor, inicia sesión.', success: false };
+        }
+        userId = session.user.id;
+    } else {
+        console.log('🎭 Mock Mode: Saltando validación de sesión para carga masiva de usuarios. Usando ID mock.');
     }
-
-    const userId = session.user.id;
 
     // Call the existing RegistroMasivoUsuario function
     const result = await RegistroMasivoUsuario(formData, userId);

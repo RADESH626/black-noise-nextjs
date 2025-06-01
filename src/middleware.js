@@ -1,6 +1,8 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
+const isMockModeEnabled = process.env.NEXT_PUBLIC_MOCK_MODE === 'true';
+
 export default withAuth(
   function middleware(req) {
     const token = req.nextauth.token;
@@ -11,7 +13,14 @@ export default withAuth(
     console.log('Token exists:', !!token);
     console.log('Token rol:', token?.rol);
     console.log('Token data:', token);
+    console.log('Is Mock Mode Enabled:', isMockModeEnabled);
     console.log('========================');
+
+    // If mock mode is enabled, bypass all role-based and authentication redirects
+    if (isMockModeEnabled) {
+      console.log('🎭 Mock Mode: Saltando todas las validaciones de middleware.');
+      return NextResponse.next();
+    }
 
     // Si no hay token, redireccionar a login
     if (!token) {
@@ -47,6 +56,11 @@ export default withAuth(
   {
     callbacks: {
       authorized: ({ req, token }) => {
+        // If mock mode is enabled, always authorize
+        if (isMockModeEnabled) {
+          console.log('🎭 Mock Mode: Authorized callback siempre devuelve true.');
+          return true;
+        }
         console.log('Authorized callback - token exists:', !!token);
         return !!token;
       }

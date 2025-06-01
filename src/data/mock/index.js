@@ -5,6 +5,7 @@ export { mockPedidos } from './pedidos';
 export { mockProveedores } from './proveedores';
 export { mockVentas } from './ventas';
 export { mockPagos } from './pagos';
+export { mockSolicitudesProveedor } from './solicitudesProveedor';
 
 // Importar todos los datos
 import { mockUsuarios } from './usuarios';
@@ -13,6 +14,7 @@ import { mockPedidos } from './pedidos';
 import { mockProveedores } from './proveedores';
 import { mockVentas } from './ventas';
 import { mockPagos } from './pagos';
+import { mockSolicitudesProveedor } from './solicitudesProveedor';
 
 // Función para obtener todos los datos mock
 export const getAllMockData = () => ({
@@ -21,7 +23,8 @@ export const getAllMockData = () => ({
   pedidos: mockPedidos,
   proveedores: mockProveedores,
   ventas: mockVentas,
-  pagos: mockPagos
+  pagos: mockPagos,
+  solicitudesProveedor: mockSolicitudesProveedor
 });
 
 // =================== FUNCIONES DE UTILIDAD PARA USUARIOS ===================

@@ -3,10 +3,31 @@
 import connectDB from '@/utils/DBconection';
 import Design from '@/models/Design';
 import { revalidatePath } from 'next/cache';
+import { 
+    mockDesigns, 
+    getMockDesignsByUsuario, 
+    getMockDesignById 
+} from '@/data/mock/designs'; // Import mock data for designs
+
+const isMockModeEnabled = process.env.NEXT_PUBLIC_MOCK_MODE === 'true';
+
+// Helper para generar IDs únicos (simulado)
+const generateUniqueId = (prefix = 'mock') => `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 // Crear un nuevo diseño
 async function guardarDesign(data) {
     console.log('DEBUG: Entering guardarDesign with data:', data);
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Simulando guardarDesign.');
+        const newDesign = {
+            ...data,
+            id: generateUniqueId('design'), // Use 'id' as per mock data structure
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        };
+        revalidatePath('/admin/designs');
+        return { success: true, message: "Diseño creado exitosamente (simulado)", data: newDesign };
+    }
     try {
         await connectDB();
         console.log('DEBUG: Database connected for guardarDesign.');
@@ -26,6 +47,10 @@ async function guardarDesign(data) {
 // Obtener todos los diseños
 async function obtenerDesigns() {
     console.log('DEBUG: Entering obtenerDesigns.');
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Obteniendo todos los diseños mock.');
+        return { designs: mockDesigns };
+    }
     try {
         await connectDB();
         console.log('DEBUG: Database connected for obtenerDesigns.');
@@ -41,6 +66,10 @@ async function obtenerDesigns() {
 // Obtener diseños por usuario ID
 async function obtenerDesignsPorUsuarioId(usuarioId) {
     console.log('DEBUG: Entering obtenerDesignsPorUsuarioId with usuarioId:', usuarioId);
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Obteniendo diseños mock por usuario ID:', usuarioId);
+        return { designs: getMockDesignsByUsuario(usuarioId) };
+    }
     try {
         await connectDB();
         console.log('DEBUG: Database connected for obtenerDesignsPorUsuarioId.');
@@ -56,6 +85,14 @@ async function obtenerDesignsPorUsuarioId(usuarioId) {
 // Obtener diseño por ID
 async function ObtenerDesignPorId(id) {
     console.log('DEBUG: Entering ObtenerDesignPorId with ID:', id);
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Obteniendo diseño mock por ID:', id);
+        const design = getMockDesignById(id);
+        if (design) {
+            return design;
+        }
+        return { error: 'Diseño no encontrado (simulado)' };
+    }
     try {
         await connectDB();
         console.log('DEBUG: Database connected for ObtenerDesignPorId.');
@@ -76,6 +113,22 @@ async function ObtenerDesignPorId(id) {
 // Editar diseño
 async function EditarDesign(id, data) {
     console.log('DEBUG: Entering EditarDesign with ID:', id, 'and data:', data);
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Simulando edición de diseño ID:', id);
+        const existingDesign = getMockDesignById(id);
+        if (existingDesign) {
+            const updatedDesign = {
+                ...existingDesign,
+                ...data,
+                updatedAt: new Date().toISOString()
+            };
+            revalidatePath('/admin/designs');
+            revalidatePath(`/admin/designs/editar/${id}`);
+            return { success: true, message: "Diseño actualizado exitosamente (simulado)", data: updatedDesign };
+        } else {
+            return { error: 'Diseño no encontrado para actualizar (simulado)' };
+        }
+    }
     try {
         await connectDB();
         console.log('DEBUG: Database connected for EditarDesign.');
@@ -98,6 +151,16 @@ async function EditarDesign(id, data) {
 // Eliminar diseño
 async function EliminarDesign(id) {
     console.log('DEBUG: Entering EliminarDesign with ID:', id);
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Simulando eliminación de diseño ID:', id);
+        const existingDesign = getMockDesignById(id);
+        if (existingDesign) {
+            revalidatePath('/admin/designs');
+            return { success: true, message: "Diseño eliminado exitosamente (simulado)", data: existingDesign };
+        } else {
+            return { error: 'Diseño no encontrado para eliminar (simulado)' };
+        }
+    }
     try {
         await connectDB();
         console.log('DEBUG: Database connected for EliminarDesign.');

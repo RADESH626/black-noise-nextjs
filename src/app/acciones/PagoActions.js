@@ -5,10 +5,29 @@ import Pago from '@/models/Pago';
 import Usuario from '@/models/Usuario'; // Necesario para popular
 import Venta from '@/models/Venta';   // Necesario para popular
 import { revalidatePath } from 'next/cache';
+import { mockPagos, getMockPagoById } from '@/data/mock/pagos'; // Import mock data for pagos
+import { mockUsuarios } from '@/data/mock/usuarios'; // Import mock data for users to simulate populate
+import { mockVentas } from '@/data/mock/ventas';     // Import mock data for ventas to simulate populate
+
+const isMockModeEnabled = process.env.NEXT_PUBLIC_MOCK_MODE === 'true';
+
+// Helper para generar IDs únicos (simulado)
+const generateUniqueId = (prefix = 'mock') => `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 // Crear un nuevo pago
 async function guardarPago(data) {
     console.log('DEBUG: Entering guardarPago with data:', data);
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Simulando guardarPago.');
+        const newPago = {
+            ...data,
+            id: generateUniqueId('payment'), // Use 'id' as per mock data structure
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        };
+        revalidatePath('/admin/pagos');
+        return { success: true, message: "Pago creado exitosamente (simulado)", data: newPago };
+    }
     try {
         await connectDB();
         console.log('DEBUG: Database connected for guardarPago.');
@@ -25,9 +44,41 @@ async function guardarPago(data) {
     }
 }
 
+// Helper para simular populate
+const simulatePopulate = (item, field, mockDataArray, selectFields) => {
+    if (!item || !item[field]) return item;
+    const populatedItem = mockDataArray.find(mock => mock._id === item[field] || mock.id === item[field]);
+    if (populatedItem) {
+        const selected = {};
+        if (selectFields) {
+            selectFields.split(' ').forEach(f => {
+                if (populatedItem[f]) selected[f] = populatedItem[f];
+            });
+        } else {
+            // If no specific fields, return a simplified object with ID and a representative field
+            selected._id = populatedItem._id || populatedItem.id;
+            if (populatedItem.nombreUsuario) selected.nombreUsuario = populatedItem.nombreUsuario;
+            if (populatedItem.correo) selected.correo = populatedItem.correo;
+        }
+        return { ...item, [field]: selected };
+    }
+    return item;
+};
+
 // Obtener todos los pagos
 async function obtenerPagos() {
     console.log('DEBUG: Entering obtenerPagos.');
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Obteniendo todos los pagos mock.');
+        let pagosSimulados = mockPagos.map(pago => ({ ...pago })); // Deep copy to avoid modifying original mock data
+
+        // Simulate populate for usuarioId
+        pagosSimulados = pagosSimulados.map(pago => simulatePopulate(pago, 'usuarioId', mockUsuarios, 'nombreUsuario correo'));
+        // Simulate populate for ventaId
+        pagosSimulados = pagosSimulados.map(pago => simulatePopulate(pago, 'ventaId', mockVentas, '_id'));
+
+        return { pagos: pagosSimulados };
+    }
     try {
         await connectDB();
         console.log('DEBUG: Database connected for obtenerPagos.');
@@ -46,6 +97,16 @@ async function obtenerPagos() {
 // Obtener pago por ID
 async function ObtenerPagoPorId(id) {
     console.log('DEBUG: Entering ObtenerPagoPorId with ID:', id);
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Obteniendo pago mock por ID:', id);
+        let pago = getMockPagoById(id);
+        if (pago) {
+            pago = simulatePopulate(pago, 'usuarioId', mockUsuarios, 'nombreUsuario correo');
+            pago = simulatePopulate(pago, 'ventaId', mockVentas, '_id');
+            return pago;
+        }
+        return { error: 'Pago no encontrado (simulado)' };
+    }
     try {
         await connectDB();
         console.log('DEBUG: Database connected for ObtenerPagoPorId.');
@@ -69,6 +130,22 @@ async function ObtenerPagoPorId(id) {
 // Editar pago (principalmente para cambiar estado)
 async function EditarPago(id, data) {
     console.log('DEBUG: Entering EditarPago with ID:', id, 'and data:', data);
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Simulando edición de pago ID:', id);
+        const existingPago = getMockPagoById(id);
+        if (existingPago) {
+            const updatedPago = {
+                ...existingPago,
+                ...data,
+                updatedAt: new Date().toISOString()
+            };
+            revalidatePath('/admin/pagos');
+            revalidatePath(`/admin/pagos/editar/${id}`);
+            return { success: true, message: "Pago actualizado exitosamente (simulado)", data: updatedPago };
+        } else {
+            return { error: 'Pago no encontrado para actualizar (simulado)' };
+        }
+    }
     try {
         await connectDB();
         console.log('DEBUG: Database connected for EditarPago.');
