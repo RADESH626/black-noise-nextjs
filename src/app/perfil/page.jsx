@@ -1,7 +1,9 @@
-import ProfileData from "./ProfileData";
+"use client";
+
+import ProfileContent from "./ProfileContent"; // Import ProfileContent
 
 function ProfilePage() {
-  return <ProfileData />;
+  return <ProfileContent />; // Render ProfileContent directly
 }
 
 export default ProfilePage;

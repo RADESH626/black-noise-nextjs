@@ -1,12 +1,44 @@
 "use client";
 
 import { useModal } from "@/context/ModalContext";
-import { signOut } from "next-auth/react"; // Import signOut
+import { signOut, useSession } from "next-auth/react"; // Import signOut and useSession
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
 import FormEditarUsuario from "@/app/admin/usuarios/components/FormEditarUsuario";
+import { useCart } from "@/context/CartContext"; // Import useCart
+import { useEffect, useState } from "react"; // Import useEffect and useState
+import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions"; // Import the server action
 
-function ProfileContent({ user, designs: userDesigns, error }) {
+function ProfileContent() { // Removed user, designs, and error props
   const { openModal } = useModal();
+  const { cartItems, addItem } = useCart(); // Get cartItems and addItem from context
+  const { data: session, status } = useSession(); // Get session using useSession
+
+  const [userDesigns, setUserDesigns] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchDesigns = async () => {
+      if (status === 'authenticated' && session?.user?.id) {
+        setLoading(true);
+        setError(null);
+        const { designs, error } = await obtenerDesignsPorUsuarioId(session.user.id);
+        if (error) {
+          setError(error);
+        } else {
+          setUserDesigns(designs || []);
+        }
+        setLoading(false);
+      } else if (status === 'unauthenticated') {
+        // Handle unauthenticated state if necessary, maybe redirect to login
+        setLoading(false);
+      }
+    };
+
+    fetchDesigns();
+  }, [session, status]); // Rerun effect when session or status changes
+
+  const user = session?.user; // Get user from session
 
   const handleEditProfile = () => {
     openModal(
@@ -30,7 +62,8 @@ function ProfileContent({ user, designs: userDesigns, error }) {
 
   return (
     <div className="mx-auto p-4 md:p-8  bg-black text-white w-screen h-screen">
-      <header className="bg-black p-6 md:p-8 rounded-lg shadow-lg mb-8">
+      {/* User Info Section - Re-added here */}
+      <div className="bg-black p-6 md:p-8 rounded-lg shadow-lg mb-8">
         <div className="flex flex-col md:flex-row items-center">
           {/* imagen */}
           <div className="w-32 h-32 md:w-60 md:h-60 bg-gray-700 rounded-lg mb-4 md:mb-0 md:mr-8 ">
@@ -39,13 +72,13 @@ function ProfileContent({ user, designs: userDesigns, error }) {
 
           {/* seccion info */}
           <div className="flex-grow text-center md:text-left">
-            <h1 className="text-3xl md:text-4xl font-bold mb-1">{user?.name.toUpperCase()}</h1>
+            <h1 className="text-3xl md:text-4xl font-bold mb-1">{user?.primerNombre} {user?.primerApellido}</h1> {/* Use fetched name */}
 
             {/* info */}
             <div className="text-gray-400 mb-3">
-              <p>CORREO: {user?.email}</p>
-              <p>NÚMERO DE LIKES: {user?.likes}</p>
-              <p>BIOGRAFÍA: {user?.bio ? user.bio : "..."}</p>
+              <p>CORREO: {user?.correo}</p> {/* Use fetched email */}
+              <p>NÚMERO DE LIKES: {user?.likes || 0}</p> {/* Use fetched likes */}
+              <p>BIOGRAFÍA: {user?.bio ? user.bio : "..."}</p> {/* Use fetched bio */}
             </div>
 
             {/* botones */}
@@ -65,7 +98,7 @@ function ProfileContent({ user, designs: userDesigns, error }) {
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* nav */}
       <nav className="mb-8">
@@ -80,7 +113,9 @@ function ProfileContent({ user, designs: userDesigns, error }) {
       </nav>
 
       <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {error ? (
+        {loading ? (
+          <div className="col-span-full text-center text-gray-400">Cargando diseños...</div>
+        ) : error ? (
           <div className="col-span-full text-red-500 text-center">
             Error al cargar los diseños: {error}
           </div>
@@ -92,13 +127,13 @@ function ProfileContent({ user, designs: userDesigns, error }) {
           userDesigns.map((design) => (
             <div key={design._id} className="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
               <div className="w-full h-56 bg-gray-700 relative">
-                <img 
-                  src={design.imagenDesing} 
+                <img
+                  src={design.imagenDesing}
                   alt={design.nombreDesing}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute top-0 right-0 m-3">
-                  <button 
+                  <button
                     onClick={() => handleEditDesign(design)}
                     className="bg-white text-purple-700 font-semibold py-1 px-4 rounded-md text-sm hover:bg-gray-200 transition duration-150"
                   >
@@ -106,11 +141,25 @@ function ProfileContent({ user, designs: userDesigns, error }) {
                   </button>
                 </div>
               </div>
-              <div className="p-4 gradient-text-bg">
-                <p className="font-semibold">nombre: {design.nombreDesing}</p>
-                <p className="font-semibold">precio: ${design.valorDesing}</p>
-                <p className="font-semibold">categoría: {design.categoria}</p>
-                <p className="font-semibold text-purple-400">likes: {design.likes}</p>
+              <div className="p-4 gradient-text-bg flex justify-between items-center"> {/* Added flex and justify-between */}
+                <div> {/* Added div for text content */}
+                  <p className="font-semibold">nombre: {design.nombreDesing}</p>
+                  <p className="font-semibold">precio: ${design.valorDesing}</p>
+                  <p className="font-semibold">categoría: {design.categoria}</p>
+                  <p className="font-semibold text-purple-400">likes: {design.likes}</p>
+                </div>
+                {/* Checkbox for adding to cart */}
+                <input
+                  type="checkbox"
+                  checked={cartItems.some(item => item.id === design._id)} // Check if item is in cart
+                  onChange={() => addItem({ // Add item to cart on change
+                    id: design._id,
+                    nombre: design.nombreDesing,
+                    price: design.valorDesing,
+                    imagen: design.imagenDesing,
+                  })}
+                  className="form-checkbox h-5 w-5 text-purple-600" // Basic styling
+                />
               </div>
             </div>
           ))

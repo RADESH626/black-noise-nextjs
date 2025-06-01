@@ -3,6 +3,7 @@ import "./globals.css";
 import { PopUpProvider } from '../context/PopUpContext';
 import { ModalProvider } from '../context/ModalContext';
 import { UserProvider } from '../context/UserContext';
+import { CartProvider } from '../context/CartContext'; // Import CartProvider
 import SessionProviderWrapper from "./SessionProviderWrapper"; // Import the SessionProviderWrapper
 
 const geistSans = Geist({
@@ -28,7 +29,9 @@ export default function RootLayout({ children }) {
           <PopUpProvider>
             <ModalProvider>
               <UserProvider>
-                {children}
+                <CartProvider> {/* Wrap with CartProvider */}
+                  {children}
+                </CartProvider>
               </UserProvider>
             </ModalProvider>
           </PopUpProvider>
