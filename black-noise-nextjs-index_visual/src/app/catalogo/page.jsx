@@ -13,7 +13,7 @@ const todosDiseños = [
     categoria: 'Camisa',
     likes: 0,
     imagen: '/img/Camisas/Camisa 1.jpg',
-    price: 20000,
+    price: 20.000,
   },
   {
     id: 'catalogo-diseno-2',
@@ -22,7 +22,7 @@ const todosDiseños = [
     categoria: 'Camisa',
     likes: 10,
     imagen: '/img/Camisas/Camisa 2.jpg',
-    price: 25000,
+    price: 25.000,
   },
   {
     id: 'catalogo-diseno-3',
@@ -31,7 +31,7 @@ const todosDiseños = [
     categoria: 'Camisa',
     likes: 50,
     imagen: '/img/Camisas/Camisa.jpg',
-    price: 30000,
+    price: 30.000,
   },
   {
     id: 'catalogo-diseno-4',
@@ -40,7 +40,7 @@ const todosDiseños = [
     categoria: 'Camisa',
     likes: 90,
     imagen: '/img/Camisetas/Camiseta 2.jpg',
-    price: 18000,
+    price: 18.000,
   },
   {
     id: 'catalogo-diseno-5',
@@ -49,7 +49,7 @@ const todosDiseños = [
     categoria: 'Chaqueta',
     likes: 15000,
     imagen: '/img/Chaquetas/Chaqueta 1.jpg',
-    price: 50000,
+    price: 50.000,
   },
   {
     id: 'catalogo-diseno-6',
@@ -58,7 +58,7 @@ const todosDiseños = [
     categoria: 'Falda',
     likes: 120,
     imagen: '/img/Faldas/Falda 1.jpg',
-    price: 35000,
+    price: 35.000,
   },
   {
     id: 'catalogo-diseno-7',
@@ -67,7 +67,7 @@ const todosDiseños = [
     categoria: 'Gorra',
     likes: 500,
     imagen: '/img/Gorras/Gorra 1.jpg',
-    price: 22000,
+    price: 22.000,
   },
   {
     id: 'catalogo-diseno-8',
@@ -76,7 +76,7 @@ const todosDiseños = [
     categoria: 'Pantalon',
     likes: 1000,
     imagen: '/img/Pantalones/Pantalon 2.jpg',
-    price: 40000,
+    price: 40.000,
   },
    {
     id: 'catalogo-diseno-9',
@@ -85,7 +85,7 @@ const todosDiseños = [
     categoria: 'Vestido',
     likes: 275,
     imagen: '/img/Sweaters/Sweater.jpg',
-    price: 48000,
+    price: 48.000,
   },
 ];
 
