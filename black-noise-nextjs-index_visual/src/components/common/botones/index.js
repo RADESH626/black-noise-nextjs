@@ -13,3 +13,4 @@ export { BotonEliminar } from './BotonEliminar';
 export { BotonEnviarCorreo } from './BotonEnviarCorreo';
 export { BotonExportarPDF } from './BotonExportarPDF';
 export { BotonGeneral } from './BotonGeneral';
+export { BotonDescargar } from './BotonDescargar';

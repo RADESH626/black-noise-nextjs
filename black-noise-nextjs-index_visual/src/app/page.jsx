@@ -4,6 +4,8 @@ import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
 import Footer from '@/components/layout/general/footer/Footer';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import ProveedorButton from '@/components/layout/general/ProveedorButton';
+import BotonDescargar from '@/components/common/botones/BotonDescargar';
+
 
 async function indexPage() {
   return (
@@ -55,65 +57,71 @@ async function indexPage() {
           </div>
 
           <div className='self-center'>
-            <BotonGeneral>!Descargalo ahora!</BotonGeneral>
+            <BotonDescargar>!Descargalo ahora!</BotonDescargar>
           </div>
         </motion.section>
 
-        {/* Sección 2 */}
+       {/* Sección 2 */}
         <motion.section
-          className='flex flex-col justify-between items-center gap-4 p-15 text-white h-full w-full'
+          className='flex flex-col justify-between items-center gap-4 p-10 text-white w-full'
           style={{ background: 'linear-gradient(to bottom, #000000, #1f2937)' }}
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
           viewport={{ once: false, amount: 0.3 }}
         >
-          <div className='flex flex-row justify-between items-center gap-4 w-full'>
-            <div className='flex flex-col justify-center items-center gap-4 p-5'>
-              <h1 className='font-bold text-5xl text-center w-full'>DISEÑA </h1>
-              <h1 className='font-bold text-5xl text-center w-full'>PRENDAS REALES</h1>
-              <p className='text-center text-4xl '>Selecciona tu talla, el color, corta y crea detalles</p>
+          <div className='flex flex-col md:flex-row justify-between items-center gap-4 w-full max-w-7xl'>
+            <div className='flex flex-col justify-center items-center gap-4 p-5 text-center md:text-left'>
+              <h1 className='font-bold text-5xl w-full'>DISEÑA</h1>
+              <h1 className='font-bold text-5xl w-full'>PRENDAS REALES</h1>
+              <p className='text-4xl'>Selecciona tu talla, el color, corta y crea detalles</p>
               <BotonGeneral>EMPIEZA AHORA</BotonGeneral>
             </div>
 
             <motion.div
-              className='flex flex-col justify-center items-center gap-4 p-5'
+              className='flex justify-center items-center p-5 w-full md:w-1/2'
               initial={{ scale: 0.9, opacity: 0 }}
               whileInView={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.3 }}
               viewport={{ once: false }}
             >
-              <img src='/img/modelos/modelo 4.jpg' alt="imagen de ropa" className='w-1/2 h-1/2 rounded-[80px] h-full w-full' />
+              <img
+                src='/img/modelos/modelo 4.jpg'
+                alt="imagen de ropa"
+                className='rounded-[80px] w-full h-auto object-cover'
+              />
             </motion.div>
           </div>
         </motion.section>
 
         {/* Sección 3 */}
         <motion.section
-          className='flex flex-col justify-between items-center gap-4 p-15 text-white h-full w-full'
+          className='flex flex-col justify-between items-center gap-4 p-10 text-white w-full'
           style={{ background: 'linear-gradient(to bottom, #1f2937, #000000)' }}
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
           viewport={{ once: false }}
         >
-          <div className='flex flex-row justify-between items-center gap-4 w-full'>
-            <div className='flex flex-col justify-center items-center gap-4 p-5'>
-              <motion.img
+          <div className='flex flex-col md:flex-row justify-between items-center gap-4 w-full max-w-7xl'>
+            <motion.div
+              className='flex justify-center items-center p-5 w-full md:w-1/2'
+              initial={{ scale: 0.8, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              viewport={{ once: false }}
+            >
+              <img
                 src='/img/modelos/modelo 3.jpg'
                 alt="imagen de ropa"
-                className='w-1/2 h-1/2 rounded-[80px] h-full w-full'
-                initial={{ scale: 0.8, opacity: 0 }}
-                whileInView={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.3 }}
-                viewport={{ once: false }}
+                className='rounded-[80px] w-full h-auto object-cover'
               />
-            </div>
+            </motion.div>
 
-            <div className='flex flex-col justify-center items-center gap-4 p-5'>
-              <h1 className='font-bold text-5xl text-center w-full'>AÑADE ELEMENTOS </h1>
-              <h1 className='font-bold text-5xl text-center w-full'>A TUS PRENDAS</h1>
-              <p className='text-center text-4xl '>Añade parches, taches, estampados y mucho más</p>
+            <div className='flex flex-col justify-center items-center gap-4 p-5 text-center md:text-left'>
+              <h1 className='font-bold text-5xl w-full'>AÑADE ELEMENTOS</h1>
+              <h1 className='font-bold text-5xl w-full'>A TUS PRENDAS</h1>
+              <p className='text-4xl'>Añade parches, taches, estampados y mucho más</p>
               <BotonGeneral>EMPIEZA AHORA</BotonGeneral>
             </div>
           </div>
@@ -121,29 +129,33 @@ async function indexPage() {
 
         {/* Sección 4 */}
         <motion.section
-          className='flex flex-col justify-between items-center gap-4 p-15 text-white h-full w-full'
+          className='flex flex-col justify-between items-center gap-4 p-10 text-white w-full'
           style={{ background: 'linear-gradient(to bottom,  #000000, #1f2937, #000000)' }}
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
           viewport={{ once: false }}
         >
-          <div className='flex flex-row justify-between items-center gap-4 w-full'>
-            <div className='flex flex-col justify-center items-center gap-4 p-5'>
-              <h1 className='font-bold text-5xl text-center w-full'>DISEÑA</h1>
-              <h1 className='font-bold text-5xl text-center w-full'>PRENDAS REALES</h1>
-              <p className='text-center text-4xl '>Selecciona tu talla, el color, corta y crea detalles</p>
+          <div className='flex flex-col md:flex-row justify-between items-center gap-4 w-full max-w-7xl'>
+            <div className='flex flex-col justify-center items-center gap-4 p-5 text-center md:text-left'>
+              <h1 className='font-bold text-5xl w-full'>DISEÑA</h1>
+              <h1 className='font-bold text-5xl w-full'>PRENDAS REALES</h1>
+              <p className='text-4xl'>Selecciona tu talla, el color, corta y crea detalles</p>
               <BotonGeneral>EMPIEZA AHORA</BotonGeneral>
             </div>
 
             <motion.div
-              className='flex flex-col justify-center items-center gap-4 p-5'
+              className='flex justify-center items-center p-5 w-full md:w-1/2'
               initial={{ scale: 0.8, opacity: 0 }}
               whileInView={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.3 }}
               viewport={{ once: false }}
             >
-              <img src='/img/modelos/modelo 5.jpg' alt="imagen de ropa" className='rounded-[80px] h-full w-full' />
+              <img
+                src='/img/modelos/modelo 5.jpg'
+                alt="imagen de ropa"
+                className='rounded-[80px] w-full h-auto object-cover'
+              />
             </motion.div>
           </div>
         </motion.section>
