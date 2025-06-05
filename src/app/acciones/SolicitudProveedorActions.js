@@ -2,10 +2,27 @@
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // Adjust path if necessary
+<<<<<<< HEAD
 
 
 export async function obtenerSolicitudesProveedor() {
     console.log('DEBUG: Entering obtenerSolicitudesProveedor.');
+=======
+import { mockSolicitudesProveedor, getMockSolicitudProveedorById } from '@/data/mock/solicitudesProveedor'; // Import mock data for solicitudesProveedor
+import { revalidatePath } from 'next/cache';
+
+const isMockModeEnabled = process.env.NEXT_PUBLIC_MOCK_MODE === 'true';
+
+// Helper para generar IDs únicos (simulado)
+const generateUniqueId = (prefix = 'mock') => `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+export async function obtenerSolicitudesProveedor() {
+    console.log('DEBUG: Entering obtenerSolicitudesProveedor.');
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Obteniendo todas las solicitudes de proveedor mock.');
+        return { solicitudes: mockSolicitudesProveedor };
+    }
+>>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
     try {
         const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/solicitudes-proveedor`;
         console.log('DEBUG: Making GET request to:', apiUrl);
@@ -38,12 +55,29 @@ export async function obtenerSolicitudesProveedor() {
 export async function submitSupplierApplicationAction(prevState, formData) {
   console.log('Server Action Supplier Application: Iniciado.');
 
+<<<<<<< HEAD
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
     console.log('Server Action Supplier Application: Usuario no autenticado.');
     return { message: 'Usuario no autenticado. Por favor, inicia sesión.', success: false };
   }
+=======
+  let userId = 'mock-user-id'; // Default mock user ID
+
+  // Temporarily disable session validation for development
+  // if (!isMockModeEnabled) { // Original condition
+  //   const session = await getServerSession(authOptions);
+  //   if (!session?.user?.id) {
+  //     console.log('Server Action Supplier Application: Usuario no autenticado.');
+  //     return { message: 'Usuario no autenticado. Por favor, inicia sesión.', success: false };
+  //   }
+  //   userId = session.user.id;
+  // } else {
+  //   console.log('🎭 Mock Mode: Saltando validación de sesión para solicitud de proveedor. Usando ID mock.');
+  // }
+  console.log('Temporarily bypassing session validation for submitSupplierApplicationAction. Using mock user ID.');
+>>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
 
   const data = {
     nombreEmpresa: formData.get('nombreEmpresa'),
@@ -53,11 +87,32 @@ export async function submitSupplierApplicationAction(prevState, formData) {
     metodosPagoAceptados: formData.getAll('metodosPagoAceptados'), // Use getAll for multiple checkboxes
     comisionPropuesta: parseFloat(formData.get('comisionPropuesta')),
     mensajeAdicional: formData.get('mensajeAdicional'),
+<<<<<<< HEAD
     usuarioId: session.user.id,
+=======
+    usuarioId: userId, // Use the determined userId
+>>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
   };
 
   console.log('Server Action Supplier Application: Datos recibidos:', data);
 
+<<<<<<< HEAD
+=======
+  if (isMockModeEnabled) {
+    console.log('🎭 Mock Mode: Simulando submitSupplierApplicationAction.');
+    const newSolicitud = {
+        ...data,
+        id: generateUniqueId('req'),
+        estado: 'PENDIENTE', // Default state for new applications
+        adminNotas: '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+    };
+    revalidatePath('/solicitud-proveedor'); // Revalidate path for UI consistency
+    return { message: '¡Solicitud enviada con éxito (simulado)!', success: true, solicitud: newSolicitud };
+  }
+
+>>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
   try {
     // Call the API route to create the supplier application
     const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/solicitud-proveedor`; // Use the user-facing API route
@@ -93,6 +148,22 @@ export async function submitSupplierApplicationAction(prevState, formData) {
 
 export async function CrearSolicitudProveedor(data) {
     console.log('DEBUG: Entering CrearSolicitudProveedor with data:', data);
+<<<<<<< HEAD
+=======
+    if (isMockModeEnabled) {
+        console.log('🎭 Mock Mode: Simulando CrearSolicitudProveedor (admin).');
+        const newSolicitud = {
+            ...data,
+            id: generateUniqueId('req-admin'),
+            estado: data.estado || 'PENDIENTE',
+            adminNotas: data.adminNotas || '',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        };
+        revalidatePath('/admin/solicitudes-proveedor');
+        return { success: true, message: "Solicitud de proveedor creada exitosamente (simulado).", solicitud: newSolicitud };
+    }
+>>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
     try {
         const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/administrador/solicitudes-proveedor`;
         console.log('DEBUG: Making POST request to:', apiUrl, 'with body:', data);
@@ -136,6 +207,26 @@ export async function CrearSolicitudProveedor(data) {
 }
 export async function procesarSolicitudProveedor(solicitudId, action, adminNotas) {
     console.log('DEBUG: Entering procesarSolicitudProveedor with ID:', solicitudId, 'action:', action, 'adminNotas:', adminNotas);
+<<<<<<< HEAD
+=======
+    if (isMockModeEnabled) {
+        console.log(`🎭 Mock Mode: Simulando procesarSolicitudProveedor para ID: ${solicitudId}, acción: ${action}.`);
+        const existingSolicitud = getMockSolicitudProveedorById(solicitudId);
+        if (existingSolicitud) {
+            const newEstado = action === 'aprobar' ? 'APROBADO' : 'RECHAZADO';
+            const updatedSolicitud = {
+                ...existingSolicitud,
+                estado: newEstado,
+                adminNotas: adminNotas,
+                updatedAt: new Date().toISOString()
+            };
+            revalidatePath('/admin/solicitudes-proveedor');
+            return { success: true, message: `Solicitud ${newEstado.toLowerCase()} exitosamente (simulado).`, solicitud: updatedSolicitud };
+        } else {
+            return { error: 'Solicitud de proveedor no encontrada (simulado).' };
+        }
+    }
+>>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
     try {
         const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/solicitudes-proveedor/${solicitudId}`;
         console.log('DEBUG: Making PUT request to:', apiUrl, 'with body:', { action, adminNotas });

@@ -1,6 +1,7 @@
 "use client";
 
 import { useModal } from "@/context/ModalContext";
+<<<<<<< HEAD
 import { signOut, useSession } from "next-auth/react"; // Import signOut and useSession
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
 import FormEditarUsuario from "@/app/admin/usuarios/components/FormEditarUsuario";
@@ -13,16 +14,50 @@ function ProfileContent() { // Removed user, designs, and error props
   const { cartItems, addItem } = useCart(); // Get cartItems and addItem from context
   const { data: session, status } = useSession(); // Get session using useSession
 
+=======
+import { signOut } from "next-auth/react"; // Import signOut
+import { useSimulatedSession } from "@/hooks/useSimulatedSession"; // Import useSimulatedSession
+import BotonGeneral from "@/components/common/botones/BotonGeneral";
+import FormEditarUsuario from "@/app/admin/usuarios/components/FormEditarUsuario";
+import { useEffect, useState } from "react"; // Import useEffect and useState
+import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions"; // Import the server action
+import { useMockData } from "@/hooks/useMockData"; // Import useMockData
+import DesignsComponent from "./DesignsComponent"; // Import DesignsComponent
+import PedidosComponent from "./PedidosComponent"; // Import PedidosComponent
+
+function ProfileContent() { // Removed user, designs, and error props
+  const { openModal } = useModal();
+  const { data: session, status } = useSimulatedSession(); // Get session using useSimulatedSession
+  const { mockDataEnabled } = useMockData(); // Get mockDataEnabled from useMockData
+
+  const [activeTab, setActiveTab] = useState('designs'); // State to manage active tab
+  const [currentUser, setCurrentUser] = useState(null); // State for user data
+>>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
   const [userDesigns, setUserDesigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+<<<<<<< HEAD
+=======
+    console.log("Mock Data Enabled in ProfileContent:", mockDataEnabled);
+  }, [mockDataEnabled]);
+
+  useEffect(() => {
+    // Update currentUser when session changes
+    setCurrentUser(session?.user || null);
+
+>>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
     const fetchDesigns = async () => {
       if (status === 'authenticated' && session?.user?.id) {
         setLoading(true);
         setError(null);
+<<<<<<< HEAD
         const { designs, error } = await obtenerDesignsPorUsuarioId(session.user.id);
+=======
+        // Pass mockDataEnabled to the server action
+        const { designs, error } = await obtenerDesignsPorUsuarioId(session.user.id, mockDataEnabled);
+>>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
         if (error) {
           setError(error);
         } else {
@@ -32,13 +67,23 @@ function ProfileContent() { // Removed user, designs, and error props
       } else if (status === 'unauthenticated') {
         // Handle unauthenticated state if necessary, maybe redirect to login
         setLoading(false);
+<<<<<<< HEAD
+=======
+        setUserDesigns([]); // Clear designs if unauthenticated
+>>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
       }
     };
 
     fetchDesigns();
+<<<<<<< HEAD
   }, [session, status]); // Rerun effect when session or status changes
 
   const user = session?.user; // Get user from session
+=======
+  }, [session, status, mockDataEnabled]); // Rerun effect when session, status, or mockDataEnabled changes
+
+  const user = currentUser; // Use the state variable for user
+>>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
 
   const handleEditProfile = () => {
     openModal(
@@ -91,10 +136,14 @@ function ProfileContent() { // Removed user, designs, and error props
                 CERRAR SESIÓN
               </BotonGeneral>
 
+<<<<<<< HEAD
               <BotonGeneral onClick={() => { /* Add logic for editing/adding designs */ }}>
                 EDITAR DISEÑO
               </BotonGeneral>
 
+=======
+              
+>>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
             </div>
           </div>
         </div>
@@ -103,15 +152,29 @@ function ProfileContent() { // Removed user, designs, and error props
       {/* nav */}
       <nav className="mb-8">
         <div className="flex border-b border-gray-700">
+<<<<<<< HEAD
           <button className="py-3 px-6 text-lg font-medium text-purple-400 border-b-2 border-purple-400 focus:outline-none">
             DISEÑOS
           </button>
           <button className="py-3 px-6 text-lg font-medium text-gray-500 hover:text-gray-300 focus:outline-none">
+=======
+          <button
+            className={`py-3 px-6 text-lg font-medium ${activeTab === 'designs' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`}
+            onClick={() => setActiveTab('designs')}
+          >
+            DISEÑOS
+          </button>
+          <button
+            className={`py-3 px-6 text-lg font-medium ${activeTab === 'orders' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`}
+            onClick={() => setActiveTab('orders')}
+          >
+>>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
             PEDIDOS
           </button>
         </div>
       </nav>
 
+<<<<<<< HEAD
       <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading ? (
           <div className="col-span-full text-center text-gray-400">Cargando diseños...</div>
@@ -165,6 +228,20 @@ function ProfileContent() { // Removed user, designs, and error props
           ))
         )}
       </main>
+=======
+      {activeTab === 'designs' && (
+        <DesignsComponent
+          loading={loading}
+          error={error}
+          userDesigns={userDesigns}
+          handleEditDesign={handleEditDesign}
+        />
+      )}
+
+      {activeTab === 'orders' && (
+        <PedidosComponent userId={user?.id} />
+      )}
+>>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
     </div>
   );
 }

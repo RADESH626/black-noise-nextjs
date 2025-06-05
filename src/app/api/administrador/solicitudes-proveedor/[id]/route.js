@@ -10,12 +10,22 @@ import { authOptions } from '../../auth/[...nextauth]/route'; // Asegúrate de q
 
 export async function PUT(request, { params }) {
     await dbConnect();
+<<<<<<< HEAD
     const session = await getServerSession(authOptions);
 
     // Solo administradores pueden aprobar/rechazar solicitudes
     if (!session || session.user.rol !== Rol.ADMINISTRADOR) {
         return NextResponse.json({ message: 'Acceso denegado. Se requiere rol de administrador.' }, { status: 403 });
     }
+=======
+    // Temporarily disable session and role validation for development
+    // const session = await getServerSession(authOptions);
+
+    // // Solo administradores pueden aprobar/rechazar solicitudes
+    // if (!session || session.user.rol !== Rol.ADMINISTRADOR) {
+    //     return NextResponse.json({ message: 'Acceso denegado. Se requiere rol de administrador.' }, { status: 403 });
+    // }
+>>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
 
     const { id } = params;
     const { action, adminNotas } = await request.json(); // 'action' puede ser 'aprobar' o 'rechazar'

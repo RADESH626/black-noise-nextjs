@@ -1,5 +1,6 @@
 "use client";
 
+<<<<<<< HEAD
 import { useState, useEffect } from 'react';
 import {
   getAllMockData,
@@ -204,3 +205,11 @@ export const useMockData = () => {
 };
 
 export default useMockData;
+=======
+import { useMockDataContext } from '@/context/MockDataContext';
+
+export function useMockData() {
+    const { mockDataEnabled, toggleMockData } = useMockDataContext();
+    return { mockDataEnabled, toggleMockData };
+}
+>>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d

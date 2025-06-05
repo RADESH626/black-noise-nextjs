@@ -269,7 +269,11 @@ function FormRegistro() {
 
       </div>
 
+<<<<<<< HEAD
       <div className="text-center mt-5 text-white">
+=======
+      <div className="text-center mt-5 text-[#000000]">
+>>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
         <p className="mb-4">¿Ya tienes una cuenta?</p>
         <a href="/login" id="showLogin">
           <BotonGeneral>

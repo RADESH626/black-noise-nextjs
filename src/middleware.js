@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
@@ -42,10 +43,32 @@ export default withAuth(
     }
 
     console.log('Access granted for path:', path, 'with rol:', token.rol);
+=======
+import { NextResponse } from "next/server";
+import { withAuth } from "next-auth/middleware";
+
+const productionMiddleware = withAuth(
+  async function middleware(req) {
+    const token = req.nextauth.token;
+    const pathname = req.nextUrl.pathname;
+
+    // Example: Redirect admin users from non-admin pages to /admin
+    if (token?.role === "ADMINISTRADOR" && !pathname.startsWith("/admin")) {
+      return NextResponse.redirect(new URL("/admin", req.url));
+    }
+
+    // Example: Redirect provider users from non-provider pages to /proveedor
+    if (token?.role === "PROVEVEEDOR" && !pathname.startsWith("/proveedor")) {
+      return NextResponse.redirect(new URL("/proveedor", req.url));
+    }
+
+    // Allow access if no specific redirection is needed
+>>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
     return NextResponse.next();
   },
   {
     callbacks: {
+<<<<<<< HEAD
       authorized: ({ req, token }) => {
         console.log('Authorized callback - token exists:', !!token);
         return !!token;
@@ -63,4 +86,29 @@ export const config = {
     "/api/cliente/:path*",
     "/api/proveedor/:path*"
   ]
+=======
+      authorized: ({ token }) => {
+        // Allow access to all authenticated users by default
+        return !!token;
+      },
+    },
+    pages: {
+      signIn: "/login", // Redirect unauthenticated users to the login page
+    },
+  }
+);
+
+const developmentMiddleware = async function middleware(req) {
+  // Unconditionally allow access to all routes for development purposes
+  return NextResponse.next();
+};
+
+export default developmentMiddleware;
+
+export const config = {
+  matcher: [
+    // Match all routes for middleware to apply
+    "/(.*)",
+  ],
+>>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
 };
