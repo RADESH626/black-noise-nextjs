@@ -13,9 +13,9 @@ const Pedidos = () => {
       const parsed = JSON.parse(datos);
       setPedidoCompleto(parsed);
 
-      // Suma price * quantity
+      // Suma precio * cantidad
       const totalPedido = parsed.productos.reduce(
-        (acc, p) => acc + (p.price * (p.quantity || 1)), 0
+        (acc, p) => acc + (p.precio * (p.cantidad || 1)), 0
       );
       setTotal(totalPedido + 50); // + envío
     }
@@ -24,7 +24,7 @@ const Pedidos = () => {
   if (!pedidoCompleto) {
     return (
       <PageLayout>
-        <div className="min-h-screen flex justify-center items-center text-white">
+        <div style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", color: "#ffffff", backgroundColor: "#000000" }}>
           No hay pedidos aún.
         </div>
       </PageLayout>
@@ -35,45 +35,71 @@ const Pedidos = () => {
 
   return (
     <PageLayout>
-      <div className="min-h-screen bg-black text-white font-poppins p-4">
-        <h2 className="text-center text-2xl font-bold mt-4">Tus Pedidos</h2>
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "linear-gradient(to right, #000000, #0A1828, #000000)",
+          color: "#ffffff",
+          fontFamily: "Poppins, sans-serif",
+          padding: "1rem",
+        }}
+      >
+        <h2 style={{ textAlign: "center", fontSize: "1.5rem", fontWeight: "bold", marginTop: "1rem" }}>Tus Pedidos</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+            gap: "1rem",
+            marginTop: "2rem",
+          }}
+        >
           {productos.map((pedido, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white text-black p-4 rounded-xl"
+              style={{
+                backgroundColor: "#ffffff",
+                color: "#000000",
+                padding: "1rem",
+                borderRadius: "1rem",
+              }}
             >
               {pedido.img && (
                 <img
                   src={pedido.img}
                   alt={pedido.nombre}
-                  className="w-full h-40 object-cover rounded-md mb-2"
+                  style={{
+                    width: "100%",
+                    height: "160px",
+                    objectFit: "cover",
+                    borderRadius: "0.5rem",
+                    marginBottom: "0.5rem",
+                  }}
                 />
               )}
 
-              <h4 className="font-semibold text-lg">{pedido.nombre}</h4>
-              <p className="text-sm">Precio: ${pedido.price.toFixed(2)}</p>
-              <p className="text-sm">Cantidad: {pedido.quantity}</p>
-              <p className="text-sm">Categoría: camisa</p>
-              <p className="text-sm">❤️ 2mil</p>
+              <h4 style={{ fontWeight: "600", fontSize: "1.125rem" }}>{pedido.nombre}</h4>
+              <p style={{ fontSize: "0.875rem" }}>Precio: ${pedido.precio.toFixed(2)}</p>
+              <p style={{ fontSize: "0.875rem" }}>Cantidad: {pedido.cantidad}</p>
+              <p style={{ fontSize: "0.875rem" }}>Categoría: camisa</p>
+              <p style={{ fontSize: "0.875rem" }}>❤️ 2mil</p>
             </motion.div>
           ))}
         </div>
 
-        <hr className="border-white my-6" />
-        <div className="text-sm bg-[#1f2937] p-4 rounded-md">
-          <p className="font-semibold mb-2">DETALLES DEL PEDIDO:</p>
-          <p><span className="font-bold">Prenda(s):</span> {productos.length}</p>
-          <p><span className="font-bold">Correo:</span> {cliente.correo}</p>
-          <p><span className="font-bold">Dirección:</span> {cliente.direccion}</p>
-          <p><span className="font-bold">Fecha del pedido:</span> {fecha}</p>
-          <p><span className="font-bold">Proveedor a cargo:</span> {proveedor}</p>
-          <p><span className="font-bold">Método de pago:</span> {metodoPago}</p>
-          <p><span className="font-bold">Total con envío:</span> ${total.toFixed(2)}</p>
+        <hr style={{ borderColor: "#ffffff", margin: "1.5rem 0" }} />
+        <div style={{ fontSize: "0.875rem", backgroundColor: "#131212FF", padding: "1rem", borderRadius: "0.5rem" }}>
+          <p style={{ fontWeight: "600", marginBottom: "0.5rem" }}>DETALLES DEL PEDIDO:</p>
+          <p><span style={{ fontWeight: "700" }}>Prenda(s):</span> {productos.length}</p>
+          <p><span style={{ fontWeight: "700" }}>Correo:</span> {cliente.correo}</p>
+          <p><span style={{ fontWeight: "700" }}>Dirección:</span> {cliente.direccion}</p>
+          <p><span style={{ fontWeight: "700" }}>Fecha del pedido:</span> {fecha}</p>
+          <p><span style={{ fontWeight: "700" }}>Proveedor a cargo:</span> {proveedor}</p>
+          <p><span style={{ fontWeight: "700" }}>Método de pago:</span> {metodoPago}</p>
+          <p><span style={{ fontWeight: "700" }}>Total con envío:</span> ${total.toFixed(2)}</p>
         </div>
       </div>
     </PageLayout>

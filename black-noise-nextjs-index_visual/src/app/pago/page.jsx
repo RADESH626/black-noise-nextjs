@@ -46,11 +46,12 @@ export default function Pago() {
 
   return (
     <div
-      style={{ backgroundColor: "#FDF9F9FF", color: "#000000FF" }}
-      className="min-h-screen p-8"
-    >
-      <section
-        style={{ backgroundColor: "#FFFFFFFF", padding: "1.5rem", borderRadius: "0.5rem", boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
+     style={{ background: "linear-gradient(to right, #000000, #0A1828, #000000)", // gradiente negro-blanco-negro
+      color: "#FFFFFFFF"}} // texto negro opaco 
+      className="min-h-screen p-8" >
+
+      <section                     // Fondo de resumen pedido
+        style={{ backgroundColor: "#131212FF", padding: "1.5rem", borderRadius: "0.5rem", boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
         className="mb-8"
       >
         <h2 style={{ fontWeight: "600", fontSize: "1.25rem", marginBottom: "1rem" }}>
@@ -73,8 +74,8 @@ export default function Pago() {
       </section>
 
       <form
-        onSubmit={handlePago}
-        style={{ backgroundColor: "#FFFFFFFF", padding: "1.5rem", borderRadius: "0.5rem", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", maxWidth: "28rem", margin: "0 auto" }}
+        onSubmit={handlePago}      // Fondo del formulario metodo de pago
+        style={{ backgroundColor: "#131212FF", padding: "1.5rem", borderRadius: "0.5rem", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", maxWidth: "28rem", margin: "0 auto" }}
       >
         <h1 style={{ fontWeight: "600", fontSize: "1.25rem", marginBottom: "1rem" }}>
           Metodo de pago
@@ -92,7 +93,7 @@ export default function Pago() {
             style={{
               width: "100%",
               borderRadius: "0.25rem",
-              border: "1px solid #2B2C2EFF",
+              border: "1px solid #FFFFFFFF", //Color del borde
               padding: "0.5rem 0.75rem",
               marginTop: "0.25rem",
             }}
@@ -108,7 +109,7 @@ export default function Pago() {
             style={{
               width: "100%",
               borderRadius: "0.25rem",
-              border: "1px solid #2B2C2EFF",
+              border: "1px solid #FFFFFFFF", //Color del borde
               padding: "0.5rem 0.75rem",
               marginTop: "0.25rem",
             }}
@@ -124,7 +125,7 @@ export default function Pago() {
             style={{
               width: "100%",
               borderRadius: "0.25rem",
-              border: "1px solid #2B2C2EFF",
+              border: "1px solid #FFFFFFFF", //Color del borde
               padding: "0.5rem 0.75rem",
               marginTop: "0.25rem",
             }}
@@ -139,9 +140,11 @@ export default function Pago() {
             style={{
               width: "100%",
               borderRadius: "0.25rem",
-              border: "1px solid #2B2C2EFF",
+              border: "1px solid #FFFFFFFF", //Color del borde
               padding: "0.5rem 0.75rem",
               marginTop: "0.25rem",
+              color: "#FFFFFFFF", // Color del texto
+              backgroundColor: "#131212FF", // Color de fondo del select
             }}
           >
             <option value="tarjeta">Aexpress</option>
@@ -151,7 +154,7 @@ export default function Pago() {
           </select>
         </label>
 
-        {error && (
+        {error && (          // Mostrar mensaje de error
           <p style={{ color: "#252424FF", marginBottom: "1rem" }}>{error}</p>
         )}
 
@@ -159,16 +162,16 @@ export default function Pago() {
           type="submit"
           style={{
             width: "100%",
-            backgroundColor: "#FFFFFFFF",
-            color: "#FFFFFF",
+            backgroundColor: "#0A1828", // Color del botón
+            color: "#FFFFFFFF", // Color del texto del botón
             fontWeight: "600",
             padding: "0.75rem",
             borderRadius: "0.375rem",
             cursor: "pointer",
             transition: "background-color 0.3s",
           }}
-          onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#154780FF")}
-          onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#154780FF")}
+          onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#201F1FFF")} // Cambia el color al pasar el mouse
+          onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#0A1828")} // Vuelve al color original al quitar el mouse
         >
           Pagar Ahora
         </button>
