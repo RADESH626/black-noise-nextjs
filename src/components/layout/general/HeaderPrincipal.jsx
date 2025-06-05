@@ -1,15 +1,33 @@
 "use client"; // Required for onClick events
 
 import Link from 'next/link';
-import { useSession, signOut } from 'next-auth/react';
+import { signOut } from 'next-auth/react';
+import { useSimulatedSession } from '@/hooks/useSimulatedSession'; // Use simulated session
+import { useState, useEffect, useRef } from 'react'; // Import useState, useEffect, useRef
 import IconoPersona from '../../common/iconos/IconoPersona';
 import BotonGeneral from '../../common/botones/BotonGeneral';
-// Removed useEffect, useState, and ObtenerUsuarioPorId imports
-// Removed fullUserData, loadingUser, userError state
-// Removed useEffect for fetching user data
 
 function HeaderPrincipal() {
-    const { data: session } = useSession();
+    const { data: session } = useSimulatedSession(); // Use simulated session
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown visibility
+    const dropdownRef = useRef(null); // Ref for dropdown element
+
+    const handleUserIconClick = () => {
+        setIsDropdownOpen(!isDropdownOpen);
+    };
+
+    const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            setIsDropdownOpen(false);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     return (
         <div>
@@ -28,29 +46,36 @@ function HeaderPrincipal() {
                         </div>
                     </Link>
 
-                    
-
-
                     {session ? (
-                        <>
-                            <div className='flex flex-row items-center justify-center gap-4'>
-                                <span className='text-white'>
-                                    ¡Bienvenido {session.user?.name}!
-                                </span>
-                                <Link href="/perfil">
-                                    <div className="w-8 h-8 rounded-full overflow-hidden">
-                                        <img
-                                            src={session.user?.image || "/img/perfil/FotoPerfil.webp"}
-                                            alt="Foto de perfil"
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
-                                </Link>
+                        <div className='relative flex flex-row items-center justify-center gap-4' ref={dropdownRef}>
+                            <span className='text-white'>
+                                ¡Bienvenido {session.user?.name}!
+                            </span>
+                            {/* User Icon to trigger dropdown */}
+                            <div
+                                className="w-8 h-8 rounded-full overflow-hidden cursor-pointer"
+                                onClick={handleUserIconClick}
+                            >
+                                <img
+                                    src={session.user?.image || "/img/perfil/FotoPerfil.webp"}
+                                    alt="Foto de perfil"
+                                    className="w-full h-full object-cover"
+                                />
                             </div>
-                            <BotonGeneral onClick={() => signOut({ callbackUrl: '/login' })}>
-                                Cerrar Sesión
-                            </BotonGeneral>
-                        </>
+                            {isDropdownOpen && (
+                                <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-20 top-full">
+                                    <Link href="/perfil" className="block px-4 py-2 text-sm text-white hover:bg-gray-700" onClick={() => setIsDropdownOpen(false)}>
+                                        Ver Perfil
+                                    </Link>
+                                    <button
+                                        onClick={() => { signOut({ callbackUrl: '/login' }); setIsDropdownOpen(false); }}
+                                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700"
+                                    >
+                                        Cerrar Sesión
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     ) : (
                         <Link href="/login">
                             <BotonGeneral>

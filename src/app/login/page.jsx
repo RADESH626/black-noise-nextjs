@@ -1,6 +1,7 @@
 'use client'
 import { motion } from 'framer-motion';
 import FormLogin from "@/components/layout/general/forms/FormLogin";
+import Link from 'next/link';
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
 
 function Login() {
@@ -35,14 +36,14 @@ function Login() {
                 Sigue creando prendas increíbles y creativas. Deja volar tu imaginación y descubre nuevas posibilidades con BlackNoise.
               </p>
               <div className="mt-6">
-                <a href="/">
+                <Link href="/">
                   <BotonGeneral>
                     <span className="flex items-center gap-2">
                       <i className='bx bx-home-alt-2 text-xl transition-transform hover:scale-110'></i>
                       Ir al inicio
                     </span>
                   </BotonGeneral>
-                </a>
+                </Link>
               </div>
             </div>
           </motion.div>

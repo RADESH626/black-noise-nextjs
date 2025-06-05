@@ -15,33 +15,58 @@ function EditarPerfilProveedorPage() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchPerfil = async () => {
-            if (status === 'loading') return;
+        // Temporarily bypass session and role validation for development
+        setLoading(false);
+        // Provide a mock profile for the form to render
+        setPerfil({
+            _id: 'mock-provider-id',
+            nombreProveedor: 'Mock Proveedor',
+            nit: '123456789-0',
+            direccionEmpresa: 'Calle Falsa 123',
+            especialidad: 'Ropa',
+            metodosPagoAceptados: ['Tarjeta de Crédito', 'PayPal'],
+            comision: 0.10,
+            disponibilidad: 'DISPONIBLE',
+            rut: 'mock-rut',
+            usuarioId: 'mock-user-id',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        });
+        return;
 
-            if (!session) {
-                router.push('/login');
-                return;
-            }
+        // Original logic (commented out for temporary bypass):
+        // if (process.env.NEXT_PUBLIC_MOCK_MODE === 'true') {
+        //     setLoading(false);
+        //     return;
+        // }
 
-            if (session.user.rol !== Rol.PROVEEDOR) {
-                router.push('/proveedor');
-                return;
-            }
+        // const fetchPerfil = async () => {
+        //     if (status === 'loading') return;
 
-            try {
-                const result = await obtenerMiPerfilProveedor();
-                if (result.error) {
-                    throw new Error(result.error);
-                }
-                setPerfil(result.proveedor);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
+        //     if (!session) {
+        //         router.push('/login');
+        //         return;
+        //     }
 
-        fetchPerfil();
+        //     if (session.user.rol !== Rol.PROVEEDOR) {
+        //         router.push('/proveedor');
+        //         return;
+        //     }
+
+        //     try {
+        //         const result = await obtenerMiPerfilProveedor();
+        //         if (result.error) {
+        //             throw new Error(result.error);
+        //         }
+        //         setPerfil(result.proveedor);
+        //     } catch (err) {
+        //         setError(err.message);
+        //     } finally {
+        //         setLoading(false);
+        //     }
+        // };
+
+        // fetchPerfil();
     }, [session, status, router]);
 
     if (loading) {

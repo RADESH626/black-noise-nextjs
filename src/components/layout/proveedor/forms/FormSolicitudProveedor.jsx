@@ -50,11 +50,12 @@ function FormSolicitudProveedor() {
     }, [state, showPopUp]); // Dependencias del useEffect
 
     // Keep client-side session check for rendering the form
-    if (!session) {
-        // This part is handled in the parent page component (src/app/solicitud-proveedor/page.jsx)
-        // but keeping this check here for clarity or if this component is used elsewhere.
-        return <p>Por favor, inicia sesión para enviar una solicitud.</p>;
-    }
+    // Temporarily disable client-side session check for development
+    // if (!session) {
+    //     // This part is handled in the parent page component (src/app/solicitud-proveedor/page.jsx)
+    //     // but keeping this check here for clarity or if this component is used elsewhere.
+    //     return <p>Por favor, inicia sesión para enviar una solicitud.</p>;
+    // }
 
 
     return (

@@ -64,10 +64,51 @@ async function obtenerDesigns() {
 }
 
 // Obtener diseños por usuario ID
-async function obtenerDesignsPorUsuarioId(usuarioId) {
-    console.log('DEBUG: Entering obtenerDesignsPorUsuarioId with usuarioId:', usuarioId);
+async function obtenerDesignsPorUsuarioId(usuarioId, mockDataEnabledClient = false) {
+    console.log('DEBUG: Entering obtenerDesignsPorUsuarioId with usuarioId:', usuarioId, 'mockDataEnabledClient:', mockDataEnabledClient);
+    // Prioritize client-side mock data toggle over environment variable
+    if (mockDataEnabledClient) {
+        console.log('🎭 Mock Mode (Client-side): Obteniendo diseños mock por usuario ID:', usuarioId);
+        // Return mock designs for the simulated user ID
+        // If the user has no designs, return an empty array
+        const mockDesignsForUser = getMockDesignsByUsuario(usuarioId);
+        if (usuarioId === "mockUserId123") { // Check for the specific mock user ID
+            // If the goal is to toggle "has designs" or "no designs"
+            // We can return an empty array or a populated array based on some internal logic
+            // For now, let's return a fixed set of mock designs for the mock user
+            // Or, if the user wants to toggle "has designs" or "no designs", we need a way to control that.
+            // The user's goal is "que este boton cambie si el usuario "tiene" o no diseños registrados"
+            // This implies the mock data button should control whether the mock user has designs.
+            // Let's assume if mockDataEnabledClient is true, the mock user has designs.
+            // If mockDataEnabledClient is false, the mock user has no designs.
+            if (mockDataEnabledClient) {
+                return { designs: mockDesignsForUser.length > 0 ? mockDesignsForUser : [{
+                    _id: "mockDesign1",
+                    nombreDesing: "Mock Design 1",
+                    valorDesing: 25.00,
+                    categoria: "Camiseta",
+                    likes: 5,
+                    imagenDesing: "/img/Camisetas/Camiseta 1.jpg",
+                    usuarioId: "mockUserId123"
+                },
+                {
+                    _id: "mockDesign2",
+                    nombreDesing: "Mock Design 2",
+                    valorDesing: 30.00,
+                    categoria: "Chaqueta",
+                    likes: 10,
+                    imagenDesing: "/img/Chaquetas/Chaqueta 1.jpg",
+                    usuarioId: "mockUserId123"
+                }] };
+            } else {
+                return { designs: [] }; // No designs when mock data is disabled
+            }
+        }
+        return { designs: mockDesignsForUser }; // For other mock users if any
+    }
+    // Fallback to environment variable if client-side toggle is not active
     if (isMockModeEnabled) {
-        console.log('🎭 Mock Mode: Obteniendo diseños mock por usuario ID:', usuarioId);
+        console.log('🎭 Mock Mode (Environment): Obteniendo diseños mock por usuario ID:', usuarioId);
         return { designs: getMockDesignsByUsuario(usuarioId) };
     }
     try {

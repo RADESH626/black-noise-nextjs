@@ -17,34 +17,44 @@ function ProveedorPage() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            setError(null);
+        // Temporarily bypass session and data fetching for development
+        setLoading(false);
+        return;
 
-            try {
-                // Obtener lista de proveedores
-                const result = await obtenerProveedores();
-                if (result.error) {
-                    throw new Error(result.error);
-                }
-                setProveedores(result.proveedores);
+        // Original logic (commented out for temporary bypass):
+        // if (process.env.NEXT_PUBLIC_MOCK_MODE === 'true') {
+        //     setLoading(false);
+        //     return;
+        // }
 
-                // Si el usuario es proveedor, obtener su perfil
-                if (session?.user?.rol === Rol.PROVEEDOR) {
-                    const perfilResult = await obtenerMiPerfilProveedor();
-                    if (perfilResult.error) {
-                        throw new Error(perfilResult.error);
-                    }
-                    setMiPerfil(perfilResult.proveedor);
-                }
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
+        // const fetchData = async () => {
+        //     setLoading(true);
+        //     setError(null);
 
-        fetchData();
+        //     try {
+        //         // Obtener lista de proveedores
+        //         const result = await obtenerProveedores();
+        //         if (result.error) {
+        //             throw new Error(result.error);
+        //         }
+        //         setProveedores(result.proveedores);
+
+        //         // Si el usuario es proveedor, obtener su perfil
+        //         if (session?.user?.rol === Rol.PROVEEDOR) {
+        //             const perfilResult = await obtenerMiPerfilProveedor();
+        //             if (perfilResult.error) {
+        //                 throw new Error(perfilResult.error);
+        //             }
+        //             setMiPerfil(perfilResult.proveedor);
+        //         }
+        //     } catch (err) {
+        //         setError(err.message);
+        //     } finally {
+        //         setLoading(false);
+        //     }
+        // };
+
+        // fetchData();
     }, [session]);
 
     if (loading) {

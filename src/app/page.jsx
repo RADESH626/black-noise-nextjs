@@ -7,7 +7,7 @@ import ProveedorButton from '@/components/layout/general/ProveedorButton';
 import BotonDescargar from '@/components/common/botones/BotonDescargar';
 
 
-async function indexPage() {
+function indexPage() {
   return (
     <div className='pt-16'>
       <HeaderPrincipal />

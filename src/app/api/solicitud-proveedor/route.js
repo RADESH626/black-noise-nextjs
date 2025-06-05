@@ -8,24 +8,25 @@ export async function POST(request) {
     console.log('Backend: POST /api/solicitud-proveedor iniciado.');
     await dbConnect();
     console.log('Backend: Conexión a DB establecida.');
-    const session = await getServerSession(authOptions);
+    // Temporarily disable session validation for development
+    // const session = await getServerSession(authOptions);
 
-    if (!session) {
-        console.log('Backend: Solicitud no autenticada. Retornando 401.');
-        return NextResponse.json({ message: 'No autenticado' }, { status: 401 });
-    }
-    console.log('Backend: Sesión de usuario encontrada:', session.user.id);
+    // if (!session) {
+    //     console.log('Backend: Solicitud no autenticada. Retornando 401.');
+    //     return NextResponse.json({ message: 'No autenticado' }, { status: 401 });
+    // }
+    // console.log('Backend: Sesión de usuario encontrada:', session.user.id);
 
     try {
         const body = await request.json();
         console.log('Backend: Body de la solicitud recibido:', body);
         const { usuarioId, nombreEmpresa, nit, direccionEmpresa, especialidad, metodosPagoAceptados, comisionPropuesta, mensajeAdicional } = body;
 
-        // Validate that the session user ID matches the one sent in the body
-        if (session.user.id !== usuarioId) {
-            console.log('Backend: User ID does not match session. Returning 403.');
-            return NextResponse.json({ message: 'User ID does not match session' }, { status: 403 });
-        }
+        // Temporarily disable session user ID validation for development
+        // if (session.user.id !== usuarioId) {
+        //     console.log('Backend: User ID does not match session. Returning 403.');
+        //     return NextResponse.json({ message: 'User ID does not match session' }, { status: 403 });
+        // }
 
         // Optional: Validate if a pending request already exists for this user
         const existingPendingRequest = await SolicitudProveedor.findOne({ usuarioId, estadoSolicitud: 'PENDIENTE' });

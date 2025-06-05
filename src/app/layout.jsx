@@ -2,10 +2,12 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { PopUpProvider } from '../context/PopUpContext';
 import { ModalProvider } from '../context/ModalContext';
-import { UserProvider } from '../context/UserContext';
 import { CartProvider } from '../context/CartContext'; // Import CartProvider
-import SessionProviderWrapper from "./SessionProviderWrapper"; // Import the SessionProviderWrapper
-
+import SessionProviderWrapper from './SessionProviderWrapper';
+import { MockSessionProvider } from '@/context/MockSessionContext';
+import SessionToggleButton from '@/components/common/SessionToggleButton';
+import { MockDataProvider } from '@/context/MockDataContext';
+import MockDataToggleButton from '@/components/common/MockDataToggleButton';
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -25,17 +27,27 @@ export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <body className="bg-primary text-secondary">
-        <SessionProviderWrapper>
           <PopUpProvider>
             <ModalProvider>
-              <UserProvider>
                 <CartProvider> {/* Aquí envuelves con CartProvider */}
-                  {children}
+                  <SessionProviderWrapper>
+                    <MockSessionProvider>
+                      <MockDataProvider>
+                        {children}
+                        {/* Mock Data Toggle Button */}
+                        <div style={{ position: 'fixed', bottom: '70px', right: '20px', zIndex: 1000 }}>
+                          <MockDataToggleButton />
+                        </div>
+                        {/* Session Toggle Button */}
+                        <div style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 1000 }}>
+                          <SessionToggleButton />
+                        </div>
+                      </MockDataProvider>
+                    </MockSessionProvider>
+                  </SessionProviderWrapper>
                 </CartProvider>
-              </UserProvider>
             </ModalProvider>
           </PopUpProvider>
-        </SessionProviderWrapper>
       </body>
     </html>
   )

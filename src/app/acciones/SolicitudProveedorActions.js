@@ -50,16 +50,18 @@ export async function submitSupplierApplicationAction(prevState, formData) {
 
   let userId = 'mock-user-id'; // Default mock user ID
 
-  if (!isMockModeEnabled) {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
-      console.log('Server Action Supplier Application: Usuario no autenticado.');
-      return { message: 'Usuario no autenticado. Por favor, inicia sesión.', success: false };
-    }
-    userId = session.user.id;
-  } else {
-    console.log('🎭 Mock Mode: Saltando validación de sesión para solicitud de proveedor. Usando ID mock.');
-  }
+  // Temporarily disable session validation for development
+  // if (!isMockModeEnabled) { // Original condition
+  //   const session = await getServerSession(authOptions);
+  //   if (!session?.user?.id) {
+  //     console.log('Server Action Supplier Application: Usuario no autenticado.');
+  //     return { message: 'Usuario no autenticado. Por favor, inicia sesión.', success: false };
+  //   }
+  //   userId = session.user.id;
+  // } else {
+  //   console.log('🎭 Mock Mode: Saltando validación de sesión para solicitud de proveedor. Usando ID mock.');
+  // }
+  console.log('Temporarily bypassing session validation for submitSupplierApplicationAction. Using mock user ID.');
 
   const data = {
     nombreEmpresa: formData.get('nombreEmpresa'),

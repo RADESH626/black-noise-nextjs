@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { obtenerDesignsPorUsuarioId } from '../../../../src/app/acciones/DesignActions';
 import { guardarPedido } from '../../../../src/app/acciones/PedidoActions';
-import { useUser } from '../../../../src/context/UserContext';
+import { ObtenerUsuarioPorCorreo } from '../../../../src/app/acciones/UsuariosActions'; // Import the action
+import { useSession } from 'next-auth/react'; // Import useSession
 
 const NewOrderModal = ({ onClose }) => {
-  const { user, loading: userLoading } = useUser();
+  const { data: session, status } = useSession(); // Use useSession
+  const [user, setUser] = useState(null); // Local user state
+  const userLoading = status === 'loading'; // Derive loading from session status
   const [designs, setDesigns] = useState([]);
   const [selectedDesigns, setSelectedDesigns] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,31 +15,45 @@ const NewOrderModal = ({ onClose }) => {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (userLoading) return;
+    const fetchUserDataAndDesigns = async () => {
+      if (status === 'loading') {
+        setLoading(true);
+        return;
+      }
 
-    const fetchDesigns = async () => {
-      if (!user || !user._id) {
-        setError('Usuario no autenticado. No se pueden cargar los diseños.');
+      if (status === 'unauthenticated' || !session?.user?.email) {
+        setError('Usuario no autenticado. Por favor, inicie sesión.');
         setLoading(false);
         return;
       }
+
       try {
-        const { designs: userDesigns, error: fetchError } = await obtenerDesignsPorUsuarioId(user._id);
+        // Fetch full user data using email from session
+        const fetchedUser = await ObtenerUsuarioPorCorreo(session.user.email);
+        if (!fetchedUser || !fetchedUser._id) {
+          setError('No se pudo cargar la información completa del usuario.');
+          setLoading(false);
+          return;
+        }
+        setUser(fetchedUser); // Set the local user state
+
+        // Now fetch designs using the fetched user's _id
+        const { designs: userDesigns, error: fetchError } = await obtenerDesignsPorUsuarioId(fetchedUser._id);
         if (fetchError) {
           setError(fetchError);
         } else {
           setDesigns(userDesigns);
         }
       } catch (err) {
-        setError('Error al cargar los diseños.');
-        console.error('Error fetching designs:', err);
+        setError('Error al cargar los datos del usuario o los diseños.');
+        console.error('Error fetching user data or designs:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchDesigns();
-  }, [user, userLoading]);
+    fetchUserDataAndDesigns();
+  }, [session, status]); // Depend on session and status
 
   const handleDesignSelect = (designId) => {
     setSelectedDesigns((prevSelected) =>
@@ -57,7 +74,7 @@ const NewOrderModal = ({ onClose }) => {
           to: email,
           subject: 'Confirmación de Pedido Black Noise',
           body: `
-            Hola ${user.name || 'usuario'},
+            Hola ${user?.primerNombre || session?.user?.name || 'usuario'},
             
             Tu pedido ha sido registrado exitosamente con los siguientes detalles:
             
@@ -108,7 +125,7 @@ const NewOrderModal = ({ onClose }) => {
       estimatedDelivery.setDate(now.getDate() + 7); // 7 days from now
 
       const newOrderData = {
-        usuarioId: user._id,
+        usuarioId: user?._id,
         fechaPedido: now.toISOString(),
         estado: 'Pendiente',
         total: total,
@@ -122,8 +139,10 @@ const NewOrderModal = ({ onClose }) => {
 
       if (success) {
         alert('Pedido guardado exitosamente!');
-        if (user.email) {
-          await sendOrderConfirmationEmail(user.email, savedOrder);
+        if (user?.correo) { // Use user?.correo from the fetched user object
+          await sendOrderConfirmationEmail(user.correo, savedOrder);
+        } else if (session?.user?.email) { // Fallback to session email if user.correo is not available
+          await sendOrderConfirmationEmail(session.user.email, savedOrder);
         }
         onClose();
       } else {
@@ -137,11 +156,11 @@ const NewOrderModal = ({ onClose }) => {
     }
   };
 
-  if (loading || userLoading) {
+  if (loading) { // Use local loading state
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-gray-900 p-8 rounded-lg shadow-xl text-white">
-          Cargando datos...
+          Cargando datos del usuario y diseños...
         </div>
       </div>
     );
@@ -158,11 +177,12 @@ const NewOrderModal = ({ onClose }) => {
     );
   }
 
+  // If not loading and no user, it means unauthenticated or failed to fetch user
   if (!user || !user._id) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-gray-900 p-8 rounded-lg shadow-xl text-white">
-          <p>No se pudo cargar la información del usuario. Por favor, inicie sesión.</p>
+          <p>No se pudo cargar la información del usuario o el usuario no está autenticado. Por favor, inicie sesión.</p>
           <button onClick={onClose} className="mt-4 px-4 py-2 bg-red-600 rounded hover:bg-red-700">Cerrar</button>
         </div>
       </div>

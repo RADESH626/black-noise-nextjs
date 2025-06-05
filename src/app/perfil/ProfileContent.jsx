@@ -1,28 +1,41 @@
 "use client";
 
 import { useModal } from "@/context/ModalContext";
-import { signOut, useSession } from "next-auth/react"; // Import signOut and useSession
+import { signOut } from "next-auth/react"; // Import signOut
+import { useSimulatedSession } from "@/hooks/useSimulatedSession"; // Import useSimulatedSession
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
 import FormEditarUsuario from "@/app/admin/usuarios/components/FormEditarUsuario";
-import { useCart } from "@/context/CartContext"; // Import useCart
 import { useEffect, useState } from "react"; // Import useEffect and useState
 import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions"; // Import the server action
+import { useMockData } from "@/hooks/useMockData"; // Import useMockData
+import DesignsComponent from "./DesignsComponent"; // Import DesignsComponent
+import PedidosComponent from "./PedidosComponent"; // Import PedidosComponent
 
 function ProfileContent() { // Removed user, designs, and error props
   const { openModal } = useModal();
-  const { cartItems, addItem } = useCart(); // Get cartItems and addItem from context
-  const { data: session, status } = useSession(); // Get session using useSession
+  const { data: session, status } = useSimulatedSession(); // Get session using useSimulatedSession
+  const { mockDataEnabled } = useMockData(); // Get mockDataEnabled from useMockData
 
+  const [activeTab, setActiveTab] = useState('designs'); // State to manage active tab
+  const [currentUser, setCurrentUser] = useState(null); // State for user data
   const [userDesigns, setUserDesigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    console.log("Mock Data Enabled in ProfileContent:", mockDataEnabled);
+  }, [mockDataEnabled]);
+
+  useEffect(() => {
+    // Update currentUser when session changes
+    setCurrentUser(session?.user || null);
+
     const fetchDesigns = async () => {
       if (status === 'authenticated' && session?.user?.id) {
         setLoading(true);
         setError(null);
-        const { designs, error } = await obtenerDesignsPorUsuarioId(session.user.id);
+        // Pass mockDataEnabled to the server action
+        const { designs, error } = await obtenerDesignsPorUsuarioId(session.user.id, mockDataEnabled);
         if (error) {
           setError(error);
         } else {
@@ -32,13 +45,14 @@ function ProfileContent() { // Removed user, designs, and error props
       } else if (status === 'unauthenticated') {
         // Handle unauthenticated state if necessary, maybe redirect to login
         setLoading(false);
+        setUserDesigns([]); // Clear designs if unauthenticated
       }
     };
 
     fetchDesigns();
-  }, [session, status]); // Rerun effect when session or status changes
+  }, [session, status, mockDataEnabled]); // Rerun effect when session, status, or mockDataEnabled changes
 
-  const user = session?.user; // Get user from session
+  const user = currentUser; // Use the state variable for user
 
   const handleEditProfile = () => {
     openModal(
@@ -91,10 +105,7 @@ function ProfileContent() { // Removed user, designs, and error props
                 CERRAR SESIÓN
               </BotonGeneral>
 
-              <BotonGeneral onClick={() => { /* Add logic for editing/adding designs */ }}>
-                EDITAR DISEÑO
-              </BotonGeneral>
-
+              
             </div>
           </div>
         </div>
@@ -103,68 +114,33 @@ function ProfileContent() { // Removed user, designs, and error props
       {/* nav */}
       <nav className="mb-8">
         <div className="flex border-b border-gray-700">
-          <button className="py-3 px-6 text-lg font-medium text-purple-400 border-b-2 border-purple-400 focus:outline-none">
+          <button
+            className={`py-3 px-6 text-lg font-medium ${activeTab === 'designs' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`}
+            onClick={() => setActiveTab('designs')}
+          >
             DISEÑOS
           </button>
-          <button className="py-3 px-6 text-lg font-medium text-gray-500 hover:text-gray-300 focus:outline-none">
+          <button
+            className={`py-3 px-6 text-lg font-medium ${activeTab === 'orders' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`}
+            onClick={() => setActiveTab('orders')}
+          >
             PEDIDOS
           </button>
         </div>
       </nav>
 
-      <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {loading ? (
-          <div className="col-span-full text-center text-gray-400">Cargando diseños...</div>
-        ) : error ? (
-          <div className="col-span-full text-red-500 text-center">
-            Error al cargar los diseños: {error}
-          </div>
-        ) : userDesigns.length === 0 ? (
-          <div className="col-span-full text-center text-gray-400">
-            No tienes diseños publicados aún.
-          </div>
-        ) : (
-          userDesigns.map((design) => (
-            <div key={design._id} className="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-              <div className="w-full h-56 bg-gray-700 relative">
-                <img
-                  src={design.imagenDesing}
-                  alt={design.nombreDesing}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute top-0 right-0 m-3">
-                  <button
-                    onClick={() => handleEditDesign(design)}
-                    className="bg-white text-purple-700 font-semibold py-1 px-4 rounded-md text-sm hover:bg-gray-200 transition duration-150"
-                  >
-                    EDITAR
-                  </button>
-                </div>
-              </div>
-              <div className="p-4 gradient-text-bg flex justify-between items-center"> {/* Added flex and justify-between */}
-                <div> {/* Added div for text content */}
-                  <p className="font-semibold">nombre: {design.nombreDesing}</p>
-                  <p className="font-semibold">precio: ${design.valorDesing}</p>
-                  <p className="font-semibold">categoría: {design.categoria}</p>
-                  <p className="font-semibold text-purple-400">likes: {design.likes}</p>
-                </div>
-                {/* Checkbox for adding to cart */}
-                <input
-                  type="checkbox"
-                  checked={cartItems.some(item => item.id === design._id)} // Check if item is in cart
-                  onChange={() => addItem({ // Add item to cart on change
-                    id: design._id,
-                    nombre: design.nombreDesing,
-                    price: design.valorDesing,
-                    imagen: design.imagenDesing,
-                  })}
-                  className="form-checkbox h-5 w-5 text-purple-600" // Basic styling
-                />
-              </div>
-            </div>
-          ))
-        )}
-      </main>
+      {activeTab === 'designs' && (
+        <DesignsComponent
+          loading={loading}
+          error={error}
+          userDesigns={userDesigns}
+          handleEditDesign={handleEditDesign}
+        />
+      )}
+
+      {activeTab === 'orders' && (
+        <PedidosComponent userId={user?.id} />
+      )}
     </div>
   );
 }

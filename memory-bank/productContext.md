@@ -14,7 +14,7 @@ The platform should offer distinct experiences for three main user roles:
 
 ### 1. Customer (General User)
 - **Browsing:** Users can browse a catalog of custom clothing designs, categorized by type (e.g., t-shirts, hoodies, jackets).
-- **Viewing Details:** Clicking on a design should display detailed information, including images, description, available sizes, and price.
+- **Viewing Details:** Clicking on a design should display detailed information, including images, description, available sizes, and price. **Note: Comments are intentionally not implemented for designs to avoid potential negative opinions.**
 - **Shopping Cart:** Users can add designs to a shopping cart.
 - **Checkout:** A secure checkout process allows users to complete purchases, including payment integration.
 - **Profile Management:** Users can register, log in, and manage their personal information and order history.

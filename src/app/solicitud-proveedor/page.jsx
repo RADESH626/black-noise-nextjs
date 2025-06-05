@@ -2,50 +2,9 @@
 
 import React from 'react';
 import FormSolicitudProveedor from '@/components/layout/proveedor/forms/FormSolicitudProveedor';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 import Image from 'next/image';
 
 function Solicitud() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (status === 'loading') {
-      return; // Do nothing while loading
-    }
-    
-    if (!session) {
-      router.push('/login'); // Redirect to login if not authenticated
-      return;
-    }
-  }, [session, status, router]);
-
-  // Loading state
-  if (status === 'loading') {
-    return (
-      <div className="flex justify-center items-center h-screen bg-[#000000] text-[#FFFFFF]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FFFFFF] mx-auto mb-4"></div>
-          <p>Cargando sesión...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // No session
-  if (!session) {
-    return (
-      <div className="flex justify-center items-center h-screen bg-[#000000] text-[#FFFFFF]">
-        <div className="text-center">
-          <p>Redirigiendo al login...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show the form for logged-in users who are not providers
   return (
     <main className="min-h-screen flex items-center justify-center p-5"
       style={{ background: "linear-gradient(135deg, #000000FF , #0A1828 )" }}>

@@ -1,8 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NewOrderModal from '../../components/common/modales/NewOrderModal';
+import { obtenerPedidosPorUsuarioId } from '@/app/acciones/PedidoActions'; // Import server action
+import { useSimulatedSession } from "@/hooks/useSimulatedSession"; // Import useSimulatedSession
+import { useMockData } from "@/hooks/useMockData"; // Import useMockData
 
-function PedidosComponent({ orders }) {
+function PedidosComponent({ userId }) { // Expect userId prop
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [orders, setOrders] = useState([]); // State for orders
+  const [loading, setLoading] = useState(true); // State for loading
+  const [error, setError] = useState(null); // State for error
+
+  const { data: session, status } = useSimulatedSession(); // Get session
+  const { mockDataEnabled } = useMockData(); // Get mockDataEnabled
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      if (status === 'authenticated' && userId) {
+        setLoading(true);
+        setError(null);
+        const { pedidos, error: fetchError } = await obtenerPedidosPorUsuarioId(userId, mockDataEnabled);
+        if (fetchError) {
+          setError(fetchError);
+          setOrders([]);
+        } else {
+          setOrders(pedidos || []);
+        }
+        setLoading(false);
+      } else if (status === 'unauthenticated') {
+        setLoading(false);
+        setOrders([]);
+      }
+    };
+
+    fetchOrders();
+  }, [userId, status, mockDataEnabled]); // Re-run when userId, status, or mockDataEnabled changes
 
   const handleNewOrder = () => {
     setIsModalOpen(true);
@@ -22,7 +53,13 @@ function PedidosComponent({ orders }) {
         </button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"> 
-        {orders.length === 0 ? (
+        {loading ? (
+          <div className="col-span-full text-center text-gray-400">Cargando pedidos...</div>
+        ) : error ? (
+          <div className="col-span-full text-red-500 text-center">
+            Error al cargar los pedidos: {error}
+          </div>
+        ) : orders.length === 0 ? (
           <div className="col-span-full text-center text-gray-400">
             No tienes pedidos realizados aún.
           </div>
