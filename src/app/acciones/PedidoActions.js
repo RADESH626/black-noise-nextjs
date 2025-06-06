@@ -5,96 +5,10 @@ import Pedido from '@/models/Pedido';
 import Design from '@/models/Design';     // Necesario para popular
 import Proveedor from '@/models/Proveedor'; // Necesario para popular
 import { revalidatePath } from 'next/cache';
-<<<<<<< HEAD
-=======
-import { mockPedidos, getMockPedidoById, getMockPedidosByCliente } from '@/data/mock/pedidos'; // Import mock data for pedidos
-import { mockDesigns } from '@/data/mock/designs'; // Import mock data for designs to simulate populate
-import { mockProveedores } from '@/data/mock/proveedores'; // Import mock data for proveedores to simulate populate
-import { mockUsuarios } from '@/data/mock/usuarios'; // Import mock data for users to simulate populate
-
-const isMockModeEnabled = process.env.NEXT_PUBLIC_MOCK_MODE === 'true';
-
-// Helper para generar IDs únicos (simulado)
-const generateUniqueId = (prefix = 'mock') => `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
-// Helper para simular populate (re-using or adapting from PagoActions)
-const simulatePopulate = (item, field, mockDataArray, selectFields) => {
-    if (!item || !item[field]) return item;
-
-    // Handle array population (e.g., designIds)
-    if (Array.isArray(item[field])) {
-        const populatedArray = item[field].map(id => {
-            const foundItem = mockDataArray.find(mock => mock._id === id || mock.id === id);
-            if (foundItem) {
-                const selected = {};
-                if (selectFields) {
-                    selectFields.split(' ').forEach(f => {
-                        if (foundItem[f]) selected[f] = foundItem[f];
-                    });
-                } else {
-                    selected._id = foundItem._id || foundItem.id;
-                    if (foundItem.name) selected.name = foundItem.name; // Example for design name
-                    if (foundItem.imageUrl) selected.imageUrl = foundItem.imageUrl; // Example for design image
-                }
-                return selected;
-            }
-            return id; // Return original ID if not found
-        }).filter(Boolean); // Filter out nulls if any
-        return { ...item, [field]: populatedArray };
-    }
-
-    // Handle single item population
-    const populatedItem = mockDataArray.find(mock => mock._id === item[field] || item.id === item[field]);
-    if (populatedItem) {
-        const selected = {};
-        if (selectFields) {
-            selectFields.split(' ').forEach(f => {
-                if (populatedItem[f]) selected[f] = populatedItem[f];
-            });
-        } else {
-            selected._id = populatedItem._id || populatedItem.id;
-            if (populatedItem.nombreUsuario) selected.nombreUsuario = populatedItem.nombreUsuario;
-            if (populatedItem.correo) selected.correo = populatedItem.correo;
-            if (populatedItem.name) selected.name = populatedItem.name;
-            if (populatedItem.email) selected.email = populatedItem.email;
-            if (populatedItem.nombreProveedor) selected.nombreProveedor = populatedItem.nombreProveedor;
-            if (populatedItem.contactoPrincipal) selected.contactoPrincipal = populatedItem.contactoPrincipal;
-        }
-        return { ...item, [field]: selected };
-    }
-    return item;
-};
-
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
 
 // Crear un nuevo pedido
 async function guardarPedido(data) {
     console.log('DEBUG: Entering guardarPedido with data:', data);
-<<<<<<< HEAD
-=======
-    if (isMockModeEnabled) {
-        console.log('🎭 Mock Mode: Simulando guardarPedido.');
-        // Ensure designIds and detallesPedido are arrays for mock data
-        if (data.designIds && typeof data.designIds === 'string') {
-            data.designIds = data.designIds.split(',').map(id => id.trim()).filter(id => id);
-        }
-        if (data.detallesPedido && typeof data.detallesPedido === 'string') {
-            data.detallesPedido = data.detallesPedido.split(',').map(detalle => detalle.trim()).filter(detalle => detalle);
-        }
-
-        const newPedido = {
-            ...data,
-            id: generateUniqueId('order'), // Use 'id' as per mock data structure
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            estado: data.estado || 'PENDIENTE', // Default state for new orders
-            valorTotal: data.valorTotal || 0, // Default value
-        };
-        revalidatePath('/admin/pedidos');
-        revalidatePath('/perfil');
-        return { success: true, message: "Pedido creado exitosamente (simulado)", data: newPedido };
-    }
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
     try {
         await connectDB();
         console.log('DEBUG: Database connected for guardarPedido.');
@@ -124,20 +38,6 @@ async function guardarPedido(data) {
 // Obtener todos los pedidos
 async function obtenerPedidos() {
     console.log('DEBUG: Entering obtenerPedidos.');
-<<<<<<< HEAD
-=======
-    if (isMockModeEnabled) {
-        console.log('🎭 Mock Mode: Obteniendo todos los pedidos mock.');
-        let pedidosSimulados = mockPedidos.map(pedido => ({ ...pedido }));
-
-        // Simulate populate for designIds, usuarioId, proveedorId
-        pedidosSimulados = pedidosSimulados.map(pedido => simulatePopulate(pedido, 'designIds', mockDesigns, 'name imageUrl'));
-        pedidosSimulados = pedidosSimulados.map(pedido => simulatePopulate(pedido, 'usuarioId', mockUsuarios, 'name email'));
-        pedidosSimulados = pedidosSimulados.map(pedido => simulatePopulate(pedido, 'proveedorId', mockProveedores, 'nombreProveedor contactoPrincipal'));
-
-        return { pedidos: pedidosSimulados };
-    }
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
     try {
         await connectDB();
         console.log('DEBUG: Database connected for obtenerPedidos.');
@@ -153,24 +53,9 @@ async function obtenerPedidos() {
     }
 }
 
-<<<<<<< HEAD
-// Obtener pedido por ID
-async function ObtenerPedidoPorId(id) {
-    console.log('DEBUG: Entering ObtenerPedidoPorId with ID:', id);
-=======
 // Obtener pedidos por usuario ID
 async function obtenerPedidosPorUsuarioId(usuarioId) {
     console.log('DEBUG: Entering obtenerPedidosPorUsuarioId with usuarioId:', usuarioId);
-    if (isMockModeEnabled) {
-        console.log('🎭 Mock Mode: Obteniendo pedidos mock por usuario ID:', usuarioId);
-        let pedidosSimulados = getMockPedidosByCliente(usuarioId).map(pedido => ({ ...pedido }));
-
-        // Simulate populate for designIds, proveedorId
-        pedidosSimulados = pedidosSimulados.map(pedido => simulatePopulate(pedido, 'designIds', mockDesigns, 'name imageUrl'));
-        pedidosSimulados = pedidosSimulados.map(pedido => simulatePopulate(pedido, 'proveedorId', mockProveedores, 'nombreProveedor contactoPrincipal'));
-
-        return { pedidos: pedidosSimulados };
-    }
     try {
         await connectDB();
         console.log('DEBUG: Database connected for obtenerPedidosPorUsuarioId.');
@@ -189,18 +74,6 @@ async function obtenerPedidosPorUsuarioId(usuarioId) {
 // Obtener pedido por ID
 async function ObtenerPedidoPorId(id) {
     console.log('DEBUG: Entering ObtenerPedidoPorId with ID:', id);
-    if (isMockModeEnabled) {
-        console.log('🎭 Mock Mode: Obteniendo pedido mock por ID:', id);
-        let pedido = getMockPedidoById(id);
-        if (pedido) {
-            pedido = simulatePopulate(pedido, 'designIds', mockDesigns, 'name imageUrl');
-            pedido = simulatePopulate(pedido, 'usuarioId', mockUsuarios, 'name email');
-            pedido = simulatePopulate(pedido, 'proveedorId', mockProveedores, 'nombreProveedor contactoPrincipal');
-            return pedido;
-        }
-        return { error: 'Pedido no encontrado (simulado)' };
-    }
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
     try {
         await connectDB();
         console.log('DEBUG: Database connected for ObtenerPedidoPorId.');
@@ -224,25 +97,6 @@ async function ObtenerPedidoPorId(id) {
 // Editar pedido (principalmente para cambiar estado, fecha estimada, detalles)
 async function EditarPedido(id, data) {
     console.log('DEBUG: Entering EditarPedido with ID:', id, 'and data:', data);
-<<<<<<< HEAD
-=======
-    if (isMockModeEnabled) {
-        console.log('🎭 Mock Mode: Simulando edición de pedido ID:', id);
-        const existingPedido = getMockPedidoById(id);
-        if (existingPedido) {
-            const updatedPedido = {
-                ...existingPedido,
-                ...data,
-                updatedAt: new Date().toISOString()
-            };
-            revalidatePath('/admin/pedidos');
-            revalidatePath(`/admin/pedidos/editar/${id}`);
-            return { success: true, message: "Pedido actualizado exitosamente (simulado)", data: updatedPedido };
-        } else {
-            return { error: 'Pedido no encontrado para actualizar (simulado)' };
-        }
-    }
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
     try {
         await connectDB();
         console.log('DEBUG: Database connected for EditarPedido.');
@@ -282,10 +136,7 @@ async function EditarPedido(id, data) {
 export {
     guardarPedido,
     obtenerPedidos,
-<<<<<<< HEAD
-=======
     obtenerPedidosPorUsuarioId,
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
     ObtenerPedidoPorId,
     EditarPedido
 };
