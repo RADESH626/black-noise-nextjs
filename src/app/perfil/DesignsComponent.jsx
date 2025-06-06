@@ -1,10 +1,10 @@
 "use client";
 
 import React from 'react';
-import { useCart } from "@/context/CartContext"; // Import useCart
+import { useCartStorage } from "@/hooks/useCartStorage"; // Import useCartStorage
 
 function DesignsComponent({ loading, error, userDesigns, handleEditDesign }) {
-  const { cartItems, addItem } = useCart(); // Get cartItems and addItem from context
+  const { cartItems, addItem } = useCartStorage(); // Get cartItems and addItem from useCartStorage
 
   return (
     <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -43,17 +43,26 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign }) {
                 <p className="font-semibold">categoría: {design.categoria}</p>
                 <p className="font-semibold text-purple-400">likes: {design.likes}</p>
               </div>
-              <input
-                type="checkbox"
-                checked={cartItems.some(item => item.id === design._id)}
-                onChange={() => addItem({
-                  id: design._id,
-                  nombre: design.nombreDesing,
-                  price: design.valorDesing,
-                  imagen: design.imagenDesing,
-                })}
-                className="form-checkbox h-5 w-5 text-purple-600"
-              />
+              {cartItems.some(item => item.id === design._id) ? (
+                <button
+                  disabled
+                  className="bg-gray-600 text-white font-semibold py-2 px-4 rounded-md text-sm cursor-not-allowed"
+                >
+                  En el carrito
+                </button>
+              ) : (
+                <button
+                  onClick={() => addItem({
+                    id: design._id,
+                    nombre: design.nombreDesing,
+                    price: design.valorDesing,
+                    imagen: design.imagenDesing,
+                  })}
+                  className="bg-purple-700 text-white font-semibold py-2 px-4 rounded-md text-sm hover:bg-purple-800 transition duration-150"
+                >
+                  Agregar al carrito
+                </button>
+              )}
             </div>
           </div>
         ))

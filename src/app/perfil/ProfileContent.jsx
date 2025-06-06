@@ -24,6 +24,7 @@ import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions"; // Im
 import { useMockData } from "@/hooks/useMockData"; // Import useMockData
 import DesignsComponent from "./DesignsComponent"; // Import DesignsComponent
 import PedidosComponent from "./PedidosComponent"; // Import PedidosComponent
+import CartComponent from "./CartComponent"; // Import CartComponent
 
 function ProfileContent() { // Removed user, designs, and error props
   const { openModal } = useModal();
@@ -170,6 +171,12 @@ function ProfileContent() { // Removed user, designs, and error props
           >
 >>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
             PEDIDOS
+          </button>
+          <button
+            className={`py-3 px-6 text-lg font-medium ${activeTab === 'cart' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`}
+            onClick={() => setActiveTab('cart')}
+          >
+            CARRITO
           </button>
         </div>
       </nav>

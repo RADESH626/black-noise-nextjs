@@ -52,12 +52,12 @@ export default function Carrito() {
 =======
 import React, { useState } from "react";
 import PageLayout from "@/components/layout/PageLayout";
-import { useCart } from "@/context/CartContext";
+import { useCartStorage } from "@/hooks/useCartStorage";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 
 export default function Carrito() {
-  const { cartItems, getTotal, clearCart } = useCart();
+  const { cartItems, getTotal, clearCart } = useCartStorage();
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const router = useRouter();
 

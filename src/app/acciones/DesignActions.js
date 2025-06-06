@@ -94,28 +94,25 @@ async function obtenerDesignsPorUsuarioId(usuarioId, mockDataEnabledClient = fal
             // This implies the mock data button should control whether the mock user has designs.
             // Let's assume if mockDataEnabledClient is true, the mock user has designs.
             // If mockDataEnabledClient is false, the mock user has no designs.
-            if (mockDataEnabledClient) {
-                return { designs: mockDesignsForUser.length > 0 ? mockDesignsForUser : [{
-                    _id: "mockDesign1",
-                    nombreDesing: "Mock Design 1",
-                    valorDesing: 25.00,
-                    categoria: "Camiseta",
-                    likes: 5,
-                    imagenDesing: "/img/Camisetas/Camiseta 1.jpg",
-                    usuarioId: "mockUserId123"
-                },
-                {
-                    _id: "mockDesign2",
-                    nombreDesing: "Mock Design 2",
-                    valorDesing: 30.00,
-                    categoria: "Chaqueta",
-                    likes: 10,
-                    imagenDesing: "/img/Chaquetas/Chaqueta 1.jpg",
-                    usuarioId: "mockUserId123"
-                }] };
-            } else {
-                return { designs: [] }; // No designs when mock data is disabled
-            }
+            // Always return mock designs if mockDataEnabledClient is true for mockUserId123
+            return { designs: mockDesignsForUser.length > 0 ? mockDesignsForUser : [{
+                _id: "mockDesign1",
+                nombreDesing: "Mock Design 1",
+                valorDesing: 25.00,
+                categoria: "Camiseta",
+                likes: 5,
+                imagenDesing: "/img/Camisetas/Camiseta 1.jpg",
+                usuarioId: "mockUserId123"
+            },
+            {
+                _id: "mockDesign2",
+                nombreDesing: "Mock Design 2",
+                valorDesing: 30.00,
+                categoria: "Chaqueta",
+                likes: 10,
+                imagenDesing: "/img/Chaquetas/Chaqueta 1.jpg",
+                usuarioId: "mockUserId123"
+            }] };
         }
         return { designs: mockDesignsForUser }; // For other mock users if any
     }

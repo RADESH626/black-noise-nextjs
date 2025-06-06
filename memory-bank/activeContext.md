@@ -365,7 +365,7 @@ const inputClasses = `w-full p-3 bg-neutral-800 border border-accent1 rounded-[1
 # Active Context
 
 ## Current Work Focus
-The current focus is on transforming the `/catalogo` view into a social media-like page, using mock design data, and ensuring proper integration with existing contexts.
+The current focus is on transforming the `/catalogo` view into a social media-like page, using mock design data, and ensuring proper integration with existing contexts. Additionally, the user profile (`/perfil`) has been enhanced with a dedicated cart section.
 
 ## Recent Changes
 - Created `src/context/MockSessionContext.jsx` to provide a mock session state.
@@ -383,22 +383,23 @@ The current focus is on transforming the `/catalogo` view into a social media-li
 - Created `src/hooks/useMockData.js` to abstract mock data logic.
 - Created `src/components/common/MockDataToggleButton.jsx` for toggling mock data.
 - Modified `src/app/layout.jsx` to integrate `MockDataProvider` and `MockDataToggleButton`, placing the toggle buttons at the bottom right of the screen for easy access during development.
-- **NEW:** Eliminated `src/context/UserContext.jsx`.
-- **NEW:** Modified `src/app/layout.jsx` to remove `UserProvider` import and component.
-- **NEW:** Refactored `src/components/common/modales/NewOrderModal.jsx` to:
+- Eliminated `src/context/UserContext.jsx`.
+- Modified `src/app/layout.jsx` to remove `UserProvider` import and component.
+- Refactored `src/components/common/modales/NewOrderModal.jsx` to:
     - Use `useSession` from `next-auth/react` instead of `useUser`.
     - Fetch detailed user data (including `_id`) using `ObtenerUsuarioPorCorreo` from `src/app/acciones/UsuariosActions` based on the session email.
     - Adjust all logic and rendering that previously relied on `UserContext`.
-- **NEW:** Modified `src/app/catalogo/page.jsx` to display designs in a social media-like format, including user avatars and interaction buttons (like, share).
-- **NEW:** Integrated `mockDesigns` from `src/data/mock/designs.js` into `src/app/catalogo/page.jsx` to replace hardcoded design data.
-- **NEW:** Changed the "Crear Publicación" button text to "Publicar Diseño" in `src/app/catalogo/page.jsx`.
-- **NEW:** Implemented client-side like/unlike toggle functionality for designs in `src/app/catalogo/page.jsx` using `localStorage` to persist liked states.
-- **NEW:** Resolved "Maximum update depth exceeded" error in `src/app/catalogo/page.jsx` by memoizing derived state using `useMemo`.
-- **NEW:** Enhanced the like button in `src/app/catalogo/page.jsx` to visually toggle between an outline heart (`♡`) and a filled heart (`❤️`) based on the liked state.
-- **NEW:** Implemented conditional rendering in `src/app/catalogo/page.jsx` to display a "No hay diseños disponibles" message when no designs are present.
+- Modified `src/app/catalogo/page.jsx` to display designs in a social media-like format, including user avatars and interaction buttons (like, share).
+- Integrated `mockDesigns` from `src/data/mock/designs.js` into `src/app/catalogo/page.jsx` to replace hardcoded design data.
+- Changed the "Crear Publicación" button text to "Publicar Diseño" in `src/app/catalogo/page.jsx`.
+- Implemented client-side like/unlike toggle functionality for designs in `src/app/catalogo/page.jsx` using `localStorage` to persist liked states.
+- Resolved "Maximum update depth exceeded" error in `src/app/catalogo/page.jsx` by memoizing derived state using `useMemo`.
+- Enhanced the like button in `src/app/catalogo/page.jsx` to visually toggle between an outline heart (`♡`) and a filled heart (`❤️`) based on the liked state.
+- Implemented conditional rendering in `src/app/catalogo/page.jsx` to display a "No hay diseños disponibles" message when no designs are present.
+- **NEW:** Created `src/app/perfil/CartComponent.jsx` to display the user's shopping cart.
+- **NEW:** Integrated `CartComponent.jsx` into `src/app/perfil/ProfileContent.jsx`, adding a new "CARRITO" tab for navigation.
 
 ## Next Steps
-- Update `progress.md`.
 - Instruct the user to restart the development server and verify the changes.
 
 ## Active Decisions and Considerations
@@ -410,7 +411,7 @@ The current focus is on transforming the `/catalogo` view into a social media-li
 
 ## Important Patterns and Preferences
 - Next.js middleware for route protection.
-- React Context for global state management (mock session, mock data).
+- React Context for global state management (mock session, mock data, cart).
 - Custom hooks for abstracting logic (`useSimulatedSession`, `useMockData`).
 - Modals for user interaction (profile options).
 - Centralizing user data fetching via NextAuth.js session and server actions.

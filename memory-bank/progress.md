@@ -231,6 +231,8 @@
 - The `useRouter` import and initialization were removed from `ProfileContent.jsx`.
 - `DesignsComponent.jsx` was created to encapsulate the design display logic.
 - `PedidosComponent.jsx` was updated to fetch and display order data using `obtenerPedidosPorUsuarioId`, handling loading and error states.
+- **NEW:** A "CARRITO" section has been added to the user profile (`/perfil` view), accessible via a new tab in `ProfileContent.jsx`.
+- **NEW:** `src/app/perfil/CartComponent.jsx` has been created to display cart contents, integrating with `CartContext` for state management.
 
 ## What's Left to Build
 - Revert or adjust middleware for production environment.
@@ -255,6 +257,7 @@
 - The `/catalogo` view has been updated to display designs in a social media-like format, using mock data, and includes a "Publicar Diseño" button.
 - The like functionality in `/catalogo` now supports a like/unlike toggle per design per user (client-side, via `localStorage`), with visual feedback (outline/filled heart icon).
 - A message "No hay diseños disponibles" is displayed when no designs are present in the `/catalogo` view.
+- **NEW:** The user profile (`/perfil`) now includes a "CARRITO" tab, displaying cart contents via `CartComponent.jsx`.
 
 ## Known Issues
 - The current middleware configuration is not suitable for production as it bypasses all authentication.

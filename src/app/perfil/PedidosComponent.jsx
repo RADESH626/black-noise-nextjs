@@ -1,100 +1,78 @@
-import React, { useState, useEffect } from 'react';
-import NewOrderModal from '../../components/common/modales/NewOrderModal';
-import { obtenerPedidosPorUsuarioId } from '@/app/acciones/PedidoActions'; // Import server action
-import { useSimulatedSession } from "@/hooks/useSimulatedSession"; // Import useSimulatedSession
-import { useMockData } from "@/hooks/useMockData"; // Import useMockData
+'use client';
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
-function PedidosComponent({ userId }) { // Expect userId prop
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [orders, setOrders] = useState([]); // State for orders
-  const [loading, setLoading] = useState(true); // State for loading
-  const [error, setError] = useState(null); // State for error
-
-  const { data: session, status } = useSimulatedSession(); // Get session
-  const { mockDataEnabled } = useMockData(); // Get mockDataEnabled
+const PedidosContent = () => {
+  const [pedidoCompleto, setPedidoCompleto] = useState(null);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      if (status === 'authenticated' && userId) {
-        setLoading(true);
-        setError(null);
-        const { pedidos, error: fetchError } = await obtenerPedidosPorUsuarioId(userId, mockDataEnabled);
-        if (fetchError) {
-          setError(fetchError);
-          setOrders([]);
-        } else {
-          setOrders(pedidos || []);
-        }
-        setLoading(false);
-      } else if (status === 'unauthenticated') {
-        setLoading(false);
-        setOrders([]);
-      }
-    };
+    const datos = localStorage.getItem("pedidoCompleto");
+    if (datos) {
+      const parsed = JSON.parse(datos);
+      setPedidoCompleto(parsed);
 
-    fetchOrders();
-  }, [userId, status, mockDataEnabled]); // Re-run when userId, status, or mockDataEnabled changes
+      // Suma price * quantity
+      const totalPedido = parsed.productos.reduce(
+        (acc, p) => acc + (p.price * (p.quantity || 1)), 0
+      );
+      setTotal(totalPedido + 50); // + envío
+    }
+  }, []);
 
-  const handleNewOrder = () => {
-    setIsModalOpen(true);
-  };
+  if (!pedidoCompleto) {
+    return (
+      <div className="min-h-screen flex justify-center items-center text-white">
+        No hay pedidos aún.
+      </div>
+    );
+  }
+
+  const { cliente, productos, fecha, proveedor, metodoPago } = pedidoCompleto;
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex justify-center">
-        <button
-          onClick={handleNewOrder}
-          className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center 
-                     text-white text-2xl font-bold shadow-lg hover:bg-purple-700 
-                     transition duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
-          aria-label="Crear nuevo pedido"
-        >
-          <img src="/icons/icono +.svg" alt="Add" className="w-6 h-6" />
-        </button>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"> 
-        {loading ? (
-          <div className="col-span-full text-center text-gray-400">Cargando pedidos...</div>
-        ) : error ? (
-          <div className="col-span-full text-red-500 text-center">
-            Error al cargar los pedidos: {error}
-          </div>
-        ) : orders.length === 0 ? (
-          <div className="col-span-full text-center text-gray-400">
-            No tienes pedidos realizados aún.
-          </div>
-        ) : (
-          orders.map((order) => (
-            <div key={order._id} className="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-              <div className="p-4 gradient-text-bg">
-                <p className="font-semibold">ID Pedido: {order._id}</p>
-                <p className="font-semibold">Fecha: {new Date(order.fechaPedido).toLocaleDateString()}</p>
-                <p className="font-semibold">Estado: {order.estado}</p>
-                <p className="font-semibold">Total: ${order.total}</p>
-                {/* Detalles del pedido */}
-                <div className="mt-2 text-gray-400">
-                  <h4 className="font-medium">Detalles:</h4>
-                  {order.detallesPedido && order.detallesPedido.length > 0 ? (
-                    order.detallesPedido.map((detail, index) => (
-                      <p key={index} className="text-sm ml-2">
-                        - {detail}
-                      </p>
-                    ))
-                  ) : (
-                    <p className="text-sm ml-2">No hay detalles de productos disponibles.</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))
-        )}
+    <div className="min-h-screen bg-black text-white font-poppins p-4">
+      <h2 className="text-center text-2xl font-bold mt-4">Tus Pedidos</h2>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+        {productos.map((pedido, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className="bg-white text-black p-4 rounded-xl"
+          >
+            {pedido.img && (
+              <img
+                src={pedido.img}
+                alt={pedido.nombre}
+                className="w-full h-40 object-cover rounded-md mb-2"
+              />
+            )}
+
+            <h4 className="font-semibold text-lg">{pedido.nombre}</h4>
+            <p className="text-sm">Precio: ${pedido.price.toFixed(2)}</p>
+            <p className="text-sm">Cantidad: {pedido.quantity}</p>
+            <p className="text-sm">Categoría: camisa</p>
+            <p className="text-sm">❤️ 2mil</p>
+          </motion.div>
+        ))}
       </div>
 
-      {isModalOpen && (
-        <NewOrderModal onClose={() => setIsModalOpen(false)} />
-      )}
+      <hr className="border-white my-6" />
+      <div className="text-sm bg-[#1f2937] p-4 rounded-md">
+        <p className="font-semibold mb-2">DETALLES DEL PEDIDO:</p>
+        <p><span className="font-bold">Prenda(s):</span> {productos.length}</p>
+        <p><span className="font-bold">Correo:</span> {cliente.correo}</p>
+        <p><span className="font-bold">Dirección:</span> {cliente.direccion}</p>
+        <p><span className="font-bold">Fecha del pedido:</span> {fecha}</p>
+        <p><span className="font-bold">Proveedor a cargo:</span> {proveedor}</p>
+        <p><span className="font-bold">Método de pago:</span> {metodoPago}</p>
+        <p><span className="font-bold">Total con envío:</span> ${total.toFixed(2)}</p>
+      </div>
     </div>
   );
-}
+};
 
-export default PedidosComponent;
+export default PedidosContent;

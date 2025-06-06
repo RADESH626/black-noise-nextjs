@@ -2,11 +2,11 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useCart } from "@/context/CartContext";
+import { useCartStorage } from "@/hooks/useCartStorage";
 
 export default function Pago() {
   const router = useRouter();
-  const { cartItems, clearCart, getTotal } = useCart();
+  const { cartItems, clearCart, getTotal } = useCartStorage();
 
   useEffect(() => {
     if (cartItems.length === 0) {

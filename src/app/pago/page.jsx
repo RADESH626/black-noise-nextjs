@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useCart } from "@/context/CartContext";
+import { useCartStorage } from "@/hooks/useCartStorage";
 
 export default function Pago() {
   const router = useRouter();
-  const { cartItems, clearCart, getTotal } = useCart();
+  const { cartItems, clearCart, getTotal } = useCartStorage();
 
   const [nombre, setNombre] = useState("");
   const [correo, setCorreo] = useState("");
@@ -176,4 +176,3 @@ export default function Pago() {
     </div>
   );
 }
-

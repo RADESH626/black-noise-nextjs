@@ -102,7 +102,7 @@ const ComunidadDiseños = () => {
 'use client'
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { useCart } from '@/context/CartContext';
+import { useCartStorage } from '@/hooks/useCartStorage';
 import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
 import Footer from '@/components/layout/general/footer/Footer';
 
@@ -111,7 +111,7 @@ import { useMockDataContext } from '@/context/MockDataContext';
 
 const ComunidadDiseños = () => {
   const [activo, setActivo] = useState('diseños');
-  const { addItem } = useCart();
+  const { addItem } = useCartStorage();
   const { mockDataEnabled } = useMockDataContext();
 
   const allDesigns = useMemo(() => {
