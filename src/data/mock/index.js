@@ -5,10 +5,7 @@ export { mockPedidos } from './pedidos';
 export { mockProveedores } from './proveedores';
 export { mockVentas } from './ventas';
 export { mockPagos } from './pagos';
-<<<<<<< HEAD
-=======
 export { mockSolicitudesProveedor } from './solicitudesProveedor';
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
 
 // Importar todos los datos
 import { mockUsuarios } from './usuarios';
@@ -17,10 +14,7 @@ import { mockPedidos } from './pedidos';
 import { mockProveedores } from './proveedores';
 import { mockVentas } from './ventas';
 import { mockPagos } from './pagos';
-<<<<<<< HEAD
-=======
 import { mockSolicitudesProveedor } from './solicitudesProveedor';
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
 
 // Función para obtener todos los datos mock
 export const getAllMockData = () => ({
@@ -29,12 +23,8 @@ export const getAllMockData = () => ({
   pedidos: mockPedidos,
   proveedores: mockProveedores,
   ventas: mockVentas,
-<<<<<<< HEAD
-  pagos: mockPagos
-=======
   pagos: mockPagos,
   solicitudesProveedor: mockSolicitudesProveedor
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
 });
 
 // =================== FUNCIONES DE UTILIDAD PARA USUARIOS ===================

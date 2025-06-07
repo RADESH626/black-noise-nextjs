@@ -8,13 +8,8 @@ function BotonGeneral({ children, onClick, type = 'button', disabled = false, cl
             type={type}
             onClick={onClick}
             disabled={disabled}
-<<<<<<< HEAD
-            className={`px-8 py-2 bg-gradient-to-r from-white to-pink-500 text-black font-semibold 
-            ${!disabled ? 'hover:from-pink-500 hover:to-white' : 'opacity-50 cursor-not-allowed'} 
-=======
             className={`px-8 py-2 bg-gradient-to-r from-[#FFFFFF] to-[#3656e2] text-black font-semibold 
             ${!disabled ? 'hover:from-[#4866ec] hover:to-[#FFFFFF]' : 'opacity-50 cursor-not-allowed'} 
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
             rounded-[20px] transition duration-300 ${className}`}
         >
             {children}
@@ -23,7 +18,3 @@ function BotonGeneral({ children, onClick, type = 'button', disabled = false, cl
 }
 
 export default BotonGeneral;
-<<<<<<< HEAD
-=======
-
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d

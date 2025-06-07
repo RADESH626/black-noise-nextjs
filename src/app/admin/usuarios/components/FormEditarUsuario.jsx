@@ -1,14 +1,8 @@
 "use client";
 
-<<<<<<< HEAD
-import { useEffect, useActionState } from "react"; // Import useEffect and useActionState
-import { useFormStatus } from "react-dom"; // Import useFormStatus
-import { usePopUp } from '@/context/PopUpContext'; // Import PopUpContext
-=======
 import { useEffect, useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { usePopUp } from '@/context/PopUpContext';
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
 import {
   InputTipoDocumentoIdentidad,
@@ -21,12 +15,8 @@ import {
   InputRol
 } from '@/components/common/inputs';
 
-<<<<<<< HEAD
-import { updateUserAction } from "@/app/acciones/UsuariosActions"; // Import Server Action
-=======
 import { updateUserAction } from "@/app/acciones/UsuariosActions";
 import { useMockData } from '@/hooks/useMockData'; // Import useMockData hook
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
 
 // Component for the submit button with pending state
 function SubmitButton({ isProfile }) {
@@ -43,20 +33,13 @@ function SubmitButton({ isProfile }) {
 const initialState = {
   message: null,
   success: false,
-<<<<<<< HEAD
-=======
   data: null, // Add data to initial state
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
 };
 
 // Receive initial user data as a prop
 function FormEditarUsuario({ initialUserData, userId, isProfile }) {
-<<<<<<< HEAD
-  const { showPopUp } = usePopUp(); // Use PopUpContext
-=======
   const { showPopUp } = usePopUp();
   const { isMockMode, usuarios } = useMockData(); // Get isMockMode and usuarios from useMockData
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
 
   // Bind the userId to the server action
   const updateUserActionWithId = updateUserAction.bind(null, userId);
@@ -64,34 +47,23 @@ function FormEditarUsuario({ initialUserData, userId, isProfile }) {
   // Use useActionState to manage the state of the action
   const [state, formAction] = useActionState(updateUserActionWithId, initialState);
 
-<<<<<<< HEAD
-  // Effect to show pop-up based on the state
-=======
   // Effect to show pop-up based on the state and update mock data if in mock mode
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
   useEffect(() => {
     if (state.message) {
       showPopUp(state.message, state.success ? 'success' : 'error');
     }
-<<<<<<< HEAD
-=======
 
     if (isMockMode() && state.success && state.data) {
       // If in mock mode and the server action succeeded, update the client-side mock data
       console.log('🎭 Mock Mode: Actualizando datos mock de usuario en el cliente.');
       usuarios.update(state.data._id, state.data);
     }
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
     // Optionally, handle redirection or other UI updates on success
     // if (state.success && !isProfile) {
     //   // Redirect to admin user list after editing a user in admin section
     //   // router.push('/admin/usuarios');
     // }
-<<<<<<< HEAD
-  }, [state, showPopUp, isProfile]); // Add isProfile to dependencies
-=======
   }, [state, showPopUp, isProfile, isMockMode, usuarios]); // Add isMockMode and usuarios to dependencies
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
 
   // No loading state needed here as initial data is passed as prop
   if (!initialUserData) {

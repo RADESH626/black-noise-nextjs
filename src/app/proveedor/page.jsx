@@ -17,36 +17,6 @@ function ProveedorPage() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-<<<<<<< HEAD
-        const fetchData = async () => {
-            setLoading(true);
-            setError(null);
-
-            try {
-                // Obtener lista de proveedores
-                const result = await obtenerProveedores();
-                if (result.error) {
-                    throw new Error(result.error);
-                }
-                setProveedores(result.proveedores);
-
-                // Si el usuario es proveedor, obtener su perfil
-                if (session?.user?.rol === Rol.PROVEEDOR) {
-                    const perfilResult = await obtenerMiPerfilProveedor();
-                    if (perfilResult.error) {
-                        throw new Error(perfilResult.error);
-                    }
-                    setMiPerfil(perfilResult.proveedor);
-                }
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-=======
         // Temporarily bypass session and data fetching for development
         setLoading(false);
         return;
@@ -85,7 +55,6 @@ function ProveedorPage() {
         // };
 
         // fetchData();
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
     }, [session]);
 
     if (loading) {

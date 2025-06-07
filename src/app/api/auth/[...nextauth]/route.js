@@ -14,11 +14,6 @@ export const authOptions = {
       id: "credentials",
       async authorize(credentials, req) {
         console.log("Attempting authentication with credentials:", credentials);
-<<<<<<< HEAD
-        
-        try {
-
-=======
 
         // Bypass authentication in development mode
         if (process.env.NODE_ENV === "development") {
@@ -33,7 +28,6 @@ export const authOptions = {
         }
         
         try {
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
           const user = await ObtenerUsuarioPorCorreo(credentials.email);
           
           if (!user) {

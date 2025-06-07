@@ -4,15 +4,10 @@ import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
 import Footer from '@/components/layout/general/footer/Footer';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import ProveedorButton from '@/components/layout/general/ProveedorButton';
-<<<<<<< HEAD
-
-async function indexPage() {
-=======
 import BotonDescargar from '@/components/common/botones/BotonDescargar';
 
 
 function indexPage() {
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
   return (
     <div className='pt-16'>
       <HeaderPrincipal />
@@ -22,17 +17,10 @@ function indexPage() {
         {/* Sección 1 */}
         <motion.section
           className='flex flex-col justify-start items-start gap-5 px-90 py-16 text-white'
-<<<<<<< HEAD
-          style={{ background: 'linear-gradient(to bottom, #000000, #C255AAFF, #000000)' }}
-          initial={{ opacity: 0, y: 60 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-=======
           style={{ background: 'linear-gradient(to bottom, #000000, #0A1828, #000000)' }}
           initial={{ opacity: 0, y: 60 }}
           whileInView={{ opacity: 1, y: 5 }}
           transition={{ duration: 1.8 }}
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
           viewport={{ once: false, amount: 0.3 }}
         >
           <div className='flex flex-col justify-center items-center gap-8 px-10 py-16 text-white'>
@@ -40,11 +28,7 @@ function indexPage() {
               className='font-bold text-5xl mb-4'
               style={{ color: '#ffffff' }}
               initial={{ scale: 0.8, opacity: 0 }}
-<<<<<<< HEAD
-              whileInView={{ scale: 1, opacity: 1 }}
-=======
               whileInView={{ scale: 1, opacity: 5 }}
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
               transition={{ duration: 0.3 }}
               viewport={{ once: false }}
             >
@@ -73,15 +57,6 @@ function indexPage() {
           </div>
 
           <div className='self-center'>
-<<<<<<< HEAD
-            <BotonGeneral>!Descargalo ahora!</BotonGeneral>
-          </div>
-        </motion.section>
-
-        {/* Sección 2 */}
-        <motion.section
-          className='flex flex-col justify-between items-center gap-4 p-15 text-white h-full w-full'
-=======
             <BotonDescargar>!Descargalo ahora!</BotonDescargar>
           </div>
         </motion.section>
@@ -89,85 +64,45 @@ function indexPage() {
        {/* Sección 2 */}
         <motion.section
           className='flex flex-col justify-between items-center gap-4 p-10 text-white w-full'
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
           style={{ background: 'linear-gradient(to bottom, #000000, #1f2937)' }}
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
           viewport={{ once: false, amount: 0.3 }}
         >
-<<<<<<< HEAD
-          <div className='flex flex-row justify-between items-center gap-4 w-full'>
-            <div className='flex flex-col justify-center items-center gap-4 p-5'>
-              <h1 className='font-bold text-5xl text-center w-full'>DISEÑA </h1>
-              <h1 className='font-bold text-5xl text-center w-full'>PRENDAS REALES</h1>
-              <p className='text-center text-4xl '>Selecciona tu talla, el color, corta y crea detalles</p>
-=======
           <div className='flex flex-col md:flex-row justify-between items-center gap-4 w-full max-w-7xl'>
             <div className='flex flex-col justify-center items-center gap-4 p-5 text-center md:text-left'>
               <h1 className='font-bold text-5xl w-full'>DISEÑA</h1>
               <h1 className='font-bold text-5xl w-full'>PRENDAS REALES</h1>
               <p className='text-4xl'>Selecciona tu talla, el color, corta y crea detalles</p>
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
               <BotonGeneral>EMPIEZA AHORA</BotonGeneral>
             </div>
 
             <motion.div
-<<<<<<< HEAD
-              className='flex flex-col justify-center items-center gap-4 p-5'
-=======
               className='flex justify-center items-center p-5 w-full md:w-1/2'
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
               initial={{ scale: 0.9, opacity: 0 }}
               whileInView={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.3 }}
               viewport={{ once: false }}
             >
-<<<<<<< HEAD
-              <img src='/img/modelos/modelo 4.jpg' alt="imagen de ropa" className='w-1/2 h-1/2 rounded-[80px] h-full w-full' />
-=======
               <img
                 src='/img/modelos/modelo 4.jpg'
                 alt="imagen de ropa"
                 className='rounded-[80px] w-full h-auto object-cover'
               />
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
             </motion.div>
           </div>
         </motion.section>
 
         {/* Sección 3 */}
         <motion.section
-<<<<<<< HEAD
-          className='flex flex-col justify-between items-center gap-4 p-15 text-white h-full w-full'
-=======
           className='flex flex-col justify-between items-center gap-4 p-10 text-white w-full'
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
           style={{ background: 'linear-gradient(to bottom, #1f2937, #000000)' }}
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
           viewport={{ once: false }}
         >
-<<<<<<< HEAD
-          <div className='flex flex-row justify-between items-center gap-4 w-full'>
-            <div className='flex flex-col justify-center items-center gap-4 p-5'>
-              <motion.img
-                src='/img/modelos/modelo 3.jpg'
-                alt="imagen de ropa"
-                className='w-1/2 h-1/2 rounded-[80px] h-full w-full'
-                initial={{ scale: 0.8, opacity: 0 }}
-                whileInView={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.3 }}
-                viewport={{ once: false }}
-              />
-            </div>
-
-            <div className='flex flex-col justify-center items-center gap-4 p-5'>
-              <h1 className='font-bold text-5xl text-center w-full'>AÑADE ELEMENTOS </h1>
-              <h1 className='font-bold text-5xl text-center w-full'>A TUS PRENDAS</h1>
-              <p className='text-center text-4xl '>Añade parches, taches, estampados y mucho más</p>
-=======
           <div className='flex flex-col md:flex-row justify-between items-center gap-4 w-full max-w-7xl'>
             <motion.div
               className='flex justify-center items-center p-5 w-full md:w-1/2'
@@ -187,7 +122,6 @@ function indexPage() {
               <h1 className='font-bold text-5xl w-full'>AÑADE ELEMENTOS</h1>
               <h1 className='font-bold text-5xl w-full'>A TUS PRENDAS</h1>
               <p className='text-4xl'>Añade parches, taches, estampados y mucho más</p>
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
               <BotonGeneral>EMPIEZA AHORA</BotonGeneral>
             </div>
           </div>
@@ -195,53 +129,33 @@ function indexPage() {
 
         {/* Sección 4 */}
         <motion.section
-<<<<<<< HEAD
-          className='flex flex-col justify-between items-center gap-4 p-15 text-white h-full w-full'
-=======
           className='flex flex-col justify-between items-center gap-4 p-10 text-white w-full'
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
           style={{ background: 'linear-gradient(to bottom,  #000000, #1f2937, #000000)' }}
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
           viewport={{ once: false }}
         >
-<<<<<<< HEAD
-          <div className='flex flex-row justify-between items-center gap-4 w-full'>
-            <div className='flex flex-col justify-center items-center gap-4 p-5'>
-              <h1 className='font-bold text-5xl text-center w-full'>DISEÑA</h1>
-              <h1 className='font-bold text-5xl text-center w-full'>PRENDAS REALES</h1>
-              <p className='text-center text-4xl '>Selecciona tu talla, el color, corta y crea detalles</p>
-=======
           <div className='flex flex-col md:flex-row justify-between items-center gap-4 w-full max-w-7xl'>
             <div className='flex flex-col justify-center items-center gap-4 p-5 text-center md:text-left'>
               <h1 className='font-bold text-5xl w-full'>DISEÑA</h1>
               <h1 className='font-bold text-5xl w-full'>PRENDAS REALES</h1>
               <p className='text-4xl'>Selecciona tu talla, el color, corta y crea detalles</p>
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
               <BotonGeneral>EMPIEZA AHORA</BotonGeneral>
             </div>
 
             <motion.div
-<<<<<<< HEAD
-              className='flex flex-col justify-center items-center gap-4 p-5'
-=======
               className='flex justify-center items-center p-5 w-full md:w-1/2'
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
               initial={{ scale: 0.8, opacity: 0 }}
               whileInView={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.3 }}
               viewport={{ once: false }}
             >
-<<<<<<< HEAD
-              <img src='/img/modelos/modelo 5.jpg' alt="imagen de ropa" className='rounded-[80px] h-full w-full' />
-=======
               <img
                 src='/img/modelos/modelo 5.jpg'
                 alt="imagen de ropa"
                 className='rounded-[80px] w-full h-auto object-cover'
               />
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
             </motion.div>
           </div>
         </motion.section>
@@ -280,11 +194,7 @@ function indexPage() {
         {/* Sección 5 - Registro Proveedores */}
         <motion.section
           className='flex h-screen flex-col justify-center items-center gap-4 p-10 text-white'
-<<<<<<< HEAD
-          style={{ background: 'linear-gradient(to bottom, #000000, #C255AAFF, #000000)' }}
-=======
           style={{ background: 'linear-gradient(to bottom, #000000, #0A1828, #000000)' }}
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
@@ -306,8 +216,4 @@ function indexPage() {
   )
 }
 
-<<<<<<< HEAD
-export default indexPage;
-=======
-export default indexPage;
->>>>>>> e32d185aa7ca43c5c2af446b5ff65a84e8a01a7d
+export default indexPage;
