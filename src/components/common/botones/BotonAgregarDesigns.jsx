@@ -1,16 +1,11 @@
-// src/components/common/botones/BotonAgregarDesigns.jsx
-import { IconoAgregarUsuario } from '../iconos';
-import { BotonAccion } from './BotonAccion';
+import React from 'react';
 
-export function BotonAgregarDesigns() {
-    return (
-        <BotonAccion 
-            texto="Agregar Diseño"
-            href="/admin/designs/agregar"
-            tipo="primario"
-            icono={IconoAgregarUsuario}
-        />
-    );
+function BotonAgregarDesigns() {
+  return (
+    <button>
+      Agregar Diseño
+    </button>
+  );
 }
 
 export default BotonAgregarDesigns;

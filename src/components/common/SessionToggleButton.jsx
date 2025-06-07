@@ -1,21 +1,20 @@
 "use client";
-import { useMockSession } from '@/context/MockSessionContext';
-import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
-export default function SessionToggleButton() {
-  const { simulatedSession, toggleMockSession } = useMockSession();
+import React from 'react';
+import { useSimulatedSession } from '@/hooks/useSimulatedSession'; // Assuming this hook exists
 
-  console.log("SessionToggleButton re-rendered. simulatedSession:", simulatedSession ? "Authenticated" : "Unauthenticated");
-
-  const buttonText = simulatedSession ? 'Simular Sesión: Logueado' : 'Simular Sesión: No Logueado';
-  const buttonClass = simulatedSession ? 'bg-green-500 hover:bg-green-700' : 'bg-red-500 hover:bg-red-700';
+const SessionToggleButton = () => {
+  const { mockSession, toggleMockSession } = useSimulatedSession();
 
   return (
-    <BotonGeneral
+    <button
       onClick={toggleMockSession}
-      className={`fixed bottom-5 right-5 z-1000 ${buttonClass} text-white`}
+      className="fixed bottom-4 left-4 bg-blue-500 text-white px-4 py-2 rounded-md shadow-lg z-50 hover:bg-blue-600 transition-colors duration-200"
+      title="Toggle Mock Session"
     >
-      {buttonText}
-    </BotonGeneral>
+      {mockSession ? 'Disable Mock Session' : 'Enable Mock Session'}
+    </button>
   );
-}
+};
+
+export default SessionToggleButton;

@@ -1,75 +1,18 @@
-"use client";
-
-import { useEffect } from 'react';
-import { useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
-import { usePopUp } from '@/context/PopUpContext';
-import BotonGeneral from '@/components/common/botones/BotonGeneral';
-// Import the Server Action for bulk upload
-import { bulkUploadUsersAction } from '@/app/acciones/UsuariosActions';
-
-// Component for the submit button with pending state
-function SubmitButton() {
-  const { pending } = useFormStatus();
-
-  return (
-    <BotonGeneral type="submit" disabled={pending}>
-      {pending ? 'Cargando...' : 'Cargar Archivo'}
-    </BotonGeneral>
-  );
-}
-
-// Initial state for useActionState
-const initialState = {
-  message: null,
-  success: false,
-};
+import { BotonGeneral } from '@/components/common/botones'
+import {RegistroMasivoUsuario} from '@/app/acciones/UsuariosActions'
+import { InputFiles } from '@/components/common/inputs'
 
 function FormCargaMasivaUsuarios() {
-  const { showPopUp } = usePopUp();
-
-  // Use useActionState to manage the state of the action
-  // Use useActionState with the actual bulk upload Server Action
-  const [state, formAction] = useActionState(bulkUploadUsersAction, initialState);
-
-  // Effect to show pop-up based on the state
-  useEffect(() => {
-    if (state.message) {
-      showPopUp(state.message, state.success ? 'success' : 'error');
-    }
-  }, [state, showPopUp]);
-
   return (
-    <div className="max-w-md mx-auto p-6 bg-neutral-800 text-secondary rounded-xl shadow-2xl border border-accent1">
-      <h2 className="text-2xl font-bold mb-6 text-center text-accent1">Carga Masiva de Usuarios</h2>
-      {/* Form element with action prop */}
-      <form action={formAction} className="space-y-4">
-        <div className="relative">
-          <label htmlFor="bulkFile" className="block text-sm font-medium text-accent1 mb-2">
-            Seleccionar archivo (.csv)
-          </label>
-          <input
-            type="file"
-            id="bulkFile"
-            name="bulkFile" // Name is crucial for FormData
-            accept=".csv" // Accept only CSV files
-            required
-            className="block w-full text-sm text-secondary
-              file:mr-4 file:py-2 file:px-4
-              file:rounded-full file:border-0
-              file:text-sm file:font-semibold
-              file:bg-accent1 file:text-primary
-              hover:file:bg-accent2"
-          />
-        </div>
+    <form action={RegistroMasivoUsuario} className='flex flex-col items-center justify-center w-full h-full bg-gray-600 rounded-2xl p-4 gap-4'>
 
-        <div className="flex justify-center">
-          {/* Use the SubmitButton component */}
-          <SubmitButton />
-        </div>
-      </form>
-    </div>
-  );
+
+      <InputFiles name="file" />
+
+      <BotonGeneral type="submit">Registrar Usuarios</BotonGeneral>
+
+    </form>
+  )
 }
 
-export default FormCargaMasivaUsuarios;
+export default FormCargaMasivaUsuarios

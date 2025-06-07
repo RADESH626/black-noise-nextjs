@@ -1,41 +1,72 @@
 "use client";
-import { createContext, useContext, useState } from 'react';
 
-const MockSessionContext = createContext(null);
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
-const mockClientSession = {
-  user: {
-    id: "mockUserId123", // Add a mock ID for fetching designs
-    name: "Usuario de Prueba",
-    email: "test@example.com",
-    image: "/img/perfil/FotoPerfil.webp",
-    role: "cliente",
-    primerNombre: "Usuario",
-    primerApellido: "Prueba",
-    likes: 123,
-    bio: "Esta es una biografía de prueba para el usuario simulado.",
-  },
-  expires: "2030-01-01T00:00:00.000Z",
-};
+const MockSessionContext = createContext();
 
-export function MockSessionProvider({ children }) {
-  const [simulatedSession, setSimulatedSession] = useState(null); // Inicia sin sesión
+export const MockSessionProvider = ({ children }) => {
+  const [mockSession, setMockSession] = useState(null);
+
+  useEffect(() => {
+    // Load mock session state from localStorage on component mount
+    const storedMockSession = localStorage.getItem('mockSession');
+    if (storedMockSession) {
+      setMockSession(JSON.parse(storedMockSession));
+    } else {
+      // Default to a mock session if nothing in localStorage
+      setMockSession({
+        user: {
+          name: "Mock User",
+          email: "mock@example.com",
+          image: "/img/perfil/FotoPerfil.webp", // Example mock image
+          role: "CLIENTE", // Default role for mock session
+        },
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Expires in 24 hours
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    // Save mock session state to localStorage whenever it changes
+    if (mockSession !== null) {
+      localStorage.setItem('mockSession', JSON.stringify(mockSession));
+    }
+  }, [mockSession]);
 
   const toggleMockSession = () => {
-    setSimulatedSession(prev => {
-      const newState = prev ? null : mockClientSession;
-      console.log("Simulated Session Toggled to:", newState ? "Authenticated" : "Unauthenticated");
-      return newState;
+    setMockSession((prevSession) => {
+      if (prevSession) {
+        // If there's a session, clear it (simulate logout)
+        localStorage.removeItem('mockSession');
+        return null;
+      } else {
+        // If no session, create a default mock session (simulate login)
+        const newSession = {
+          user: {
+            name: "Mock User",
+            email: "mock@example.com",
+            image: "/img/perfil/FotoPerfil.webp",
+            role: "CLIENTE",
+          },
+          expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        };
+        localStorage.setItem('mockSession', JSON.stringify(newSession));
+        return newSession;
+      }
     });
   };
 
   return (
-    <MockSessionContext.Provider value={{ simulatedSession, toggleMockSession }}>
+    <MockSessionContext.Provider value={{ mockSession, toggleMockSession }}>
       {children}
     </MockSessionContext.Provider>
   );
-}
+};
 
-export function useMockSession() {
-  return useContext(MockSessionContext);
-}
+export const useMockSession = () => {
+  const context = useContext(MockSessionContext);
+  if (!context) {
+    throw new Error('useMockSession must be used within a MockSessionProvider');
+  }
+  return context;
+};

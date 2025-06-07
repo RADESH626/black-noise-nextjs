@@ -8,16 +8,16 @@ import { useState } from 'react';
  * Este componente puede ser incluido en cualquier página para ver datos de prueba
  */
 const MockDataDemo = () => {
-  const mockData = useMockData();
+  const { mockDataEnabled, toggleMockData } = useMockData();
   const [activeTab, setActiveTab] = useState('usuarios');
 
-  if (!mockData.isMockMode()) {
+  if (!mockDataEnabled) {
     return (
       <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
         <p className="text-sm">
           🎭 Modo de datos de prueba desactivado. 
           <button 
-            onClick={mockData.toggleMockMode}
+            onClick={toggleMockData}
             className="ml-2 underline hover:no-underline"
           >
             Activar datos de prueba
@@ -319,7 +319,7 @@ const MockDataDemo = () => {
             <p className="text-purple-100">Visualiza el aspecto de tu aplicación con datos realistas</p>
           </div>
           <button 
-            onClick={mockData.toggleMockMode}
+            onClick={toggleMockData}
             className="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition-colors"
           >
             Desactivar

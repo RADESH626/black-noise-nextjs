@@ -1,16 +1,11 @@
-// src/components/common/botones/BotonAgregarProveedores.jsx
-import { IconoAgregarUsuario } from '../iconos';
-import { BotonAccion } from './BotonAccion';
+import React from 'react';
 
-export function BotonAgregarProveedores() {
-    return (
-        <BotonAccion 
-            texto="Registrar Proveedor"
-            href="/admin/proveedores/agregar"
-            tipo="info"
-            icono={IconoAgregarUsuario}
-        />
-    );
+function BotonAgregarProveedores() {
+  return (
+    <button>
+      Agregar Proveedor
+    </button>
+  );
 }
 
 export default BotonAgregarProveedores;

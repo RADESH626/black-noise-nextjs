@@ -16,8 +16,6 @@ function BotonEditar({ children }) {
             text-white 
             hover:bg-blue-700 
             focus:ring-green-500
-            h-full
-            w-full
             "
         >
             editar

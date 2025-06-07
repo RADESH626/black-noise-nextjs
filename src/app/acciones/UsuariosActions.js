@@ -268,7 +268,7 @@ async function obtenerUsuariosHabilitados() {
             return plainUser;
         });
         
-        return plainUsers;
+        return { users: plainUsers };
 
     } catch (error) {
         console.error('Error al encontrar el usuario:', error.message);
@@ -692,7 +692,7 @@ export async function ObtenerTodosLosUsuarios() {
         });
 
         // console.log("Datos retornados por ObtenerTodosLosUsuarios (plain):", plainUsers); // Log para depuración
-        return plainUsers;
+        return { users: plainUsers };
 
     } catch (error) {
         console.error('Error al encontrar el usuario:', error.message);
