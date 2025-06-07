@@ -5,25 +5,13 @@ import { useCartStorage } from '@/hooks/useCartStorage';
 import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
 import Footer from '@/components/layout/general/footer/Footer';
 
-import { mockDesigns } from '@/data/mock/designs';
-import { useMockDataContext } from '@/context/MockDataContext';
-
 const ComunidadDiseños = () => {
   const [activo, setActivo] = useState('diseños');
   const { addItem } = useCartStorage();
-  const { mockDataEnabled } = useMockDataContext();
 
   const allDesigns = useMemo(() => {
-    return mockDataEnabled ? mockDesigns.map(d => ({
-      ...d,
-      id: d._id, // Map _id to id for consistency with existing code
-      usuario: 'Usuario de la Comunidad', // Placeholder as mock data only has usuarioId
-      userAvatar: '/img/perfil/FotoPerfil.webp', // Placeholder
-      prenda: d.nombreDesing, // Map nombreDesing to prenda
-      imagen: d.imagenDesing, // Map imagenDesing to imagen
-      price: d.valorDesing, // Map valorDesing to price
-    })) : []; // Fallback if mockDataEnabled is false, or fetch real data
-  }, [mockDataEnabled, mockDesigns]);
+    return []; // Aquí se debería implementar la lógica para obtener diseños reales
+  }, []);
 
   // Filtramos populares, por ejemplo, más de 100 likes
   const populares = useMemo(() => allDesigns.filter(d => d.likes > 100), [allDesigns]);

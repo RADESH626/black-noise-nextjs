@@ -2,12 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { PopUpProvider } from '../context/PopUpContext';
 import { ModalProvider } from '../context/ModalContext';
-import { CartProvider } from '../context/CartContext'; // Import CartProvider
 import SessionProviderWrapper from './SessionProviderWrapper';
-import { MockSessionProvider } from '@/context/MockSessionContext';
-import SessionToggleButton from '@/components/common/SessionToggleButton';
-import { MockDataProvider } from '@/context/MockDataContext';
-import MockDataToggleButton from '@/components/common/MockDataToggleButton';
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -29,23 +24,9 @@ export default function RootLayout({ children }) {
       <body className="bg-primary text-secondary">
           <PopUpProvider>
             <ModalProvider>
-                <CartProvider> {/* Aquí envuelves con CartProvider */}
                   <SessionProviderWrapper>
-                    <MockSessionProvider>
-                      <MockDataProvider>
-                        {children}
-                        {/* Mock Data Toggle Button */}
-                        <div style={{ position: 'fixed', bottom: '70px', right: '20px', zIndex: 1000 }}>
-                          <MockDataToggleButton />
-                        </div>
-                        {/* Session Toggle Button */}
-                        <div style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 1000 }}>
-                          <SessionToggleButton />
-                        </div>
-                      </MockDataProvider>
-                    </MockSessionProvider>
+                    {children}
                   </SessionProviderWrapper>
-                </CartProvider>
             </ModalProvider>
           </PopUpProvider>
       </body>

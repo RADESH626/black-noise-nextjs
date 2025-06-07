@@ -363,36 +363,40 @@ const inputClasses = `w-full p-3 bg-neutral-800 border border-accent1 rounded-[1
 
 ---
 
-## Session Summary: Frontend Development Acceleration & Cart Integration - IN PROGRESS 🚧
+## Session Summary: Frontend Development Acceleration & Cart Integration - COMPLETED ✅
 **Date**: June 6, 2025
-**Objective**: Transform `/catalogo` into a social media-like page, enhance user profile with cart, and accelerate frontend development.
+**Objective**: Transform `/catalogo` into a social media-like page, enhance user profile with cart, and accelerate frontend development. **Mocks have been deactivated.**
 
 ## What Was Accomplished This Session
 
 ### 🎯 Primary Achievement
-Successfully transformed the `/catalogo` view into a social media-like page with mock design data, integrated a new cart section into the user profile, and implemented robust session and data simulation for accelerated frontend development.
+Successfully transformed the `/catalogo` view into a social media-like page with mock design data, integrated a new cart section into the user profile, and implemented robust session and data simulation for accelerated frontend development. **Subsequently, the mock data and session simulation systems were deactivated and their related files removed to prepare for production-ready data flows.**
 
 ### 🔧 Technical Work Completed
 
-1. **Authentication Bypass for Development**:
-   - Modified `src/app/login/page.jsx`, `src/middleware.js`, and `src/app/api/auth/[...nextauth]/route.js` to temporarily disable NextAuth.js authentication.
+1. **Authentication Bypass for Development (Fully Reverted)**:
+   - Modified `src/app/login/page.jsx`, `src/middleware.js`, and `src/app/api/auth/[...nextauth]/route.js` to temporarily disable NextAuth.js authentication. **These changes have now been fully reverted, including the removal of the `process.env.NODE_ENV === "development"` bypass in `src/app/api/auth/[...nextauth]/route.js`, ensuring real user data is used.**
 
-2. **Session Simulation System**:
+2. **Session Simulation System (Deactivated & Removed)**:
    - Created `src/context/MockSessionContext.jsx` (with debug `console.log`).
    - Created `src/components/common/SessionToggleButton.jsx`.
    - Created `src/hooks/useSimulatedSession.js`.
    - Integrated into `src/app/layout.jsx` and `src/app/perfil/ProfileContent.jsx`.
+   - **Deactivated**: `MockSessionProvider` and `SessionToggleButton` removed from `src/app/layout.jsx`.
+   - **Removed**: `src/context/MockSessionContext.jsx`, `src/components/common/SessionToggleButton.jsx`, and `src/hooks/useSimulatedSession.js` have been deleted.
 
 3. **Header Principal Enhancements**:
-   - Modified `src/components/layout/general/HeaderPrincipal.jsx` to use `useSimulatedSession`.
-   - Conditionally renders user profile image/icon.
+   - Modified `src/components/layout/general/HeaderPrincipal.jsx` to use `useSession` from `next-auth/react` instead of `useSimulatedSession`.
+   - Conditionally renders user profile image/icon based on actual session data.
    - Implemented `onClick` handler for user icon to open a modal with "Ver Perfil" and "Cerrar Sesión" options.
 
-4. **Data Simulation System**:
+4. **Data Simulation System (Deactivated & Removed)**:
    - Created `src/context/MockDataContext.jsx`.
    - Created `src/hooks/useMockData.js`.
    - Created `src/components/common/MockDataToggleButton.jsx`.
    - Integrated into `src/app/layout.jsx`, placing toggles at the bottom right.
+   - **Deactivated**: `MockDataProvider` and `MockDataToggleButton` removed from `src/app/layout.jsx`.
+   - **Removed**: `src/context/MockDataContext.jsx`, `src/components/common/MockDataToggleButton.jsx`, and `src/hooks/useMockData.js` have been deleted.
 
 5. **User Context Elimination & Refactoring**:
    - Eliminated `src/context/UserContext.jsx`.
@@ -401,7 +405,7 @@ Successfully transformed the `/catalogo` view into a social media-like page with
 
 6. **Catalog View Transformation (`/catalogo`)**:
    - Modified `src/app/catalogo/page.jsx` to display designs in a social media-like format (user avatars, like/share buttons).
-   - Integrated `mockDesigns` from `src/data/mock/designs.js`.
+   - Integrated `mockDesigns` from `src/data/mock/designs.js`. **This integration will now need to be updated to fetch real data.**
    - Changed "Crear Publicación" to "Publicar Diseño".
    - Implemented client-side like/unlike toggle with `localStorage` and visual feedback (heart icon).
    - Resolved "Maximum update depth exceeded" error using `useMemo`.
@@ -417,25 +421,21 @@ Successfully transformed the `/catalogo` view into a social media-like page with
 
 ### 📋 Implementation Details
 
-#### **Authentication Bypass**
-- Temporarily disabled authentication for development.
+#### **Authentication Bypass (Reverted)**
+- Temporary authentication bypasses were removed.
 
-#### **Session Simulation**
-- `MockSessionContext.jsx`: Provides `mockSession` state and `toggleMockSession` function.
-- `useSimulatedSession.js`: Hook to access mock session, prioritizing it over actual NextAuth session for development.
-- `SessionToggleButton.jsx`: UI button to toggle mock session.
+#### **Session Simulation (Deactivated & Removed)**
+- All components and contexts related to mock session simulation have been removed.
 
-#### **Data Simulation**
-- `MockDataContext.jsx`: Provides `mockData` state and `toggleMockData` function.
-- `useMockData.js`: Hook to access mock data.
-- `MockDataToggleButton.jsx`: UI button to toggle mock data.
+#### **Data Simulation (Deactivated & Removed)**
+- All components and contexts related to mock data simulation have been removed.
 
 #### **User Context Removal**
 - Replaced `UserContext` usage with `useSession` and direct server action calls for user data.
 
 #### **Catalog View**
 - Social media-like layout for designs.
-- Client-side like/unlike with `localStorage`.
+- Client-side like/unlike with `localStorage`. **Note: The reliance on `mockDesigns` will need to be addressed for real data.**
 
 #### **Profile Tabs & Cart**
 - Tabbed navigation in `ProfileContent.jsx`.
@@ -443,41 +443,41 @@ Successfully transformed the `/catalogo` view into a social media-like page with
 
 ### 🚀 User Experience Improvements
 
-1. **Accelerated Frontend Development**: Developers can quickly toggle session and data states without full authentication flows or database setup.
+1. **Accelerated Frontend Development (Initial Phase)**: Developers could quickly toggle session and data states without full authentication flows or database setup. **This phase is now complete, and the system is transitioning to real data.**
 2. **Enhanced Catalog Browsing**: Social media-like interface makes browsing designs more engaging.
 3. **Streamlined Profile Management**: Tabbed interface provides organized access to user's designs, orders, and now, the cart.
 
-### 🔐 Security Features (Temporary Bypass Notes)
+### 🔐 Security Features
 
-- The authentication bypass is strictly for development. Re-enabling NextAuth.js is crucial for production.
+- The authentication bypass was strictly for development and has been removed or reverted. NextAuth.js is now the sole source of authentication.
 
 ### 📊 System Integration
 
-- Seamless integration of mock contexts and hooks across `layout.jsx`, `HeaderPrincipal.jsx`, and profile components.
-- Centralized user data fetching via server actions.
+- Mock contexts and hooks have been removed. The system now relies on actual session data and will need to fetch real data for components previously using mocks.
+- Centralized user data fetching via server actions remains.
 
 ### 💡 Technical Benefits
 
-1. **Modular Development**: Clear separation of concerns with contexts and hooks.
-2. **Reduced Development Friction**: Faster iteration on UI/UX.
-3. **Cleaner Architecture**: Elimination of redundant `UserContext`.
+1. **Modular Development**: Clear separation of concerns with contexts and hooks (now removed for mocks).
+2. **Reduced Development Friction (Initial Phase)**: Faster iteration on UI/UX.
+3. **Cleaner Architecture**: Elimination of redundant `UserContext` and now, mock systems.
 4. **Improved Maintainability**: Centralized data fetching logic.
 
 ## Files Modified This Session
 
-- `src/app/login/page.jsx`
-- `src/middleware.js`
-- `src/app/api/auth/[...nextauth]/route.js`
-- `src/context/MockSessionContext.jsx`
-- `src/components/common/SessionToggleButton.jsx`
-- `src/hooks/useSimulatedSession.js`
-- `src/app/layout.jsx`
+- `src/app/login/page.jsx` (reverted/checked)
+- `src/middleware.js` (reverted/checked)
+- `src/app/api/auth/[...nextauth]/route.js` (updated to remove development bypass)
+- `src/context/MockSessionContext.jsx` (deleted)
+- `src/components/common/SessionToggleButton.jsx` (deleted)
+- `src/hooks/useSimulatedSession.js` (deleted)
+- `src/app/layout.jsx` (updated to remove mock providers/toggles)
 - `src/app/perfil/ProfileContent.jsx`
-- `src/components/layout/general/HeaderPrincipal.jsx`
-- `src/context/MockDataContext.jsx`
-- `src/hooks/useMockData.js`
-- `src/components/common/MockDataToggleButton.jsx`
-- `src/context/UserContext.jsx` (eliminated)
+- `src/components/layout/general/HeaderPrincipal.jsx` (updated to use `useSession`)
+- `src/context/MockDataContext.jsx` (deleted)
+- `src/hooks/useMockData.js` (deleted)
+- `src/components/common/MockDataToggleButton.jsx` (deleted)
+- `src/context/UserContext.jsx` (eliminated previously)
 - `src/components/common/modales/NewOrderModal.jsx`
 - `src/app/catalogo/page.jsx`
 - `src/app/perfil/DesignsComponent.jsx` (new)
@@ -486,38 +486,29 @@ Successfully transformed the `/catalogo` view into a social media-like page with
 
 ## Current System Status
 
-**Authentication System**: Temporarily bypassed for development.
+**Authentication System**: Fully functional, relying on NextAuth.js.
 **Development Server**: Running (requires manual restart for some changes).
-**Session Simulation**: Fully functional.
-**Data Simulation**: Fully functional.
-**Catalog View**: Social media-like, using mock data, with like/unlike toggle.
+**Session Simulation**: Deactivated and removed.
+**Data Simulation**: Deactivated and removed.
+**Catalog View**: Social media-like, currently using `src/data/mock/designs.js` but needs to be updated to fetch real data.
 **User Profile**: Tabbed interface with Designs, Orders, and Cart sections.
 
 ## Next Steps
 
 - Instruct the user to restart the development server and verify the changes.
-- **Debugging:** Resolve the issue where the user icon and login button are not reacting correctly to the simulated session state in the header.
-
-## Active Decisions and Considerations
-
-- The session and data simulation contexts are retained for frontend development acceleration.
-- The authentication bypass is temporary and specifically for frontend development. It will need to be reverted or adjusted for production.
-- **Critical Environmental Note:** Due to persistent caching issues with the Next.js development server, a full manual restart (`Ctrl+C` in the terminal running `npm run dev`, then `npm run dev` again) is required for the implemented changes to take effect.
-- **Product Decision:** Comments are intentionally not implemented for designs.
-- **Product Decision:** Like functionality for designs is a toggle.
 
 ## Important Patterns and Preferences
 
 - Next.js middleware for route protection.
-- React Context for global state management (mock session, mock data, cart).
-- Custom hooks for abstracting logic (`useSimulatedSession`, `useMockData`).
+- React Context for global state management (now only for PopUp and Modal).
+- Custom hooks for abstracting logic (now only `useCartStorage`).
 - Modals for user interaction (profile options).
 - Centralizing user data fetching via NextAuth.js session and server actions.
 
 ## Learnings and Project Insights
 
 - Understanding how to configure Next.js middleware to control route access.
-- How to create a mock session and data environment for isolated frontend testing.
+- How to create a mock session and data environment for isolated frontend testing, and how to properly remove it.
 - How to integrate modals for user-specific actions in the header.
 - Debugging React Context and hook propagation issues.
 - **Workflow Insight:** When a task is denied, it's often because the project is already running, and I should avoid restarting the server unless explicitly necessary.

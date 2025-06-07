@@ -15,18 +15,6 @@ export const authOptions = {
       async authorize(credentials, req) {
         console.log("Attempting authentication with credentials:", credentials);
 
-        // Bypass authentication in development mode
-        if (process.env.NODE_ENV === "development") {
-          console.log("Development mode: Bypassing authentication.");
-          return {
-            id: "mock-user-id",
-            name: "Desarrollador",
-            email: "dev@example.com",
-            image: "/img/perfil/FotoPerfil.webp",
-            rol: "ADMINISTRADOR", // Or any role for testing
-          };
-        }
-        
         try {
           const user = await ObtenerUsuarioPorCorreo(credentials.email);
           

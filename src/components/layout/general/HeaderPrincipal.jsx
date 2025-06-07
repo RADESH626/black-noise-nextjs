@@ -2,13 +2,15 @@
 
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
-import { useSimulatedSession } from '@/hooks/useSimulatedSession'; // Use simulated session
+import { useSession } from 'next-auth/react';
 import { useState, useEffect, useRef } from 'react'; // Import useState, useEffect, useRef
 import IconoPersona from '../../common/iconos/IconoPersona';
 import BotonGeneral from '../../common/botones/BotonGeneral';
 
 function HeaderPrincipal() {
-    const { data: session } = useSimulatedSession(); // Use simulated session
+    const { data: session } = useSession();
+
+    
     const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown visibility
     const dropdownRef = useRef(null); // Ref for dropdown element
 

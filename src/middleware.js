@@ -32,12 +32,7 @@ const productionMiddleware = withAuth(
   }
 );
 
-const developmentMiddleware = async function middleware(req) {
-  // Unconditionally allow access to all routes for development purposes
-  return NextResponse.next();
-};
-
-export default developmentMiddleware;
+export default productionMiddleware;
 
 export const config = {
   matcher: [
