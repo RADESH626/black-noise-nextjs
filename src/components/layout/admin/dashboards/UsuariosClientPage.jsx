@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { ObtenerTodosLosUsuarios } from '@/app/acciones/UsuariosActions.js';
+import { useState, useEffect, useCallback } from 'react';
+import { ObtenerTodosLosUsuarios, toggleUsuarioHabilitado } from '@/app/acciones/UsuariosActions.js';
 import Tabla from '@/components/common/tablas/Tabla';
 import TdGeneral from '@/components/common/tablas/TdGeneral';
 import THUsuarios from '@/components/layout/admin/usuarios/THUsuarios';
 import Image from 'next/image';
 import Link from 'next/link';
-import BotonEditar from '@/components/common/botones/BotonEditar'; // Assuming this path
+import BotonEditar from '@/components/common/botones/BotonEditar';
+import FormBuscarUsuario from '@/components/layout/admin/usuarios/forms/FormBuscarUsuario';
+import { usePopUp } from '@/context/PopUpContext';
 
 // Utility function for date formatting
 const formatDate = (dateString) => {
@@ -16,42 +18,63 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('es-ES', options);
 };
 
-// Placeholder for user status toggle function
-const handleToggleUserStatus = async (userId, currentStatus) => {
-  console.log(`Toggle user status for ${userId} from ${currentStatus}`);
-  // Implement actual logic to update user status via server action
-  // Example: await toggleUserStatusAction(userId, !currentStatus);
-};
-
 export default function UsuariosClientPage({ initialUsers }) {
   const [users, setUsers] = useState(initialUsers || []);
-  const [loading, setLoading] = useState(!initialUsers);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { showPopUp } = usePopUp();
+
+  const fetchAndSetUsers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const result = await ObtenerTodosLosUsuarios();
+      if (result && result.users && Array.isArray(result.users)) {
+        setUsers(result.users);
+      } else {
+        setError(result?.error || "No se recibió un array de usuarios.");
+        console.log("Error al cargar usuarios en UsuariosClientPage.jsx:", result?.error || "No se recibió un array de usuarios.");
+      }
+    } catch (err) {
+      setError(err.message);
+      console.log("Error fetching users:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    if (!initialUsers || initialUsers.length === 0) { // Only fetch if no initial data
-      async function fetchUsers() {
-        try {
-          setLoading(true);
-          const result = await ObtenerTodosLosUsuarios();
-          if (result && result.users && Array.isArray(result.users)) {
-            setUsers(result.users);
-          } else {
-            setError(result?.error || "No se recibió un array de usuarios.");
-            console.log("Error al cargar usuarios en UsuariosClientPage.jsx:", result?.error || "No se recibió un array de usuarios.");
-          }
-        } catch (err) {
-          setError(err.message);
-          console.log("Error fetching users:", err);
-        } finally {
-          setLoading(false);
-        }
-      }
-      fetchUsers();
+    if (!initialUsers || initialUsers.length === 0) {
+      fetchAndSetUsers();
+    } else {
+      setUsers(initialUsers);
     }
-  }, [initialUsers]);
+  }, [initialUsers, fetchAndSetUsers]);
 
-  if (loading) {
+  const handleSearchSuccess = (filteredUsers) => {
+    setUsers(filteredUsers);
+    setError(null); // Clear any previous errors
+  };
+
+  const handleToggleUserStatus = async (userId, currentStatus) => {
+    setLoading(true);
+    try {
+      const result = await toggleUsuarioHabilitado(userId, !currentStatus);
+      if (result.success) {
+        showPopUp(result.message, 'success');
+        // Re-fetch users to get the updated status
+        fetchAndSetUsers();
+      } else {
+        showPopUp(result.message, 'error');
+      }
+    } catch (err) {
+      showPopUp('Error al cambiar el estado del usuario.', 'error');
+      console.error('Error toggling user status:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading && users.length === 0) { // Only show full loading if no users are displayed yet
     return <p>Cargando usuarios...</p>;
   }
 
@@ -62,14 +85,16 @@ export default function UsuariosClientPage({ initialUsers }) {
   return (
     <div>
       <h4 className='font-bold text-2xl text-black'>Gestión de Usuarios</h4>
-      {/* Render user data here */}
+      <div className="my-4 p-4 bg-gray-800 rounded-lg shadow-md">
+        <FormBuscarUsuario onSearchSuccess={handleSearchSuccess} />
+      </div>
       {users.length > 0 ? (
         <div className="overflow-x-auto">
           <Tabla>
             <THUsuarios />
             <tbody className='bg-gray-300 divide-y divide-gray-400'>
                 {loading ? (
-                    <tr><TdGeneral colSpan="6" className="text-center py-4">Cargando...</TdGeneral></tr>
+                    <tr><TdGeneral colSpan="6" className="text-center py-4">Actualizando...</TdGeneral></tr>
                 ) : users.length === 0 ? (
                     <tr><TdGeneral colSpan="6" className="text-center py-4">No se encontraron usuarios.</TdGeneral></tr>
                 ) : (

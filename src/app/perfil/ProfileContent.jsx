@@ -3,8 +3,7 @@
 import { useModal } from "@/context/ModalContext";
 import { signOut, useSession } from "next-auth/react"; // Import signOut and useSession
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
-import FormEditarUsuario from "@/app/admin/usuarios/components/FormEditarUsuario";
-import { useCart } from "@/context/CartContext"; // Import useCart
+import { useCartStorage } from "@/hooks/useCartStorage"; // Import useCartStorage
 import { useEffect, useState } from "react"; // Import useEffect and useState
 import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions"; // Import the server action
 import DesignsComponent from "./DesignsComponent"; // Import DesignsComponent
@@ -13,7 +12,7 @@ import CartComponent from "./CartComponent"; // Import CartComponent
 
 function ProfileContent() { // Removed user, designs, and error props
   const { openModal } = useModal();
-  const { cartItems, addItem } = useCart(); // Get cartItems and addItem from context
+  const { cartItems, addItem } = useCartStorage(); // Get cartItems and addItem from context
   const { data: session, status } = useSession(); // Get session using useSession
 
   const [activeTab, setActiveTab] = useState('designs'); // State to manage active tab
@@ -52,8 +51,11 @@ function ProfileContent() { // Removed user, designs, and error props
   const handleEditProfile = () => {
     openModal(
       "Editar Perfil",
-      <FormEditarUsuario UserId={user?.id} isProfile={true} />,
-      'large' // Usamos tamaño grande para el formulario de perfil
+      <div className="text-white">
+        <h3 className="text-lg mb-4">Funcionalidad de edición de perfil no disponible.</h3>
+        <p>El componente FormEditarUsuario no fue encontrado.</p>
+      </div>,
+      'default'
     );
   };
 

@@ -25,6 +25,16 @@
         *   Renderiza los usuarios en una tabla con encabezados y celdas genéricas.
     * **Modelos de Datos / Endpoints:** Consume `UsuariosActions.js` para obtener datos de usuarios.
 
+#### 📄 **Archivo:** `src/components/layout/admin/usuarios/forms/FormBuscarUsuario.jsx`
+* **Rol:** Formulario para que los administradores busquen usuarios por texto (nombre, correo, documento, etc.).
+* **Implementación Clave:**
+    * **Componentes/Funciones Relevantes:** `FormBuscarUsuario` (componente), `useActionState`, `useFormStatus`, `usePopUp`, `FiltrarUsuarios` (de `UsuariosActions.js`), `Input`, `BotonGeneral`.
+    * **Lógica Principal:**
+        *   Utiliza `FiltrarUsuarios` como Server Action para procesar la búsqueda.
+        *   Maneja el estado de envío (`pending`) y muestra feedback al usuario a través de `usePopUp`.
+        *   Pasa los resultados de la búsqueda a un callback `onSearchSuccess` para que el componente padre (`UsuariosClientPage`) actualice la tabla.
+    * **Modelos de Datos / Endpoints:** Interactúa con `UsuariosActions.js` para filtrar usuarios.
+
 #### 📄 **Archivo:** `src/components/layout/admin/usuarios/forms/FormAgregarUsuarios.jsx`
 * **Rol:** Formulario para que los administradores agreguen un nuevo usuario individualmente.
 * **Implementación Clave:**
@@ -64,4 +74,3 @@
     * **Componentes/Funciones Relevantes:** `THUsuarios` (componente), `Thgeneral`, `TablaHeader`.
     * **Lógica Principal:** Renderiza una fila de encabezados de tabla predefinidos para la información del usuario.
     * **Modelos de Datos / Endpoints:** No interactúa directamente.
-

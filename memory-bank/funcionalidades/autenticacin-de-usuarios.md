@@ -24,7 +24,7 @@
 * **Rol:** Componente de formulario para el inicio de sesión. Maneja la interacción del usuario y la llamada a la acción de servidor de login.
 * **Implementación Clave:**
     * **Componentes/Funciones Relevantes:** `FormLogin` (componente), `useActionState`, `useFormStatus`, `usePopUp`, `signIn` (de `next-auth/react`).
-    * **Lógica Principal:** Utiliza `loginAction` de `UsuariosActions.js` como Server Action. Maneja el estado del formulario, muestra pop-ups de éxito/error y redirige al usuario según su rol (`ADMINISTRADOR` a `/admin`, `PROVEEDOR` a `/proveedor`, `CLIENTE` a `/`).
+    * **Lógica Principal:** Utiliza `loginAction` de `UsuariosActions.js` como Server Action. Maneja el estado del formulario, muestra pop-ups de éxito/error y redirige al usuario según su rol (`ADMINISTRADOR` a `/admin`, `PROVEEDOR` a `/proveedor`, `CLIENTE` a `/catalogo`).
     * **Modelos de Datos / Endpoints:** Interactúa con `UsuariosActions.js` para la autenticación.
 
 #### 📄 **Archivo:** `src/components/layout/general/forms/FormRegistro.jsx`
@@ -69,4 +69,3 @@
     * **Componentes/Funciones Relevantes:** `NextAuth`, `CredentialsProvider`, `MongoDBAdapter`.
     * **Lógica Principal:** Define los proveedores de autenticación (en este caso, credenciales), cómo se maneja la sesión y los callbacks para la autorización. Se conecta a la base de datos para validar usuarios.
     * **Modelos de Datos / Endpoints:** Interactúa con el modelo `Usuario` para la autenticación.
-

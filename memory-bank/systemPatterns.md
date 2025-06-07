@@ -21,16 +21,16 @@ All forms in the application now follow this standardized pattern:
 
 ```jsx
 "use client";
-import { useEffect } from "react";
-import { useActionState, useFormStatus } from 'react-dom';
-import { usePopUp } from '@/context/PopUpContext';
+import { useEffect } = "react";
+import { useActionState, useFormStatus } = "react-dom";
+import { usePopUp } = "@/context/PopUpContext";
 
 // Submit button component with pending state
-function SubmitButton({ customText = 'Submit' }) {
+function SubmitButton({ customText = "Submit" }) {
   const { pending } = useFormStatus();
   return (
     <BotonGeneral type="submit" disabled={pending}>
-      {pending ? 'Loading...' : customText}
+      {pending ? "Loading..." : customText}
     </BotonGeneral>
   );
 }
@@ -47,7 +47,7 @@ function FormComponent({ onSuccess }) {
 
   useEffect(() => {
     if (state.message) {
-      showPopUp(state.message, state.success ? 'success' : 'error');
+      showPopUp(state.message, state.success ? "success" : "error");
       if (state.success && onSuccess) {
         onSuccess();
       }
@@ -68,15 +68,15 @@ All server actions follow this standardized pattern:
 
 ```javascript
 "use server"
-import { revalidatePath } from 'next/cache';
+import { revalidatePath } from "next/cache";
 
 export async function actionName(prevState, formData) {
-    console.log('Server Action: Started');
+    console.log("Server Action: Started");
 
     // Validation
-    const requiredField = formData.get('requiredField');
+    const requiredField = formData.get("requiredField");
     if (!requiredField) {
-        return { message: 'Required field missing.', success: false };
+        return { message: "Required field missing.", success: false };
     }
 
     try {
@@ -85,18 +85,18 @@ export async function actionName(prevState, formData) {
 
         if (result.success) {
             // Revalidate relevant paths
-            revalidatePath('/relevant/path');
+            revalidatePath("/relevant/path");
             return { 
-                message: result.message || 'Operation completed successfully.', 
+                message: result.message || "Operation completed successfully.", 
                 success: true, 
                 data: result.data 
             };
         } else {
-            return { message: result.error || 'Operation failed.', success: false };
+            return { message: result.error || "Operation failed.", success: false };
         }
     } catch (error) {
-        console.error('Server Action Error:', error.message);
-        return { message: 'Unexpected error occurred.', success: false };
+        console.error("Server Action Error:", error.message);
+        return { message: "Unexpected error occurred.", success: false };
     }
 }
 ```
@@ -133,7 +133,7 @@ const { showPopUp } = usePopUp();
 
 useEffect(() => {
   if (state.message) {
-    showPopUp(state.message, state.success ? 'success' : 'error');
+    showPopUp(state.message, state.success ? "success" : "error");
   }
 }, [state, showPopUp]);
 ```
@@ -146,7 +146,7 @@ function SubmitButton() {
   const { pending } = useFormStatus();
   return (
     <button type="submit" disabled={pending}>
-      {pending ? 'Processing...' : 'Submit'}
+      {pending ? "Processing..." : "Submit"}
     </button>
   );
 }
@@ -197,7 +197,7 @@ const plainUser = {
   ...mongoUser,
   _id: mongoUser._id.toString(),
   fechaNacimiento: mongoUser.fechaNacimiento ? 
-    new Date(mongoUser.fechaNacimiento).toISOString().split('T')[0] : null,
+    new Date(mongoUser.fechaNacimiento).toISOString().split("T")[0] : null,
   createdAt: mongoUser.createdAt ? 
     new Date(mongoUser.createdAt).toISOString() : null,
 };
@@ -224,8 +224,8 @@ const plainUser = {
 try {
   // Business logic
 } catch (error) {
-  console.error('Detailed error:', error.message);
-  return { message: 'User-friendly error message', success: false };
+  console.error("Detailed error:", error.message);
+  return { message: "User-friendly error message", success: false };
 }
 ```
 
@@ -233,7 +233,7 @@ try {
 ```jsx
 useEffect(() => {
   if (state.message) {
-    showPopUp(state.message, state.success ? 'success' : 'error');
+    showPopUp(state.message, state.success ? "success" : "error");
   }
 }, [state, showPopUp]);
 ```
@@ -248,7 +248,7 @@ const result = Papa.parse(text, {
   header: true,
   skipEmptyLines: true,
   transformHeader: header => header.trim(),
-  transform: value => typeof value === 'string' ? value.trim() : value,
+  transform: value => typeof value === "string" ? value.trim() : value,
 });
 ```
 
@@ -261,11 +261,11 @@ const result = Papa.parse(text, {
 
 ### Path Revalidation
 ```javascript
-import { revalidatePath } from 'next/cache';
+import { revalidatePath } from "next/cache";
 
 // After successful mutation
-revalidatePath('/admin/usuarios');           // Admin user list
-revalidatePath('/perfil/editar');            // Profile edit page
+revalidatePath("/admin/usuarios");           // Admin user list
+revalidatePath("/perfil/editar");            // Profile edit page
 revalidatePath(`/admin/usuarios/editar/${userId}`); // Specific edit page
 ```
 
@@ -293,12 +293,12 @@ src/
 import { actionName } from "@/app/acciones/ModuleActions";
 
 // Component imports
-import { useActionState, useFormStatus } from 'react-dom';
-import { usePopUp } from '@/context/PopUpContext';
+import { useActionState, useFormStatus } from "react-dom";
+import { usePopUp } from "@/context/PopUpContext";
 
 // Database imports
-import connectDB from '@/utils/DBconection';
-import Model from '@/models/Model';
+import connectDB from "@/utils/DBconection";
+import Model from "@/models/Model";
 ```
 
 ## Performance Patterns - ESTABLISHED ✅
@@ -315,7 +315,7 @@ import Model from '@/models/Model';
 
 ### Caching Strategy
 - Use `revalidatePath` for targeted cache invalidation
-- Implement `cache: 'no-store'` for real-time data
+- Implement `cache: "no-store"` for real-time data
 - Optimize API call patterns
 
 ## Security Patterns - ESTABLISHED ✅
@@ -341,3 +341,17 @@ Future patterns to establish:
 - Unit testing for Server Actions
 - Integration testing for forms
 - E2E testing for user workflows
+
+---
+
+## Existence Verification Principle
+
+To prevent build errors and ensure code integrity, it is mandatory to follow this verification pattern before using any module or component.
+
+1.  **Verify Before Importing:** Before writing a line of code that imports a component, module, or Server Action (e.g., `import MyComponent from ''components/MyComponent'`)' (see below for file content), it is required to first verify that the corresponding file (`src/components/MyComponent.jsx`) actually exists in the project's file structure.
+
+2.  **No Assumptions:** Code should not reference "ghost" files. The existence of components must not be assumed or invented.
+
+3.  **Corrective Action:** If a needed component does not exist, the correct procedure is:
+    * **a.** Include the creation of said component as part of the work plan.
+    * **b.** If creating the component is outside the scope of the current task, the user must be notified of the missing dependency instead of generating code that will fail.

@@ -33,7 +33,7 @@
         *   Proporciona funciones `handleEditProfile` para abrir un modal con `FormEditarUsuario` y `handleEditDesign` para una futura edición de diseños.
         *   Renderiza condicionalmente `DesignsComponent`, `PedidosComponent` y `CartComponent` según la pestaña activa.
         *   Permite cerrar sesión (`signOut`).
-    * **Modelos de Datos / Endpoints:** Consume `DesignActions.js` para obtener diseños. El `FormEditarUsuario` interactúa con `UsuariosActions.js`.
+    * **Modelos de Datos / Endpoints:** Consume `DesignActions.js` (específicamente `obtenerDesignsPorUsuarioId`) para obtener diseños. El `FormEditarUsuario` interactúa con `UsuariosActions.js`.
 
 #### 📄 **Archivo:** `src/app/perfil/ProfileData.jsx`
 * **Rol:** Componente que solía manejar la lógica de obtención de datos del perfil, pero ahora delega a `ProfileContent`.
@@ -71,4 +71,3 @@
     * **Componentes/Funciones Relevantes:** `CartComponent` (componente), `useCart` (de `src/context/CartContext`).
     * **Lógica Principal:** Muestra los ítems del carrito obtenidos del contexto `useCart`. (Nota: La importación `useCart` de `src/context/CartContext` en `ProfileContent.jsx` y la ausencia de `src/context/CartContext.jsx` sugieren una posible inconsistencia o que `useCart` es un alias para `useCartStorage`).
     * **Modelos de Datos / Endpoints:** No interactúa directamente con la DB, depende del estado del carrito gestionado en el cliente.
-

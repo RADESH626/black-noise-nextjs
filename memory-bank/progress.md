@@ -57,6 +57,9 @@
 6.  **Venta Model Refactoring**:
     -   Cleaned `src/app/acciones/VentaActions.js` by resolving merge conflicts and removing mock mode logic.
     -   Confirmed no API routes (`src/app/api/ventas/route.js`, `src/app/api/ventas/[id]/route.js`) existed for deletion.
+7.  **Fix for `obtenerDesignsPorUsuarioId` Error**:
+    -   Added `export async function obtenerDesignsPorUsuarioId(userId)` to `src/app/acciones/DesignActions.js`. This function queries the `Design` model to find designs associated with a specific `userId`.
+    -   Updated `memory-bank/funcionalidades/gestin-de-perfil-de-usuario.md` to reflect the usage of this new function.
 
 **Technical Achievements**:
 -   Successfully migrated all specified entity logic from API Routes to Server Actions.
@@ -64,6 +67,7 @@
 -   Removed all mock data logic from Server Actions, ensuring they operate solely with the database.
 -   Resolved all identified merge conflicts in the refactored Server Action files.
 -   Maintained consistent error handling and `revalidatePath` usage across all Server Actions.
+-   Resolved the `obtenerDesignsPorUsuarioId is not a function` error by implementing the missing function in `DesignActions.js`.
 
 #### ✅ Mock Data System for Visual Development (Session 6 - Deactivated)
 **Date**: July 6, 2025

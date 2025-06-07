@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import FormEditarUsuario from "@/app/admin/usuarios/components/FormEditarUsuario";
 
 async function EditarPerfil() {
   const getUserData = async () => {
@@ -26,7 +25,10 @@ async function EditarPerfil() {
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-8 text-center">Editar Perfil</h1>
         <div className="bg-black rounded-lg p-6 text-white shadow-lg">
-          <FormEditarUsuario usuarioId={user.id} isProfile={true} />
+          <div className="text-white text-center p-4">
+            <h3 className="text-lg mb-4">Funcionalidad de edición de perfil no disponible.</h3>
+            <p>El componente FormEditarUsuario no fue encontrado.</p>
+          </div>
         </div>
       </div>
     </div>

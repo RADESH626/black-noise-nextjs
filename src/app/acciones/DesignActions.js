@@ -49,6 +49,20 @@ export async function obtenerDesigns() {
     }
 }
 
+// Function to get designs by user ID
+export async function obtenerDesignsPorUsuarioId(userId) {
+    await connectDB();
+    console.log('DEBUG: Entering obtenerDesignsPorUsuarioId with userId:', userId);
+    try {
+        const designs = await Design.find({ userId: userId }).lean(); // Assuming 'userId' field in Design model
+        console.log('DEBUG: Designs obtained by userId successfully:', designs);
+        return { designs: JSON.parse(JSON.stringify(designs)), error: null };
+    } catch (error) {
+        console.error('ERROR in obtenerDesignsPorUsuarioId:', error);
+        return { designs: null, error: 'Error al obtener los diseños por usuario: ' + error.message };
+    }
+}
+
 // Function to register a single design (from a form)
 // This function was previously named RegistrarDesing and had user-related fields.
 // It's now corrected to handle design registration.

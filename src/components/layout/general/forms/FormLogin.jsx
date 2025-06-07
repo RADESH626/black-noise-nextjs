@@ -73,8 +73,8 @@ function FormLogin() {
             console.log('Frontend Login: Redirigiendo proveedor al panel de proveedor.');
             router.push('/proveedor');
           } else {
-            console.log('Frontend Login: Redirigiendo cliente al inicio. Rol actual:', state.userRole);
-            router.push('/');
+            console.log('Frontend Login: Redirigiendo cliente al catálogo. Rol actual:', state.userRole);
+            router.push('/catalogo');
           }
         }
       };
