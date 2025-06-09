@@ -33,16 +33,22 @@ export function BotonAccion({
         </>
     );
 
-    // Si hay href, renderizar como Link
+    // If href is provided, it means this component is likely a child of a Next.js Link or custom LinkComponent.
+    // In this case, we should render a span or div that can be wrapped by the parent Link.
+    // The onClick should still be handled by this component if provided.
     if (href) {
         return (
-            <Link href={href} className={clasesFinal} {...props}>
+            <span
+                onClick={onClick} // Keep onClick for internal actions if needed
+                className={clasesFinal}
+                {...props}
+            >
                 {contenido}
-            </Link>
+            </span>
         );
     }
 
-    // Si no hay href, renderizar como botón
+    // If no href, render as a button (original behavior)
     return (
         <button 
             onClick={onClick} 

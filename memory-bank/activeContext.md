@@ -1,20 +1,13 @@
 # Session: 2025-09-06
 
-## Task: Implement filter by payment methods for suppliers list
+## Task: Fix hydration error due to nested <a> tags
 
 ### Changes Made:
-- **`src/components/layout/admin/dashboards/proveedores/ListaProveedores.jsx`**:
-    - Added `selectedPaymentMethod` state to manage the filter.
-    - Modified `providers` state to `allProviders` and introduced `filteredProviders`.
-    - Implemented a `useEffect` to filter `allProviders` based on `selectedPaymentMethod`.
-    - Added a `select` input for payment method filtering above the suppliers table.
-    - Updated the table rendering to use `filteredProviders`.
-- **`memory-bank/funcionalidades/gestin-de-proveedores-admin.md`**:
-    - Updated the "Flujo de Interacción" section to mention the new filter.
-    - Updated the "Archivos Involucrados" section for `ListaProveedores.jsx` to describe the filter implementation.
+- **`src/components/common/botones/BotonAccion.jsx`**:
+    - Modified the conditional rendering logic for `href`. Instead of rendering a `next/link` component directly, it now renders a `<span>` element when `href` is provided. This prevents the creation of nested `<a>` tags when `BotonAccion` is used as a child of another `LinkComponent` or `next/link`. The `className` and other props are now applied to this `<span>`.
 
 ### Key Decisions:
-- Implemented client-side filtering for payment methods in `ListaProveedores.jsx` for simplicity, assuming the number of providers is manageable. If performance becomes an issue, server-side filtering would be considered.
+- Refactored `BotonAccion.jsx` to ensure it does not create nested `<a>` tags, resolving the hydration error. The component now renders a `<span>` when `href` is present, allowing external `Link` components to wrap it correctly.
 
 ### Next Steps:
 - Generate git commit.
