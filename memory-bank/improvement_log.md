@@ -26,3 +26,16 @@
 **Error:** A persistent "Module not found" error in `src/app/proveedor/page.jsx` for components like `LoadingSpinner` and `ErrorMessage` was initially misdiagnosed as a malformed import string literal or caching issue. The root cause was ultimately the physical absence of the `LoadingSpinner.jsx` and `ErrorMessage.jsx` files in the `src/components/common/` directory. The `ENOENT: no such file or directory` part of the error message was the key indicator, which was initially overlooked due to the misleading "malformed string literal" appearance in the compiler output.
 **Correction:** The missing component files (`src/components/common/LoadingSpinner.jsx` and `src/components/common/ErrorMessage.jsx`) were created with basic implementations.
 **Rule Update:** When encountering "Module not found" errors, especially those accompanied by `ENOENT: no such file or directory`, always prioritize verifying the physical existence of the imported files at the specified paths before investigating import path formatting, alias resolution, or caching issues. A `list_files` or `search_files` operation should be among the first diagnostic steps.
+
+### 2025-09-06 - Next.js Import Error (Missing Exported Function)
+**Error:** Received "Attempted import error: 'obtenerMiPerfilProveedor' is not exported from '../acciones/ProveedorActions'" in `src/app/proveedor/page.jsx`. The function `obtenerMiPerfilProveedor` was being imported but was not defined or exported in the `ProveedorActions.js` file. Additionally, the call to this function in `page.jsx` was passing an unnecessary `session.user.proveedorId` argument, while the intended logic for fetching a provider's profile should rely on the session's email.
+**Correction:**
+1.  A new asynchronous function `obtenerMiPerfilProveedor` was added to `src/app/acciones/ProveedorActions.js`. This function retrieves the current user's session using `getServerSession` and then queries the `Proveedor` model using the `session.user.email` to find the corresponding provider profile.
+2.  The `src/app/proveedor/page.jsx` file was updated to:
+    *   Correctly import `obtenerMiPerfilProveedor` from `../acciones/ProveedorActions`.
+    *   Modify the call to `obtenerMiPerfilProveedor()` to remove the `session.user.proveedorId` argument, aligning with the updated function signature.
+    *   Update import paths for `LoadingSpinner` and `ErrorMessage` to use `@/` aliases for consistency and to potentially resolve any compiler caching issues.
+**Rule Update:** When encountering "Attempted import error: '[functionName]' is not exported from '[filePath]'", always verify:
+1.  If the function is actually defined and exported in the specified file. If not, implement and export it.
+2.  If the function's signature (arguments) in the calling file matches the definition in the exporting file. Adjust as necessary.
+3.  Consider updating relative import paths to `@/` aliases for Next.js projects to improve clarity and maintainability, and as a potential solution for compiler parsing issues.

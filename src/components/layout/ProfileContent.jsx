@@ -118,6 +118,10 @@ function ProfileContent() { // Removed user, designs, and error props
                 CERRAR SESIÓN
               </BotonGeneral>
 
+              {/* <BotonGeneral onClick={handleGoToCatalog}>
+                REGRESAR AL CATÁLOGO
+              </BotonGeneral> */}
+              
             </div>
           </div>
         </div>
