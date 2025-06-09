@@ -25,9 +25,10 @@ export async function crearProveedor(prevState, formData) {
     const nombreDueño = formData.get("nombreDueño");
     const telefonoContacto = formData.get("telefonoContacto");
     const emailContacto = formData.get("emailContacto");
+    const metodosPagoAceptados = formData.getAll("metodosPagoAceptados"); // Get all selected payment methods
 
-    if (!nombreEmpresa || !nit || !direccionEmpresa || !especialidad || !comision || !nombreDueño || !telefonoContacto || !emailContacto) {
-      return { message: "Todos los campos son obligatorios.", success: false };
+    if (!nombreEmpresa || !nit || !direccionEmpresa || !especialidad || !comision || !nombreDueño || !telefonoContacto || !emailContacto || metodosPagoAceptados.length === 0) {
+      return { message: "Todos los campos son obligatorios, incluyendo al menos un método de pago.", success: false };
     }
 
     const nuevoProveedor = new Proveedor({
@@ -39,6 +40,7 @@ export async function crearProveedor(prevState, formData) {
       nombreDueño,
       telefonoContacto,
       emailContacto,
+      metodosPagoAceptados, // Include the new field
       habilitado: true, // New providers are enabled by default
     });
 

@@ -94,3 +94,28 @@
 
 **Próximos Pasos:**
 - Verificar la funcionalidad de creación y gestión de proveedores para asegurar que el cambio de nombre del campo no haya introducido nuevos problemas.
+
+### 9/6/2025, 3:13:00 p. m. - Adición de campo 'Métodos de Pago' al formulario de proveedor
+
+**Descripción:** Se ha añadido un nuevo campo al formulario de agregar proveedor que permite seleccionar múltiples métodos de pago aceptados por el proveedor a través de checkboxes.
+
+**Acciones Realizadas:**
+- Se actualizó la documentación en `memory-bank/funcionalidades/gestin-de-proveedores-admin.md` para reflejar la adición del nuevo campo `metodosDePago`.
+- Se confirmó que el modelo `src/models/Proveedor.js` ya soporta el campo `metodosPagoAceptados` como un array de strings.
+- Se modificó `src/components/layout/admin/dashboards/proveedores/FormularioAgregarProveedor.jsx` para:
+    - Importar `MetodoPago` del enum de pagos.
+    - Añadir un estado local (`selectedPaymentMethods`) para gestionar los métodos de pago seleccionados.
+    - Renderizar un grupo de checkboxes, uno por cada `MetodoPago` disponible.
+    - Implementar una función `handlePaymentMethodChange` para actualizar el estado de los métodos de pago seleccionados.
+- Se modificó `src/app/acciones/ProveedorActions.js` para:
+    - Utilizar `formData.getAll("metodosPagoAceptados")` para obtener todos los métodos de pago seleccionados como un array.
+    - Incluir el array `metodosPagoAceptados` en la creación del nuevo objeto `Proveedor`.
+    - Añadir una validación para asegurar que al menos un método de pago sea seleccionado.
+
+**Archivos Modificados:**
+- `memory-bank/funcionalidades/gestin-de-proveedores-admin.md`
+- `src/components/layout/admin/dashboards/proveedores/FormularioAgregarProveedor.jsx`
+- `src/app/acciones/ProveedorActions.js`
+
+**Próximos Pasos:**
+- Verificar la funcionalidad de agregar proveedor para asegurar que los métodos de pago se seleccionen y guarden correctamente.

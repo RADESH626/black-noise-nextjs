@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useEffect, useActionState } from "react";
+import React, { useEffect, useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { usePopUp } from "@/context/PopUpContext";
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
 import InputGeneral from "@/components/common/inputs/InputGeneral";
 import { crearProveedor } from "@/app/acciones/ProveedorActions";
 import { CategoriaProducto } from "@/models/enums/CategoriaProducto"; // Import CategoriaProducto
+import { MetodoPago } from "@/models/enums/pago"; // Import MetodoPago
 
 // Submit button component with pending state
 function SubmitButton({ customText = "Agregar Proveedor" }) {
@@ -27,6 +28,7 @@ const initialState = {
 function FormularioAgregarProveedor({ onSuccess }) {
   const { showPopUp } = usePopUp();
   const [state, formAction] = useActionState(crearProveedor, initialState);
+  const [selectedPaymentMethods, setSelectedPaymentMethods] = useState([]);
 
   useEffect(() => {
     if (state.message) {
@@ -36,6 +38,13 @@ function FormularioAgregarProveedor({ onSuccess }) {
       }
     }
   }, [state, showPopUp, onSuccess]);
+
+  const handlePaymentMethodChange = (event) => {
+    const { value, checked } = event.target;
+    setSelectedPaymentMethods((prev) =>
+      checked ? [...prev, value] : prev.filter((method) => method !== value)
+    );
+  };
 
   return (
     <form action={formAction} className="space-y-5 text-white">
@@ -142,6 +151,32 @@ function FormularioAgregarProveedor({ onSuccess }) {
             placeholder="Correo electrónico de contacto de la empresa"
             required
           />
+        </div>
+        <div className="relative md:col-span-2">
+          <label className="block mb-1 text-sm font-medium text-purple-400">
+            Métodos de Pago Aceptados
+          </label>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {Object.values(MetodoPago).map((metodo) => (
+              <div key={metodo} className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={`metodo-${metodo}`}
+                  name="metodosPagoAceptados"
+                  value={metodo}
+                  checked={selectedPaymentMethods.includes(metodo)}
+                  onChange={handlePaymentMethodChange}
+                  className="form-checkbox h-4 w-4 text-purple-600 transition duration-150 ease-in-out"
+                />
+                <label
+                  htmlFor={`metodo-${metodo}`}
+                  className="ml-2 text-sm text-white"
+                >
+                  {metodo}
+                </label>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
       <SubmitButton />
