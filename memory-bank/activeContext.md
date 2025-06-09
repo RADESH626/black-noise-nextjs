@@ -38,3 +38,21 @@
 
 **Próximos Pasos:**
 - Verificar la funcionalidad de creación y gestión de proveedores para asegurar que la eliminación del campo 'rut' no haya introducido nuevos problemas.
+
+### 9/6/2025, 2:55:26 p. m. - Desvinculación de Proveedor de Usuario
+
+**Descripción:** Se ha modificado el modelo de proveedor para que ya no esté vinculado a un usuario de la plataforma. El campo `usuarioId` ha sido eliminado.
+
+**Acciones Realizadas:**
+- Se actualizó la documentación en `memory-bank/funcionalidades/gestin-de-proveedores-admin.md` para reflejar que los proveedores ya no son usuarios de la plataforma y el campo `usuarioId` ha sido eliminado.
+- Se eliminó el campo `usuarioId` del esquema `ProveedorSchema` en `src/models/Proveedor.js`.
+- Se eliminaron las referencias al campo `usuarioId` en la función `crearProveedor` en `src/app/acciones/ProveedorActions.js`, incluyendo la obtención del valor de la sesión del usuario y la validación de campos obligatorios.
+- Se realizó una búsqueda exhaustiva del término 'usuarioId' en `src/app/api/administrador/` y `src/components/` para asegurar que no quedaran referencias relacionadas con la vinculación de proveedores a usuarios. Se confirmó que las referencias encontradas en `NewOrderModal.jsx` y `CartComponent.jsx` son correctas y no están relacionadas con la gestión de proveedores.
+
+**Archivos Modificados:**
+- `memory-bank/funcionalidades/gestin-de-proveedores-admin.md`
+- `src/models/Proveedor.js`
+- `src/app/acciones/ProveedorActions.js`
+
+**Próximos Pasos:**
+- Verificar la funcionalidad de creación y gestión de proveedores para asegurar que la desvinculación del campo `usuarioId` no haya introducido nuevos problemas.

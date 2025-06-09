@@ -27,10 +27,7 @@ export async function crearProveedor(prevState, formData) {
     const email = formData.get("email");
     const direccion = formData.get("direccion"); // This seems to be a general contact address, not the company address
 
-    // Use session.user.id for usuarioId
-    const usuarioId = session.user.id;
-
-    if (!nombreProveedor || !nit || !direccionEmpresa || !usuarioId || !especialidad || !comision || !contacto || !telefono || !email || !direccion) {
+    if (!nombreProveedor || !nit || !direccionEmpresa || !especialidad || !comision || !contacto || !telefono || !email || !direccion) {
       return { message: "Todos los campos son obligatorios.", success: false };
     }
 
@@ -38,7 +35,6 @@ export async function crearProveedor(prevState, formData) {
       nombreProveedor,
       nit,
       direccionEmpresa,
-      usuarioId,
       especialidad,
       comision: parseFloat(comision), // Ensure commission is a number
       contacto,

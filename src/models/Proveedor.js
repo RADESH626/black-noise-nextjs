@@ -17,11 +17,6 @@ const ProveedorSchema = new Schema({
         type: String,
         required: true
     },
-    usuarioId: {
-        type: Schema.Types.ObjectId,
-        ref: 'Usuario',
-        required: true
-    },
     especialidad: {
         type: String,
         enum: Object.values(CategoriaProducto),
