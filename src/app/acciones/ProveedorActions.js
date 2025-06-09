@@ -81,7 +81,11 @@ export async function crearProveedor(prevState, formData) {
       }
 
       revalidatePath("/admin/proveedores");
-      return { message: "Proveedor creado exitosamente. La clave de acceso ha sido enviada al correo electrónico del proveedor.", success: true };
+      return {
+        message: "Proveedor creado exitosamente. La clave de acceso ha sido enviada al correo electrónico del proveedor.",
+        success: true,
+        accessKey: generatedAccessKey // Add the generated access key here
+      };
     } catch (error) {
       console.error("Error al crear proveedor:", error);
       return { message: `Error al crear proveedor: ${error.message}`, success: false };
