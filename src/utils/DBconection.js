@@ -16,8 +16,6 @@ export default async function connectDB() {
         }
 
         const db = await mongoose.connect(MONGODB_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
         });
 
         console.log('Database connected successfully');
