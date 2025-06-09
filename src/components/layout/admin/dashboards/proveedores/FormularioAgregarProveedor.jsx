@@ -29,12 +29,18 @@ function FormularioAgregarProveedor({ onSuccess }) {
   const { showPopUp } = usePopUp();
   const [state, formAction] = useActionState(crearProveedor, initialState);
   const [selectedPaymentMethods, setSelectedPaymentMethods] = useState([]);
+  const [displayedAccessKey, setDisplayedAccessKey] = useState(null); // New state for access key
 
   useEffect(() => {
     if (state.message) {
       showPopUp(state.message, state.success ? "success" : "error");
-      if (state.success && onSuccess) {
-        onSuccess();
+      if (state.success) {
+        if (state.accessKey) {
+          setDisplayedAccessKey(state.accessKey); // Set the access key if available
+        }
+        if (onSuccess) {
+          onSuccess();
+        }
       }
     }
   }, [state, showPopUp, onSuccess]);
@@ -178,6 +184,24 @@ function FormularioAgregarProveedor({ onSuccess }) {
             ))}
           </div>
         </div>
+        {displayedAccessKey && ( // Conditionally render the access key field
+          <div className="relative md:col-span-2">
+            <label className="block mb-1 text-sm font-medium text-purple-400">
+              Clave de Acceso del Proveedor
+            </label>
+            <InputGeneral
+              type="text"
+              id="accessKeyDisplay"
+              name="accessKeyDisplay"
+              value={displayedAccessKey}
+              readOnly
+              className="bg-gray-800 cursor-not-allowed" // Make it look read-only
+            />
+            <p className="mt-2 text-sm text-gray-400">
+              Por favor, copia esta clave. No se mostrará de nuevo.
+            </p>
+          </div>
+        )}
       </div>
       <SubmitButton />
     </form>

@@ -54,7 +54,7 @@
 #### 📄 **Archivo:** `src/components/layout/admin/dashboards/proveedores/FormularioAgregarProveedor.jsx` (Modificado)
 * **Rol:** Componente de formulario para agregar y editar proveedores.
 * **Implementación Clave:**
-    * **Cambios:** Se ha añadido un nuevo campo de selección múltiple para `metodosDePago` utilizando checkboxes. Los valores seleccionados se gestionan en el estado del formulario y se envían como parte de los datos del proveedor. **Se incluirá un campo para generar o mostrar la clave de acceso del proveedor, permitiendo al administrador gestionarla.**
+    * **Cambios:** Se ha añadido un nuevo campo de selección múltiple para `metodosDePago` utilizando checkboxes. Los valores seleccionados se gestionan en el estado del formulario y se envían como parte de los datos del proveedor. **Ahora, después de la creación exitosa de un proveedor, la clave de acceso generada se muestra al administrador en un campo de solo lectura dentro de este formulario.**
 
 #### 📄 **Archivo:** `src/app/acciones/ProveedorActions.js` (Modificado)
 * **Rol:** Contiene Server Actions para la gestión de proveedores por parte del administrador.
