@@ -1,4 +1,40 @@
-# Product Context
+# Project Overview
+
+## Project Name
+Black Noise Next.js E-commerce
+
+## Overview
+This project is an e-commerce platform built with Next.js, designed to sell custom clothing designs. It includes features for user authentication (login, registration, profile management), product display, design management (for administrators), supplier management, order processing, and payment handling.
+
+## Core Goals
+- Provide a seamless e-commerce experience for users to browse and purchase custom clothing.
+- Enable administrators to manage designs, users, suppliers, orders, and payments.
+- Facilitate suppliers to manage their profiles and view their orders.
+- Ensure secure user authentication and data management.
+- Implement a robust API layer for data interaction.
+
+## Key Features
+- User Authentication (Login, Registration, Profile Editing)
+- Admin Dashboard (User Management, Design Management, Supplier Management, Order Management, Payment Management)
+- Supplier Portal (Profile Editing, Order Viewing)
+- Product Catalog and Display
+- Shopping Cart and Checkout Process
+- Payment Integration
+- Database Integration (MongoDB)
+
+## Technologies
+- **Frontend:** Next.js, React
+- **Backend:** Next.js API Routes
+- **Database:** MongoDB
+- **Authentication:** NextAuth.js
+- **Styling:** CSS Modules, Tailwind CSS (if applicable)
+- **Deployment:** Vercel (or similar)
+
+## Stakeholders
+- Users (Customers)
+- Administrators
+- Suppliers
+- Development Team
 
 ## Why this project exists
 The "Black Noise Next.js E-commerce" project aims to provide a dedicated online platform for selling custom clothing designs. The current market lacks a centralized, user-friendly platform that specializes in unique, customizable apparel, leading to fragmented sales channels and limited reach for designers. This project addresses that gap by offering a streamlined experience for both customers and designers/suppliers.
@@ -39,3 +75,9 @@ The platform should offer distinct experiences for three main user roles:
 - **Fast Performance:** Quick loading times and smooth interactions to ensure a pleasant user experience.
 - **Secure:** Users' personal and payment information must be handled with the highest security standards.
 - **Clear Communication:** Provide clear feedback to users on their actions (e.g., "Item added to cart," "Order placed successfully").
+
+## Future Considerations
+- Advanced search and filtering for products.
+- User reviews and ratings.
+- Integration with third-party shipping services.
+- Analytics and reporting.

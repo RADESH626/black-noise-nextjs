@@ -9,7 +9,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import BotonEditar from '@/components/common/botones/BotonEditar';
 import FormBuscarUsuario from '@/components/layout/admin/usuarios/forms/FormBuscarUsuario';
+import ModalAgregarUsuario from '@/components/common/modales/ModalAgregarUsuario';
+import ModalEditarUsuario from '@/components/layout/admin/usuarios/modals/ModalEditarUsuario'; // Import ModalEditarUsuario
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import { usePopUp } from '@/context/PopUpContext';
+import { useActionState } from 'react'; // For React 19
+import { useFormStatus } from 'react-dom'; // For React 19
 
 // Utility function for date formatting
 const formatDate = (dateString) => {
@@ -18,10 +23,46 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('es-ES', options);
 };
 
+// Component for the toggle user status button, using Server Actions pattern
+function ToggleUserStatusForm({ userId, currentStatus, onStatusChanged }) {
+    const { showPopUp } = usePopUp();
+    const [state, formAction] = useActionState(toggleUsuarioHabilitado, { message: null, success: false });
+    const { pending } = useFormStatus();
+
+    useEffect(() => {
+        if (state.message) {
+            showPopUp(state.message, state.success ? "success" : "error");
+            if (state.success && onStatusChanged) {
+                onStatusChanged(); // Notify parent to refresh user list
+            }
+        }
+    }, [state, showPopUp, onStatusChanged]);
+
+    return (
+        <form action={formAction}>
+            <input type="hidden" name="id" value={userId} />
+            <input type="hidden" name="newStatus" value={String(!currentStatus)} />
+            <button
+                type="submit"
+                disabled={pending}
+                className={`px-3 py-1.5 font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75 text-sm whitespace-nowrap ${currentStatus
+                    ? 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500'
+                    : 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500'
+                }`}
+            >
+                {pending ? (currentStatus ? 'Deshabilitando...' : 'Habilitando...') : (currentStatus ? 'Deshabilitar' : 'Habilitar')}
+            </button>
+        </form>
+    );
+}
+
 export default function UsuariosClientPage({ initialUsers }) {
   const [users, setUsers] = useState(initialUsers || []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [showEditUserModal, setShowEditUserModal] = useState(false); // State for edit user modal
+  const [userToEdit, setUserToEdit] = useState(null); // State to hold user data for editing
   const { showPopUp } = usePopUp();
 
   const fetchAndSetUsers = useCallback(async () => {
@@ -84,7 +125,12 @@ export default function UsuariosClientPage({ initialUsers }) {
 
   return (
     <div>
-      <h4 className='font-bold text-2xl text-black'>Gestión de Usuarios</h4>
+      <div className="flex justify-between items-center mb-4">
+        <h4 className='font-bold text-2xl text-black'>Gestión de Usuarios</h4>
+        <BotonGeneral onClick={() => setShowAddUserModal(true)}>
+          Agregar Usuario
+        </BotonGeneral>
+      </div>
       <div className="my-4 p-4 bg-gray-800 rounded-lg shadow-md">
         <FormBuscarUsuario onSearchSuccess={handleSearchSuccess} />
       </div>
@@ -151,19 +197,17 @@ export default function UsuariosClientPage({ initialUsers }) {
                             {/* Acciones */}
                             <TdGeneral>
                                 <div className="flex flex-col md:flex-row gap-2 items-center justify-center">
-                                    <Link href={`/admin/usuarios/editar/${user._id}`} passHref>
-                                        <BotonEditar>Editar</BotonEditar>
-                                    </Link>
-                                    <button
-                                        onClick={() => handleToggleUserStatus(user._id, user.habilitado)}
-                                        disabled={loading}
-                                        className={`px-3 py-1.5 font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75 text-sm whitespace-nowrap ${user.habilitado
-                                            ? 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500'
-                                            : 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500'
-                                        }`}
-                                    >
-                                        {user.habilitado ? 'Deshabilitar' : 'Habilitar'}
-                                    </button>
+                                    <BotonEditar onClick={() => {
+                                        setUserToEdit(user);
+                                        setShowEditUserModal(true);
+                                    }}>
+                                        Editar
+                                    </BotonEditar>
+                                    <ToggleUserStatusForm 
+                                        userId={user._id} 
+                                        currentStatus={user.habilitado} 
+                                        onStatusChanged={fetchAndSetUsers} 
+                                    />
                                 </div>
                             </TdGeneral>
                         </tr>
@@ -175,6 +219,22 @@ export default function UsuariosClientPage({ initialUsers }) {
       ) : (
         <p>No hay usuarios para mostrar.</p>
       )}
+
+      <ModalAgregarUsuario 
+        isOpen={showAddUserModal} 
+        onClose={() => setShowAddUserModal(false)} 
+        onUserAdded={fetchAndSetUsers}
+      />
+
+      <ModalEditarUsuario
+        isOpen={showEditUserModal}
+        onClose={() => {
+            setShowEditUserModal(false);
+            setUserToEdit(null); // Clear user data on close
+        }}
+        userData={userToEdit}
+        onUserUpdated={fetchAndSetUsers}
+      />
     </div>
   );
 }

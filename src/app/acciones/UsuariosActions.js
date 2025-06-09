@@ -13,6 +13,29 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // Adjust path
 
 const DEFAULT_PROFILE_PICTURE_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAKwAAACUCAMAAAA5xjIqAAAAMFBMVEXk5ueutLenrrHn6eqrsbTq7O3Lz9Hh4+S4vcDGyszT1tjP09Te4OKyuLvCx8nW2dvDGAcOAAAECUlEQVR4nO2c23LjIAxAbcTVBvP/f7vQZLNJ47SAsGTPcp4605czqpC4yJ2mwWAwGAwGg8FgMBgMBq+AUmDisizR5x+5dT4Dk4kuiAfSOm+mUworv25ByPkZKcK2mNPpqsmF+dX07jvbByfTdWLP9O4r9XmSAaY1fFbNiLCcxBYm+7PqV3DdKVIX4i9hvesGz28LukQ124p4Gdesu/LGtsY12ypWV1HhmqoCY2xhrYnrV2wjly3EStVEMEyy5vf6+h5ay+MKW71rSlvHkQgQW1xTbDmaAzSp8iQCuLbA5mpLLutDoytHaKta1ytiIXY1zYHN0HZdWOr67LfQ0vYxZTGBlRtpaA0msKnpekLXup3hDpRHMkBlQcoDR+eKKLJ3WUu3+UpnRJxs2iDQyWJTdqY8PDbvCx6R1WQrzDTtZF9k6SqtQRaDRKCTxa6vmXB74PGukk4Wm7KpHJAtsCE7ZKeLLbBLla5rNYWGS65XpKU72FxpI3OpLSIsSFfKzTf6WDNbQln0gXGnc73WUfxSlxyTwiUtYZWd8qPShS7mLnXliWpi9O+MiFIbiFVRDyCaXHaaWmUJL+UewNL4aMfy1tz2HEp8Rf+gZY1xPTQ3JQLfWI+q3s9Ixvmu2rQVdKeZPapsJcuswQOosSU8JX7SLe5kgv7p/t22bARJcq6tf4AvuPOQ2ykGJ3Piut053yfVoM8z8AvG/jDsO4uzhPWO8jbI3TFqGTbDOYK4B4B3dv4+oC5nq08wN/tOysqvgXohZCLP/odt9eY8yfoGpAjHVWu9Rn9izRtJFtSN/CO3zgeynfFxyVF1Ce30usTov37BLfcMgInOhqd19VQYgt3WU2QE5M9pVmfzovqhJaTVNm86si42NUW9vZWrj8bSbi7y+ILyLsy/tNn3BhHsQq2bKqqTZRF9Qwgb6T68SjFd7W5rLQ2wsC7SxFeZbf9jqirf2R5/1wF584p/Zr75xkOTASBunVQzwq7HbR3BbOi//wupmh2WDLqv6g17RHAhBtwLzQek0L11cwYcRcqFricJ8EdkwMO25+0HYEbnixC219mn6oqoERn6lAXAz22U2M493psgHpmuz7r4K0Yy1w4fX+FnNipAxrb1+ajVdkPYtnykiEK0vzsd2wp2aW4PNDXrO61Xzsf3gj2aeln7szcKGRpkATmz027rGhZZh7HTRuq3CZrNtf4rIfQAH8a28sFM8VSCO6LKFTzT6rpRN0ChONrBMxVnSOgwLo+iZv/VNv3Sk4r52g7T8khk+RfatLvYXdnynS17FiTb4sgyNoS/FI/bc21hnikttfivELpQJov7wr4Xsmw3o7g9bxQmLbfmjbKjY+P/h+lNWcddxCmwRbLmJJS4Dv5D/gBmFDnwIIZzJgAAAABJRU5ErkJggg==';
 
+// Helper function to convert Mongoose document to plain object
+function toPlainObject(doc) {
+    if (!doc) return null;
+    const obj = doc.toObject ? doc.toObject() : { ...doc }; // Handle both Mongoose docs and lean objects
+
+    if (obj._id) {
+        obj._id = obj._id.toString();
+    }
+    // Convert dates to YYYY-MM-DD for form compatibility or ISO string for full timestamp
+    if (obj.fechaNacimiento) {
+        obj.fechaNacimiento = new Date(obj.fechaNacimiento).toISOString().split('T')[0];
+    }
+    if (obj.createdAt) {
+        obj.createdAt = new Date(obj.createdAt).toISOString();
+    }
+    if (obj.updatedAt) {
+        obj.updatedAt = new Date(obj.updatedAt).toISOString();
+    }
+    // Remove __v if present
+    delete obj.__v;
+    return obj;
+}
+
 // Server Action para manejar el login
 export async function loginAction(prevState, formData) {
     
@@ -130,26 +153,7 @@ async function guardarUsuarios(data, enviarCorreo = false) {
             }
         }
         
-        // Convertir el documento de Mongoose a un objeto plano
-        const usuarioPlano = {
-            tipoDocumento: UsuarioGuardado.tipoDocumento,
-            numeroDocumento: UsuarioGuardado.numeroDocumento,
-            primerNombre: UsuarioGuardado.primerNombre,
-            segundoNombre: UsuarioGuardado.segundoNombre,
-            primerApellido: UsuarioGuardado.primerApellido,
-            segundoApellido: UsuarioGuardado.segundoApellido,
-            nombreUsuario: UsuarioGuardado.nombreUsuario,
-            fechaNacimiento: UsuarioGuardado.fechaNacimiento,
-            genero: UsuarioGuardado.genero,
-            numeroTelefono: UsuarioGuardado.numeroTelefono,
-            direccion: UsuarioGuardado.direccion,
-            correo: UsuarioGuardado.correo,
-            password: UsuarioGuardado.password, // Include password for internal use if needed, but be careful
-            rol: UsuarioGuardado.rol,
-            habilitado: UsuarioGuardado.habilitado,
-            _id: UsuarioGuardado._id.toString()
-        };
-        return { success: true, data: usuarioPlano };
+        return { success: true, data: toPlainObject(UsuarioGuardado) };
         
     } catch (error) {
         console.error('Error en la función guardarUsuarios:', error.message);
@@ -201,32 +205,7 @@ async function obtenerUsuarios() {
         await connectDB(); // Ensure DB connection is awaited
 
         const usuarios = await Usuario.find({}).lean();
-
-        // Manually convert to plain objects with string IDs and dates
-        const plainUsers = usuarios.map(user => {
-            const plainUser = { ...user };
-            if (plainUser._id) {
-                plainUser._id = plainUser._id.toString();
-            }
-            if (plainUser.fechaNacimiento && typeof plainUser.fechaNacimiento !== 'string') {
-                 if (plainUser.fechaNacimiento instanceof Date) {
-                    plainUser.fechaNacimiento = plainUser.fechaNacimiento.toISOString().split('T')[0];
-                 } else {
-                    try {
-                        plainUser.fechaNacimiento = new Date(plainUser.fechaNacimiento).toISOString().split('T')[0];
-                    } catch (e) {
-                        plainUser.fechaNacimiento = null; 
-                    }
-                 }
-            }
-            if (plainUser.createdAt instanceof Date) {
-                plainUser.createdAt = plainUser.createdAt.toISOString();
-            }
-            if (plainUser.updatedAt instanceof Date) {
-                plainUser.updatedAt = plainUser.updatedAt.toISOString();
-            }
-            return plainUser;
-        });
+        const plainUsers = usuarios.map(toPlainObject);
         
         return { usuarios: plainUsers };
 
@@ -241,32 +220,7 @@ async function obtenerUsuariosHabilitados() {
     try {
         await connectDB(); // Ensure DB connection is awaited
         const usuarios = await Usuario.find({ habilitado: true }).lean();
-
-        // Manually convert to plain objects with string IDs and dates
-        const plainUsers = usuarios.map(user => {
-            const plainUser = { ...user };
-            if (plainUser._id) {
-                plainUser._id = plainUser._id.toString();
-            }
-            if (plainUser.fechaNacimiento && typeof plainUser.fechaNacimiento !== 'string') {
-                 if (plainUser.fechaNacimiento instanceof Date) {
-                    plainUser.fechaNacimiento = plainUser.fechaNacimiento.toISOString().split('T')[0];
-                 } else {
-                    try {
-                        plainUser.fechaNacimiento = new Date(plainUser.fechaNacimiento).toISOString().split('T')[0];
-                    } catch (e) {
-                        plainUser.fechaNacimiento = null; 
-                    }
-                 }
-            }
-            if (plainUser.createdAt instanceof Date) {
-                plainUser.createdAt = plainUser.createdAt.toISOString();
-            }
-            if (plainUser.updatedAt instanceof Date) {
-                plainUser.updatedAt = plainUser.updatedAt.toISOString();
-            }
-            return plainUser;
-        });
+        const plainUsers = usuarios.map(toPlainObject);
         
         return { users: plainUsers };
 
@@ -290,17 +244,7 @@ async function ObtenerUsuarioPorId(id) {
             console.log('DEBUG: User not found for ID:', id);
             return null;
         }
-        // Convert MongoDB specific types to plain JavaScript types
-        const plainUser = {
-            ...response,
-            _id: response._id.toString(),
-            fechaNacimiento: response.fechaNacimiento ? 
-                new Date(response.fechaNacimiento).toISOString().split('T')[0] : null,
-            createdAt: response.createdAt ? 
-                new Date(response.createdAt).toISOString() : null,
-            updatedAt: response.updatedAt ? 
-                new Date(response.updatedAt).toISOString() : null
-        };
+        const plainUser = toPlainObject(response);
         console.log('DEBUG: Exiting ObtenerUsuarioPorId with plain user:', plainUser);
         return plainUser;
     } catch (error) {
@@ -321,17 +265,7 @@ async function ObtenerUsuarioPorCorreo(email) {
             console.error('Usuario no encontrado por correo:', email);
             return null;
         }
-        // Convert to plain object
-        const plainUser = {
-            ...user,
-            _id: user._id.toString(),
-            fechaNacimiento: user.fechaNacimiento ? 
-                new Date(user.fechaNacimiento).toISOString().split('T')[0] : null,
-            createdAt: user.createdAt ? 
-                new Date(user.createdAt).toISOString() : null,
-            updatedAt: user.updatedAt ? 
-                new Date(user.updatedAt).toISOString() : null
-        };
+        const plainUser = toPlainObject(user);
         return plainUser;
         
     } catch (error) {
@@ -428,7 +362,7 @@ async function RegistroMasivoUsuario(formData) { // Removed userId as it's fetch
                 try {
                     const nuevoUsuario = new Usuario(usuarioData);
                     const usuarioGuardado = await nuevoUsuario.save();
-                    results.push({ success: true, data: JSON.parse(JSON.stringify(usuarioGuardado)) });
+                    results.push({ success: true, data: toPlainObject(usuarioGuardado) });
                 } catch (error) {
                     console.error(`Error al guardar usuario ${usuarioData.correo || usuarioData.numeroDocumento}:`, error.message);
                     if (error.code === 11000) {
@@ -522,32 +456,7 @@ async function FiltrarUsuarios(prevState, formData) {
     }
 
     const usuariosEncontradosRaw = await Usuario.find(query).lean(); // Use .lean() here too
-
-    // Manually convert to plain objects with string IDs and dates
-    const usuariosEncontrados = usuariosEncontradosRaw.map(user => {
-        const plainUser = { ...user };
-        if (plainUser._id) {
-            plainUser._id = plainUser._id.toString();
-        }
-        if (plainUser.fechaNacimiento && typeof plainUser.fechaNacimiento !== 'string') {
-             if (plainUser.fechaNacimiento instanceof Date) {
-                plainUser.fechaNacimiento = plainUser.fechaNacimiento.toISOString().split('T')[0];
-             } else {
-                try {
-                    plainUser.fechaNacimiento = new Date(plainUser.fechaNacimiento).toISOString().split('T')[0];
-                } catch (e) {
-                    plainUser.fechaNacimiento = null; 
-                }
-             }
-        }
-        if (plainUser.createdAt instanceof Date) {
-            plainUser.createdAt = plainUser.createdAt.toISOString();
-        }
-        if (plainUser.updatedAt instanceof Date) {
-            plainUser.updatedAt = plainUser.updatedAt.toISOString();
-        }
-        return plainUser;
-    });
+    const usuariosEncontrados = usuariosEncontradosRaw.map(toPlainObject);
 
     console.log("Usuarios encontrados (plain):", usuariosEncontrados);
 
@@ -581,13 +490,13 @@ async function toggleUsuarioHabilitado(formData) {
             id,
             { habilitado: nuevoEstadoHabilitado },
             { new: true } // Devuelve el documento modificado
-        );
+        ).lean(); // Use lean() to get a plain object
 
         console.log(`Usuario ${nuevoEstadoHabilitado ? 'habilitado' : 'deshabilitado'} exitosamente:`, usuarioActualizado);
 
         revalidatePath('/admin/usuarios'); // Revalida la página de usuarios para reflejar el cambio
 
-        return { success: true, message: `Usuario ${nuevoEstadoHabilitado ? 'habilitado' : 'deshabilitado'} exitosamente.`, data: JSON.parse(JSON.stringify(usuarioActualizado)) };
+        return { success: true, message: `Usuario ${nuevoEstadoHabilitado ? 'habilitado' : 'deshabilitado'} exitosamente.`, data: toPlainObject(usuarioActualizado) };
 
     } catch (error) {
         console.error(`Error al cambiar el estado de habilitado del usuario con ID ${id}:`, error.message);
@@ -611,7 +520,7 @@ async function EditarUsuario(id, formData) {
             segundoApellido: formData.get('segundoApellido'),
             fechaNacimiento: formData.get('fechaNacimiento'),
             genero: formData.get('genero'),
-            numeroTelefono: formData.get('telefono'), // Note: name is 'telefono' in the form
+            numeroTelefono: formData.get('numeroTelefono'), // Corrected field name
             direccion: formData.get('direccion'),
             correo: formData.get('correo'),
             rol: formData.get('rol'), // Include rol update
@@ -633,17 +542,7 @@ async function EditarUsuario(id, formData) {
             return { error: `No se encontró ningún usuario con el ID ${id}.` };
         }
 
-        // Manually convert to plain object with string ID and dates
-        const plainUser = {
-            ...usuarioActualizado,
-            _id: usuarioActualizado._id.toString(),
-            fechaNacimiento: usuarioActualizado.fechaNacimiento ?
-                new Date(usuarioActualizado.fechaNacimiento).toISOString().split('T')[0] : null,
-            createdAt: usuarioActualizado.createdAt ?
-                new Date(usuarioActualizado.createdAt).toISOString() : null,
-            updatedAt: usuarioActualizado.updatedAt ?
-                new Date(usuarioActualizado.updatedAt).toISOString() : null
-        };
+        const plainUser = toPlainObject(usuarioActualizado);
 
         console.log('DEBUG: Exiting EditarUsuario with plain user:', plainUser);
         return { success: true, message: 'Usuario actualizado exitosamente.', data: plainUser };
