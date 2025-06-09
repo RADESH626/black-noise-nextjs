@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link'; // Import Link for navigation
 import { useCartStorage } from '@/hooks/useCartStorage';
 import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
 import Footer from '@/components/layout/general/footer/Footer';
@@ -108,9 +109,9 @@ const ComunidadDiseños = () => {
               className="flex-grow p-3 rounded-full bg-[#292727] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <button className="bg-blue-600 px-6 py-2 rounded-full text-white font-semibold hover:bg-blue-700 transition-colors duration-300">
+          <Link href="/perfil" className="bg-blue-600 px-6 py-2 rounded-full text-white font-semibold hover:bg-blue-700 transition-colors duration-300">
             Publicar Diseño
-          </button>
+          </Link>
         </div>
 
         {tarjetas.length === 0 ? (

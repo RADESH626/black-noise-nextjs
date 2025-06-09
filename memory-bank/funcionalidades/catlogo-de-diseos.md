@@ -19,7 +19,7 @@
         *   Implementa la lógica de "me gusta" (`handleLike`) con persistencia en `localStorage` y un contador de likes.
         *   Permite añadir diseños al carrito usando `addItem` de `useCartStorage`.
         *   Renderiza los diseños en un formato de "red social" con avatares de usuario y botones de interacción.
-        *   Incluye una sección "Publicar Diseño" que es un placeholder.
+        *   Incluye una sección "Publicar Diseño" que ahora redirige a la página de perfil del usuario (`/perfil`).
     * **Modelos de Datos / Endpoints:** Consume `mockDesigns` (datos mock). Interactúa con `useCartStorage` para la gestión del carrito en el cliente.
 
 #### 📄 **Archivo:** `src/app/acciones/DesignActions.js`
@@ -42,4 +42,3 @@
     * **Componentes/Funciones Relevantes:** Exporta el array `mockDesigns`.
     * **Lógica Principal:** Contiene un array de objetos JavaScript que simulan la estructura de los datos de diseños.
     * **Modelos de Datos / Endpoints:** Datos estáticos, no interactúa con la base de datos.
-

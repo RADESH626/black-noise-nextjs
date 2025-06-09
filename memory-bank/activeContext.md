@@ -1,23 +1,20 @@
 # Active Context - Current Session State
 
-## Session Summary: Implement "Cerrar Sesión" button in Admin Panel Navbar - ✅ COMPLETED
-**Date**: 9/6/2025, 8:39:40 a. m.
-**Objective**: Replace the "Volver al Inicio" button in the admin panel's navigation bar with a "Cerrar Sesión" button that logs out the user.
+## Session Summary: Redirect "Publicar Diseño" button in Catalog to User Profile - ✅ COMPLETED
+**Date**: 9/6/2025, 8:44:07 a. m.
+**Objective**: Modify the "Publicar Diseño" button in the catalog page (`/catalogo`) to redirect users to their profile page (`/perfil`) when clicked.
 
 ---
 
 ### ✅ Changes Implemented This Session:
 
-* **File:** `memory-bank/funcionalidades/panel-de-administracin.md`
-    * **Change:** Updated documentation to reflect the change of the "Volver al Inicio" button to "Cerrar Sesión" in the Admin Navbar and specified `src/app/admin/layout.jsx` as the relevant file.
-* **File:** `memory-bank/funcionalidades/autenticacin-de-usuarios.md`
-    * **Change:** Added documentation about the logout functionality in the admin panel's nav bar and the use of `signOut` from `next-auth/react`.
-* **File:** `src/components/layout/admin/AdminSidebar.jsx`
-    * **Change:** Modified the `Link` component for "Volver al Inicio" to a `button` that calls `signOut({ callbackUrl: '/login' })` and changed its text to "Cerrar Sesión".
+* **File:** `memory-bank/funcionalidades/catlogo-de-diseos.md`
+    * **Change:** Updated documentation to reflect that the "Publicar Diseño" section now redirects to the user's profile page (`/perfil`).
+* **File:** `src/app/catalogo/page.jsx`
+    * **Change:** Replaced the `<button>` element for "Publicar Diseño" with a `Link` component from `next/link` and set its `href` to `/perfil` to enable redirection.
 
 ### 💡 Key Decisions & New Patterns:
-* The `AdminSidebar.jsx` was identified as the correct location for the button, rather than `src/app/admin/layout.jsx` directly, as the sidebar component contains the navigation elements.
-* Used `signOut({ callbackUrl: '/login' })` to ensure the user is redirected to the login page after logging out.
+* Used `next/link` for client-side navigation to ensure a smooth transition to the profile page without a full page reload.
 
 ### ➡️ Next Steps:
 * No immediate next steps related to this task. The functionality is implemented and documented.
