@@ -1,10 +1,13 @@
 # Project Progress
 
 ## Current Status:
-- Investigating and addressing an error in adding new providers.
-- Modified `src/app/acciones/ProveedorActions.js` to provide more detailed error messages.
-- Updated `src/app/acciones/ProveedorActions.js` to include all required fields for `Proveedor` model based on schema validation errors.
-- Updated `src/components/layout/admin/dashboards/proveedores/FormularioAgregarProveedor.jsx` to include all required input fields for the `Proveedor` model.
+- **Supplier Portal Enhancement Completed:**
+    - Implemented a dedicated and secure section for suppliers to access their order information without exposing user data.
+    - Developed a new authentication mechanism for suppliers using unique access keys, integrated with the existing login flow.
+    - Updated data models, server actions, NextAuth.js configuration, and middleware to support supplier-specific authentication and session management.
+    - Created new frontend pages (`src/app/proveedor/pedidos/page.jsx` and `src/app/proveedor/pedidos/ver/[id]/page.jsx`) for supplier order listing and detail viewing.
+    - Refactored the main supplier portal page (`src/app/proveedor/page.jsx`) to align with the new functionality and remove outdated sections.
+    - Ensured strict data scoping for suppliers, allowing them to view only their own orders.
 
 ## Next Steps:
-- Awaiting user feedback after implementing the schema field corrections in both the server action and the frontend form.
+- The supplier portal enhancement is complete and ready for testing and review.

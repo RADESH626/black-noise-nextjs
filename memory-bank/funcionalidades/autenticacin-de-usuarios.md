@@ -1,6 +1,6 @@
 # ✅ Funcionalidad: Autenticación de Usuarios
 
-**Descripción:** Permite a los usuarios registrarse en la plataforma y iniciar sesión, con redirección basada en el rol del usuario (Administrador, Proveedor, Cliente).
+**Descripción:** Permite a los usuarios registrarse en la plataforma y iniciar sesión. Ahora, también permite a los proveedores iniciar sesión utilizando una clave de acceso única. La redirección post-autenticación se basa en el rol del usuario (Administrador, Cliente) o en la identificación como Proveedor.
 
 ---
 
@@ -34,8 +34,8 @@
     * **Lógica Principal:** Utiliza `registerAction` de `UsuariosActions.js` como Server Action. Maneja el estado del formulario y muestra pop-ups de éxito/error.
     * **Modelos de Datos / Endpoints:** Interactúa con `UsuariosActions.js` para el registro.
 
-#### 📄 **Archivo:** `src/app/acciones/UsuariosActions.js`
-* **Rol:** Contiene todas las Server Actions y funciones de lógica de negocio relacionadas con la gestión de usuarios, incluyendo autenticación y registro.
+#### 📄 **Archivo:** `src/app/acciones/UsuariosActions.js` (Modificado)
+* **Rol:** Contiene todas las Server Actions y funciones de lógica de negocio relacionadas con la gestión de usuarios, ahora extendida para manejar la autenticación de proveedores.
 * **Implementación Clave:**
     * **Componentes/Funciones Relevantes:**
         *   `loginAction`: Server Action para el inicio de sesión.
@@ -44,17 +44,17 @@
         *   `ObtenerUsuarioPorCorreo`: Función para buscar un usuario por correo electrónico.
         *   `guardarUsuarios`: Función genérica para guardar un usuario en la DB, incluyendo la asignación de foto de perfil por defecto y envío de correo de bienvenida (`nodemailer`).
     * **Lógica Principal:**
-        *   `loginAction`: Valida credenciales, verifica contraseña con `bcrypt.compare`, obtiene el rol del usuario y lo retorna para la redirección en el cliente.
+        *   `loginAction`: Primero intenta autenticar como usuario regular (validando credenciales y verificando contraseña con `bcrypt.compare`). Si la autenticación de usuario falla, intenta autenticar como proveedor buscando el correo electrónico y verificando la clave de acceso proporcionada contra el campo `accessKey` hasheado en el modelo `Proveedor`. Si la autenticación de proveedor es exitosa, retorna un objeto que identifica al usuario como proveedor y contiene su `proveedorId` para la redirección y gestión de sesión.
         *   `registerAction`: Valida la confirmación de contraseña y llama a `RegistrarUsuario`.
         *   `RegistrarUsuario`: Hashea la contraseña, asigna rol `CLIENTE` por defecto, genera `nombreUsuario` y llama a `guardarUsuarios`.
         *   Manejo de errores robusto y revalidación de caché (`revalidatePath`) para operaciones de escritura.
-    * **Modelos de Datos / Endpoints:** Modifica/consume el modelo `Usuario` de Mongoose. Envía correos electrónicos usando `nodemailer`.
+    * **Modelos de Datos / Endpoints:** Modifica/consume los modelos `Usuario` y `Proveedor` de Mongoose. Envía correos electrónicos usando `nodemailer`.
 
-#### 📄 **Archivo:** `src/middleware.js`
-* **Rol:** Middleware de Next.js para la protección de rutas y la redirección basada en roles.
+#### 📄 **Archivo:** `src/middleware.js` (Modificado)
+* **Rol:** Middleware de Next.js para la protección de rutas y la redirección basada en roles/tipo de usuario.
 * **Implementación Clave:**
     * **Componentes/Funciones Relevantes:** `productionMiddleware` (función principal del middleware).
-    * **Lógica Principal:** Intercepta las solicitudes, verifica la sesión del usuario y su rol, y redirige a rutas específicas si no tienen los permisos adecuados. Protege rutas como `/admin` y `/proveedor`.
+    * **Lógica Principal:** Intercepta las solicitudes, verifica la sesión del usuario. Ahora, además de verificar el `rol` para usuarios regulares, también verifica un flag `isSupplier` y el `proveedorId` en la sesión para los proveedores. Redirige a rutas específicas (`/admin`, `/proveedor`) si no tienen los permisos adecuados.
     * **Modelos de Datos / Endpoints:** Utiliza la sesión de NextAuth.js.
 
 #### 📄 **Archivo:** `src/app/SessionProviderWrapper.jsx`
@@ -63,12 +63,16 @@
     * **Componentes/Funciones Relevantes:** `SessionProvider` de `next-auth/react`.
     * **Lógica Principal:** Proporciona el contexto de sesión a toda la aplicación.
 
-#### 📄 **Archivo:** `src/app/api/auth/[...nextauth]/route.js`
+#### 📄 **Archivo:** `src/app/api/auth/[...nextauth]/route.js` (Modificado)
 * **Rol:** Configuración de NextAuth.js para la autenticación.
 * **Implementación Clave:**
-    * **Componentes/Funciones Relevantes:** `NextAuth`, `CredentialsProvider`, `MongoDBAdapter`.
-    * **Lógica Principal:** Define los proveedores de autenticación (en este caso, credenciales), cómo se maneja la sesión y los callbacks para la autorización. Se conecta a la base de datos para validar usuarios.
-    * **Modelos de Datos / Endpoints:** Interactúa con el modelo `Usuario` para la autenticación.
+    * **Componentes/Funciones Relevantes:** `NextAuth`, `CredentialsProvider`, `MongoDBAdapter`, `jwt` callback, `session` callback.
+    * **Lógica Principal:**
+        *   `CredentialsProvider`: El `authorize` callback se modificará para primero intentar autenticar un usuario regular. Si no se encuentra o las credenciales son incorrectas, intentará autenticar un proveedor buscando el correo electrónico en el modelo `Proveedor` y verificando la clave de acceso. Si la autenticación de proveedor es exitosa, devolverá un objeto de usuario con un `id` (el `_id` del proveedor), un `email`, y un nuevo campo `isSupplier: true` junto con el `proveedorId`.
+        *   `jwt` callback: Asegura que el `isSupplier` flag y el `proveedorId` se añadan al token JWT para persistencia de la sesión.
+        *   `session` callback: Asegura que el `isSupplier` flag y el `proveedorId` estén disponibles en el objeto de sesión del cliente (`session.user.isSupplier`, `session.user.proveedorId`).
+        *   Se conecta a la base de datos para validar usuarios y proveedores.
+    * **Modelos de Datos / Endpoints:** Interactúa con los modelos `Usuario` y `Proveedor` para la autenticación.
 
 ---
 

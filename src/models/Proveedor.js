@@ -29,6 +29,11 @@ const ProveedorSchema = new Schema({
         type: String,
         required: true
     },
+    accessKey: {
+        type: String,
+        unique: true,
+        sparse: true // Allows null values to not violate the unique constraint
+    },
     especialidad: {
         type: String,
         enum: Object.values(CategoriaProducto),

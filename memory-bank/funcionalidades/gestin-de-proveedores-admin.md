@@ -1,6 +1,6 @@
 # ✅ Funcionalidad: Gestión de Proveedores (Admin)
 
-**Descripción:** Permite a los administradores ver, filtrar, agregar, editar y eliminar proveedores directamente en la plataforma. Esta es la única vía para incorporar nuevos proveedores al sistema, reemplazando cualquier proceso de solicitud previo por parte de usuarios generales. Se ha eliminado el campo 'rut' del proveedor, ya que el 'nit' es suficiente para acceder a la información del RUT. Además, los proveedores ya no están vinculados a un usuario de la plataforma, eliminando la necesidad del campo `usuarioId`. Se han añadido campos para almacenar el nombre del dueño de la empresa proveedora, así como el correo electrónico y el número de teléfono de contacto de la empresa. La dirección de la empresa (`direccionEmpresa`) se utilizará tanto como dirección principal de la empresa como dirección de contacto. El campo `nombreProveedor` ha sido renombrado a `nombreEmpresa` para mayor claridad en el registro. Se ha incorporado un nuevo campo `metodosDePago` que permite seleccionar múltiples métodos de pago aceptados por el proveedor a través de checkboxes.
+**Descripción:** Permite a los administradores ver, filtrar, agregar, editar y eliminar proveedores directamente en la plataforma. Esta es la única vía para incorporar nuevos proveedores al sistema, reemplazando cualquier proceso de solicitud previo por parte de usuarios generales. Se ha eliminado el campo 'rut' del proveedor, ya que el 'nit' es suficiente para acceder a la información del RUT. Además, los proveedores ya no están vinculados a un usuario de la plataforma, eliminando la necesidad del campo `usuarioId`. Se han añadido campos para almacenar el nombre del dueño de la empresa proveedora, así como el correo electrónico y el número de teléfono de contacto de la empresa. La dirección de la empresa (`direccionEmpresa`) se utilizará tanto como dirección principal de la empresa como dirección de contacto. El campo `nombreProveedor` ha sido renombrado a `nombreEmpresa` para mayor claridad en el registro. Se ha incorporado un nuevo campo `metodosDePago` que permite seleccionar múltiples métodos de pago aceptados por el proveedor a través de checkboxes. **Adicionalmente, los administradores ahora pueden generar y gestionar una clave de acceso única para cada proveedor, la cual será utilizada por el proveedor para iniciar sesión en su portal dedicado.**
 
 **Flujo de Interacción:** Los administradores acceden a esta funcionalidad desde el panel de administración (`/admin`) seleccionando la opción "Proveedores". Pueden ver una lista de proveedores existentes, utilizar un filtro por métodos de pago aceptados, y usar el botón "Agregar Proveedor" que abre un modal para incorporar nuevos proveedores.
 
@@ -49,23 +49,24 @@
 #### 📄 **Archivo:** `src/models/Proveedor.js` (Modificado)
 * **Rol:** Define el esquema del modelo de datos para los proveedores.
 * **Implementación Clave:**
-    * **Cambios:** Se ha añadido el campo `metodosDePago` como un array de strings para almacenar los métodos de pago aceptados por el proveedor.
+    * **Cambios:** Se ha añadido el campo `metodosDePago` como un array de strings para almacenar los métodos de pago aceptados por el proveedor. **Se añadirá un campo `accessKey` (hashed) para la autenticación de proveedores.**
 
 #### 📄 **Archivo:** `src/components/layout/admin/dashboards/proveedores/FormularioAgregarProveedor.jsx` (Modificado)
-* **Rol:** Componente de formulario para agregar nuevos proveedores.
+* **Rol:** Componente de formulario para agregar y editar proveedores.
 * **Implementación Clave:**
-    * **Cambios:** Se ha añadido un nuevo campo de selección múltiple para `metodosDePago` utilizando checkboxes. Los valores seleccionados se gestionan en el estado del formulario y se envían como parte de los datos del proveedor.
+    * **Cambios:** Se ha añadido un nuevo campo de selección múltiple para `metodosDePago` utilizando checkboxes. Los valores seleccionados se gestionan en el estado del formulario y se envían como parte de los datos del proveedor. **Se incluirá un campo para generar o mostrar la clave de acceso del proveedor, permitiendo al administrador gestionarla.**
 
 #### 📄 **Archivo:** `src/app/acciones/ProveedorActions.js` (Modificado)
 * **Rol:** Contiene Server Actions para la gestión de proveedores por parte del administrador.
 * **Implementación Clave:**
-    * **Componentes/Funciones Relevantes:** `obtenerProveedoresHabilitados`, `obtenerProveedores`, `crearProveedor`, `actualizarProveedor`, `eliminarProveedor`, `obtenerProveedorPorId`.
+    * **Componentes/Funciones Relevantes:** `obtenerProveedoresHabilitados`, `obtenerProveedores`, `crearProveedor`, `actualizarProveedor`, `eliminarProveedor`, `obtenerProveedorPorId`, `generarYGuardarAccessKey` (nuevo).
     * **Lógica Principal:**
         *   `obtenerProveedoresHabilitados`: Recupera solo los proveedores que están habilitados.
         *   `obtenerProveedores`: Recupera todos los proveedores.
-        *   `crearProveedor`: Crea un nuevo proveedor. **Esta acción debe incluir una verificación de rol de administrador (`getServerSession`) para asegurar que solo los administradores puedan ejecutarla.** Ahora también maneja el nuevo campo `metodosDePago`.
-        *   `actualizarProveedor`: Actualiza los datos de un proveedor existente.
+        *   `crearProveedor`: Crea un nuevo proveedor. **Esta acción debe incluir una verificación de rol de administrador (`getServerSession`) para asegurar que solo los administradores puedan ejecutarla.** Ahora también maneja el nuevo campo `metodosDePago` y **generará y guardará una `accessKey` inicial para el proveedor.**
+        *   `actualizarProveedor`: Actualiza los datos de un proveedor existente. **Permitirá actualizar la `accessKey` si es necesario.**
         *   `eliminarProveedor`: Elimina un proveedor.
         *   `obtenerProveedorPorId`: Busca un proveedor por su ID.
+        *   `generarYGuardarAccessKey`: (Nuevo) Función para generar y hashear una nueva clave de acceso para un proveedor específico.
         *   Todas las acciones interactúan directamente con el modelo `Proveedor` de Mongoose y utilizan `revalidatePath`.
     * **Modelos de Datos / Endpoints:** Modifica/consume el modelo `Proveedor` de Mongoose.

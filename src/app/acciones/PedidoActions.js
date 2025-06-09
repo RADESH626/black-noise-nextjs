@@ -67,11 +67,52 @@ async function obtenerPedidosPorUsuarioId(usuarioId) {
         return { pedidos: JSON.parse(JSON.stringify(pedidos)) };
     } catch (error) {
         console.error('ERROR in obtenerPedidosPorUsuarioId:', error);
-        return { error: 'Error al obtener los pedidos del usuario: ' + error.message };
+    return { success: false, message: 'Error al obtener los pedidos del usuario: ' + error.message };
     }
 }
 
-// Obtener pedido por ID
+// Obtener pedidos por ID de Proveedor (puede ser un pedido específico o todos los de un proveedor)
+export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId) {
+    console.log('DEBUG: Entering obtenerPedidosPorProveedorId with pedidoId:', pedidoId, 'proveedorId:', proveedorId);
+    try {
+        await connectDB();
+        console.log('DEBUG: Database connected for obtenerPedidosPorProveedorId.');
+
+        if (!proveedorId) {
+            return { success: false, message: "ID de proveedor es requerido." };
+        }
+
+        let query = { proveedorId: proveedorId };
+        if (pedidoId) {
+            query._id = pedidoId;
+        }
+
+        const pedidos = await Pedido.find(query)
+            .populate('desingIds', 'nombreDesing imagenDesing') // Popula nombre e imagen de los diseños
+            .populate('proveedorId', 'nombreEmpresa emailContacto') // Popula algunos campos de Proveedor
+            .lean();
+
+        if (pedidoId && pedidos.length === 0) {
+            console.log('DEBUG: Specific order not found for supplier or does not belong to supplier.');
+            return { success: false, message: 'Pedido no encontrado o no pertenece a este proveedor.' };
+        }
+
+        console.log('DEBUG: Orders retrieved for supplier ID:', proveedorId, 'count:', pedidos.length);
+        
+        // If a specific pedidoId was requested, return the single pedido object
+        if (pedidoId) {
+            return { success: true, pedido: JSON.parse(JSON.stringify(pedidos[0])) };
+        } else {
+            // Otherwise, return the array of all orders for the supplier
+            return { success: true, pedidos: JSON.parse(JSON.stringify(pedidos)) };
+        }
+    } catch (error) {
+        console.error('ERROR in obtenerPedidosPorProveedorId:', error);
+        return { success: false, message: 'Error al obtener los pedidos del proveedor: ' + error.message };
+    }
+}
+
+// Obtener pedido por ID (para uso general/admin)
 async function ObtenerPedidoPorId(id) {
     console.log('DEBUG: Entering ObtenerPedidoPorId with ID:', id);
     try {
@@ -79,18 +120,18 @@ async function ObtenerPedidoPorId(id) {
         console.log('DEBUG: Database connected for ObtenerPedidoPorId.');
         const pedido = await Pedido.findById(id)
             .populate('desingIds', 'nombreDesing imagenDesing')
-            .populate('proveedorId', 'nombreProveedor contactoPrincipal')
+            .populate('proveedorId', 'nombreEmpresa emailContacto')
             .lean();
         console.log('DEBUG: Order retrieved from DB:', pedido);
         if (!pedido) {
             console.log('DEBUG: Order not found for ID:', id);
-            return { error: 'Pedido no encontrado' };
+            return { success: false, message: 'Pedido no encontrado' };
         }
         console.log('DEBUG: Exiting ObtenerPedidoPorId with order:', JSON.parse(JSON.stringify(pedido)));
-        return JSON.parse(JSON.stringify(pedido));
+        return { success: true, pedido: JSON.parse(JSON.stringify(pedido)) };
     } catch (error) {
         console.error('ERROR in ObtenerPedidoPorId:', error);
-        return { error: 'Error al obtener el pedido: ' + error.message };
+        return { success: false, message: 'Error al obtener el pedido: ' + error.message };
     }
 }
 
@@ -136,7 +177,8 @@ async function EditarPedido(id, data) {
 export {
     guardarPedido,
     obtenerPedidos,
-    obtenerPedidosPorUsuarioId,
+    obtenerPedidosPorUsuarioId, // This function is now deprecated for supplier use, but kept for user-specific orders
+    obtenerPedidosPorProveedorId, // New function for supplier-specific orders
     ObtenerPedidoPorId,
     EditarPedido
 };
