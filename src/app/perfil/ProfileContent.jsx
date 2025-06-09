@@ -9,6 +9,7 @@ import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions"; // Im
 import DesignsComponent from "./DesignsComponent"; // Import DesignsComponent
 import PedidosComponent from "./PedidosComponent"; // Import PedidosComponent
 import CartComponent from "./CartComponent"; // Import CartComponent
+import PagosComponent from "./PagosComponent"; // Import PagosComponent
 import { ObtenerUsuarioPorId } from "@/app/acciones/UsuariosActions"; // Import the server action
 
 function ProfileContent() { // Removed user, designs, and error props
@@ -131,18 +132,28 @@ function ProfileContent() { // Removed user, designs, and error props
           >
             DISEÑOS
           </button>
-          <button
-            className={`py-3 px-6 text-lg font-medium ${activeTab === 'orders' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`}
-            onClick={() => setActiveTab('orders')}
-          >
-            PEDIDOS
-          </button>
+
           <button
             className={`py-3 px-6 text-lg font-medium ${activeTab === 'cart' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`}
             onClick={() => setActiveTab('cart')}
           >
             CARRITO
           </button>
+
+          <button
+            className={`py-3 px-6 text-lg font-medium ${activeTab === 'orders' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`}
+            onClick={() => setActiveTab('orders')}
+          >
+            PEDIDOS
+          </button>
+
+          <button
+            className={`py-3 px-6 text-lg font-medium ${activeTab === 'payments' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`}
+            onClick={() => setActiveTab('payments')}
+          >
+            PAGOS
+          </button>
+          
         </div>
       </nav>
 
@@ -163,6 +174,10 @@ function ProfileContent() { // Removed user, designs, and error props
 
         {activeTab === 'cart' && (
           <CartComponent />
+        )}
+
+        {activeTab === 'payments' && (
+          <PagosComponent userId={user?.id} />
         )}
       </div>
     </div>

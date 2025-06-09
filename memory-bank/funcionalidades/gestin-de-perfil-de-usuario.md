@@ -1,8 +1,8 @@
 # ✅ Funcionalidad: Gestión de Perfil de Usuario
 
-**Descripción:** Permite a los usuarios autenticados visualizar su información de perfil, diseños publicados, pedidos realizados y el contenido de su carrito de compras, así como editar sus datos personales.
+**Descripción:** Permite a los usuarios autenticados visualizar su información de perfil, diseños publicados, pedidos realizados, el contenido de su carrito de compras y sus pagos registrados, así como editar sus datos personales.
 
-**Flujo de Interacción:** El usuario navega a `/perfil` para ver un resumen de su información y acceder a pestañas para ver diseños, pedidos y carrito. Desde `/perfil/editar`, o a través de un modal en `/perfil`, puede modificar sus datos personales.
+**Flujo de Interacción:** El usuario navega a `/perfil` para ver un resumen de su información y acceder a pestañas para ver diseños, pedidos, carrito y pagos. Desde `/perfil/editar`, o a través de un modal en `/perfil`, puede modificar sus datos personales.
 
 ---
 
@@ -33,7 +33,7 @@
         *   Carga los diseños del usuario usando `obtenerDesignsPorUsuarioId` de `DesignActions.js`.
         *   **Muestra la información completa del perfil del usuario (nombre, correo, tipo de documento, número de documento, fecha de nacimiento, género, número de teléfono, dirección, biografía y likes).**
         *   Proporciona funciones `handleEditProfile` para abrir un modal con `FormEditarUsuario` y `handleEditDesign` para una futura edición de diseños.
-        *   Renderiza condicionalmente `DesignsComponent`, `PedidosComponent` y `CartComponent` según la pestaña activa.
+        *   Renderiza condicionalmente `DesignsComponent`, `PedidosComponent`, `CartComponent` y `PagosComponent` según la pestaña activa.
         *   Permite cerrar sesión (`signOut`).
     * **Modelos de Datos / Endpoints:** Consume `DesignActions.js` (específicamente `obtenerDesignsPorUsuarioId`) para obtener diseños. El `FormEditarUsuario` interactúa con `UsuariosActions.js`.
 
@@ -66,6 +66,13 @@
     * **Componentes/Funciones Relevantes:** `PedidosComponent` (componente).
     * **Lógica Principal:** Recibe el `userId` como prop y probablemente realiza una llamada a una Server Action (ej. `PedidoActions.js`) para obtener los pedidos del usuario. **Nota:** Se ha adaptado visualmente para mostrar cada producto de un pedido en un formato de tarjeta de cuadrícula, similar a cómo se muestran los diseños en `DesignsComponent.jsx`, incluyendo una imagen (o marcador de posición) y detalles clave.
     * **Modelos de Datos / Endpoints:** Probablemente consume `PedidoActions.js` para obtener datos de pedidos.
+
+#### 📄 **Archivo:** `src/app/perfil/PagosComponent.jsx`
+* **Rol:** Componente que muestra los pagos registrados por el usuario en la sección de perfil.
+* **Implementación Clave:**
+    * **Componentes/Funciones Relevantes:** `PagosComponent` (componente).
+    * **Lógica Principal:** Recibe el `userId` como prop y realiza una llamada a una Server Action (`PagoActions.js`) para obtener los pagos del usuario. Muestra los pagos en un formato de lista o tabla.
+    * **Modelos de Datos / Endpoints:** Consume `PagoActions.js` para obtener datos de pagos.
 
 #### 📄 **Archivo:** `src/app/perfil/CartComponent.jsx`
 * **Rol:** Componente que muestra el contenido del carrito de compras del usuario en la sección de perfil.

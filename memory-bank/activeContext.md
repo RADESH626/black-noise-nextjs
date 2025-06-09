@@ -1,28 +1,43 @@
 # Active Context - Current Session State
 
-## Session Summary: Implementación de altura dinámica y scroll interno en componentes de perfil - ✅ COMPLETED
-**Date**: 9/6/2025, 9:15:41 a. m.
-**Objective**: Ajustar los componentes de diseños, carrito y pedidos para que ocupen el espacio restante de la pantalla cuando no tienen contenido, y se adapten a la altura de su contenido con scroll interno cuando sí lo tienen.
+## Session Summary: Restrict "Solicitar Proveedor" to Admin-Only Direct Addition - ✅ COMPLETED
+**Date**: 9/6/2025, 9:35:22 a. m.
+**Objective**: Modify the supplier management functionality so that only administrators can directly add new providers, removing the public-facing "request to be a provider" process.
 
 ---
 
 ### ✅ Changes Implemented This Session:
 
-*   **File:** `src/app/perfil/DesignsComponent.jsx`
-    *   **Change:** Revertido el cambio de `min-h-screen` en el div de mensaje vacío.
-*   **File:** `src/app/perfil/CartComponent.jsx`
-    *   **Change:** Revertido el cambio de `min-h-screen` en el div de mensaje vacío.
-*   **File:** `src/app/perfil/PedidosComponent.jsx`
-    *   **Change:** Revertido el cambio de `min-h-screen` a `min-h-full` en el div de mensaje vacío.
-*   **File:** `src/app/perfil/ProfileContent.jsx`
-    *   **Change:** Implementado un layout flexbox (`flex flex-col min-h-screen`) para el contenedor principal. Las secciones de información de usuario y navegación ahora tienen `flex-shrink-0`. El área de contenido de las pestañas (`DesignsComponent`, `PedidosComponent`, `CartComponent`) está envuelta en un `div` con `flex-grow overflow-y-auto`, lo que le permite ocupar el espacio restante y manejar el scroll internamente.
-*   **File:** `memory-bank/activeContext.md`
-    *   **Change:** Actualización del log de sesión.
+* **File:** `memory-bank/funcionalidades/gestin-de-solicitudes-de-proveedor-admin.md` (Renamed to `gestin-de-proveedores-directa-admin.md`)
+    * **Change:** Renamed and updated the documentation to reflect the removal of the public "solicitud" process and the new direct admin addition of providers.
+* **File:** `memory-bank/funcionalidades/gestin-de-proveedores-admin.md`
+    * **Change:** Updated documentation to clarify that adding providers is an admin-only, direct action, replacing the old "solicitud" process.
+* **File:** `memory-bank/funcionalidades/portal-de-proveedores.md`
+    * **Change:** Updated documentation to remove any mention of non-providers requesting to become providers.
+* **File:** `src/app/solicitud-proveedor/` (Directory)
+    * **Change:** Removed the entire directory and its contents, eliminating the public-facing "solicitud de proveedor" page.
+* **File:** `src/app/acciones/SolicitudProveedorActions.js`
+    * **Change:** Removed this file as its functionality is no longer needed.
+* **File:** `src/models/SolicitudProveedor.js`
+    * **Change:** Removed this file as its model is no longer needed.
+* **File:** `src/app/acciones/ProveedorActions.js`
+    * **Change:** Implemented the `crearProveedor` server action and added an admin role check using `getServerSession` to ensure only administrators can add providers. Also implemented basic fetching for `obtenerProveedoresHabilitados` and `obtenerProveedores`.
+* **File:** `src/components/layout/admin/dashboards/ProveedoresDashboard.jsx` (Renamed to `GestionProveedoresDashboard.jsx`)
+    * **Change:** Renamed the file and updated the component function name to `GestionProveedoresDashboard` to match the new documentation.
+* **File:** `src/components/layout/admin/dashboards/proveedores/FormularioAgregarProveedor.jsx`
+    * **Change:** Created a new React component for administrators to add new providers, following the established form and server action patterns.
+* **File:** `src/app/admin/proveedores/agregar/page.jsx`
+    * **Change:** Created a new page to render the `FormularioAgregarProveedor` component, making it accessible via `/admin/proveedores/agregar`.
+* **File:** `src/app/admin/page.jsx`
+    * **Change:** Updated the `dashboardComponents` map to use `GestionProveedoresDashboard` and removed the reference to `SolicitudesProveedorDashboard`.
 
 ### 💡 Key Decisions & New Patterns:
 
-*   Se adoptó un enfoque de layout flexbox en `ProfileContent.jsx` para gestionar la altura de los componentes de las pestañas. Esto permite que el área de contenido de las pestañas se expanda para llenar el espacio vertical disponible cuando el contenido es escaso, y que muestre un scrollbar interno cuando el contenido excede ese espacio, logrando el comportamiento dinámico y consistente solicitado por el usuario.
+*   **Centralized Provider Addition:** Consolidated provider creation under the admin panel, removing the public-facing request mechanism.
+*   **Role-Based Access Control:** Implemented `getServerSession` in `crearProveedor` to enforce admin-only access, aligning with security patterns.
+*   **Documentation-Driven Development:** Followed the principle of updating documentation first to guide code changes.
 
 ### ➡️ Next Steps:
 
-*   No hay pasos pendientes relacionados con esta tarea.
+*   Generate and present `git add` command.
+*   Generate and present `git commit` command.

@@ -28,10 +28,6 @@ const DesignSchema = new Schema({
         type: Number,
         required: true
     },
-    fechaRealizacion: {
-        type: Date,
-        default: Date.now
-    },
     estadoDesing: {
         type: String,
         enum: Object.values(EstadoDesing),

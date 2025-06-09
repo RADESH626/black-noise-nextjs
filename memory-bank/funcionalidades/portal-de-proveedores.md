@@ -1,23 +1,22 @@
 # ✅ Funcionalidad: Portal de Proveedores
 
-**Descripción:** Proporciona una interfaz para que los usuarios con rol de "Proveedor" gestionen su perfil y visualicen sus pedidos. También permite a los usuarios no proveedores solicitar convertirse en uno.
+**Descripción:** Proporciona una interfaz para que los usuarios con rol de "Proveedor" gestionen su perfil y visualicen sus pedidos. La funcionalidad de solicitud para convertirse en proveedor por parte de usuarios no proveedores ha sido eliminada.
 
-**Flujo de Interacción:** Los usuarios acceden a `/proveedor`. Si son proveedores, ven un panel con opciones para editar su perfil y ver sus pedidos. Si no son proveedores, ven una lista de proveedores existentes y un botón para enviar una solicitud para ser proveedor.
+**Flujo de Interacción:** Los usuarios acceden a `/proveedor`. Si son proveedores, ven un panel con opciones para editar su perfil y ver sus pedidos. Los usuarios que no tienen el rol de proveedor no tendrán acceso a la funcionalidad de solicitud.
 
 ---
 
 ### Archivos Involucrados:
 
-#### 📄 **Archivo:** `src/app/proveedor/page.jsx`
+#### 📄 **Archivo:** `src/app/proveedor/page.jsx` (Modificado)
 * **Rol:** Página principal del portal de proveedores.
 * **Implementación Clave:**
     * **Componentes/Funciones Relevantes:** `ProveedorPage` (componente principal), `useSession`, `useRouter`, `Link`, `BotonGeneral`, `Rol` (enum).
     * **Lógica Principal:**
         *   Obtiene la sesión del usuario para determinar su rol.
         *   Muestra un panel específico para proveedores logueados con enlaces a `/proveedor/editar-perfil` y `/proveedor/pedidos`.
-        *   Muestra una lista de "Nuestros Proveedores" (aunque la obtención de datos está actualmente comentada/bypasseada).
-        *   Si el usuario no es proveedor, muestra un botón para "Solicitar ser Proveedor" que enlaza a `/proveedor/solicitud`.
-        *   Nota: La lógica de obtención de datos de proveedores (`obtenerProveedores`, `obtenerMiPerfilProveedor`) está actualmente comentada o bypassada para desarrollo.
+        *   **Elimina la lógica que muestra la lista de "Nuestros Proveedores" y el botón "Solicitar ser Proveedor" para usuarios no proveedores.**
+        *   Asegura que solo los usuarios con el rol `PROVEEDOR` puedan acceder a las funcionalidades del portal.
     * **Modelos de Datos / Endpoints:** Consume `ProveedorActions.js` (aunque actualmente bypassado).
 
 #### 📄 **Archivo:** `src/app/proveedor/editar-perfil/page.jsx`

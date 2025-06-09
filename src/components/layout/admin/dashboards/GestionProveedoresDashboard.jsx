@@ -10,7 +10,7 @@ import { obtenerProveedoresHabilitados } from '@/app/acciones/ProveedorActions.j
 import FormFiltrarProveedores from './proveedores/FormFiltrarProveedores';
 import BotonAgregarProveedores from '../../../common/botones/BotonAgregarProveedores';
 
-function ProveedoresDashboard() {
+function GestionProveedoresDashboard() {
     const [proveedores, setProveedores] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -62,4 +62,4 @@ function ProveedoresDashboard() {
     );
 }
 
-export default ProveedoresDashboard;
+export default GestionProveedoresDashboard;

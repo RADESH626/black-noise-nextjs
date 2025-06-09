@@ -5,8 +5,7 @@ import { useAdminDashboard } from '../../context/AdminDashboardContext';
 // Importa todos los componentes de dashboard
 import UsuariosDashboard from '../../components/layout/admin/dashboards/UsuariosDashboard';
 import DesignsDashboard from '../../components/layout/admin/dashboards/DesignsDashboard';
-import ProveedoresDashboard from '../../components/layout/admin/dashboards/ProveedoresDashboard';
-import SolicitudesProveedorDashboard from '../../components/layout/admin/dashboards/SolicitudesProveedorDashboard';
+import GestionProveedoresDashboard from '../../components/layout/admin/dashboards/GestionProveedoresDashboard';
 import PedidosDashboard from '../../components/layout/admin/dashboards/PedidosDashboard';
 import VentasDashboard from '../../components/layout/admin/dashboards/VentasDashboard';
 import PagosDashboard from '../../components/layout/admin/dashboards/PagosDashboard';
@@ -15,8 +14,7 @@ import PagosDashboard from '../../components/layout/admin/dashboards/PagosDashbo
 const dashboardComponents = {
   usuarios: <UsuariosDashboard />,
   designs: <DesignsDashboard />,
-  proveedores: <ProveedoresDashboard />,
-  solicitudes: <SolicitudesProveedorDashboard />,
+  proveedores: <GestionProveedoresDashboard />,
   pedidos: <PedidosDashboard />,
   ventas: <VentasDashboard />,
   pagos: <PagosDashboard />,
