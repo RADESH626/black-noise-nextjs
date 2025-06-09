@@ -59,8 +59,8 @@ function ProveedorPage() {
     // If session exists and user is a supplier, but profile not loaded (e.g., not found)
     if (session?.user?.isSupplier && !miPerfil) {
         return (
-            <div className="min-h-screen bg-black text-white p-8 flex flex-col items-center justify-center">
-                <h1 className="text-3xl font-bold mb-4">Portal de Proveedores</h1>
+            <div className="flex flex-col items-center justify-center h-full">
+                <h1 className="text-3xl font-bold mb-4 text-gray-800">Portal de Proveedores</h1>
                 <p className="text-red-500 text-lg">No se pudo cargar tu perfil de proveedor. Por favor, contacta al administrador.</p>
             </div>
         );
@@ -69,13 +69,13 @@ function ProveedorPage() {
     // Render supplier dashboard for authenticated suppliers
     if (session?.user?.isSupplier) {
         return (
-            <div className="min-h-screen bg-black text-white p-8">
-                <h1 className="text-3xl font-bold mb-8 text-center">Bienvenido, {miPerfil?.nombreEmpresa || 'Proveedor'}</h1>
+            <div className="h-full">
+                <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">Bienvenido, {miPerfil?.nombreEmpresa || 'Proveedor'}</h1>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                    <div className="bg-gray-800 rounded-lg shadow-lg p-6 text-center">
-                        <h2 className="text-xl font-semibold mb-4">Gestión de Perfil</h2>
-                        <p className="text-gray-300 mb-6">Actualiza tu información de contacto y detalles de la empresa.</p>
+                    <div className="bg-gray-100 rounded-lg shadow-lg p-6 text-center">
+                        <h2 className="text-xl font-semibold mb-4 text-gray-700">Gestión de Perfil</h2>
+                        <p className="text-gray-600 mb-6">Actualiza tu información de contacto y detalles de la empresa.</p>
                         <Link href="/proveedor/editar-perfil">
                             <BotonGeneral>
                                 Editar Perfil
@@ -83,9 +83,9 @@ function ProveedorPage() {
                         </Link>
                     </div>
 
-                    <div className="bg-gray-800 rounded-lg shadow-lg p-6 text-center">
-                        <h2 className="text-xl font-semibold mb-4">Mis Pedidos</h2>
-                        <p className="text-gray-300 mb-6">Visualiza y gestiona los pedidos asociados a tu empresa.</p>
+                    <div className="bg-gray-100 rounded-lg shadow-lg p-6 text-center">
+                        <h2 className="text-xl font-semibold mb-4 text-gray-700">Mis Pedidos</h2>
+                        <p className="text-gray-600 mb-6">Visualiza y gestiona los pedidos asociados a tu empresa.</p>
                         <Link href="/proveedor/pedidos">
                             <BotonGeneral>
                                 Ver Pedidos
@@ -99,9 +99,9 @@ function ProveedorPage() {
 
     // Fallback for non-suppliers or unauthenticated users (should be redirected by middleware)
     return (
-        <div className="min-h-screen bg-black text-white p-8 flex flex-col items-center justify-center">
-            <h1 className="text-3xl font-bold mb-4">Acceso Denegado</h1>
-            <p className="text-lg">No tienes permiso para acceder a esta página.</p>
+        <div className="flex flex-col items-center justify-center h-full">
+            <h1 className="text-3xl font-bold mb-4 text-gray-800">Acceso Denegado</h1>
+            <p className="text-lg text-gray-600">No tienes permiso para acceder a esta página.</p>
             <Link href="/login" className="mt-6 text-blue-500 hover:underline">
                 Volver al Login
             </Link>

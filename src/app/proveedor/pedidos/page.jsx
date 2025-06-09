@@ -56,16 +56,16 @@ export default function ListaPedidosProveedorPage() {
 
   if (pedidos.length === 0) {
     return (
-      <div className="container mx-auto p-4 text-center">
-        <h1 className="text-2xl font-bold mb-4">Mis Pedidos</h1>
-        <p>No tienes pedidos asociados en este momento.</p>
+      <div className="text-center">
+        <h1 className="text-2xl font-bold mb-4 text-gray-800">Mis Pedidos</h1>
+        <p className="text-gray-600">No tienes pedidos asociados en este momento.</p>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Mis Pedidos</h1>
+    <div>
+      <h1 className="text-2xl font-bold mb-4 text-gray-800">Mis Pedidos</h1>
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
           <thead className="bg-gray-200 text-gray-700">
