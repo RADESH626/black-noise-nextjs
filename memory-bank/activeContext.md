@@ -47,6 +47,58 @@ Se ha modificado el componente `ProveedorSidebar` para utilizar el componente `B
 *   **Cambio:** Se importó `BotonGeneral` y se reemplazó el elemento `button` existente por `BotonGeneral` para el botón de cerrar sesión.
 *   **Detalle:** Se eliminaron las clases de estilo Tailwind CSS del botón original, ya que `BotonGeneral` maneja su propio estilo.
 
+## Task: Refactorización de Rutas API de Administrador y Optimización de Estilos Globales
+
+### Descripción:
+Se ha completado la refactorización de las rutas API bajo `src/app/api/administrador/` para utilizar manejadores CRUD genéricos, autorización y manejo de errores consistente. Además, se optimizaron los estilos globales moviendo estilos específicos de componentes a módulos CSS dedicados y eliminando estilos no utilizados.
+
+### Archivos Modificados:
+
+#### 📄 **Archivo:** `src/app/api/administrador/usuarios/route.js`
+*   **Cambio:** Refactorizado para usar `createHandler` y `getAllHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Usuario` y manejo de errores consistente.
+
+#### 📄 **Archivo:** `src/app/api/administrador/usuarios/[id]/route.js`
+*   **Cambio:** Creado e implementado `GET`, `PUT`, y `DELETE` utilizando `getByIdHandler`, `updateHandler`, y `deleteHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Usuario`.
+
+#### 📄 **Archivo:** `src/app/api/administrador/proveedores/route.js`
+*   **Cambio:** Refactorizado para usar `createHandler` y `getAllHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Proveedor` y manejo de errores consistente.
+
+#### 📄 **Archivo:** `src/app/api/administrador/proveedores/[id]/route.js`
+*   **Cambio:** Creado e implementado `GET`, `PUT`, y `DELETE` utilizando `getByIdHandler`, `updateHandler`, y `deleteHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Proveedor`.
+
+#### 📄 **Archivo:** `src/app/api/administrador/designs/route.js`
+*   **Cambio:** Refactorizado para usar `createHandler` y `getAllHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Design` y manejo de errores consistente.
+
+#### 📄 **Archivo:** `src/app/api/administrador/designs/[id]/route.js`
+*   **Cambio:** Creado e implementado `GET`, `PUT`, y `DELETE` utilizando `getByIdHandler`, `updateHandler`, y `deleteHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Design`.
+
+#### 📄 **Archivo:** `src/app/api/administrador/pagos/route.js`
+*   **Cambio:** Refactorizado para usar `createHandler` y `getAllHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Pago` y manejo de errores consistente.
+
+#### 📄 **Archivo:** `src/app/api/administrador/pagos/[id]/route.js`
+*   **Cambio:** Creado e implementado `GET`, `PUT`, y `DELETE` utilizando `getByIdHandler`, `updateHandler`, y `deleteHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Pago`.
+
+#### 📄 **Archivo:** `src/app/api/administrador/pedidos/route.js`
+*   **Cambio:** Refactorizado para usar `createHandler` y `getAllHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Pedido` y manejo de errores consistente.
+
+#### 📄 **Archivo:** `src/app/api/administrador/pedidos/[id]/route.js`
+*   **Cambio:** Creado e implementado `GET`, `PUT`, y `DELETE` utilizando `getByIdHandler`, `updateHandler`, y `deleteHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Pedido`.
+
+#### 📄 **Archivo:** `src/app/api/administrador/ventas/route.js`
+*   **Cambio:** Refactorizado para usar `createHandler` y `getAllHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Venta` y manejo de errores consistente.
+
+#### 📄 **Archivo:** `src/app/api/administrador/ventas/[id]/route.js`
+*   **Cambio:** Creado e implementado `GET`, `PUT`, y `DELETE` utilizando `getByIdHandler`, `updateHandler`, y `deleteHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Venta`.
+
+#### 📄 **Archivo:** `src/components/common/modales/PopUpMessage.module.css`
+*   **Cambio:** Creado para contener estilos específicos del componente PopUp (`popup-shadow`, `popup-success`, `popup-error`).
+
+#### 📄 **Archivo:** `src/components/common/modales/PopUpMessage.jsx`
+*   **Cambio:** Actualizado para importar y utilizar los estilos de `PopUpMessage.module.css`.
+
+#### 📄 **Archivo:** `src/app/globals.css`
+*   **Cambio:** Eliminados los estilos específicos del PopUp y los estilos de `dialog` no utilizados.
+
 ### Próximos Pasos:
 1.  Generar y presentar el comando `git add`.
 2.  Esperar confirmación del usuario.

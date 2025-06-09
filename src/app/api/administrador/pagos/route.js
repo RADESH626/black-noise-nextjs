@@ -1,27 +1,29 @@
-import Pago from '@/models/Pago'
-import { NextResponse } from 'next/server'
-import connectDB from '@/utils/DBconection'
+import Pago from '@/models/Pago';
+import { NextResponse } from 'next/server';
+import connectDB from '@/utils/DBconection';
+import { createHandler, getAllHandler } from '@/utils/crudHandler';
+import { handleError, ValidationError } from '@/utils/errorHandler';
+import { validateRequiredFields } from '@/utils/validation';
+import { withAuthorization } from '@/utils/authMiddleware';
 
-export async function GET(request) {
-    try {
-        connectDB()
-        const pagos = await Pago.find()
-        return NextResponse.json({ pagos })
-    } catch (error) {
-        console.error('Error al obtener pagos:', error)
-        return NextResponse.json({ message: 'Error al obtener pagos' }, { status: 500 })
-    }
-}
+export const GET = withAuthorization(getAllHandler(Pago), 'ADMINISTRADOR');
 
-export async function POST(request) {
+export const POST = withAuthorization(async (request) => {
     try {
-        connectDB()
-        const data = await request.json()
-        const nuevoPago = new Pago(data)
-        const pagoGuardado = await nuevoPago.save()
-        return NextResponse.json(pagoGuardado, { status: 201 })
+        await connectDB();
+        const data = await request.json();
+
+        // Specific validations for Pago model
+        validateRequiredFields(data, ['monto', 'metodoPago', 'estado', 'pedidoId']);
+
+        // Use the generic createHandler
+        const response = await createHandler(Pago)(request);
+        const responseBody = await response.json();
+
+        return NextResponse.json(responseBody, { status: response.status });
+
     } catch (error) {
-        console.error('Error al crear pago:', error)
-        return NextResponse.json({ message: 'Error al crear pago' }, { status: 500 })
+        const errorResponse = handleError(error, 'Error al crear el pago');
+        return NextResponse.json(errorResponse, { status: errorResponse.statusCode });
     }
-}
+}, 'ADMINISTRADOR');

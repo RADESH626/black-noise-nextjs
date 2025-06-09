@@ -1,27 +1,29 @@
-import Design from '@/models/Design'
-import { NextResponse } from 'next/server'
-import connectDB from '@/utils/DBconection'
+import Design from '@/models/Design';
+import { NextResponse } from 'next/server';
+import connectDB from '@/utils/DBconection';
+import { createHandler, getAllHandler } from '@/utils/crudHandler';
+import { handleError, ValidationError } from '@/utils/errorHandler';
+import { validateRequiredFields } from '@/utils/validation';
+import { withAuthorization } from '@/utils/authMiddleware';
 
-export async function GET(request) {
-    try {
-        connectDB()
-        const designs = await Design.find()
-        return NextResponse.json({ designs })
-    } catch (error) {
-        console.error('Error al obtener diseños:', error)
-        return NextResponse.json({ message: 'Error al obtener diseños' }, { status: 500 })
-    }
-}
+export const GET = withAuthorization(getAllHandler(Design), 'ADMINISTRADOR');
 
-export async function POST(request) {
+export const POST = withAuthorization(async (request) => {
     try {
-        connectDB()
-        const data = await request.json()
-        const nuevoDesign = new Design(data)
-        const designGuardado = await nuevoDesign.save()
-        return NextResponse.json(designGuardado, { status: 201 })
+        await connectDB();
+        const data = await request.json();
+
+        // Specific validations for Design model
+        validateRequiredFields(data, ['nombre', 'descripcion', 'precio', 'categoria']);
+
+        // Use the generic createHandler
+        const response = await createHandler(Design)(request);
+        const responseBody = await response.json();
+
+        return NextResponse.json(responseBody, { status: response.status });
+
     } catch (error) {
-        console.error('Error al crear diseño:', error)
-        return NextResponse.json({ message: 'Error al crear diseño' }, { status: 500 })
+        const errorResponse = handleError(error, 'Error al crear el diseño');
+        return NextResponse.json(errorResponse, { status: errorResponse.statusCode });
     }
-}
+}, 'ADMINISTRADOR');

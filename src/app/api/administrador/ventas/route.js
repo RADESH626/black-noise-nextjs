@@ -1,27 +1,29 @@
-import Venta from '@/models/Venta'
-import { NextResponse } from 'next/server'
-import connectDB from '@/utils/DBconection'
+import Venta from '@/models/Venta';
+import { NextResponse } from 'next/server';
+import connectDB from '@/utils/DBconection';
+import { createHandler, getAllHandler } from '@/utils/crudHandler';
+import { handleError, ValidationError } from '@/utils/errorHandler';
+import { validateRequiredFields } from '@/utils/validation';
+import { withAuthorization } from '@/utils/authMiddleware';
 
-export async function GET(request) {
-    try {
-        connectDB()
-        const ventas = await Venta.find()
-        return NextResponse.json({ ventas })
-    } catch (error) {
-        console.error('Error al obtener ventas:', error)
-        return NextResponse.json({ message: 'Error al obtener ventas' }, { status: 500 })
-    }
-}
+export const GET = withAuthorization(getAllHandler(Venta), 'ADMINISTRADOR');
 
-export async function POST(request) {
+export const POST = withAuthorization(async (request) => {
     try {
-        connectDB()
-        const data = await request.json()
-        const nuevaVenta = new Venta(data)
-        const ventaGuardada = await nuevaVenta.save()
-        return NextResponse.json(ventaGuardada, { status: 201 })
+        await connectDB();
+        const data = await request.json();
+
+        // Specific validations for Venta model
+        validateRequiredFields(data, ['pedidoId', 'usuarioId', 'total', 'fechaVenta']);
+
+        // Use the generic createHandler
+        const response = await createHandler(Venta)(request);
+        const responseBody = await response.json();
+
+        return NextResponse.json(responseBody, { status: response.status });
+
     } catch (error) {
-        console.error('Error al crear venta:', error)
-        return NextResponse.json({ message: 'Error al crear venta' }, { status: 500 })
+        const errorResponse = handleError(error, 'Error al crear la venta');
+        return NextResponse.json(errorResponse, { status: errorResponse.statusCode });
     }
-}
+}, 'ADMINISTRADOR');

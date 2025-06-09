@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import styles from './PopUpMessage.module.css';
 
 const PopUpMessage = ({ message, type, onClose }) => {
   const [isVisible, setIsVisible] = useState(true);
@@ -14,11 +15,11 @@ const PopUpMessage = ({ message, type, onClose }) => {
 
   if (!isVisible) return null;
 
-  const popupClass = type === 'success' ? 'popup-success' : 'popup-error';
+  const popupClass = type === 'success' ? styles.popupSuccess : styles.popupError;
 
   return (
     <div className="fixed top-0 left-0 right-0 flex justify-center z-50 animate-slideDown">
-      <div className={`${popupClass} text-secondary px-6 py-4 rounded-b-lg popup-shadow min-w-[300px] max-w-[500px] mx-4 mt-0 backdrop-blur-sm bg-opacity-95`}>
+      <div className={`${popupClass} text-secondary px-6 py-4 rounded-b-lg ${styles.popupShadow} min-w-[300px] max-w-[500px] mx-4 mt-0 backdrop-blur-sm bg-opacity-95`}>
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-3">
             <span className={`text-2xl ${type === 'success' ? 'text-neutral-100' : 'text-neutral-100'}`}>
