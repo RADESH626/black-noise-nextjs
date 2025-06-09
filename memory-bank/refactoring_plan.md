@@ -15,7 +15,7 @@ This document outlines the planned refactoring tasks for the project. Each item 
     - [x] Implement consistent error handling across all API routes.
     - [x] Centralize input validation logic.
     - [x] Abstract common CRUD operations into reusable functions or a base handler to reduce code duplication.
-    - [x] Ensure robust authentication and authorization checks are in place for all admin routes.
+    - [x] Ensure robust authentication and authorization checks are in place for all admin routes. (Completed for `crearProveedor` in `ProveedorActions.js`)
 
 - [x] **Action Files Review (`src/app/acciones/`)**:
     - [x] Analyze `*Actions.js` files for complexity and redundancy.

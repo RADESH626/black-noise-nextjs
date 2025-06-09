@@ -5,11 +5,12 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import connectDB from "@/utils/DBconection";
 import Proveedor from "@/models/Proveedor";
 import { revalidatePath } from "next/cache";
+import { Rol } from "@/models/enums/usuario/Rol";
 
 export async function crearProveedor(prevState, formData) {
   const session = await getServerSession(authOptions);
 
-  if (!session || session.user.rol !== "ADMIN") {
+  if (!session || session.user.rol !== Rol.ADMINISTRADOR) {
     return { message: "Acceso denegado. Solo los administradores pueden crear proveedores.", success: false };
   }
 
@@ -41,7 +42,7 @@ export async function crearProveedor(prevState, formData) {
     return { message: "Proveedor creado exitosamente.", success: true };
   } catch (error) {
     console.error("Error al crear proveedor:", error);
-    return { message: "Error al crear proveedor.", success: false };
+    return { message: `Error al crear proveedor: ${error.message}`, success: false };
   }
 }
 
