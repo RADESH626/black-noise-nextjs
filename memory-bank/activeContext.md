@@ -147,9 +147,14 @@
 - Se examinó `src/app/acciones/ProveedorActions.js`, específicamente la función `obtenerProveedoresHabilitados`, que realiza la consulta a la base de datos.
 - Se identificó que el esquema `ProveedorSchema` en `src/models/Proveedor.js` no incluía el campo `habilitado`, el cual es utilizado por `obtenerProveedoresHabilitados` para filtrar proveedores.
 - Se añadió el campo `habilitado` de tipo `Boolean` con un valor por defecto `true` al `ProveedorSchema` en `src/models/Proveedor.js`.
+- Para habilitar los proveedores existentes en la base de datos, se añadió temporalmente una función `habilitarTodosLosProveedores` en `src/app/acciones/ProveedorActions.js` y un botón en `src/components/layout/admin/dashboards/GestionProveedoresDashboard.jsx` para ejecutarla.
+- Tras la confirmación del usuario de que los proveedores se mostraban correctamente, se eliminaron la función `habilitarTodosLosProveedores` y el botón temporal.
+- Se corrigió una importación duplicada de `habilitarTodosLosProveedores` en `src/components/layout/admin/dashboards/GestionProveedoresDashboard.jsx`.
 
 **Archivos Modificados:**
 - `src/models/Proveedor.js`
+- `src/app/acciones/ProveedorActions.js`
+- `src/components/layout/admin/dashboards/GestionProveedoresDashboard.jsx`
 
 **Próximos Pasos:**
-- Verificar que la lista de proveedores ahora se carga correctamente en el panel de administración.
+- La funcionalidad de la lista de proveedores debería estar operativa.

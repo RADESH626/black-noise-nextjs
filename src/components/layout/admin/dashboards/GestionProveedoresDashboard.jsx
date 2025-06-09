@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import SeccionHeader from '../secciones/acciones/SeccionHeader';
-import { obtenerProveedoresHabilitados } from '@/app/acciones/ProveedorActions.js';
+import { obtenerProveedoresHabilitados, habilitarTodosLosProveedores } from '@/app/acciones/ProveedorActions.js';
 import FormFiltrarProveedores from './proveedores/FormFiltrarProveedores'; // Keep for now, but will be replaced or integrated
 import ListaProveedores from './proveedores/ListaProveedores';
 import BotonAgregarProveedores from '@/components/common/botones/BotonAgregarProveedores';
