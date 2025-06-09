@@ -1,47 +1,46 @@
 import { NextResponse } from "next/server";
-import { withAuth } from "next-auth/middleware";
+import { getToken } from "next-auth/jwt"; // Import getToken
 
-const productionMiddleware = withAuth(
-  async function middleware(req) {
-    const token = req.nextauth.token;
-    const pathname = req.nextUrl.pathname;
+export async function middleware(req) {
+  const pathname = req.nextUrl.pathname;
 
-    // Example: Redirect admin users from non-admin pages to /admin
-    if (token?.role === "ADMINISTRADOR" && !pathname.startsWith("/admin")) {
-      return NextResponse.redirect(new URL("/admin", req.url));
-    }
+  // Define paths that do NOT require authentication
+  const publicPaths = ["/login", "/registro", "/api/email", "/api/auth"];
 
-    // Redirect supplier users from non-supplier pages to /proveedor
-    if (token?.isSupplier === true && !pathname.startsWith("/proveedor")) {
-      return NextResponse.redirect(new URL("/proveedor", req.url));
-    }
+  // Check if the current path is a public path
+  const isPublicPath = publicPaths.some(path => pathname.startsWith(path));
 
-    // Allow access if no specific redirection is needed
+  if (isPublicPath) {
     return NextResponse.next();
-    },
-    {
-      callbacks: {
-        authorized: ({ token, req }) => {
-          const { pathname } = req.nextUrl;
-          // Allow access to login and registration pages for unauthenticated users
-          if (pathname === "/login" || pathname === "/registro") {
-            return true;
-          }
-          // Allow access to all authenticated users by default for other pages
-          return !!token;
-        },
-      },
-      pages: {
-        signIn: "/login", // Redirect unauthenticated users to the login page
-      },
-    }
-);
+  }
 
-export default productionMiddleware;
+  // For all other paths, check for authentication
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+
+  if (!token) {
+    // Redirect unauthenticated users to the login page
+    const url = req.nextUrl.clone();
+    url.pathname = '/login';
+    url.search = `callbackUrl=${encodeURIComponent(pathname + req.nextUrl.search)}`;
+    return NextResponse.redirect(url);
+  }
+
+  // Role-based redirection (if token exists)
+  if (token?.role === "ADMINISTRADOR" && !pathname.startsWith("/admin")) {
+    return NextResponse.redirect(new URL("/admin", req.url));
+  }
+
+  if (token?.isSupplier === true && !pathname.startsWith("/proveedor")) {
+    return NextResponse.redirect(new URL("/proveedor", req.url));
+  }
+
+  // Allow access if authenticated and no specific redirection is needed
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [
-    // Match all routes for middleware to apply
-    "/(.*)",
+    // Exclude Next.js internal paths and static files from middleware
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };

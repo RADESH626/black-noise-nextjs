@@ -32,3 +32,21 @@
 ### Next Steps:
 - Update `progress.md`.
 - Generate git commit.
+
+## Task: Fix login page not visible
+
+### Changes Made:
+- **Middleware (`src/middleware.js`):**
+    - Modified `matcher` configuration to exclude Next.js internal paths (`/_next/static`, `/_next/image`, `favicon.ico`) from middleware processing.
+    - Added `/api/auth` to `publicPaths` array to prevent middleware from redirecting NextAuth.js internal API calls.
+- **Login Page (`src/app/login/page.jsx`):**
+    - Temporarily simplified to a basic text element for debugging.
+    - Reverted to original complex component structure after fix verification.
+
+### Key Decisions:
+- Identified `SyntaxError: Unexpected token '<'` and `CLIENT_FETCH_ERROR` as symptoms of middleware incorrectly intercepting static asset and NextAuth API requests, returning HTML instead of expected JavaScript/JSON.
+- Prioritized fixing middleware configuration to ensure proper asset loading and NextAuth functionality.
+
+### Next Steps:
+- Update `progress.md`.
+- Generate git commit.

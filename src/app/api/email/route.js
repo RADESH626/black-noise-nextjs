@@ -1,19 +1,30 @@
 import { NextResponse } from 'next/server';
+import nodemailer from 'nodemailer';
 
 export async function POST(request) {
   try {
     const { to, subject, body } = await request.json();
 
-    // In a real application, you would integrate with an email service here (e.g., Nodemailer, SendGrid, Mailgun)
-    // For demonstration purposes, we'll just log the email details.
-    console.log('--- Simulating Email Send ---');
-    console.log('To:', to);
-    console.log('Subject:', subject);
-    console.log('Body:', body);
-    console.log('-----------------------------');
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      secure: false, // Use 'true' if your SMTP server uses SSL/TLS (usually port 465)
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
-    // Simulate a successful email send
-    return NextResponse.json({ success: true, message: 'Email simulated successfully.' });
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to,
+      subject,
+      html: body, // Use html for rich text, or text for plain text
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    return NextResponse.json({ success: true, message: 'Email sent successfully.' });
   } catch (error) {
     console.error('Error in email API route:', error);
     return NextResponse.json({ success: false, message: 'Failed to send email.', error: error.message }, { status: 500 });
