@@ -119,3 +119,21 @@
 
 **Próximos Pasos:**
 - Verificar la funcionalidad de agregar proveedor para asegurar que los métodos de pago se seleccionen y guarden correctamente.
+
+### 9/6/2025, 3:17:00 p. m. - Visualización de Proveedores en Lista (Admin)
+
+**Descripción:** Se ha implementado un nuevo componente para mostrar la información de los proveedores en un formato de lista o tabla dentro del panel de administración.
+
+**Acciones Realizadas:**
+- Se creó el componente `src/components/layout/admin/dashboards/proveedores/ListaProveedores.jsx` para renderizar la lista de proveedores. Este componente es similar en estructura a la lista de usuarios y muestra detalles como nombre de la empresa, dueño, contacto, dirección y métodos de pago.
+- Se integró `ListaProveedores.jsx` en `src/components/layout/admin/dashboards/GestionProveedoresDashboard.jsx`, pasando los datos de los proveedores obtenidos a este nuevo componente.
+- Se actualizó la documentación en `memory-bank/funcionalidades/gestin-de-proveedores-admin.md` para reflejar la adición del componente `ListaProveedores.jsx` y su integración.
+
+**Archivos Modificados:**
+- `memory-bank/funcionalidades/gestin-de-proveedores-admin.md`
+- `src/components/layout/admin/dashboards/proveedores/ListaProveedores.jsx`
+- `src/components/layout/admin/dashboards/GestionProveedoresDashboard.jsx`
+
+**Próximos Pasos:**
+- Verificar la visualización de la lista de proveedores en el panel de administración.
+- Implementar la funcionalidad de edición de proveedores en `ListaProveedores.jsx` y un modal de edición asociado.

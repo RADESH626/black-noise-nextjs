@@ -32,6 +32,16 @@
     * **Lógica Principal:** Actualmente es un marcador de posición que solo muestra los proveedores iniciales pasados como prop. No implementa lógica de filtrado real.
     * **Modelos de Datos / Endpoints:** No interactúa directamente.
 
+#### 📄 **Archivo:** `src/components/layout/admin/dashboards/proveedores/ListaProveedores.jsx` (Nuevo)
+* **Rol:** Componente encargado de mostrar la información de los proveedores en un formato de lista o tabla, similar a la lista de usuarios.
+* **Implementación Clave:**
+    * **Componentes/Funciones Relevantes:** `ListaProveedores` (componente), `useState`, `useEffect`.
+    * **Lógica Principal:**
+        * Recibe una lista de proveedores como prop.
+        * Renderiza cada proveedor en una fila de una tabla, mostrando detalles como nombre de la empresa, dueño, email, teléfono, dirección y métodos de pago.
+        * Incluye botones para editar y eliminar cada proveedor.
+    * **Modelos de Datos / Endpoints:** Consume los datos de proveedores pasados como props.
+
 #### 📄 **Archivo:** `src/models/Proveedor.js` (Modificado)
 * **Rol:** Define el esquema del modelo de datos para los proveedores.
 * **Implementación Clave:**
