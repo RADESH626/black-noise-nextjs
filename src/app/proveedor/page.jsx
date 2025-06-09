@@ -4,10 +4,10 @@ import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-import ErrorMessage from '../../components/common/ErrorMessage';
-import BotonGeneral from '../../components/common/botones/BotonGeneral';
-import { obtenerMiPerfilProveedor } from '../acciones/ProveedorActions';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import ErrorMessage from '@/components/common/ErrorMessage';
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
+import { obtenerMiPerfilProveedor } from '@/app/acciones/ProveedorActions';
 
 function ProveedorPage() {
     const { data: session, status } = useSession();
@@ -29,7 +29,7 @@ function ProveedorPage() {
             setLoading(true);
             setError(null);
             try {
-                const result = await obtenerMiPerfilProveedor(session.user.proveedorId); // Assuming this action can fetch by ID from session
+                const result = await obtenerMiPerfilProveedor(); 
                 if (result.success) {
                     setMiPerfil(result.proveedor);
                 } else {
@@ -43,10 +43,10 @@ function ProveedorPage() {
             }
         };
 
-        if (session.user.isSupplier && session.user.proveedorId) {
+        if (session.user.isSupplier) { // Removed session.user.proveedorId check
             fetchMiPerfil();
         }
-    }, [session, status, router]);
+    }, [session, status, router]); // Removed session.user.proveedorId from dependency array
 
     if (loading) {
         return <LoadingSpinner />;

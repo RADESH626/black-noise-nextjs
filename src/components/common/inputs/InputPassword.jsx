@@ -17,7 +17,6 @@ function InputPassword(props) {
             focus:border-bn-accent-opaque
             placeholder:text-bn-accent
             "
-            pattern="^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@#$%^&+=!]).{8,}$"
             placeholder="Contraseña"
             required
             {...props}

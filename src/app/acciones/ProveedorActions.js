@@ -253,3 +253,34 @@ export async function eliminarProveedor(prevState, formData) {
     return { message: `Error al eliminar proveedor: ${error.message}`, success: false };
   }
 }
+
+export async function obtenerMiPerfilProveedor() {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user || !session.user.email) {
+    return { proveedor: null, success: false, message: "No hay sesión de usuario o email disponible." };
+  }
+
+  await connectDB();
+  try {
+    // Assuming the provider's email is stored in the session user object
+    const proveedor = await Proveedor.findOne({ emailContacto: session.user.email }).lean();
+
+    if (!proveedor) {
+      return { proveedor: null, success: false, message: "Perfil de proveedor no encontrado." };
+    }
+
+    return {
+      proveedor: {
+        ...proveedor,
+        _id: proveedor._id.toString(),
+        createdAt: proveedor.createdAt ? new Date(proveedor.createdAt).toISOString() : null,
+        updatedAt: proveedor.updatedAt ? new Date(proveedor.updatedAt).toISOString() : null,
+      },
+      success: true
+    };
+  } catch (error) {
+    console.error("Error al obtener el perfil del proveedor:", error);
+    return { proveedor: null, success: false, message: `Error al obtener el perfil del proveedor: ${error.message}` };
+  }
+}
