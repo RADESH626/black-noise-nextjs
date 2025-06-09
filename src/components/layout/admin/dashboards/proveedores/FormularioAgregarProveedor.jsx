@@ -42,13 +42,13 @@ function FormularioAgregarProveedor({ onSuccess }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
           <label className="block mb-1 text-sm font-medium text-purple-400">
-            Nombre del Proveedor
+            Nombre de la Empresa
           </label>
           <InputGeneral
             type="text"
-            id="nombreProveedor"
-            name="nombreProveedor"
-            placeholder="Nombre del proveedor"
+            id="nombreEmpresa"
+            name="nombreEmpresa"
+            placeholder="Nombre de la empresa"
             required
           />
         </div>

@@ -75,3 +75,22 @@
 
 **Próximos Pasos:**
 - Verificar la funcionalidad de creación y gestión de proveedores para asegurar que la adición de los nuevos campos no haya introducido nuevos problemas.
+
+### 9/6/2025, 3:08:46 p. m. - Renombrar 'nombreProveedor' a 'nombreEmpresa'
+
+**Descripción:** Se ha renombrado el campo `nombreProveedor` a `nombreEmpresa` en el modelo de proveedor y en las funcionalidades relacionadas para mayor claridad en el registro.
+
+**Acciones Realizadas:**
+- Se actualizó la documentación en `memory-bank/funcionalidades/gestin-de-proveedores-admin.md` para reflejar el cambio de nombre del campo.
+- Se renombró el campo `nombreProveedor` a `nombreEmpresa` en el esquema `ProveedorSchema` en `src/models/Proveedor.js`.
+- Se actualizaron las referencias al campo `nombreProveedor` a `nombreEmpresa` en la función `crearProveedor` en `src/app/acciones/ProveedorActions.js`.
+- Se actualizaron los campos de entrada en `src/components/layout/admin/dashboards/proveedores/FormularioAgregarProveedor.jsx` para reflejar el cambio de nombre del campo.
+
+**Archivos Modificados:**
+- `memory-bank/funcionalidades/gestin-de-proveedores-admin.md`
+- `src/models/Proveedor.js`
+- `src/app/acciones/ProveedorActions.js`
+- `src/components/layout/admin/dashboards/proveedores/FormularioAgregarProveedor.jsx`
+
+**Próximos Pasos:**
+- Verificar la funcionalidad de creación y gestión de proveedores para asegurar que el cambio de nombre del campo no haya introducido nuevos problemas.

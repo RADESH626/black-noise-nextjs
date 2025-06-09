@@ -4,7 +4,7 @@ import { CategoriaProducto } from './enums/CategoriaProducto'
 import { MetodoPago } from './enums/pago'
 
 const ProveedorSchema = new Schema({
-    nombreProveedor: {
+    nombreEmpresa: {
         type: String,
         required: true
     },

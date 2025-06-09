@@ -17,7 +17,7 @@ export async function crearProveedor(prevState, formData) {
   await connectDB();
 
   try {
-    const nombreProveedor = formData.get("nombreProveedor");
+    const nombreEmpresa = formData.get("nombreEmpresa");
     const nit = formData.get("nit");
     const direccionEmpresa = formData.get("direccionEmpresa");
     const especialidad = formData.get("especialidad");
@@ -26,12 +26,12 @@ export async function crearProveedor(prevState, formData) {
     const telefonoContacto = formData.get("telefonoContacto");
     const emailContacto = formData.get("emailContacto");
 
-    if (!nombreProveedor || !nit || !direccionEmpresa || !especialidad || !comision || !nombreDueño || !telefonoContacto || !emailContacto) {
+    if (!nombreEmpresa || !nit || !direccionEmpresa || !especialidad || !comision || !nombreDueño || !telefonoContacto || !emailContacto) {
       return { message: "Todos los campos son obligatorios.", success: false };
     }
 
     const nuevoProveedor = new Proveedor({
-      nombreProveedor,
+      nombreEmpresa,
       nit,
       direccionEmpresa,
       especialidad,
