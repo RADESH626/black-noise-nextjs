@@ -58,13 +58,12 @@ const PedidosContent = () => {
                 </button>
               </div>
             </div>
-            <div className="p-4 gradient-text-bg flex justify-between items-center text-white">
+            <div className="p-4 gradient-text-bg flex justify-between items-center">
               <div>
                 <p className="font-semibold">nombre: {pedido.nombre}</p>
                 <p className="font-semibold">precio: ${pedido.price.toFixed(2)}</p>
                 <p className="font-semibold">cantidad: {pedido.quantity}</p>
               </div>
-              {/* No "Agregar al carrito" for orders */}
             </div>
           </motion.div>
         ))}

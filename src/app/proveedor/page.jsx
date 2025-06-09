@@ -99,16 +99,33 @@ function ProveedorPage() {
                 {proveedores.length === 0 ? (
                     <p className="text-gray-400">No hay proveedores disponibles en este momento.</p>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {proveedores.map((proveedor) => (
-                            <div key={proveedor._id} className="p-6 bg-gray-800 rounded-lg">
-                                <h3 className="text-xl font-semibold mb-2 text-purple-400">
-                                    {proveedor.nombreProveedor}
-                                </h3>
-                                <p className="text-gray-300">Especialidad: {proveedor.especialidad}</p>
+                            <div key={proveedor._id} className="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+                                <div className="w-full h-56 bg-gray-700 relative">
+                                    <img
+                                        src="/public/img/proveedores/IMAGEN-SOLICITUD-PROVEEDOR.jpg"
+                                        alt={proveedor.nombreProveedor}
+                                        className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute top-0 right-0 m-3">
+                                        <button
+                                            onClick={() => alert(`Ver detalles del proveedor: ${proveedor.nombreProveedor}`)}
+                                            className="bg-white text-purple-700 font-semibold py-1 px-4 rounded-md text-sm hover:bg-gray-200 transition duration-150"
+                                        >
+                                            VER DETALLES
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="p-4 gradient-text-bg flex justify-between items-center text-white">
+                                    <div>
+                                        <p className="font-semibold">nombre: {proveedor.nombreProveedor}</p>
+                                        <p className="font-semibold">especialidad: {proveedor.especialidad}</p>
+                                    </div>
+                                </div>
                             </div>
                         ))}
-                    </div>
+                    </main>
                 )}
             </div>
 

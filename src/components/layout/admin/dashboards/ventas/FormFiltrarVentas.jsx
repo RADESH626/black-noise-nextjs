@@ -6,18 +6,39 @@ export default function FormFiltrarVentas({ initialVentasFromPage }) {
   const [ventas, setVentas] = useState(initialVentasFromPage || []);
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md">
-      <h5 className="text-lg font-semibold mb-4">Filtrar Ventas (Placeholder)</h5>
-      <p>Este es un componente de filtro de ventas de marcador de posición.</p>
-      {/* Display initial ventas for now */}
+    <div className="p-4 bg-black text-white">
+      <h5 className="text-lg font-semibold mb-4 text-center">Ventas Registradas</h5>
       {ventas.length > 0 ? (
-        <ul>
+        <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {ventas.map(venta => (
-            <li key={venta.id}>{venta.amount} - {venta.date}</li>
+            <div key={venta.id} className="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+              <div className="w-full h-56 bg-gray-700 relative">
+                <img
+                  src="/public/img/Fondos/Fondo 1.jpg"
+                  alt={`Venta ${venta.id}`}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute top-0 right-0 m-3">
+                  <button
+                    onClick={() => alert(`Ver detalles de la venta: ${venta.id}`)}
+                    className="bg-white text-purple-700 font-semibold py-1 px-4 rounded-md text-sm hover:bg-gray-200 transition duration-150"
+                  >
+                    VER DETALLES
+                  </button>
+                </div>
+              </div>
+              <div className="p-4 gradient-text-bg flex justify-between items-center text-white">
+                <div>
+                  <p className="font-semibold">ID Venta: {venta.id}</p>
+                  <p className="font-semibold">Monto: ${venta.amount.toFixed(2)}</p>
+                  <p className="font-semibold">Fecha: {new Date(venta.date).toLocaleDateString()}</p>
+                </div>
+              </div>
+            </div>
           ))}
-        </ul>
+        </main>
       ) : (
-        <p>No hay ventas para mostrar.</p>
+        <p className="text-center text-gray-400">No hay ventas para mostrar.</p>
       )}
     </div>
   );
