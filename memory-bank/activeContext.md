@@ -1,105 +1,140 @@
 # Active Context - 2025-09-06
 
-## Task: Redirigir a proveedores a la lista de pedidos al iniciar sesión
+## Current Work
+Assisted in the user profile editing section.
 
-### Descripción:
-Se ha modificado el flujo de autenticación para que, al iniciar sesión como proveedor, el usuario sea redirigido directamente a la página de lista de pedidos (`/proveedor/pedidos`) en lugar de la página principal del portal de proveedores (`/proveedor`).
+## Key Technical Concepts
+- Next.js Server Actions for data fetching and mutations.
+- `useActionState` and `useFormStatus` hooks for form management.
+- `getServerSession` for server-side session management.
+- Component-based architecture for forms and UI.
+- Adherence to established `systemPatterns.md` for form structure and field naming.
 
-### Archivos Modificados:
+## Relevant Files and Code
+- **`src/components/perfil/FormEditarUsuario.jsx` (Created)**
+  - **Summary:** New React component for editing user profile data. It's a client component that uses `useActionState` to interact with the `updateUserAction` server action. It includes all necessary input fields based on the `systemPatterns.md` user form field mapping.
+  - **Important Code Snippet:**
+    ```jsx
+    "use client";
+    import { useEffect, useState } from "react";
+    import { useActionState, useFormStatus } from "react-dom";
+    import { usePopUp } from "@/context/PopUpContext";
+    import BotonGeneral from "@/components/common/BotonGeneral";
+    import { updateUserAction } from "@/app/acciones/UsuariosActions";
 
-#### 📄 **Archivo:** `src/components/layout/general/forms/FormLogin.jsx`
-*   **Cambio:** Se actualizó la lógica de redirección dentro del `useEffect` para el rol `PROVEEDOR`.
-*   **Detalle:** La línea `router.push('/proveedor');` fue cambiada a `router.push('/proveedor/pedidos');` para asegurar la redirección directa a la lista de pedidos.
+    function SubmitButton({ customText = "Guardar Cambios" }) {
+      const { pending } = useFormStatus();
+      return (
+        <BotonGeneral type="submit" disabled={pending}>
+          {pending ? "Guardando..." : customText}
+        </BotonGeneral>
+      );
+    }
 
-## Task: Hacer el panel de proveedor similar al de admin visualmente
+    const initialState = { message: null, success: false };
 
-### Descripción:
-Se ha refactorizado la estructura del panel de proveedor para que su apariencia visual sea similar a la del panel de administración, utilizando un layout con barra lateral y un área de contenido principal con fondo blanco.
+    function FormEditarUsuario({ userData, userId, onSuccess }) {
+      const { showPopUp } = usePopUp();
+      const [state, formAction] = useActionState(updateUserAction.bind(null, userId), initialState);
+      const [formData, setFormData] = useState({
+        tipoDocumento: userData?.tipoDocumento || "",
+        numeroDocumento: userData?.numeroDocumento || "",
+        primerNombre: userData?.primerNombre || "",
+        segundoNombre: userData?.segundoNombre || "",
+        primerApellido: userData?.primerApellido || "",
+        segundoApellido: userData?.segundoApellido || "",
+        fechaNacimiento: userData?.fechaNacimiento || "",
+        genero: userData?.genero || "",
+        numeroTelefono: userData?.numeroTelefono || "",
+        direccion: userData?.direccion || "",
+        correo: userData?.correo || "",
+        rol: userData?.rol || "",
+      });
 
-### Archivos Creados:
+      useEffect(() => {
+        if (state.message) {
+          showPopUp(state.message, state.success ? "success" : "error");
+          if (state.success && onSuccess) {
+            onSuccess();
+          }
+        }
+      }, [state, showPopUp, onSuccess]);
 
-#### 📄 **Archivo:** `src/components/layout/proveedor/ProveedorSidebar.jsx`
-*   **Rol:** Componente de barra lateral para el panel de proveedor, con enlaces de navegación a "Mis Pedidos" y "Editar Perfil", y un botón de "Cerrar Sesión".
-*   **Detalle:** Implementa la navegación y el estilo visual de la barra lateral, similar a `AdminSidebar`.
+      const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({ ...prevData, [name]: value }));
+      };
 
-#### 📄 **Archivo:** `src/app/proveedor/layout.jsx`
-*   **Rol:** Layout raíz para las páginas del panel de proveedor.
-*   **Detalle:** Envuelve las rutas de `/proveedor` con la `ProveedorSidebar` y aplica el estilo de fondo blanco (`bg-white !important`) al área de contenido principal, replicando el layout del panel de administración.
+      return (
+        <form action={formAction} className="space-y-5 text-white">
+          {/* Form fields based on userData and handleChange */}
+          <SubmitButton />
+        </form>
+      );
+    }
 
-### Archivos Modificados:
+    export default FormEditarUsuario;
+    ```
 
-#### 📄 **Archivo:** `src/app/proveedor/page.jsx`
-*   **Cambio:** Se eliminaron las clases de estilo de fondo y padding (`min-h-screen bg-black text-white p-8`) del `div` principal y de los divs de mensaje de error/acceso denegado.
-*   **Detalle:** Esto permite que la página herede el estilo del nuevo `ProveedorLayout`, asegurando la consistencia visual. Se ajustaron los colores de texto a `text-gray-800` y `text-gray-600` para mejor contraste en fondo blanco.
+- **`src/app/perfil/editar/page.jsx` (Modified)**
+  - **Summary:** Refactored to fetch user data using `getServerSession` and `ObtenerUsuarioPorId` (Server Action) and then render the `FormEditarUsuario` component. Removed the old `fetch` call and placeholder message.
+  - **Important Code Snippet:**
+    ```jsx
+    import { redirect } from "next/navigation";
+    import { getServerSession } from "next-auth";
+    import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+    import { ObtenerUsuarioPorId } from "@/app/acciones/UsuariosActions";
+    import FormEditarUsuario from "@/components/perfil/FormEditarUsuario";
 
-#### 📄 **Archivo:** `src/app/proveedor/pedidos/page.jsx`
-*   **Cambio:** Se eliminaron las clases de estilo de contenedor y padding (`container mx-auto p-4`) del `div` principal y del div de mensaje de "No tienes pedidos".
-*   **Detalle:** Esto permite que la página herede el estilo del nuevo `ProveedorLayout`, asegurando la consistencia visual. Se ajustaron los colores de texto a `text-gray-800` y `text-gray-600` para mejor contraste en fondo blanco.
+    async function EditarPerfil() {
+      const session = await getServerSession(authOptions);
 
-## Task: Cambiar el botón de cerrar sesión del panel de proveedor a BotonGeneral
+      if (!session || !session.user || !session.user.id) {
+        redirect("/login");
+      }
 
-### Descripción:
-Se ha modificado el componente `ProveedorSidebar` para utilizar el componente `BotonGeneral` para el botón de "Cerrar Sesión", asegurando consistencia en el diseño de los botones.
+      const userId = session.user.id;
+      const userData = await ObtenerUsuarioPorId(userId);
 
-### Archivos Modificados:
+      if (!userData) {
+        return (
+          <div className="min-h-screen bg-white p-4">
+            <div className="max-w-4xl mx-auto">
+              <h1 className="text-3xl font-bold mb-8 text-center">Editar Perfil</h1>
+              <div className="bg-black rounded-lg p-6 text-white shadow-lg">
+                <div className="text-white text-center p-4">
+                  <h3 className="text-lg mb-4">Error al cargar el perfil.</h3>
+                  <p>No se pudieron obtener los datos del usuario.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
 
-#### 📄 **Archivo:** `src/components/layout/proveedor/ProveedorSidebar.jsx`
-*   **Cambio:** Se importó `BotonGeneral` y se reemplazó el elemento `button` existente por `BotonGeneral` para el botón de cerrar sesión.
-*   **Detalle:** Se eliminaron las clases de estilo Tailwind CSS del botón original, ya que `BotonGeneral` maneja su propio estilo.
+      return (
+        <div className="min-h-screen bg-white p-4">
+          <div className="max-w-4xl mx-auto">
+            <h1 className="text-3xl font-bold mb-8 text-center">Editar Perfil</h1>
+            <div className="bg-black rounded-lg p-6 text-white shadow-lg">
+              <FormEditarUsuario userData={userData} userId={userId} onSuccess={() => redirect("/perfil")} />
+            </div>
+          </div>
+        </div>
+      );
+    }
 
-## Task: Refactorización de Rutas API de Administrador y Optimización de Estilos Globales
+    export default EditarPerfil;
+    ```
 
-### Descripción:
-Se ha completado la refactorización de las rutas API bajo `src/app/api/administrador/` para utilizar manejadores CRUD genéricos, autorización y manejo de errores consistente. Además, se optimizaron los estilos globales moviendo estilos específicos de componentes a módulos CSS dedicados y eliminando estilos no utilizados.
+- **`src/app/acciones/UsuariosActions.js` (Reviewed)**
+  - **Summary:** Confirmed the existence and correct implementation of `ObtenerUsuarioPorId` and `updateUserAction`, which are crucial for the profile editing functionality. No direct modifications were made to this file in this session, but its functions were leveraged.
 
-### Archivos Modificados:
+## Problem Solving
+- **Discrepancy in Documentation:** Identified that `gestin-de-perfil-de-usuario.md` had outdated information regarding the location and existence of `ProfileContent.jsx` and `FormEditarUsuario.jsx`.
+- **Missing Component:** `FormEditarUsuario.jsx` was missing, which was a blocker for the profile editing functionality. This was resolved by creating the component.
+- **Outdated Data Fetching:** The `src/app/perfil/editar/page.jsx` was using an old `fetch` API call to a potentially incorrect port (`3001`). This was refactored to use a Server Action (`ObtenerUsuarioPorId`) for consistency and efficiency, aligning with `systemPatterns.md`.
 
-#### 📄 **Archivo:** `src/app/api/administrador/usuarios/route.js`
-*   **Cambio:** Refactorizado para usar `createHandler` y `getAllHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Usuario` y manejo de errores consistente.
-
-#### 📄 **Archivo:** `src/app/api/administrador/usuarios/[id]/route.js`
-*   **Cambio:** Creado e implementado `GET`, `PUT`, y `DELETE` utilizando `getByIdHandler`, `updateHandler`, y `deleteHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Usuario`.
-
-#### 📄 **Archivo:** `src/app/api/administrador/proveedores/route.js`
-*   **Cambio:** Refactorizado para usar `createHandler` y `getAllHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Proveedor` y manejo de errores consistente.
-
-#### 📄 **Archivo:** `src/app/api/administrador/proveedores/[id]/route.js`
-*   **Cambio:** Creado e implementado `GET`, `PUT`, y `DELETE` utilizando `getByIdHandler`, `updateHandler`, y `deleteHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Proveedor`.
-
-#### 📄 **Archivo:** `src/app/api/administrador/designs/route.js`
-*   **Cambio:** Refactorizado para usar `createHandler` y `getAllHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Design` y manejo de errores consistente.
-
-#### 📄 **Archivo:** `src/app/api/administrador/designs/[id]/route.js`
-*   **Cambio:** Creado e implementado `GET`, `PUT`, y `DELETE` utilizando `getByIdHandler`, `updateHandler`, y `deleteHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Design`.
-
-#### 📄 **Archivo:** `src/app/api/administrador/pagos/route.js`
-*   **Cambio:** Refactorizado para usar `createHandler` y `getAllHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Pago` y manejo de errores consistente.
-
-#### 📄 **Archivo:** `src/app/api/administrador/pagos/[id]/route.js`
-*   **Cambio:** Creado e implementado `GET`, `PUT`, y `DELETE` utilizando `getByIdHandler`, `updateHandler`, y `deleteHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Pago`.
-
-#### 📄 **Archivo:** `src/app/api/administrador/pedidos/route.js`
-*   **Cambio:** Refactorizado para usar `createHandler` y `getAllHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Pedido` y manejo de errores consistente.
-
-#### 📄 **Archivo:** `src/app/api/administrador/pedidos/[id]/route.js`
-*   **Cambio:** Creado e implementado `GET`, `PUT`, y `DELETE` utilizando `getByIdHandler`, `updateHandler`, y `deleteHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Pedido`.
-
-#### 📄 **Archivo:** `src/app/api/administrador/ventas/route.js`
-*   **Cambio:** Refactorizado para usar `createHandler` y `getAllHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Venta` y manejo de errores consistente.
-
-#### 📄 **Archivo:** `src/app/api/administrador/ventas/[id]/route.js`
-*   **Cambio:** Creado e implementado `GET`, `PUT`, y `DELETE` utilizando `getByIdHandler`, `updateHandler`, y `deleteHandler` de `crudHandler.js`, con validaciones específicas para el modelo `Venta`.
-
-#### 📄 **Archivo:** `src/components/common/modales/PopUpMessage.module.css`
-*   **Cambio:** Creado para contener estilos específicos del componente PopUp (`popup-shadow`, `popup-success`, `popup-error`).
-
-#### 📄 **Archivo:** `src/components/common/modales/PopUpMessage.jsx`
-*   **Cambio:** Actualizado para importar y utilizar los estilos de `PopUpMessage.module.css`.
-
-#### 📄 **Archivo:** `src/app/globals.css`
-*   **Cambio:** Eliminados los estilos específicos del PopUp y los estilos de `dialog` no utilizados.
-
-### Próximos Pasos:
-1.  Generar y presentar el comando `git add`.
-2.  Esperar confirmación del usuario.
-3.  Generar y presentar el comando `git commit`.
+## Pending Tasks and Next Steps
+- The core profile editing functionality is now implemented.
+- The next step is to present the `git add` command to the user.
