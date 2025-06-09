@@ -137,3 +137,19 @@
 **Próximos Pasos:**
 - Verificar la visualización de la lista de proveedores en el panel de administración.
 - Implementar la funcionalidad de edición de proveedores en `ListaProveedores.jsx` y un modal de edición asociado.
+
+### 9/6/2025, 3:18:18 p. m. - Corrección: Lista de Proveedores no obtiene datos
+
+**Descripción:** La lista de proveedores en el panel de administración no estaba obteniendo correctamente los proveedores de la base de datos.
+
+**Acciones Realizadas:**
+- Se revisó `src/components/layout/admin/dashboards/proveedores/ListaProveedores.jsx` para entender cómo se solicitan los datos.
+- Se examinó `src/app/acciones/ProveedorActions.js`, específicamente la función `obtenerProveedoresHabilitados`, que realiza la consulta a la base de datos.
+- Se identificó que el esquema `ProveedorSchema` en `src/models/Proveedor.js` no incluía el campo `habilitado`, el cual es utilizado por `obtenerProveedoresHabilitados` para filtrar proveedores.
+- Se añadió el campo `habilitado` de tipo `Boolean` con un valor por defecto `true` al `ProveedorSchema` en `src/models/Proveedor.js`.
+
+**Archivos Modificados:**
+- `src/models/Proveedor.js`
+
+**Próximos Pasos:**
+- Verificar que la lista de proveedores ahora se carga correctamente en el panel de administración.
