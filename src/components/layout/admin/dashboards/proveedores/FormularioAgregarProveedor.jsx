@@ -34,16 +34,22 @@ function FormularioAgregarProveedor({ onSuccess }) {
   useEffect(() => {
     if (state.message) {
       showPopUp(state.message, state.success ? "success" : "error");
-      if (state.success) {
-        if (state.accessKey) {
-          setDisplayedAccessKey(state.accessKey); // Set the access key if available
-        }
-        if (onSuccess) {
-          onSuccess();
-        }
+      if (state.success && state.accessKey) {
+        setDisplayedAccessKey(state.accessKey); // Set the access key if available
+        // Do NOT call onSuccess here. The modal should remain open to show the key.
+      } else if (state.success && onSuccess) {
+        // If no access key is expected, or it's already handled, close the modal
+        onSuccess();
       }
     }
   }, [state, showPopUp, onSuccess]);
+
+  const handleCloseModal = () => {
+    if (onSuccess) {
+      onSuccess(); // Close the modal
+    }
+    setDisplayedAccessKey(null); // Clear the displayed key
+  };
 
   const handlePaymentMethodChange = (event) => {
     const { value, checked } = event.target;
@@ -203,7 +209,11 @@ function FormularioAgregarProveedor({ onSuccess }) {
           </div>
         )}
       </div>
-      <SubmitButton />
+      {displayedAccessKey ? (
+        <BotonGeneral type="button" onClick={handleCloseModal} customText="Cerrar" />
+      ) : (
+        <SubmitButton />
+      )}
     </form>
   );
 }
