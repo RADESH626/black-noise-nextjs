@@ -22,7 +22,7 @@ const PedidosContent = () => {
 
   if (!pedidoCompleto) {
     return (
-      <div className="min-h-screen flex justify-center items-center text-white">
+      <div className="min-h-screen flex justify-center items-center text-gray-400">
         No hay pedidos aún.
       </div>
     );
@@ -34,31 +34,41 @@ const PedidosContent = () => {
     <div className="min-h-screen bg-black text-white font-poppins p-4">
       <h2 className="text-center text-2xl font-bold mt-4">Tus Pedidos</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+      <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
         {productos.map((pedido, index) => (
           <motion.div
             key={index}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-white text-black p-4 rounded-xl"
+            className="bg-gray-800 rounded-xl shadow-lg overflow-hidden"
           >
-            {pedido.img && (
+            <div className="w-full h-56 bg-gray-700 relative">
               <img
-                src={pedido.img}
+                src={pedido.img || "/public/img/Fondos/Fondo 1.jpg"}
                 alt={pedido.nombre}
-                className="w-full h-40 object-cover rounded-md mb-2"
+                className="w-full h-full object-cover"
               />
-            )}
-
-            <h4 className="font-semibold text-lg">{pedido.nombre}</h4>
-            <p className="text-sm">Precio: ${pedido.price.toFixed(2)}</p>
-            <p className="text-sm">Cantidad: {pedido.quantity}</p>
-            <p className="text-sm">Categoría: camisa</p>
-            <p className="text-sm">❤️ 2mil</p>
+              <div className="absolute top-0 right-0 m-3">
+                <button
+                  onClick={() => alert(`Ver detalles del pedido: ${pedido.nombre}`)}
+                  className="bg-white text-purple-700 font-semibold py-1 px-4 rounded-md text-sm hover:bg-gray-200 transition duration-150"
+                >
+                  VER DETALLES
+                </button>
+              </div>
+            </div>
+            <div className="p-4 gradient-text-bg flex justify-between items-center text-white">
+              <div>
+                <p className="font-semibold">nombre: {pedido.nombre}</p>
+                <p className="font-semibold">precio: ${pedido.price.toFixed(2)}</p>
+                <p className="font-semibold">cantidad: {pedido.quantity}</p>
+              </div>
+              {/* No "Agregar al carrito" for orders */}
+            </div>
           </motion.div>
         ))}
-      </div>
+      </main>
 
       <hr className="border-white my-6" />
       <div className="text-sm bg-[#1f2937] p-4 rounded-md">

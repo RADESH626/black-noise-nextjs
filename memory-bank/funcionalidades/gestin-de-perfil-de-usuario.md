@@ -62,7 +62,7 @@
 * **Rol:** Componente que muestra los pedidos realizados por el usuario en la sección de perfil.
 * **Implementación Clave:**
     * **Componentes/Funciones Relevantes:** `PedidosComponent` (componente).
-    * **Lógica Principal:** Recibe el `userId` como prop y probablemente realiza una llamada a una Server Action (ej. `PedidoActions.js`) para obtener los pedidos del usuario.
+    * **Lógica Principal:** Recibe el `userId` como prop y probablemente realiza una llamada a una Server Action (ej. `PedidoActions.js`) para obtener los pedidos del usuario. **Nota:** Se ha adaptado visualmente para mostrar cada producto de un pedido en un formato de tarjeta de cuadrícula, similar a cómo se muestran los diseños en `DesignsComponent.jsx`, incluyendo una imagen (o marcador de posición) y detalles clave.
     * **Modelos de Datos / Endpoints:** Probablemente consume `PedidoActions.js` para obtener datos de pedidos.
 
 #### 📄 **Archivo:** `src/app/perfil/CartComponent.jsx`
