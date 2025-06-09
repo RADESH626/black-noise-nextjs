@@ -61,3 +61,29 @@
 *   Decided against using `createHandler` directly for the `POST` method in `usuarios/route.js` due to specific business logic (password hashing, default fields, email uniqueness) that requires custom handling before saving.
 ### ➡️ Next Steps:
 *   The "API Route Refactoring (`src/app/api/administrador/`)" goal is fully completed. The next logical step is to continue with the next refactoring goal in `refactoring_plan.md`, which is "Action Files Review (`src/app/acciones/`)".
+
+## Session Summary: Action Files Review (`src/app/acciones/`) - ✅ COMPLETED
+**Date**: 9/6/2025, 1:54:16 p. m.
+**Objective**: Analyze and refactor `*Actions.js` files for complexity and redundancy, extracting reusable logic into utility functions.
+---
+### ✅ Changes Implemented:
+*   **File:** `src/utils/dbUtils.js`
+    *   **Change:** Created a utility file to house common database-related helper functions, starting with `toPlainObject` for converting Mongoose documents to plain JavaScript objects.
+*   **File:** `src/utils/authUtils.js`
+    *   **Change:** Created a utility file for authentication-related helper functions, including `hashPassword` and `comparePassword` for secure password handling.
+*   **File:** `src/app/acciones/UsuariosActions.js`
+    *   **Change:** Refactored to use `toPlainObject` from `src/utils/dbUtils.js`.
+    *   **Change:** Replaced direct `bcrypt` calls with `hashPassword` and `comparePassword` from `src/utils/authUtils.js`.
+    *   **Change:** Integrated `handleError`, `ValidationError`, and `NotFoundError` from `src/utils/errorHandler.js` for consistent error handling across all functions.
+    *   **Change:** Applied `validateRequiredFields`, `validateEmail`, and `validatePassword` from `src/utils/validation.js` for robust input validation in `RegistrarUsuario`, `RegistroMasivoUsuario`, `loginAction`, and `EditarUsuario`.
+    *   **Change:** Ensured `connectDB` is called appropriately within each action.
+*   **File:** `memory-bank/funcionalidades/gestin-de-usuarios-admin.md`
+    *   **Change:** Updated documentation to include the detailed refactoring plan for `src/app/acciones/UsuariosActions.js`, outlining the extraction of utilities and standardization of error handling/validation.
+*   **File:** `memory-bank/refactoring_plan.md`
+    *   **Change:** Marked all sub-tasks under "Action Files Review (`src/app/acciones/`)" as complete.
+
+### 💡 Key Decisions:
+*   Adopted a modular approach by extracting common functionalities (DB object conversion, password handling, error handling, validation) into dedicated utility files to reduce redundancy and improve maintainability in action files.
+*   Prioritized consistent error responses and robust input validation across all user-related actions.
+### ➡️ Next Steps:
+*   The "Action Files Review (`src/app/acciones/`)" goal is fully completed for `UsuariosActions.js`. The next logical step is to continue with the next refactoring goal in `refactoring_plan.md`, which is "Component Modularity (`src/app/*/page.jsx` and `src/components/`)".

@@ -17,10 +17,10 @@ This document outlines the planned refactoring tasks for the project. Each item 
     - [x] Abstract common CRUD operations into reusable functions or a base handler to reduce code duplication.
     - [x] Ensure robust authentication and authorization checks are in place for all admin routes.
 
-- [ ] **Action Files Review (`src/app/acciones/`)**:
-    - [ ] Analyze `*Actions.js` files for complexity and redundancy.
-    - [ ] Refactor overly complex actions into smaller, more manageable functions.
-    - [ ] Identify and extract reusable logic into utility functions in `src/utils/`.
+- [x] **Action Files Review (`src/app/acciones/`)**:
+    - [x] Analyze `*Actions.js` files for complexity and redundancy.
+    - [x] Refactor overly complex actions into smaller, more manageable functions.
+    - [x] Identify and extract reusable logic into utility functions in `src/utils/`.
 
 - [ ] **Component Modularity (`src/app/*/page.jsx` and `src/components/`)**:
     - [ ] Identify large `page.jsx` files and break down their content into smaller, more focused components.

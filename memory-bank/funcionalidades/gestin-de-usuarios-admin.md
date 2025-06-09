@@ -87,7 +87,13 @@
         *   `EditarUsuario`: Actualiza la información de un usuario existente.
         *   Todas las acciones utilizan `revalidatePath` para mantener la UI actualizada y manejan errores de forma consistente, devolviendo mensajes y estados de éxito/fallo.
     * **Modelos de Datos / Endpoints:** Modifica/consume el modelo `Usuario` de Mongoose.
-    * **Notas de Refactorización:** Se asegurará la alineación con el patrón de Server Actions, incluyendo validación, manejo de errores, y uso de `revalidatePath`. Se estandarizará la conversión de objetos de Mongoose a objetos planos.
+    * **Notas de Refactorización:**
+        *   **Estandarización de Manejo de Errores:** Integrar `src/utils/errorHandler.js` para asegurar respuestas de error consistentes y tipificadas.
+        *   **Centralización de Validación:** Utilizar `src/utils/validation.js` para validar campos de entrada en `RegistrarUsuario`, `loginAction`, `registerAction`, `EditarUsuario`, y `RegistroMasivoUsuario`.
+        *   **Extracción de Utilidades de DB:** Mover la función `toPlainObject` y cualquier otra utilidad de base de datos genérica a un nuevo archivo `src/utils/dbUtils.js`.
+        *   **Centralización de Hashing de Contraseñas:** Crear una función utilitaria para el hashing de contraseñas en `src/utils/authUtils.js` y usarla en `RegistrarUsuario` y `RegistroMasivoUsuario`.
+        *   **Optimización de Conexión a DB:** Evaluar la estrategia de `connectDB()` para asegurar que la conexión se maneje de la manera más eficiente posible en un entorno de Server Actions.
+        *   **Refinamiento de Lógica de Negocio:** Simplificar `RegistrarUsuario` y `RegistroMasivoUsuario` para mejorar la legibilidad y mantenibilidad, delegando responsabilidades a las nuevas utilidades.
 
 #### 📄 **Archivo:** `src/components/layout/admin/usuarios/THUsuarios.jsx`
 * **Rol:** Define los encabezados de la tabla para la visualización de usuarios en el panel de administración.

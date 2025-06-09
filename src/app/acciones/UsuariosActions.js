@@ -2,39 +2,19 @@
 
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import Papa from 'papaparse'; // Importar PapaParse
-import bcrypt from "bcryptjs"; // Importa bcryptjs
-import nodemailer from 'nodemailer'; // Importar Nodemailer
+import Papa from 'papaparse';
+import nodemailer from 'nodemailer';
 import connectDB from '@/utils/DBconection';
 import Usuario from '@/models/Usuario';
-import { signIn } from "next-auth/react"; // Import signIn
-import { getServerSession } from "next-auth"; // Import getServerSession
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // Adjust path if necessary
+import { signIn } from "next-auth/react";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { toPlainObject } from '@/utils/dbUtils'; // Import toPlainObject
+import { hashPassword, comparePassword } from '@/utils/authUtils'; // Import password utilities
+import { handleError, ValidationError, NotFoundError } from '@/utils/errorHandler'; // Import error handling utilities
+import { validateRequiredFields, validateEmail, validatePassword } from '@/utils/validation'; // Import validation utilities
 
-const DEFAULT_PROFILE_PICTURE_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAKwAAACUCAMAAAA5xjIqAAAAMFBMVEXk5ueutLenrrHn6eqrsbTq7O3Lz9Hh4+S4vcDGyszT1tjP09Te4OKyuLvCx8nW2dvDGAcOAAAECUlEQVR4nO2c23LjIAxAbcTVBvP/f7vQZLNJ47SAsGTPcp4605czqpC4yJ2mwWAwGAwGg8FgMBgMBq+AUmDisizR5x+5dT4Dk4kuiAfSOm+mUworv25ByPkZKcK2mNPpqsmF+dX07jvbByfTdWLP9O4r9XmSAaY1fFbNiLCcxBYm+7PqV3DdKVIX4i9hvesGz28LukQ124p4Gdesu/LGtsY12ypWV1HhmqoCY2xhrYnrV2wjly3EStVEMEyy5vf6+h5ay+MKW71rSlvHkQgQW1xTbDmaAzSp8iQCuLbA5mpLLutDoytHaKta1ytiIXY1zYHN0HZdWOr67LfQ0vYxZTGBlRtpaA0msKnpekLXup3hDpRHMkBlQcoDR+eKKLJ3WUu3+UpnRJxs2iDQyWJTdqY8PDbvCx6R1WQrzDTtZF9k6SqtQRaDRKCTxa6vmXB74PGukk4Wm7KpHJAtsCE7ZKeLLbBLla5rNYWGS65XpKU72FxpI3OpLSIsSFfKzTf6WDNbQln0gXGnc73WUfxSlxyTwiUtYZWd8qPShS7mLnXliWpi9O+MiFIbiFVRDyCaXHaaWmUJL+UewNL4aMfy1tz2HEp8Rf+gZY1xPTQ3JQLfWI+q3s9Ixvmu2rQVdKeZPapsJcuswQOosSU8JX7SLe5kgv7p/t22bARJcq6tf4AvuPOQ2ykGJ3Piut053yfVoM8z8AvG/jDsO4uzhPWO8jbI3TFqGTbDOYK4B4B3dv4+oC5nq08wN/tOysqvgXohZCLP/odt9eY8yfoGpAjHVWu9Rn9izRtJFtSN/CO3zgeynfFxyVF1Ce30usTov37BLfcMgInOhqd19VQYgt3WU2QE5M9pVmfzovqhJaTVNm86si42NUW9vZWrj8bSbi7y+ILyLsy/tNn3BhHsQq2bKqqTZRF9Qwgb6T68SjFd7W5rLQ2wsC7SxFeZbf9jqirf2R5/1wF584p/Zr75xkOTASBunVQzwq7HbR3BbOi//wupmh2WDLqv6g17RHAhBtwLzQek0L11cwYcRcqFricJ8EdkwMO25+0HYEbnixC219mn6oqoERn6lAXAz22U2M493psgHpmuz7r4K0Yy1w4fX+FnNipAxrb1+ajVdkPYtnykiEK0vzsd2wp2aW4PNDXrO61Xzsf3gj2aeln7szcKGRpkATmz027rGhZZh7HTRuq3CZrNtf4rIfQAH8a28sFM8VSCO6LKFTzT6rpRN0ChONrBMxVnSOgwLo+iZv/VNv3Sk4r52g7T8khk+RfatLvYXdnynS17FiTb4sgyNoS/FI/bc21hnikttfivELpQJov7wr4Xsmw3o7g9bxQmLbfmjbKjY+P/h+lNWcddxCmwRbLmJJS4Dv5D/gBmFDnwIIZzJgAAAABJRU5ErkJggg==';
-
-// Helper function to convert Mongoose document to plain object
-function toPlainObject(doc) {
-    if (!doc) return null;
-    const obj = doc.toObject ? doc.toObject() : { ...doc }; // Handle both Mongoose docs and lean objects
-
-    if (obj._id) {
-        obj._id = obj._id.toString();
-    }
-    // Convert dates to YYYY-MM-DD for form compatibility or ISO string for full timestamp
-    if (obj.fechaNacimiento) {
-        obj.fechaNacimiento = new Date(obj.fechaNacimiento).toISOString().split('T')[0];
-    }
-    if (obj.createdAt) {
-        obj.createdAt = new Date(obj.createdAt).toISOString();
-    }
-    if (obj.updatedAt) {
-        obj.updatedAt = new Date(obj.updatedAt).toISOString();
-    }
-    // Remove __v if present
-    delete obj.__v;
-    return obj;
-}
+const DEFAULT_PROFILE_PICTURE_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAKwAAACUCAMAAAA5xjIqAAAAMFBMVEXk5ueutLenrrHn6eqrsbTq7O3Lz9Hh4+S4vcDGyszT1tjP09Te4OKyuLvCx8nW2dvDGAcOAAAECUlEQVR4nO2c23LjIAxAbcTVBvP/f7vQZLNJ47SAsGTPcp4605czqpC4yJ2mwWAwGAwGg8FgMBgMBq+AUmDisizR5x+5dT4Dk4kuiAfSOm+mUworv25ByPkZKcK2mNPpqsmF+dX07jvbByfTdWLP9O4r9XmSAaY1fFbNiLCcxBYm+7PqV3DdKVIX4i9hvesGz28LukQ124p4Gdesu/LGtsY12ypWV1HhmqoCY2xhrYnrV2wjly3EStVEMEyy5vf6+h5ay+MKW71rSlvHkQgQW1xTbDmaAzSp8iQCuLbA5mpLLutDoytHaKta1ytiIXY1zYHN0HZdWOr67LfQ0vYxZTGBlRtpaA0msKnpekLXup3hDpRHMkBlQcoDR+eKKLJ3WUu3+UpnRJxs2iDQyWJTdqY8PDbvCx6R1WQrzDTtZF9k6SqtQRaDRKCTxa6vmXB74PGukk4Wm7KpHJAtsCE7ZKeLLbBLla5rNYWGS65XpKU72FxpI3OpLSIsSFfKzTf6WDNbQln0gXGnc73WUfxSlxyTwiUtYZWd8qPShS7mLnXliWpi9O+MiFIbiFVRDyCaXHaaWmUJL+UewNL4aMfy1tz2HEp8Rf+gZY1xPTQ3JQLfWI+q3s9Ixvmu3rQVdKeZPapsJcuswQOosSU8JX7SLe5kgv7p/t22bARJcq6tf4AvuPOQ2ykGJ3Piut053yfVoM8z8AvG/jDsO4uzhPWO8jbI3TFqGTbDOYK4B4B3dv4+oC5nq08wN/tOysqvgXohZCLP/odt9eY8yfoGpAjHVWu9Rn9izRtJFtSN/CO3zgeynfFxyVF1Ce30usTov37BLfcMgInOhqd19VQYgt3WU2QE5M9pVmfzovqhJaTVNm86si42NUW9vZWrj8bSbi7y+ILyLsy/tNn3BhHsQq2bKqqTZRF9Qwgb6T68SjFd7W5rLQ2wsC7SxFeZbf9jqirf2R5/1wF584p/Zr75xkOTASBunVQzwq7HbR3BbOi//wupmh2WDLqv6g17RHAhBtwLzQek0L11cwYcRcqFricJ8EdkwMO25+0HYEbnixC219mn6oqoERn6lAXAz22U2M493psgHpmuz7r4K0Yy1w4fX+FnNipAxrb1+ajVdkPYtnykiEK0vzsd2wp2aW4PNDXrO61Xzsf3gj2aeln7szcKGRpkATmz027rGhZZh7HTRuq3CZrNtf4rIfQAH8a28sFM8VSCO6LKFTzT6rpRN0ChONrBMxVnSOgwLo+iZv/VNv3Sk4r52g7T8khk+RfatLvYXdnynS17FiTb4sgyNoS/FI/bc21hnikttfivELpQJov7wr4Xsmw3o7g9bxQmLbfmjbKjY+P/h+lNWcddxCmwRbLmJJS4Dv5D/gBmFDnwIIZzJgAAAABJRU5ErkJggg==';
 
 // Server Action para manejar el login
 export async function loginAction(prevState, formData) {
@@ -47,7 +27,7 @@ export async function loginAction(prevState, formData) {
 
   // Perform basic server-side validation if needed
   if (!email || !password) {
-    return { message: 'Por favor, ingresa correo y contraseña.', success: false, data: null };
+    return handleError(new ValidationError('Por favor, ingresa correo y contraseña.'), 'Validation Error', 400);
   }
 
   try {
@@ -55,14 +35,14 @@ export async function loginAction(prevState, formData) {
     const user = await ObtenerUsuarioPorCorreo(email);
     
     if (!user) {
-      return { message: 'Usuario no encontrado.', success: false, data: null };
+      return handleError(new NotFoundError('Usuario no encontrado.'), 'User not found', 404);
     }
 
     // Verify password
-    const isValid = await bcrypt.compare(password, user.password);
+    const isValid = await comparePassword(password, user.password);
     
     if (!isValid) {
-      return { message: 'Credenciales incorrectas.', success: false, data: null };
+      return handleError(new ValidationError('Credenciales incorrectas.'), 'Invalid credentials', 401);
     }
 
     console.log('Server Action Login: Usuario autenticado, rol:', user.rol);
@@ -77,8 +57,7 @@ export async function loginAction(prevState, formData) {
       readyForSignIn: true 
     };
   } catch (error) {
-    console.error('Server Action Login: Error:', error);
-    return { message: 'Error del servidor durante el login.', success: false, data: null };
+    return handleError(error, 'Error del servidor durante el login.');
   }
 }
 
@@ -86,28 +65,32 @@ export async function loginAction(prevState, formData) {
 export async function addSingleUserAction(prevState, formData) {
     console.log('Server Action Add Single User: Iniciado.');
 
-    // RegistrarUsuario expects formData with password field named 'password'
-    // Ensure the password field from the form (named 'contrasena') is correctly mapped
-    const password = formData.get('contrasena');
-    if (password) {
-        formData.set('password', password); // Set the correct name for RegistrarUsuario
-        formData.delete('contrasena'); // Remove the old name
-    } else {
-         // Handle case where password is missing if needed
-         return { message: 'La contraseña es requerida.', success: false };
-    }
+    try {
+        // RegistrarUsuario expects formData with password field named 'password'
+        // Ensure the password field from the form (named 'contrasena') is correctly mapped
+        const password = formData.get('contrasena');
+        if (password) {
+            formData.set('password', password); // Set the correct name for RegistrarUsuario
+            formData.delete('contrasena'); // Remove the old name
+        } else {
+            throw new ValidationError('La contraseña es requerida.');
+        }
 
-    // Call the existing RegistrarUsuario function
-    const result = await RegistrarUsuario(formData);
+        // Call the existing RegistrarUsuario function
+        const result = await RegistrarUsuario(formData);
 
-    // RegistrarUsuario already returns { success: true, data: ... } or { error: ... }
-    // Map the result to the state structure expected by useActionState
-    if (result.success) {
-        // Revalidate path for admin user list after adding a user
-        revalidatePath('/admin/usuarios');
-        return { message: result.message || 'Usuario agregado exitosamente.', success: true, data: result.data };
-    } else {
-        return { message: result.error || 'Error al agregar el usuario.', success: false };
+        if (result.success) {
+            revalidatePath('/admin/usuarios');
+            return { message: result.message || 'Usuario agregado exitosamente.', success: true, data: result.data };
+        } else {
+            // RegistrarUsuario already returns an error object, so we can use its message
+            throw new ValidationError(result.error); // Re-throw as ValidationError
+        }
+    } catch (error) {
+        if (error instanceof ValidationError) {
+            return handleError(error, error.message, error.statusCode);
+        }
+        return handleError(error, 'Error al agregar el usuario.');
     }
 }
 
@@ -122,7 +105,7 @@ async function guardarUsuarios(data, enviarCorreo = false) {
 
         console.log('datos de usuario obtenidos:', data);
 
-        await connectDB(); // Ensure DB connection is awaited
+        await connectDB();
 
         const NuevoUsuario = new Usuario(data);
 
@@ -132,7 +115,6 @@ async function guardarUsuarios(data, enviarCorreo = false) {
 
         console.log('Usuario guardado en la base de datos:', UsuarioGuardado);
 
-        // Si no hay error, puedes devolver los datos o un mensaje de éxito
         if (enviarCorreo && UsuarioGuardado && UsuarioGuardado.correo) {
             const asunto = 'Bienvenido/a a Black Noise';
             const contenidoHtml = `
@@ -145,64 +127,54 @@ async function guardarUsuarios(data, enviarCorreo = false) {
                 <p>Atentamente,</p>
                 <p>El equipo de Black Noise</p>
             `;
-            // Llama a la función de envío de correo
             const resultadoEnvioCorreo = await enviarCorreoElectronico(UsuarioGuardado.correo, asunto, contenidoHtml);
             if (resultadoEnvioCorreo.error) {
                 console.error("Error al enviar correo de bienvenida:", resultadoEnvioCorreo.error);
-                // Podrías querer manejar este error de alguna manera, aunque el usuario ya fue guardado.
             }
         }
         
         return { success: true, data: toPlainObject(UsuarioGuardado) };
         
     } catch (error) {
-        console.error('Error en la función guardarUsuarios:', error.message);
-        // Manejo de errores de red o errores del servidor que no devuelven JSON con 'error'
-        // Devuelve un objeto de error para que el llamador pueda manejarlo.
-        if (error.code === 11000) { // Duplicate key error
-            return { error: 'Ya existe un usuario con este número de documento o correo electrónico.' };
+        if (error.code === 11000) {
+            throw new ValidationError('Ya existe un usuario con este número de documento o correo electrónico.');
         }
-        return { error: 'Error al registrar el usuario' };
+        throw handleError(error, 'Error al registrar el usuario'); // Re-throw as handled error
     }
 }
 
 // Función para enviar correos electrónicos
 async function enviarCorreoElectronico(to, subject, html) {
     try {
-        // Configura el transportador de Nodemailer
-        // Reemplaza con tu configuración de SMTP y credenciales (idealmente desde variables de entorno)
         const transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST || 'smtp.example.com', // Servidor SMTP de tu proveedor
-            port: parseInt(process.env.SMTP_PORT) || 587, // Puerto SMTP (587 para TLS, 465 para SSL)
-            secure: (parseInt(process.env.SMTP_PORT) || 587) === 465, // true para puerto 465, false para otros puertos
+            host: process.env.SMTP_HOST || 'smtp.example.com',
+            port: parseInt(process.env.SMTP_PORT) || 587,
+            secure: (parseInt(process.env.SMTP_PORT) || 587) === 465,
             auth: {
-                user: process.env.EMAIL_USER, // Tu dirección de correo
-                pass: process.env.EMAIL_PASS, // Tu contraseña de correo o contraseña de aplicación
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
             },
         });
 
         const mailOptions = {
-            from: `"Black Noise" <${process.env.EMAIL_USER}>`, // Dirección del remitente
-            to: to, // Lista de destinatarios
-            subject: subject, // Asunto del correo
-            html: html, // Cuerpo del correo en HTML
+            from: `"Black Noise" <${process.env.EMAIL_USER}>`,
+            to: to,
+            subject: subject,
+            html: html,
         };
 
-        // Envía el correo
         await transporter.sendMail(mailOptions);
         console.log(`Correo enviado exitosamente a: ${to} en usuarioActions.enviarCorreoElectronico`);
         return { success: true, message: 'Correo enviado exitosamente' };
     } catch (error) {
-        console.error('Error al enviar el correo en usuarioActions.enviarCorreoElectronico:', error);
-        // Devuelve un objeto de error para que el llamador pueda manejarlo.
-        return { error: `Error al enviar el correo: ${error.message}` };
+        return handleError(error, `Error al enviar el correo: ${error.message}`);
     }
 }
 
 //obtener usuarios de la base de datos
 async function obtenerUsuarios() {
     try {
-        await connectDB(); // Ensure DB connection is awaited
+        await connectDB();
 
         const usuarios = await Usuario.find({}).lean();
         const plainUsers = usuarios.map(toPlainObject);
@@ -210,23 +182,21 @@ async function obtenerUsuarios() {
         return { usuarios: plainUsers };
 
     } catch (error) {
-        console.error('Error al encontrar el usuario:', error.message);
-        return { error: error.message };
+        return handleError(error, 'Error al obtener usuarios');
     }
 }
 
 //obtener usuarios habilitados de la base de datos
 async function obtenerUsuariosHabilitados() {
     try {
-        await connectDB(); // Ensure DB connection is awaited
+        await connectDB();
         const usuarios = await Usuario.find({ habilitado: true }).lean();
         const plainUsers = usuarios.map(toPlainObject);
         
         return { users: plainUsers };
 
     } catch (error) {
-        console.error('Error al encontrar el usuario:', error.message);
-        return { error: error.message };
+        return handleError(error, 'Error al obtener usuarios habilitados');
     }
 }
 
@@ -234,22 +204,23 @@ async function obtenerUsuariosHabilitados() {
 async function ObtenerUsuarioPorId(id) {
     console.log('DEBUG: Entering ObtenerUsuarioPorId with ID:', id);
     try {
-        await connectDB(); // Ensure DB connection is awaited
+        await connectDB();
         console.log('DEBUG: Database connected for ObtenerUsuarioPorId.');
         
         const response = await Usuario.findById(id).lean();
         console.log('DEBUG: Raw response from DB for ObtenerUsuarioPorId:', response);
 
         if (!response) {
-            console.log('DEBUG: User not found for ID:', id);
-            return null;
+            throw new NotFoundError(`User not found with ID: ${id}`);
         }
         const plainUser = toPlainObject(response);
         console.log('DEBUG: Exiting ObtenerUsuarioPorId with plain user:', plainUser);
         return plainUser;
     } catch (error) {
-        console.error('ERROR in ObtenerUsuarioPorId:', error.message);
-        return { error: error.message };
+        if (error instanceof NotFoundError) {
+            return handleError(error, error.message, error.statusCode);
+        }
+        return handleError(error, 'Error al obtener el usuario por ID');
     }
 }
 
@@ -257,126 +228,126 @@ async function ObtenerUsuarioPorId(id) {
 async function ObtenerUsuarioPorCorreo(email) {
     try {
         console.log('Iniciando la función ObtenerUsuarioPorCorreo para el correo:', email);
-        await connectDB(); // Ensure DB connection is awaited
-        // Realizar la búsqueda de correo electrónico de forma insensible a mayúsculas y minúsculas y eliminando espacios
+        await connectDB();
         const user = await Usuario.findOne({ correo: { $regex: new RegExp(`^${email.trim()}$`, 'i') } }).lean();
 
         if (!user) {
-            console.error('Usuario no encontrado por correo:', email);
-            return null;
+            return null; // Return null if user not found, handled by loginAction
         }
         const plainUser = toPlainObject(user);
         return plainUser;
         
     } catch (error) {
-        console.error('Error al encontrar el usuario:', error.message);
-        return { error: error.message };
+        return handleError(error, 'Error al obtener el usuario por correo');
     }
 }
 
 // Función para registrar un nuevo usuario
 async function RegistrarUsuario(formData) {
-    const data = {
-        // Obtener los datos del formulario
-        tipoDocumento: formData.get('tipoDocumento'),
-        numeroDocumento: formData.get('numeroDocumento'),
-        primerNombre: formData.get('primerNombre'),
-        // Generar nombre de usuario con primer nombre y un número aleatorio de 4 cifras
-        nombreUsuario: `${formData.get('primerNombre')}${Math.floor(1000 + Math.random() * 9000)}`,
-        segundoNombre: formData.get('segundoNombre'),
-        primerApellido: formData.get('primerApellido'),
-        segundoApellido: formData.get('segundoApellido'),
-        fechaNacimiento: formData.get('fechaNacimiento'),
-        genero: formData.get('genero'),
-        numeroTelefono: formData.get('numeroTelefono'),
-        direccion: formData.get('direccion'),
-        correo: formData.get('correo'),
-        password: formData.get('password'),
-        rol: 'CLIENTE', // Asignar rol de cliente por defecto
-        habilitado: true // Asegurar que el usuario está habilitado por defecto
+    try {
+        const data = {
+            tipoDocumento: formData.get('tipoDocumento'),
+            numeroDocumento: formData.get('numeroDocumento'),
+            primerNombre: formData.get('primerNombre'),
+            nombreUsuario: `${formData.get('primerNombre')}${Math.floor(1000 + Math.random() * 9000)}`,
+            segundoNombre: formData.get('segundoNombre'),
+            primerApellido: formData.get('primerApellido'),
+            segundoApellido: formData.get('segundoApellido'),
+            fechaNacimiento: formData.get('fechaNacimiento'),
+            genero: formData.get('genero'),
+            numeroTelefono: formData.get('numeroTelefono'),
+            direccion: formData.get('direccion'),
+            correo: formData.get('correo'),
+            password: formData.get('password'),
+            rol: 'CLIENTE',
+            habilitado: true
+        };
+
+        validateRequiredFields(data, ['tipoDocumento', 'numeroDocumento', 'primerNombre', 'primerApellido', 'fechaNacimiento', 'genero', 'numeroTelefono', 'direccion', 'correo', 'password']);
+        validateEmail(data.correo);
+        validatePassword(data.password);
+
+        const hashedPassword = await hashPassword(data.password);
+        data.password = hashedPassword;
+
+        const resultado = await guardarUsuarios(data, true);
+        return resultado;
+    } catch (error) {
+        if (error instanceof ValidationError) {
+            return { success: false, error: error.message }; // Return as object for Server Action
+        }
+        return { success: false, error: 'Error al registrar el usuario' };
     }
-
-    console.log('data:', data);
-
-    //hasheamos la contraseña
-    const hashedPassword = await bcrypt.hash(data.password, 10);
-    data.password = hashedPassword;
-
-    const resultado = await guardarUsuarios(data, true); // Enviar correo al registrar un solo usuario
-    return resultado;
 }
 
 // Función para registrar un usuario masivo
-async function RegistroMasivoUsuario(formData) { // Removed userId as it's fetched internally
+async function RegistroMasivoUsuario(formData) {
     const file = formData.get('file');
 
     if (!file) {
-        return { error: 'No se ha subido ningún archivo' };
+        return { success: false, error: 'No se ha subido ningún archivo' };
     }
 
-    // Read the file as text (assuming it's a CSV or similar)
     const buffer = await file.arrayBuffer();
     const text = new TextDecoder().decode(buffer);
 
     try {
-        await connectDB(); // Connect once for bulk operation
+        await connectDB();
 
         const resultadoParseo = Papa.parse(text, {
-            header: true,         // The first row are the headers
-            skipEmptyLines: true, // Skip empty lines
+            header: true,
+            skipEmptyLines: true,
             transformHeader: header => header.trim(),
             transform: value => typeof value === 'string' ? value.trim() : value,
         });
 
         if (resultadoParseo.errors.length > 0) {
             console.error("Errores al parsear CSV:", resultadoParseo.errors);
-            return { error: 'Errores al parsear el archivo CSV.' };
+            return { success: false, error: 'Errores al parsear el archivo CSV.' };
         } else {
             const usuarios = resultadoParseo.data;
             console.log("usuarios a procesar:", usuarios);
 
             const results = [];
             for (const usuarioData of usuarios) {
-                // Hash password for each user
-                if (usuarioData.password) {
-                    usuarioData.password = await bcrypt.hash(usuarioData.password, 10);
-                } else {
-                    console.warn('Usuario sin contraseña en carga masiva:', usuarioData);
-                    results.push({ error: `Usuario ${usuarioData.correo || usuarioData.numeroDocumento} sin contraseña.` });
-                    continue;
-                }
-                
-                // Assign default profile picture if not provided
-                if (!usuarioData.fotoPerfil) {
-                    usuarioData.fotoPerfil = `data:image/webp;base64,${DEFAULT_PROFILE_PICTURE_BASE64}`;
-                }
-
-                // Assign default role if not provided
-                if (!usuarioData.rol) {
-                    usuarioData.rol = 'CLIENTE';
-                }
-
-                // Ensure habilitado is boolean
-                usuarioData.habilitado = usuarioData.habilitado === 'true' || usuarioData.habilitado === true;
-
                 try {
+                    validateRequiredFields(usuarioData, ['correo', 'password']); // Basic validation for bulk
+                    validateEmail(usuarioData.correo);
+                    validatePassword(usuarioData.password);
+
+                    if (usuarioData.password) {
+                        usuarioData.password = await hashPassword(usuarioData.password);
+                    } else {
+                        throw new ValidationError('Contraseña requerida para usuario en carga masiva.');
+                    }
+                    
+                    if (!usuarioData.fotoPerfil) {
+                        usuarioData.fotoPerfil = `data:image/webp;base64,${DEFAULT_PROFILE_PICTURE_BASE64}`;
+                    }
+
+                    if (!usuarioData.rol) {
+                        usuarioData.rol = 'CLIENTE';
+                    }
+
+                    usuarioData.habilitado = usuarioData.habilitado === 'true' || usuarioData.habilitado === true;
+
                     const nuevoUsuario = new Usuario(usuarioData);
                     const usuarioGuardado = await nuevoUsuario.save();
                     results.push({ success: true, data: toPlainObject(usuarioGuardado) });
                 } catch (error) {
                     console.error(`Error al guardar usuario ${usuarioData.correo || usuarioData.numeroDocumento}:`, error.message);
                     if (error.code === 11000) {
-                        results.push({ error: `Usuario ${usuarioData.correo || usuarioData.numeroDocumento} ya existe.` });
+                        results.push({ success: false, error: `Usuario ${usuarioData.correo || usuarioData.numeroDocumento} ya existe.` });
+                    } else if (error instanceof ValidationError) {
+                        results.push({ success: false, error: `Error de validación para ${usuarioData.correo || usuarioData.numeroDocumento}: ${error.message}` });
                     } else {
-                        results.push({ error: `Error al guardar usuario ${usuarioData.correo || usuarioData.numeroDocumento}: ${error.message}` });
+                        results.push({ success: false, error: `Error al guardar usuario ${usuarioData.correo || usuarioData.numeroDocumento}: ${error.message}` });
                     }
                 }
             }
             
-            // Revalidate path after bulk operation
             revalidatePath('/admin/usuarios');
             
-            // Check if all operations were successful
             const allSuccess = results.every(r => r.success);
             if (allSuccess) {
                 return { success: true, message: 'Carga masiva completada exitosamente.' };
@@ -386,130 +357,115 @@ async function RegistroMasivoUsuario(formData) { // Removed userId as it's fetch
             }
         }
     } catch (error) {
-        console.error("Error general al usar PapaParse o guardar usuarios:", error);
-        return { error: `Error durante la carga masiva: ${error.message}` };
+        return handleError(error, `Error durante la carga masiva: ${error.message}`);
     }
 }
 
 // Función para filtrar usuarios
 async function FiltrarUsuarios(prevState, formData) {
-    const textoBusqueda = formData.get('textoBusqueda');
-    const rol = formData.get('rol');
-    const genero = formData.get('generoFiltro');
-    const tipoDocumento = formData.get('tipoDocumentoFiltro');
-    const edad = formData.get('edadFiltro');
-    const incluirDeshabilitados = formData.get('incluirDeshabilitados') === 'true';
+    try {
+        const textoBusqueda = formData.get('textoBusqueda');
+        const rol = formData.get('rol');
+        const genero = formData.get('generoFiltro');
+        const tipoDocumento = formData.get('tipoDocumentoFiltro');
+        const edad = formData.get('edadFiltro');
+        const incluirDeshabilitados = formData.get('incluirDeshabilitados') === 'true';
 
-    console.log("Buscando usuarios con los siguientes filtros:");
-    if (textoBusqueda) console.log(`Texto Busqueda: ${textoBusqueda}`);
-    if (rol) console.log(`Rol: ${rol}`);
-    if (genero) console.log(`Genero: ${genero}`);
-    if (tipoDocumento) console.log(`Tipo Documento: ${tipoDocumento}`);
-    if (edad) console.log(`Edad: ${edad}`);
-    console.log(`Incluir Deshabilitados: ${incluirDeshabilitados}`);
+        await connectDB();
 
-    await connectDB();
+        const query = {};
 
-    const query = {};
-
-    if (textoBusqueda) {
-        query.$or = [
-            { primerNombre: { $regex: textoBusqueda, $options: 'i' } },
-            { primerApellido: { $regex: textoBusqueda, $options: 'i' } },
-            { correo: { $regex: textoBusqueda, $options: 'i' } },
-            { numeroDocumento: { $regex: textoBusqueda, $options: 'i' } }, // Add document number to search
-        ];
-    }
-
-    if (rol) query.rol = rol;
-    if (genero) query.genero = genero;
-    if (tipoDocumento) query.tipoDocumento = tipoDocumento;
-
-    if (edad) { 
-        const currentYear = new Date().getFullYear();
-        let minBirthYear, maxBirthYear;
-
-        // Simple age range parsing
-        if (edad.includes('-')) {
-            const [minAge, maxAge] = edad.split('-').map(Number);
-            maxBirthYear = currentYear - minAge;
-            minBirthYear = currentYear - maxAge;
-        } else if (edad.includes('+')) {
-            const minAge = parseInt(edad.replace('+', ''));
-            maxBirthYear = currentYear - minAge;
-            minBirthYear = 0; // No lower bound
-        } else {
-            const exactAge = parseInt(edad);
-            maxBirthYear = currentYear - exactAge;
-            minBirthYear = currentYear - exactAge;
+        if (textoBusqueda) {
+            query.$or = [
+                { primerNombre: { $regex: textoBusqueda, $options: 'i' } },
+                { primerApellido: { $regex: textoBusqueda, $options: 'i' } },
+                { correo: { $regex: textoBusqueda, $options: 'i' } },
+                { numeroDocumento: { $regex: textoBusqueda, $options: 'i' } },
+            ];
         }
 
-        // Construct date range for fechaNacimiento
-        const startDate = new Date(minBirthYear, 0, 1); // Jan 1 of min birth year
-        const endDate = new Date(maxBirthYear + 1, 0, 1); // Jan 1 of (max birth year + 1)
+        if (rol) query.rol = rol;
+        if (genero) query.genero = genero;
+        if (tipoDocumento) query.tipoDocumento = tipoDocumento;
 
-        query.fechaNacimiento = { $gte: startDate, $lt: endDate };
+        if (edad) { 
+            const currentYear = new Date().getFullYear();
+            let minBirthYear, maxBirthYear;
+
+            if (edad.includes('-')) {
+                const [minAge, maxAge] = edad.split('-').map(Number);
+                maxBirthYear = currentYear - minAge;
+                minBirthYear = currentYear - maxAge;
+            } else if (edad.includes('+')) {
+                const minAge = parseInt(edad.replace('+', ''));
+                maxBirthYear = currentYear - minAge;
+                minBirthYear = 0;
+            } else {
+                const exactAge = parseInt(edad);
+                maxBirthYear = currentYear - exactAge;
+                minBirthYear = currentYear - exactAge;
+            }
+
+            const startDate = new Date(minBirthYear, 0, 1);
+            const endDate = new Date(maxBirthYear + 1, 0, 1);
+
+            query.fechaNacimiento = { $gte: startDate, $lt: endDate };
+        }
+
+        if (!incluirDeshabilitados) {
+            query.habilitado = true;
+        }
+
+        const usuariosEncontradosRaw = await Usuario.find(query).lean();
+        const usuariosEncontrados = usuariosEncontradosRaw.map(toPlainObject);
+
+        return { data: usuariosEncontrados, message: "Búsqueda completada.", success: true };
+    } catch (error) {
+        return handleError(error, 'Error al filtrar usuarios');
     }
-
-    if (!incluirDeshabilitados) {
-        query.habilitado = true;
-    }
-
-    const usuariosEncontradosRaw = await Usuario.find(query).lean(); // Use .lean() here too
-    const usuariosEncontrados = usuariosEncontradosRaw.map(toPlainObject);
-
-    console.log("Usuarios encontrados (plain):", usuariosEncontrados);
-
-    return { data: usuariosEncontrados, message: "Búsqueda completada." };
 }
 
 // Función para cambiar el estado de habilitado de un usuario
 async function toggleUsuarioHabilitado(formData) {
-    const id = formData.get('id');
-
-    console.log('Intentando cambiar el estado de habilitado del usuario con id:', id);
-
-    if (!id) {
-        console.error('Error: ID de usuario no proporcionado para cambiar el estado.');
-        return { error: 'ID de usuario no proporcionado.' };
-    }
-
     try {
+        const id = formData.get('id');
+
+        if (!id) {
+            throw new ValidationError('ID de usuario no proporcionado para cambiar el estado.');
+        }
+
         await connectDB();
 
         const usuario = await Usuario.findById(id);
 
         if (!usuario) {
-            console.error(`Error: No se encontró ningún usuario con el ID ${id}.`);
-            return { error: `No se encontró ningún usuario con el ID ${id}.` };
+            throw new NotFoundError(`No se encontró ningún usuario con el ID ${id}.`);
         }
 
-        const nuevoEstadoHabilitado = !usuario.habilitado; // Toggle the current state
+        const nuevoEstadoHabilitado = !usuario.habilitado;
 
         const usuarioActualizado = await Usuario.findByIdAndUpdate(
             id,
             { habilitado: nuevoEstadoHabilitado },
-            { new: true } // Devuelve el documento modificado
-        ).lean(); // Use lean() to get a plain object
+            { new: true }
+        ).lean();
 
-        console.log(`Usuario ${nuevoEstadoHabilitado ? 'habilitado' : 'deshabilitado'} exitosamente:`, usuarioActualizado);
-
-        revalidatePath('/admin/usuarios'); // Revalida la página de usuarios para reflejar el cambio
+        revalidatePath('/admin/usuarios');
 
         return { success: true, message: `Usuario ${nuevoEstadoHabilitado ? 'habilitado' : 'deshabilitado'} exitosamente.`, data: toPlainObject(usuarioActualizado) };
 
     } catch (error) {
-        console.error(`Error al cambiar el estado de habilitado del usuario con ID ${id}:`, error.message);
-        return { error: `Error al procesar la solicitud: ${error.message}` };
+        if (error instanceof ValidationError || error instanceof NotFoundError) {
+            return handleError(error, error.message, error.statusCode);
+        }
+        return handleError(error, 'Error al cambiar el estado de habilitado del usuario.');
     }
 }
 
 // Función para editar un usuario
 async function EditarUsuario(id, formData) {
-    console.log('DEBUG: Entering EditarUsuario with ID:', id);
     try {
-        await connectDB(); // Ensure DB connection is awaited
-        console.log('DEBUG: Database connected for EditarUsuario.');
+        await connectDB();
 
         const updateData = {
             tipoDocumento: formData.get('tipoDocumento'),
@@ -520,82 +476,48 @@ async function EditarUsuario(id, formData) {
             segundoApellido: formData.get('segundoApellido'),
             fechaNacimiento: formData.get('fechaNacimiento'),
             genero: formData.get('genero'),
-            numeroTelefono: formData.get('numeroTelefono'), // Corrected field name
+            numeroTelefono: formData.get('numeroTelefono'),
             direccion: formData.get('direccion'),
             correo: formData.get('correo'),
-            rol: formData.get('rol'), // Include rol update
-            // Password update would need separate handling if included
+            rol: formData.get('rol'),
         };
 
-        console.log('DEBUG: Update data for user:', id, updateData);
+        validateRequiredFields(updateData, ['tipoDocumento', 'numeroDocumento', 'primerNombre', 'primerApellido', 'fechaNacimiento', 'genero', 'numeroTelefono', 'direccion', 'correo', 'rol']);
+        validateEmail(updateData.correo);
 
         const usuarioActualizado = await Usuario.findByIdAndUpdate(
             id,
             updateData,
-            { new: true, runValidators: true } // Return the modified document and run schema validators
-        ).lean(); // Use lean() to get a plain object
-
-        console.log('DEBUG: Usuario actualizado en la base de datos:', usuarioActualizado);
+            { new: true, runValidators: true }
+        ).lean();
 
         if (!usuarioActualizado) {
-            console.error(`Error: No se encontró ningún usuario con el ID ${id}.`);
-            return { error: `No se encontró ningún usuario con el ID ${id}.` };
+            throw new NotFoundError(`No se encontró ningún usuario con el ID ${id}.`);
         }
 
         const plainUser = toPlainObject(usuarioActualizado);
 
-        console.log('DEBUG: Exiting EditarUsuario with plain user:', plainUser);
         return { success: true, message: 'Usuario actualizado exitosamente.', data: plainUser };
 
     } catch (error) {
-        console.error(`ERROR al editar el usuario con ID ${id}:`, error.message);
-        if (error.code === 11000) { // Duplicate key error
-            return { error: 'Ya existe un usuario con este número de documento o correo electrónico.' };
+        if (error instanceof ValidationError || error instanceof NotFoundError) {
+            return handleError(error, error.message, error.statusCode);
         }
-        return { error: `Error al procesar la solicitud: ${error.message}` };
+        return handleError(error, 'Error al editar el usuario.');
     }
 }
 
 export async function ObtenerTodosLosUsuarios() {
     try {
-        await connectDB(); // Ensure DB connection is awaited
+        await connectDB();
         const usuarios = await Usuario.find({}).lean();
 
-        // Manually convert to plain objects with string IDs and dates
-        const plainUsers = usuarios.map(user => {
-            const plainUser = { ...user }; // Create a shallow copy from the lean object
-            if (plainUser._id) {
-                plainUser._id = plainUser._id.toString();
-            }
-            // Ensure fechaNacimiento is handled correctly, it might already be a string or null
-            if (plainUser.fechaNacimiento && typeof plainUser.fechaNacimiento !== 'string') {
-                 if (plainUser.fechaNacimiento instanceof Date) {
-                    plainUser.fechaNacimiento = plainUser.fechaNacimiento.toISOString().split('T')[0]; // Format as YYYY-MM-DD
-                 } else {
-                    // If it's an object but not a Date (e.g., from bad data), try to convert or nullify
-                    try {
-                        plainUser.fechaNacimiento = new Date(plainUser.fechaNacimiento).toISOString().split('T')[0];
-                    } catch (e) {
-                        plainUser.fechaNacimiento = null;
-                    }
-                 }
-            }
-            if (plainUser.createdAt instanceof Date) {
-                plainUser.createdAt = plainUser.createdAt.toISOString();
-            }
-            if (plainUser.updatedAt instanceof Date) {
-                plainUser.updatedAt = plainUser.updatedAt.toISOString();
-            }
-            // Add any other date fields you might have
-            return plainUser;
-        });
+        const plainUsers = usuarios.map(toPlainObject);
 
-        // console.log("Datos retornados por ObtenerTodosLosUsuarios (plain):", plainUsers); // Log para depuración
-        return { users: plainUsers };
+        return { users: plainUsers, success: true };
 
     } catch (error) {
-        console.error('Error al encontrar el usuario:', error.message);
-        return { error: error.message };
+        return handleError(error, 'Error al obtener todos los usuarios');
     }
 }
 
@@ -605,81 +527,84 @@ export {
     RegistroMasivoUsuario,
     ObtenerUsuarioPorId,
     ObtenerUsuarioPorCorreo,
-    FiltrarUsuarios, // Export as Server Action compatible function
+    FiltrarUsuarios,
     toggleUsuarioHabilitado,
-    EditarUsuario, // Export the updated function
+    EditarUsuario,
     obtenerUsuariosHabilitados,
 };
 
 // Server Action para manejar el registro de usuario
 export async function registerAction(prevState, formData) {
-  const password = formData.get('password');
-  const confirmPassword = formData.get('confirmPassword');
+  try {
+    const password = formData.get('password');
+    const confirmPassword = formData.get('confirmPassword');
 
-  // Password confirmation validation
-  if (!password || password !== confirmPassword) {
-    return { message: 'Las contraseñas no coinciden', success: false };
-  }
+    if (!password || password !== confirmPassword) {
+      throw new ValidationError('Las contraseñas no coinciden');
+    }
 
-  // Call the existing RegistrarUsuario function
-  const result = await RegistrarUsuario(formData);
+    const result = await RegistrarUsuario(formData);
 
-  // RegistrarUsuario already returns { success: true, data: ... } or { error: ... }
-  // Map the result to the state structure expected by useActionState
-  if (result.success) {
-    return { message: result.message || '¡Registro exitoso!', success: true, data: result.data };
-  } else {
-    return { message: result.error || 'Error en el registro. Inténtalo de nuevo.', success: false };
+    if (result.success) {
+      return { message: result.message || '¡Registro exitoso!', success: true, data: result.data };
+    } else {
+      throw new ValidationError(result.error);
+    }
+  } catch (error) {
+    if (error instanceof ValidationError) {
+        return handleError(error, error.message, error.statusCode);
+    }
+    return handleError(error, 'Error en el registro. Inténtalo de nuevo.');
   }
 }
 
 // Server Action para manejar la actualización de usuario
 export async function updateUserAction(userId, prevState, formData) {
-    console.log('Server Action Update User: Iniciado para ID:', userId);
+    try {
+        if (!userId) {
+            throw new ValidationError('ID de usuario no proporcionado para actualizar.');
+        }
 
-    if (!userId) {
-        return { message: 'ID de usuario no proporcionado para actualizar.', success: false };
-    }
+        const result = await EditarUsuario(userId, formData);
 
-    // Call the updated EditarUsuario function
-    const result = await EditarUsuario(userId, formData);
+        if (result.success) {
+            revalidatePath('/admin/usuarios');
+            revalidatePath(`/perfil/editar`);
+            revalidatePath(`/admin/usuarios/editar/${userId}`);
 
-    // EditarUsuario now returns { success: true, data: ... } or { error: ... }
-    // Map the result to the state structure expected by useActionState
-    if (result.success) {
-        // Revalidate path for admin user list if needed
-        revalidatePath('/admin/usuarios');
-        // Revalidate path for the specific user profile page if needed
-        revalidatePath(`/perfil/editar`); // Assuming the profile page path is /perfil/editar
-        revalidatePath(`/admin/usuarios/editar/${userId}`); // Revalidate admin edit page
-
-        return { message: result.message || 'Usuario actualizado exitosamente.', success: true, data: result.data };
-    } else {
-        return { message: result.error || 'Error al actualizar el usuario.', success: false };
+            return { message: result.message || 'Usuario actualizado exitosamente.', success: true, data: result.data };
+        } else {
+            throw new ValidationError(result.error);
+        }
+    } catch (error) {
+        if (error instanceof ValidationError) {
+            return handleError(error, error.message, error.statusCode);
+        }
+        return handleError(error, 'Error al actualizar el usuario.');
     }
 }
 
 // Server Action para manejar la carga masiva de usuarios
 export async function bulkUploadUsersAction(prevState, formData) {
-    console.log('Server Action Bulk Upload Users: Iniciado.');
+    try {
+        const session = await getServerSession(authOptions);
 
-    const session = await getServerSession(authOptions);
+        if (!session?.user?.id) {
+            throw new UnauthorizedError('Usuario no autenticado. Por favor, inicia sesión.');
+        }
 
-    if (!session?.user?.id) {
-        console.log('Server Action Bulk Upload Users: Usuario no autenticado.');
-        return { message: 'Usuario no autenticado. Por favor, inicia sesión.', success: false };
-    }
+        const result = await RegistroMasivoUsuario(formData);
 
-    // Call the existing RegistroMasivoUsuario function
-    const result = await RegistroMasivoUsuario(formData); // RegistroMasivoUsuario no necesita userId ahora
-
-    // RegistroMasivoUsuario already returns { success: true, ... } or { error: ... }
-    // Map the result to the state structure expected by useActionState
-    if (result.success) {
-        // Revalidate path for admin user list after bulk upload
-        revalidatePath('/admin/usuarios');
-        return { message: result.message || 'Carga masiva completada exitosamente.', success: true };
-    } else {
-        return { message: result.error || 'Error durante la carga masiva.', success: false };
+        if (result.success) {
+            revalidatePath('/admin/usuarios');
+            return { message: result.message || 'Carga masiva completada exitosamente.', success: true };
+        } else {
+            throw new ValidationError(result.error);
+        }
+    } catch (error) {
+        if (error instanceof ValidationError || error instanceof UnauthorizedError) {
+            return handleError(error, error.message, error.statusCode);
+        }
+        return handleError(error, 'Error durante la carga masiva.');
     }
 }
