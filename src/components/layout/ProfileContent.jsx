@@ -6,7 +6,7 @@ import BotonGeneral from "@/components/common/botones/BotonGeneral";
 import { useCartStorage } from "@/hooks/useCartStorage"; // Import useCartStorage
 import { useEffect, useState } from "react"; // Import useEffect and useState
 import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions"; // Import the server action
-import DesignsComponent from "./DesignsComponent"; // Import DesignsComponent
+import DesignsComponent from "../common/DesignsComponent"; // Import DesignsComponent
 import PedidosComponent from "./PedidosComponent"; // Import PedidosComponent
 import CartComponent from "./CartComponent"; // Import CartComponent
 import PagosComponent from "./PagosComponent"; // Import PagosComponent
