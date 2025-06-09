@@ -17,6 +17,18 @@ const ProveedorSchema = new Schema({
         type: String,
         required: true
     },
+    nombreDueño: {
+        type: String,
+        required: true
+    },
+    emailContacto: {
+        type: String,
+        required: true
+    },
+    telefonoContacto: {
+        type: String,
+        required: true
+    },
     especialidad: {
         type: String,
         enum: Object.values(CategoriaProducto),

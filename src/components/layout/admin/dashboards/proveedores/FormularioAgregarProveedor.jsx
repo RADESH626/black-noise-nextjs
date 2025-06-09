@@ -109,49 +109,37 @@ function FormularioAgregarProveedor({ onSuccess }) {
         </div>
         <div className="relative">
           <label className="block mb-1 text-sm font-medium text-purple-400">
-            Persona de Contacto
+            Nombre del Dueño
           </label>
           <InputGeneral
             type="text"
-            id="contacto"
-            name="contacto"
-            placeholder="Nombre de la persona de contacto"
+            id="nombreDueño"
+            name="nombreDueño"
+            placeholder="Nombre del dueño de la empresa"
             required
           />
         </div>
         <div className="relative">
           <label className="block mb-1 text-sm font-medium text-purple-400">
-            Teléfono de Contacto
+            Teléfono de Contacto (Empresa)
           </label>
           <InputGeneral
             type="text"
-            id="telefono"
-            name="telefono"
-            placeholder="Número de teléfono de contacto"
+            id="telefonoContacto"
+            name="telefonoContacto"
+            placeholder="Número de teléfono de contacto de la empresa"
             required
           />
         </div>
         <div className="relative">
           <label className="block mb-1 text-sm font-medium text-purple-400">
-            Email de Contacto
+            Email de Contacto (Empresa)
           </label>
           <InputGeneral
             type="email"
-            id="email"
-            name="email"
-            placeholder="Correo electrónico de contacto"
-            required
-          />
-        </div>
-        <div className="relative md:col-span-2">
-          <label className="block mb-1 text-sm font-medium text-purple-400">
-            Dirección de Contacto
-          </label>
-          <InputGeneral
-            type="text"
-            id="direccion"
-            name="direccion"
-            placeholder="Dirección de contacto del proveedor"
+            id="emailContacto"
+            name="emailContacto"
+            placeholder="Correo electrónico de contacto de la empresa"
             required
           />
         </div>
