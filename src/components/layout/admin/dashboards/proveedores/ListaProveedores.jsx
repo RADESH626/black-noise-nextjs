@@ -54,9 +54,11 @@ function DeleteProviderForm({ providerId, onProviderDeleted }) {
 }
 
 export default function ListaProveedores({ initialProviders }) {
-  const [providers, setProviders] = useState(initialProviders || []);
+  const [allProviders, setAllProviders] = useState(initialProviders || []);
+  const [filteredProviders, setFilteredProviders] = useState(initialProviders || []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('ALL'); // 'ALL' for no filter
   const { showPopUp } = usePopUp();
 
   const fetchAndSetProviders = useCallback(async () => {
@@ -64,7 +66,7 @@ export default function ListaProveedores({ initialProviders }) {
     try {
       const result = await obtenerProveedoresHabilitados();
       if (result && result.proveedores && Array.isArray(result.proveedores)) {
-        setProviders(result.proveedores);
+        setAllProviders(result.proveedores);
       } else {
         setError(result?.error || "No se recibió un array de proveedores.");
         console.log("Error al cargar proveedores en ListaProveedores.jsx:", result?.error || "No se recibió un array de proveedores.");
@@ -81,11 +83,26 @@ export default function ListaProveedores({ initialProviders }) {
     if (!initialProviders || initialProviders.length === 0) {
       fetchAndSetProviders();
     } else {
-      setProviders(initialProviders);
+      setAllProviders(initialProviders);
     }
   }, [initialProviders, fetchAndSetProviders]);
 
-  if (loading && providers.length === 0) {
+  useEffect(() => {
+    if (selectedPaymentMethod === 'ALL') {
+      setFilteredProviders(allProviders);
+    } else {
+      const filtered = allProviders.filter(provider =>
+        provider.metodosPagoAceptados && provider.metodosPagoAceptados.includes(selectedPaymentMethod)
+      );
+      setFilteredProviders(filtered);
+    }
+  }, [allProviders, selectedPaymentMethod]);
+
+  const handleFilterChange = (event) => {
+    setSelectedPaymentMethod(event.target.value);
+  };
+
+  if (loading && allProviders.length === 0) {
     return <p>Cargando proveedores...</p>;
   }
 
@@ -95,7 +112,26 @@ export default function ListaProveedores({ initialProviders }) {
 
   return (
     <div className="overflow-x-auto">
-      {providers.length > 0 ? (
+      <div className="mb-4">
+        <label htmlFor="paymentMethodFilter" className="block text-sm font-medium text-gray-700 mb-1">
+          Filtrar por Método de Pago:
+        </label>
+        <select
+          id="paymentMethodFilter"
+          name="paymentMethodFilter"
+          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          value={selectedPaymentMethod}
+          onChange={handleFilterChange}
+        >
+          <option value="ALL">Todos los Métodos</option>
+          {PAYMENT_METHODS.map((method) => (
+            <option key={method} value={method}>
+              {PAYMENT_METHOD_DISPLAY_NAMES[method]}
+            </option>
+          ))}
+        </select>
+      </div>
+      {filteredProviders.length > 0 || loading ? (
         <Tabla>
           <thead>
             <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
@@ -112,10 +148,10 @@ export default function ListaProveedores({ initialProviders }) {
           <tbody className='bg-gray-300 divide-y divide-gray-400'>
             {loading ? (
                 <tr><TdGeneral colSpan={6 + PAYMENT_METHODS.length} className="text-center py-4">Actualizando...</TdGeneral></tr>
-            ) : providers.length === 0 ? (
-                <tr><TdGeneral colSpan={6 + PAYMENT_METHODS.length} className="text-center py-4">No se encontraron proveedores.</TdGeneral></tr>
+            ) : filteredProviders.length === 0 ? (
+                <tr><TdGeneral colSpan={6 + PAYMENT_METHODS.length} className="text-center py-4">No se encontraron proveedores con el filtro seleccionado.</TdGeneral></tr>
             ) : (
-                providers.map((provider) => (
+                filteredProviders.map((provider) => (
                     <tr key={provider._id} className="hover:bg-gray-200">
                         <TdGeneral>
                             <div className="flex items-center space-x-3">

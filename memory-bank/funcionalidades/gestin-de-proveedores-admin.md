@@ -2,7 +2,7 @@
 
 **Descripción:** Permite a los administradores ver, filtrar, agregar, editar y eliminar proveedores directamente en la plataforma. Esta es la única vía para incorporar nuevos proveedores al sistema, reemplazando cualquier proceso de solicitud previo por parte de usuarios generales. Se ha eliminado el campo 'rut' del proveedor, ya que el 'nit' es suficiente para acceder a la información del RUT. Además, los proveedores ya no están vinculados a un usuario de la plataforma, eliminando la necesidad del campo `usuarioId`. Se han añadido campos para almacenar el nombre del dueño de la empresa proveedora, así como el correo electrónico y el número de teléfono de contacto de la empresa. La dirección de la empresa (`direccionEmpresa`) se utilizará tanto como dirección principal de la empresa como dirección de contacto. El campo `nombreProveedor` ha sido renombrado a `nombreEmpresa` para mayor claridad en el registro. Se ha incorporado un nuevo campo `metodosDePago` que permite seleccionar múltiples métodos de pago aceptados por el proveedor a través de checkboxes.
 
-**Flujo de Interacción:** Los administradores acceden a esta funcionalidad desde el panel de administración (`/admin`) seleccionando la opción "Proveedores". Pueden ver una lista de proveedores existentes, usar un formulario de filtro (placeholder) y utilizar el botón "Agregar Proveedor" que abre un modal para incorporar nuevos proveedores.
+**Flujo de Interacción:** Los administradores acceden a esta funcionalidad desde el panel de administración (`/admin`) seleccionando la opción "Proveedores". Pueden ver una lista de proveedores existentes, utilizar un filtro por métodos de pago aceptados, y usar el botón "Agregar Proveedor" que abre un modal para incorporar nuevos proveedores.
 
 ---
 
@@ -32,15 +32,19 @@
     * **Lógica Principal:** Actualmente es un marcador de posición que solo muestra los proveedores iniciales pasados como prop. No implementa lógica de filtrado real.
     * **Modelos de Datos / Endpoints:** No interactúa directamente.
 
-#### 📄 **Archivo:** `src/components/layout/admin/dashboards/proveedores/ListaProveedores.jsx` (Nuevo)
-* **Rol:** Componente encargado de mostrar la información de los proveedores en un formato de lista o tabla, similar a la lista de usuarios.
+#### 📄 **Archivo:** `src/components/layout/admin/dashboards/proveedores/ListaProveedores.jsx` (Modificado)
+* **Rol:** Componente encargado de mostrar la información de los proveedores en un formato de lista o tabla, similar a la lista de usuarios, ahora con funcionalidad de filtrado.
 * **Implementación Clave:**
-    * **Componentes/Funciones Relevantes:** `ListaProveedores` (componente), `useState`, `useEffect`.
+    * **Componentes/Funciones Relevantes:** `ListaProveedores` (componente), `useState`, `useEffect`, `useCallback`.
     * **Lógica Principal:**
-        * Recibe una lista de proveedores como prop.
-        * Renderiza cada proveedor en una fila de una tabla, mostrando detalles como nombre de la empresa, dueño, email, teléfono, dirección y métodos de pago.
-        * Incluye botones para editar y eliminar cada proveedor.
-    * **Modelos de Datos / Endpoints:** Consume los datos de proveedores pasados como props.
+        *   Gestiona dos estados para los proveedores: `allProviders` (todos los proveedores obtenidos) y `filteredProviders` (proveedores después de aplicar el filtro).
+        *   Introduce un estado `selectedPaymentMethod` para controlar el método de pago seleccionado para el filtro.
+        *   La función `fetchAndSetProviders` obtiene todos los proveedores habilitados.
+        *   Un `useEffect` se encarga de filtrar `allProviders` cada vez que `selectedPaymentMethod` o `allProviders` cambian, actualizando `filteredProviders`.
+        *   Renderiza un `select` HTML para permitir al usuario elegir un método de pago para filtrar.
+        *   Renderiza cada proveedor en una fila de una tabla, mostrando detalles como nombre de la empresa, dueño, email, teléfono, dirección y métodos de pago.
+        *   Incluye botones para editar y eliminar cada proveedor.
+    * **Modelos de Datos / Endpoints:** Consume los datos de proveedores obtenidos a través de `obtenerProveedoresHabilitados` de `ProveedorActions.js`.
 
 #### 📄 **Archivo:** `src/models/Proveedor.js` (Modificado)
 * **Rol:** Define el esquema del modelo de datos para los proveedores.
