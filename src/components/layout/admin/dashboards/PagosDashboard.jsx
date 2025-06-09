@@ -2,9 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import AdminPage from '../AdminLayout';
-import SeccionAcciones from '../secciones/acciones/SeccionAcciones';
-import SeccionFooter from '../secciones/acciones/SeccionFooter';
 import SeccionHeader from '../secciones/acciones/SeccionHeader';
 import { obtenerPagos } from '@/app/acciones/PagoActions.js';
 import FormFiltrarPagos from './pagos/FormFiltrarPagos';
@@ -45,20 +42,16 @@ function PagosDashboard() {
     }
 
     return (
-        <AdminPage>
-            <SeccionAcciones>
-                <SeccionHeader>
-                    <h4 className='font-bold text-2xl text-black'>Gestión de Pagos</h4>
-                </SeccionHeader>
-                <SeccionFooter>
-                    <Link href="/admin/pagos/agregar" className="flex flex-row justify-center items-center gap-4">
-                        <BotonAgregarPagos />
-                    </Link>
-                </SeccionFooter>
-            </SeccionAcciones>
+        <>
+            <SeccionHeader>
+                <h4 className='font-bold text-2xl text-black'>Gestión de Pagos</h4>
+                <Link href="/admin/pagos/agregar" className="flex flex-row justify-center items-center gap-4">
+                    <BotonAgregarPagos />
+                </Link>
+            </SeccionHeader>
 
             <FormFiltrarPagos initialPagosFromPage={pagos} />
-        </AdminPage>
+        </>
     );
 }
 

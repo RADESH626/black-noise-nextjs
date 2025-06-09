@@ -9,9 +9,9 @@
 ### Archivos Involucrados:
 
 #### 📄 **Archivo:** `src/components/layout/admin/dashboards/VentasDashboard.jsx`
-* **Rol:** Componente principal del dashboard de gestión de ventas para administradores.
+* **Rol:** Componente principal del dashboard de gestión de ventas para administradores. Este componente no debe incluir el `AdminLayout` ni `AdminPage` directamente, ya que se espera que sea renderizado como un hijo de un componente de diseño de página que ya proporciona el `AdminLayout`. Las secciones de acciones (`SeccionAcciones` y `SeccionFooter`) se han eliminado para evitar cuadros grises no deseados y para alinear el diseño con otras páginas de administración. El botón "Agregar Venta" se integrará directamente en la sección del encabezado.
 * **Implementación Clave:**
-    * **Componentes/Funciones Relevantes:** `VentasDashboard` (componente), `AdminPage`, `SeccionAcciones`, `SeccionFooter`, `SeccionHeader`, `obtenerVentas` (de `VentaActions.js`), `FormFiltrarVentas`, `BotonAgregarVentas`.
+    * **Componentes/Funciones Relevantes:** `VentasDashboard` (componente), `SeccionHeader`, `obtenerVentas` (de `VentaActions.js`), `FormFiltrarVentas`, `BotonAgregarVentas`.
     * **Lógica Principal:**
         *   Utiliza `useState` y `useEffect` para obtener y gestionar la lista de ventas.
         *   Llama a `obtenerVentas` para cargar todas las ventas.
@@ -37,4 +37,3 @@
         *   `EditarVenta`: Actualiza los datos de una venta existente.
         *   Todas las acciones interactúan directamente con el modelo `Venta` de Mongoose y utilizan `revalidatePath`.
     * **Modelos de Datos / Endpoints:** Modifica/consume el modelo `Venta` de Mongoose.
-

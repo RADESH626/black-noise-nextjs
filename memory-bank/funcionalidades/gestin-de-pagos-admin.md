@@ -9,9 +9,9 @@
 ### Archivos Involucrados:
 
 #### 📄 **Archivo:** `src/components/layout/admin/dashboards/PagosDashboard.jsx`
-* **Rol:** Componente principal del dashboard de gestión de pagos para administradores.
+* **Rol:** Componente principal del dashboard de gestión de pagos para administradores. Este componente no debe incluir el `AdminLayout` ni `AdminPage` directamente, ya que se espera que sea renderizado como un hijo de un componente de diseño de página que ya proporciona el `AdminLayout`. Las secciones de acciones (`SeccionAcciones` y `SeccionFooter`) se han eliminado para evitar cuadros grises no deseados y para alinear el diseño con otras páginas de administración. El botón "Agregar Pago" se integrará directamente en la sección del encabezado.
 * **Implementación Clave:**
-    * **Componentes/Funciones Relevantes:** `PagosDashboard` (componente), `AdminPage`, `SeccionAcciones`, `SeccionFooter`, `SeccionHeader`, `obtenerPagos` (de `PagoActions.js`), `FormFiltrarPagos`, `BotonAgregarPagos`.
+    * **Componentes/Funciones Relevantes:** `PagosDashboard` (componente), `SeccionHeader`, `obtenerPagos` (de `PagoActions.js`), `FormFiltrarPagos`, `BotonAgregarPagos`.
     * **Lógica Principal:**
         *   Utiliza `useState` y `useEffect` para obtener y gestionar la lista de pagos.
         *   Llama a `obtenerPagos` para cargar todos los pagos.
@@ -37,4 +37,3 @@
         *   `EditarPago`: Actualiza los datos de un pago existente.
         *   Todas las acciones interactúan directamente con el modelo `Pago` de Mongoose y utilizan `revalidatePath`.
     * **Modelos de Datos / Endpoints:** Modifica/consume el modelo `Pago` de Mongoose.
-

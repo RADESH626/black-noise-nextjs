@@ -2,9 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import AdminPage from '../AdminLayout';
-import SeccionAcciones from '../secciones/acciones/SeccionAcciones';
-import SeccionFooter from '../secciones/acciones/SeccionFooter';
 import SeccionHeader from '../secciones/acciones/SeccionHeader';
 import { obtenerVentas } from '@/app/acciones/VentaActions.js';
 import FormFiltrarVentas from './ventas/FormFiltrarVentas';
@@ -45,20 +42,16 @@ function VentasDashboard() {
     }
 
     return (
-        <AdminPage>
-            <SeccionAcciones>
-                <SeccionHeader>
-                    <h4 className='font-bold text-2xl text-black'>Gestión de Ventas</h4>
-                </SeccionHeader>
-                <SeccionFooter>
-                    <Link href="/admin/ventas/agregar" className="flex flex-row justify-center items-center gap-4">
-                        <BotonAgregarVentas />
-                    </Link>
-                </SeccionFooter>
-            </SeccionAcciones>
+        <>
+            <SeccionHeader>
+                <h4 className='font-bold text-2xl text-black'>Gestión de Ventas</h4>
+                <Link href="/admin/ventas/agregar" className="flex flex-row justify-center items-center gap-4">
+                    <BotonAgregarVentas />
+                </Link>
+            </SeccionHeader>
 
             <FormFiltrarVentas initialVentasFromPage={ventas} />
-        </AdminPage>
+        </>
     );
 }
 

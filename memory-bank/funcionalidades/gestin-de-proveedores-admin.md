@@ -9,9 +9,9 @@
 ### Archivos Involucrados:
 
 #### 📄 **Archivo:** `src/components/layout/admin/dashboards/GestionProveedoresDashboard.jsx` (Renombrado/Modificado)
-* **Rol:** Componente principal del dashboard de gestión de proveedores para administradores.
+* **Rol:** Componente principal del dashboard de gestión de proveedores para administradores. Este componente no debe incluir el `AdminLayout` ni `AdminPage` directamente, ya que se espera que sea renderizado como un hijo de un componente de diseño de página que ya proporciona el `AdminLayout`. Las secciones de acciones (`SeccionAcciones` y `SeccionFooter`) se han eliminado para evitar cuadros grises no deseados y para alinear el diseño con otras páginas de administración. El botón "Agregar Proveedor" se integrará directamente en la sección del encabezado.
 * **Implementación Clave:**
-    * **Componentes/Funciones Relevantes:** `GestionProveedoresDashboard` (componente), `AdminPage`, `SeccionAcciones`, `SeccionFooter`, `SeccionHeader`, `obtenerProveedoresHabilitados` (de `ProveedorActions.js`), `FormFiltrarProveedores`, `BotonAgregarProveedores`.
+    * **Componentes/Funciones Relevantes:** `GestionProveedoresDashboard` (componente), `SeccionHeader`, `obtenerProveedoresHabilitados` (de `ProveedorActions.js`), `FormFiltrarProveedores`, `BotonAgregarProveedores`.
     * **Lógica Principal:**
         *   Utiliza `useState` y `useEffect` para obtener y gestionar la lista de proveedores habilitados.
         *   Llama a `obtenerProveedoresHabilitados` para cargar los proveedores.

@@ -9,7 +9,7 @@
 ### Archivos Involucrados:
 
 #### 📄 **Archivo:** `src/components/layout/admin/dashboards/PedidosDashboard.jsx`
-* **Rol:** Componente principal del dashboard de gestión de pedidos para administradores (actualmente un placeholder).
+* **Rol:** Componente principal del dashboard de gestión de pedidos para administradores (actualmente un placeholder). Este componente no debe incluir el `AdminLayout` ni `AdminPage` directamente, ya que se espera que sea renderizado como un hijo de un componente de diseño de página que ya proporciona el `AdminLayout`. Las secciones de acciones (`SeccionAcciones` y `SeccionFooter`) se han eliminado para evitar cuadros grises no deseados y para alinear el diseño con otras páginas de administración.
 * **Implementación Clave:**
     * **Componentes/Funciones Relevantes:** `PedidosDashboard` (componente).
     * **Lógica Principal:** Es un marcador de posición que indica que el contenido real se agregará más tarde.
@@ -25,4 +25,3 @@
         *   `EditarPedido`: Actualiza los datos de un pedido existente (ej. estado).
         *   Todas las acciones interactúan directamente con el modelo `Pedido` de Mongoose y utilizan `revalidatePath`.
     * **Modelos de Datos / Endpoints:** Modifica/consume el modelo `Pedido` de Mongoose.
-
