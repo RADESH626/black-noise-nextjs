@@ -69,3 +69,14 @@
     * **Componentes/Funciones Relevantes:** `NextAuth`, `CredentialsProvider`, `MongoDBAdapter`.
     * **Lógica Principal:** Define los proveedores de autenticación (en este caso, credenciales), cómo se maneja la sesión y los callbacks para la autorización. Se conecta a la base de datos para validar usuarios.
     * **Modelos de Datos / Endpoints:** Interactúa con el modelo `Usuario` para la autenticación.
+
+#### 📄 **Archivo:** `src/app/admin/layout.jsx`
+* **Rol:** Contiene la barra de navegación del panel de administración, que ahora incluye un botón de "Cerrar Sesión".
+* **Implementación Clave:**
+    * **Componentes/Funciones Relevantes:** `signOut` (de `next-auth/react`).
+    * **Lógica Principal:** El botón "Cerrar Sesión" en la barra de navegación del administrador invoca la función `signOut` de NextAuth.js para terminar la sesión del usuario.
+    * **Modelos de Datos / Endpoints:** Interactúa con la funcionalidad de autenticación de NextAuth.js.
+* **Implementación Clave:**
+    * **Componentes/Funciones Relevantes:** `NextAuth`, `CredentialsProvider`, `MongoDBAdapter`.
+    * **Lógica Principal:** Define los proveedores de autenticación (en este caso, credenciales), cómo se maneja la sesión y los callbacks para la autorización. Se conecta a la base de datos para validar usuarios.
+    * **Modelos de Datos / Endpoints:** Interactúa con el modelo `Usuario` para la autenticación.

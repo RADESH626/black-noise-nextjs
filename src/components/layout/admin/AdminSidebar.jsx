@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { signOut } from 'next-auth/react';
 
 function AdminSidebar({ activeDashboard, onSelectDashboard }) {
   const navItems = [
@@ -55,13 +56,13 @@ function AdminSidebar({ activeDashboard, onSelectDashboard }) {
         </ul>
       </nav>
        <div className="mt-auto">
-        <Link
-          href="/"
+        <button
+          onClick={() => signOut({ callbackUrl: '/login' })} // Redirect to login page after logout
           className="flex items-center p-3 hover:bg-gray-700 rounded-md transition-colors w-full text-left"
         >
-          <Image src="/icons/icono-salida.svg" alt="Salir" width={20} height={20} className="mr-3 filter invert" />
-          <span>Volver al Inicio</span>
-        </Link>
+          <Image src="/icons/icono-salida.svg" alt="Cerrar Sesión" width={20} height={20} className="mr-3 filter invert" />
+          <span>Cerrar Sesión</span>
+        </button>
       </div>
     </aside>
   );
