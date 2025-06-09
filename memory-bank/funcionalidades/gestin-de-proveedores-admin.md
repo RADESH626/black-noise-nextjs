@@ -1,6 +1,6 @@
 # ✅ Funcionalidad: Gestión de Proveedores (Admin)
 
-**Descripción:** Permite a los administradores ver, filtrar, agregar, editar y eliminar proveedores directamente en la plataforma. Esta es la única vía para incorporar nuevos proveedores al sistema, reemplazando cualquier proceso de solicitud previo por parte de usuarios generales.
+**Descripción:** Permite a los administradores ver, filtrar, agregar, editar y eliminar proveedores directamente en la plataforma. Esta es la única vía para incorporar nuevos proveedores al sistema, reemplazando cualquier proceso de solicitud previo por parte de usuarios generales. Se ha eliminado el campo 'rut' del proveedor, ya que el 'nit' es suficiente para acceder a la información del RUT.
 
 **Flujo de Interacción:** Los administradores acceden a esta funcionalidad desde el panel de administración (`/admin`) seleccionando la opción "Proveedores". Pueden ver una lista de proveedores existentes, usar un formulario de filtro (placeholder) y utilizar el botón "Agregar Proveedor" que abre un modal para incorporar nuevos proveedores.
 

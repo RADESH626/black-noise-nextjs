@@ -78,18 +78,6 @@ function FormularioAgregarProveedor({ onSuccess }) {
         </div>
         <div className="relative">
           <label className="block mb-1 text-sm font-medium text-purple-400">
-            RUT
-          </label>
-          <InputGeneral
-            type="text"
-            id="rut"
-            name="rut"
-            placeholder="Registro Único Tributario"
-            required
-          />
-        </div>
-        <div className="relative">
-          <label className="block mb-1 text-sm font-medium text-purple-400">
             Especialidad
           </label>
           <select

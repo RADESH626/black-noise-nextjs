@@ -18,3 +18,23 @@
 
 **Próximos Pasos:**
 - El usuario debe intentar agregar un proveedor nuevamente y verificar si el problema se ha resuelto.
+
+### 9/6/2025, 2:53:00 p. m. - Eliminación del campo RUT del proveedor
+
+**Descripción:** Se eliminó el campo 'rut' del modelo de proveedor y de las funcionalidades relacionadas, ya que el 'nit' es suficiente para acceder a la información del RUT.
+
+**Acciones Realizadas:**
+- Se actualizó la documentación en `memory-bank/funcionalidades/gestin-de-proveedores-admin.md` para reflejar la eliminación del campo 'rut'.
+- Se eliminó el campo `rut` del esquema `ProveedorSchema` en `src/models/Proveedor.js`.
+- Se eliminaron las referencias al campo `rut` en la función `crearProveedor` en `src/app/acciones/ProveedorActions.js`, incluyendo la obtención del valor del `formData`, la validación de campos obligatorios y la creación del nuevo objeto `Proveedor`.
+- Se eliminó el campo de entrada `rut` del formulario `FormularioAgregarProveedor.jsx` en `src/components/layout/admin/dashboards/proveedores/FormularioAgregarProveedor.jsx`.
+- Se realizó una búsqueda exhaustiva del término 'rut' en `src/app/api/administrador/` y `src/components/` para asegurar que no quedaran referencias.
+
+**Archivos Modificados:**
+- `memory-bank/funcionalidades/gestin-de-proveedores-admin.md`
+- `src/models/Proveedor.js`
+- `src/app/acciones/ProveedorActions.js`
+- `src/components/layout/admin/dashboards/proveedores/FormularioAgregarProveedor.jsx`
+
+**Próximos Pasos:**
+- Verificar la funcionalidad de creación y gestión de proveedores para asegurar que la eliminación del campo 'rut' no haya introducido nuevos problemas.

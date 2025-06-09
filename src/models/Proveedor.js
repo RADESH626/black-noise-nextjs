@@ -17,10 +17,6 @@ const ProveedorSchema = new Schema({
         type: String,
         required: true
     },
-    rut: {
-        type: String,
-        required: true
-    },
     usuarioId: {
         type: Schema.Types.ObjectId,
         ref: 'Usuario',
