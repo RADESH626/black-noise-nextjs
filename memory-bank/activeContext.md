@@ -36,6 +36,17 @@ Se ha refactorizado la estructura del panel de proveedor para que su apariencia 
 *   **Cambio:** Se eliminaron las clases de estilo de contenedor y padding (`container mx-auto p-4`) del `div` principal y del div de mensaje de "No tienes pedidos".
 *   **Detalle:** Esto permite que la página herede el estilo del nuevo `ProveedorLayout`, asegurando la consistencia visual. Se ajustaron los colores de texto a `text-gray-800` y `text-gray-600` para mejor contraste en fondo blanco.
 
+## Task: Cambiar el botón de cerrar sesión del panel de proveedor a BotonGeneral
+
+### Descripción:
+Se ha modificado el componente `ProveedorSidebar` para utilizar el componente `BotonGeneral` para el botón de "Cerrar Sesión", asegurando consistencia en el diseño de los botones.
+
+### Archivos Modificados:
+
+#### 📄 **Archivo:** `src/components/layout/proveedor/ProveedorSidebar.jsx`
+*   **Cambio:** Se importó `BotonGeneral` y se reemplazó el elemento `button` existente por `BotonGeneral` para el botón de cerrar sesión.
+*   **Detalle:** Se eliminaron las clases de estilo Tailwind CSS del botón original, ya que `BotonGeneral` maneja su propio estilo.
+
 ### Próximos Pasos:
 1.  Generar y presentar el comando `git add`.
 2.  Esperar confirmación del usuario.

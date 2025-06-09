@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { signOut } from "next-auth/react";
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 export default function ProveedorSidebar({ activeDashboard, onSelectDashboard }) {
   const pathname = usePathname();
@@ -34,12 +35,12 @@ export default function ProveedorSidebar({ activeDashboard, onSelectDashboard })
         ))}
       </nav>
       <div className="p-4 border-t border-gray-700">
-        <button
+        <BotonGeneral
           onClick={() => signOut({ callbackUrl: "/login" })}
-          className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+          className="w-full" // Apply w-full to BotonGeneral if needed for full width
         >
           Cerrar Sesión
-        </button>
+        </BotonGeneral>
       </div>
     </aside>
   );
