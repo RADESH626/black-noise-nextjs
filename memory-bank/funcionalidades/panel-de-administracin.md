@@ -44,3 +44,11 @@
         *   Define `obtenerMetricasDashboard` para calcular y retornar el total de ventas, el número de usuarios y el número de pedidos pendientes.
         *   Maneja la conexión a la base de datos y la lógica de agregación.
     * **Modelos de Datos / Endpoints:** Interactúa directamente con los modelos de Mongoose (`Venta`, `Usuario`, `Pedido`) para realizar consultas de agregación.
+
+#### 📄 **Directorio:** `src/app/api/administrador/`
+* **Rol:** Contiene las rutas de la API para la gestión de entidades por parte del administrador.
+* **Refactorización Propuesta:**
+    *   **Manejo de Errores Consistente:** Implementar una estrategia unificada para el manejo y reporte de errores en todas las rutas.
+    *   **Validación Centralizada:** Centralizar la lógica de validación de entrada para asegurar la consistencia y reducir la duplicación de código.
+    *   **Abstracción de Operaciones CRUD:** Crear funciones o un manejador base reutilizable para operaciones CRUD comunes (Crear, Leer, Actualizar, Eliminar) para mejorar la modularidad y reducir la redundancia.
+    *   **Autenticación y Autorización Robustas:** Fortalecer las verificaciones de autenticación y autorización para todas las rutas de administrador, asegurando que solo los usuarios autorizados puedan acceder a funcionalidades sensibles.

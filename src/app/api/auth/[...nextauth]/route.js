@@ -13,8 +13,6 @@ export const authOptions = {
       },
       id: "credentials",
       async authorize(credentials, req) {
-        console.log("Attempting authentication with credentials:", credentials);
-
         try {
           const user = await ObtenerUsuarioPorCorreo(credentials.email);
           
@@ -23,8 +21,6 @@ export const authOptions = {
           }
 
           const isValid = await bcrypt.compare(credentials.password, user.password);
-
-          console.log("User found:", user);
           
           if (!isValid) {
             return null;

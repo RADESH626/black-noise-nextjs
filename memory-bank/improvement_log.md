@@ -11,3 +11,4 @@ This document logs lessons learned from past errors and provides corrective dire
 *   **Active Self-Correction**: If at any point a deviation from instructions is realized, stop, announce the error, and get back on the correct workflow.
 *   **File Deletion Rule**: When deleting a file, always check if the parent directory becomes empty. If it does, delete the empty directory as well.
 *   **Command Execution Reliability**: If a command execution fails, log the command and the reason for failure in this document to inform future command choices.
+*   **Proactive Task Suggestion**: When a refactoring aspect is completed, suggest starting the refactoring of another functionality in a new task. This should be saved in the memory bank.

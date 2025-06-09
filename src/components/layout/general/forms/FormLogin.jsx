@@ -30,7 +30,7 @@ const initialState = {
   email: null,
   password: null,
   userRole: null,
-  readyForSignIn: false,
+  readyForSignIn: false, // Keep this flag for clarity, though `state.success` will also indicate readiness
 };
 
 function FormLogin() {
@@ -44,7 +44,8 @@ function FormLogin() {
   useEffect(() => {
     console.log('Frontend Login: State changed:', state);
     
-    if (state.readyForSignIn && state.email && state.password) {
+    // If the server action was successful and indicates readiness for client-side signIn
+    if (state.success && state.readyForSignIn && state.email && state.password) {
       console.log('Frontend Login: Datos recibidos de Server Action, intentando signIn.');
       console.log('Frontend Login: User role from state:', state.userRole);
       
@@ -80,7 +81,7 @@ function FormLogin() {
       };
       handleSignIn();
     } else if (state.message) {
-       // Show messages from server-side validation if any
+       // Show messages from server-side validation or errors if any
        showPopUp(state.message, state.success ? 'success' : 'error');
     }
   }, [state, showPopUp, router]); // Dependencias del useEffect

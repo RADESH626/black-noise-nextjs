@@ -47,7 +47,7 @@ export async function loginAction(prevState, formData) {
 
   // Perform basic server-side validation if needed
   if (!email || !password) {
-    return { message: 'Por favor, ingresa correo y contraseña.', success: false };
+    return { message: 'Por favor, ingresa correo y contraseña.', success: false, data: null };
   }
 
   try {
@@ -55,14 +55,14 @@ export async function loginAction(prevState, formData) {
     const user = await ObtenerUsuarioPorCorreo(email);
     
     if (!user) {
-      return { message: 'Usuario no encontrado.', success: false };
+      return { message: 'Usuario no encontrado.', success: false, data: null };
     }
 
     // Verify password
     const isValid = await bcrypt.compare(password, user.password);
     
     if (!isValid) {
-      return { message: 'Credenciales incorrectas.', success: false };
+      return { message: 'Credenciales incorrectas.', success: false, data: null };
     }
 
     console.log('Server Action Login: Usuario autenticado, rol:', user.rol);
@@ -73,12 +73,12 @@ export async function loginAction(prevState, formData) {
       password, 
       userRole: user.rol,
       message: null, 
-      success: false, 
+      success: true, // Set to true as server-side validation passed and ready for client-side signIn
       readyForSignIn: true 
     };
   } catch (error) {
     console.error('Server Action Login: Error:', error);
-    return { message: 'Error del servidor durante el login.', success: false };
+    return { message: 'Error del servidor durante el login.', success: false, data: null };
   }
 }
 

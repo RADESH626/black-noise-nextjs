@@ -12,7 +12,7 @@ const productionMiddleware = withAuth(
     }
 
     // Example: Redirect provider users from non-provider pages to /proveedor
-    if (token?.role === "PROVEVEEDOR" && !pathname.startsWith("/proveedor")) {
+    if (token?.role === "PROVEEDOR" && !pathname.startsWith("/proveedor")) {
       return NextResponse.redirect(new URL("/proveedor", req.url));
     }
 
