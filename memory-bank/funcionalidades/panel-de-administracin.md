@@ -1,6 +1,6 @@
 # ✅ Funcionalidad: Panel de Administración
 
-**Descripción:** Proporciona una interfaz centralizada para que los administradores gestionen diversas entidades y operaciones del sistema, incluyendo usuarios, diseños, proveedores, solicitudes de proveedor, pedidos, ventas y pagos.
+**Descripción:** Proporciona una interfaz centralizada para que los administradores gestionen diversas entidades y operaciones del sistema, incluyendo usuarios, diseños, pedidos, ventas y pagos.
 
 **Flujo de Interacción:** Los administradores acceden al panel a través de `/admin` después de iniciar sesión. Una barra lateral (`AdminSidebar`) les permite navegar entre los diferentes dashboards de gestión. El botón "Volver al Inicio" en la barra de navegación ha sido reemplazado por un botón "Cerrar Sesión" para una gestión de sesión más directa.
 

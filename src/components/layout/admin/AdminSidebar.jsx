@@ -10,7 +10,6 @@ function AdminSidebar({ activeDashboard, onSelectDashboard }) {
     { id: 'usuarios', label: 'Usuarios', icon: '/icons/icono-persona.svg', needsInvert: true },
     { id: 'designs', label: 'Diseños', icon: '/icons/icono-editar.svg' },
     { id: 'proveedores', label: 'Proveedores', icon: '/icons/icono-persona+.svg', needsInvert: true },
-    { id: 'solicitudes', label: 'Solicitudes', icon: '/icons/icono-enviar-correo.svg' },
     { id: 'pedidos', label: 'Pedidos', icon: '/icons/icono-carrito.svg', needsInvert: true },
     { id: 'ventas', label: 'Ventas', icon: '/icons/icono-bolsa.svg', needsInvert: true },
     { id: 'pagos', label: 'Pagos', icon: '/icons/icono-paypal.svg' }
