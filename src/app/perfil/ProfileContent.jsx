@@ -81,9 +81,9 @@ function ProfileContent() { // Removed user, designs, and error props
   };
 
   return (
-    <div className="mx-auto p-4 md:p-8  bg-black text-white w-screen h-screen">
-      {/* User Info Section - Re-added here */}
-      <div className="bg-black p-6 md:p-8 rounded-lg shadow-lg mb-8">
+    <div className="mx-auto p-4 md:p-8 bg-black text-white w-screen flex flex-col min-h-screen">
+      {/* User Info Section */}
+      <div className="bg-black p-6 md:p-8 rounded-lg shadow-lg mb-8 flex-shrink-0">
         <div className="flex flex-col md:flex-row items-center">
           {/* imagen */}
           <div className="w-32 h-32 md:w-60 md:h-60 bg-gray-700 rounded-lg mb-4 md:mb-0 md:mr-8 ">
@@ -92,7 +92,7 @@ function ProfileContent() { // Removed user, designs, and error props
 
           {/* seccion info */}
           <div className="flex-grow text-center md:text-left">
-            <h1 className="text-3xl md:text-4xl font-bold mb-1">{user?.primerNombre} {user?.primerApellido}</h1> {/* Use fetched name */}
+            <h1 className="text-3xl md:text-4xl font-bold mb-1">{user?.primerNombre} {user?.primerApellido}</h1>
 
             {/* info */}
             <div className="text-gray-400 mb-3">
@@ -123,7 +123,7 @@ function ProfileContent() { // Removed user, designs, and error props
       </div>
 
       {/* nav */}
-      <nav className="mb-8">
+      <nav className="mb-8 flex-shrink-0">
         <div className="flex border-b border-gray-700">
           <button
             className={`py-3 px-6 text-lg font-medium ${activeTab === 'designs' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`}
@@ -146,22 +146,25 @@ function ProfileContent() { // Removed user, designs, and error props
         </div>
       </nav>
 
-      {activeTab === 'designs' && (
-        <DesignsComponent
-          loading={loading}
-          error={error}
-          userDesigns={userDesigns}
-          handleEditDesign={handleEditDesign}
-        />
-      )}
+      {/* Content Area */}
+      <div className="flex-grow overflow-y-auto">
+        {activeTab === 'designs' && (
+          <DesignsComponent
+            loading={loading}
+            error={error}
+            userDesigns={userDesigns}
+            handleEditDesign={handleEditDesign}
+          />
+        )}
 
-      {activeTab === 'orders' && (
-        <PedidosComponent userId={user?.id} />
-      )}
+        {activeTab === 'orders' && (
+          <PedidosComponent userId={user?.id} />
+        )}
 
-      {activeTab === 'cart' && (
-        <CartComponent />
-      )}
+        {activeTab === 'cart' && (
+          <CartComponent />
+        )}
+      </div>
     </div>
   );
 }

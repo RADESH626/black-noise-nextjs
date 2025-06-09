@@ -1,24 +1,28 @@
 # Active Context - Current Session State
 
-## Session Summary: Corrected user data fetching logic in ProfileContent.jsx - ✅ COMPLETED
-**Date**: 9/6/2025, 9:05:07 a. m.
-**Objective**: Resolve the issue of user profile information not displaying by correcting the data fetching and state update logic in `ProfileContent.jsx`.
+## Session Summary: Implementación de altura dinámica y scroll interno en componentes de perfil - ✅ COMPLETED
+**Date**: 9/6/2025, 9:15:41 a. m.
+**Objective**: Ajustar los componentes de diseños, carrito y pedidos para que ocupen el espacio restante de la pantalla cuando no tienen contenido, y se adapten a la altura de su contenido con scroll interno cuando sí lo tienen.
 
 ---
 
 ### ✅ Changes Implemented This Session:
 
+*   **File:** `src/app/perfil/DesignsComponent.jsx`
+    *   **Change:** Revertido el cambio de `min-h-screen` en el div de mensaje vacío.
+*   **File:** `src/app/perfil/CartComponent.jsx`
+    *   **Change:** Revertido el cambio de `min-h-screen` en el div de mensaje vacío.
+*   **File:** `src/app/perfil/PedidosComponent.jsx`
+    *   **Change:** Revertido el cambio de `min-h-screen` a `min-h-full` en el div de mensaje vacío.
 *   **File:** `src/app/perfil/ProfileContent.jsx`
-    *   **Change:** Corrected the destructuring of the `ObtenerUsuarioPorId` Server Action result. Previously, it was incorrectly destructuring `user` and `error` properties, while the function directly returns the user object or an error object. The `useEffect` now correctly assigns the fetched user data to `currentUser` and handles potential errors.
-*   **File:** `memory-bank/funcionalidades/gestin-de-perfil-de-usuario.md`
-    *   **Change:** Updated documentation to reflect that `ProfileContent.jsx` now fetches and displays full user data, including a more detailed list of displayed fields.
+    *   **Change:** Implementado un layout flexbox (`flex flex-col min-h-screen`) para el contenedor principal. Las secciones de información de usuario y navegación ahora tienen `flex-shrink-0`. El área de contenido de las pestañas (`DesignsComponent`, `PedidosComponent`, `CartComponent`) está envuelta en un `div` con `flex-grow overflow-y-auto`, lo que le permite ocupar el espacio restante y manejar el scroll internamente.
+*   **File:** `memory-bank/activeContext.md`
+    *   **Change:** Actualización del log de sesión.
 
 ### 💡 Key Decisions & New Patterns:
 
-*   Identified a critical error in how the `ObtenerUsuarioPorId` Server Action's return value was being handled in `ProfileContent.jsx`, leading to `currentUser` not being populated correctly.
-*   Corrected the data assignment to ensure the full user profile is available for rendering.
-*   Expanded the displayed user information to include all standard user model fields for better visibility and debugging.
+*   Se adoptó un enfoque de layout flexbox en `ProfileContent.jsx` para gestionar la altura de los componentes de las pestañas. Esto permite que el área de contenido de las pestañas se expanda para llenar el espacio vertical disponible cuando el contenido es escaso, y que muestre un scrollbar interno cuando el contenido excede ese espacio, logrando el comportamiento dinámico y consistente solicitado por el usuario.
 
 ### ➡️ Next Steps:
 
-*   Generate and present `git add` and `git commit` commands.
+*   No hay pasos pendientes relacionados con esta tarea.

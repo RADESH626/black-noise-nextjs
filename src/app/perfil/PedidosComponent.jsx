@@ -22,7 +22,7 @@ const PedidosContent = () => {
 
   if (!pedidoCompleto) {
     return (
-      <div className="min-h-screen flex justify-center items-center text-gray-400">
+      <div className="min-h-full flex justify-center items-center text-gray-400">
         No hay pedidos aún.
       </div>
     );
@@ -31,7 +31,7 @@ const PedidosContent = () => {
   const { cliente, productos, fecha, proveedor, metodoPago } = pedidoCompleto;
 
   return (
-    <div className="min-h-screen bg-black text-white font-poppins p-4">
+    <div className="bg-black text-white font-poppins p-4">
       <h2 className="text-center text-2xl font-bold mt-4">Tus Pedidos</h2>
 
       <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
