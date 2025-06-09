@@ -18,18 +18,23 @@ const productionMiddleware = withAuth(
 
     // Allow access if no specific redirection is needed
     return NextResponse.next();
-  },
-  {
-    callbacks: {
-      authorized: ({ token }) => {
-        // Allow access to all authenticated users by default
-        return !!token;
+    },
+    {
+      callbacks: {
+        authorized: ({ token, req }) => {
+          const { pathname } = req.nextUrl;
+          // Allow access to login and registration pages for unauthenticated users
+          if (pathname === "/login" || pathname === "/registro") {
+            return true;
+          }
+          // Allow access to all authenticated users by default for other pages
+          return !!token;
+        },
       },
-    },
-    pages: {
-      signIn: "/login", // Redirect unauthenticated users to the login page
-    },
-  }
+      pages: {
+        signIn: "/login", // Redirect unauthenticated users to the login page
+      },
+    }
 );
 
 export default productionMiddleware;

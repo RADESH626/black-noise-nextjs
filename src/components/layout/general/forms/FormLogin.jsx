@@ -120,11 +120,9 @@ function FormLogin() {
 
       <div className="text-center mt-5">
         <p className="mb-4">¿No tienes una cuenta?</p>
-        <a href="/registro" id="showRegister">
-          <BotonGeneral>
-            Regístrate ahora
-          </BotonGeneral>
-        </a>
+        <BotonGeneral type="button" onClick={() => { console.log('Attempting to redirect to /registro'); router.push('/registro'); }}>
+          Regístrate ahora
+        </BotonGeneral>
       </div>
 
     </form>

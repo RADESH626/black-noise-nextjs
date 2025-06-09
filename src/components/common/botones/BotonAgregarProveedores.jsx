@@ -1,9 +1,9 @@
 import React from 'react';
 
-function BotonAgregarProveedores() {
+function BotonAgregarProveedores({ children, ...props }) {
   return (
-    <button>
-      Agregar Proveedor
+    <button {...props}>
+      {children || "Agregar Proveedor"}
     </button>
   );
 }

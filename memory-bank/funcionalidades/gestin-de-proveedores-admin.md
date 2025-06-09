@@ -16,8 +16,14 @@
         *   Utiliza `useState` y `useEffect` para obtener y gestionar la lista de proveedores habilitados.
         *   Llama a `obtenerProveedoresHabilitados` para cargar los proveedores.
         *   Renderiza un `FormFiltrarProveedores` (actualmente un placeholder).
-        *   Proporciona un enlace (`Link`) a la página de agregar proveedor (e.g., `/admin/proveedores/agregar`).
+        *   El botón "Agregar Proveedor" ahora abre un modal que contiene el `FormularioAgregarProveedor`.
+        *   Después de agregar un proveedor exitosamente en el modal, la lista de proveedores se actualiza automáticamente.
     * **Modelos de Datos / Endpoints:** Consume `ProveedorActions.js` para obtener datos de proveedores.
+
+#### 📄 **Archivo:** `src/components/common/botones/BotonAgregarProveedores.jsx` (Modificado)
+* **Rol:** Componente de botón reutilizable para agregar proveedores. Ahora acepta y aplica `children` y otras props (como `onClick` y `className`) para mayor flexibilidad en su uso y estilizado.
+* **Implementación Clave:**
+    * **Lógica Principal:** Renderiza un botón HTML estándar, pasando todas las props recibidas directamente al elemento `<button>`. El texto por defecto es "Agregar Proveedor", pero puede ser sobrescrito por la prop `children`.
 
 #### 📄 **Archivo:** `src/components/layout/admin/dashboards/proveedores/FormFiltrarProveedores.jsx`
 * **Rol:** Componente de formulario (placeholder) para filtrar proveedores en el panel de administración.

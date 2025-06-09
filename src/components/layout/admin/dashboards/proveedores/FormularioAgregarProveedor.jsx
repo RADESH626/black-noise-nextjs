@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { useActionState, useFormStatus } from "react-dom";
+import React, { useEffect, useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { usePopUp } from "@/context/PopUpContext";
-import BotonGeneral from "@/components/common/BotonGeneral";
-import InputGeneral from "@/components/common/InputGeneral";
+import BotonGeneral from "@/components/common/botones/BotonGeneral";
+import InputGeneral from "@/components/common/inputs/InputGeneral";
 import { crearProveedor } from "@/app/acciones/ProveedorActions";
 
 // Submit button component with pending state
