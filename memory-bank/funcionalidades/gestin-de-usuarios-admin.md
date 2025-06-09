@@ -34,6 +34,7 @@
         *   Maneja el estado de envío (`pending`) y muestra feedback al usuario a través de `usePopUp`.
         *   Pasa los resultados de la búsqueda a un callback `onSearchSuccess` para que el componente padre (`UsuariosClientPage`) actualice la tabla.
     * **Modelos de Datos / Endpoints:** Interactúa con `UsuariosActions.js` para filtrar usuarios.
+    * **Notas de Refactorización:** Se corrigieron las rutas de importación para `BotonGeneral`, `usePopUp`, y `FiltrarUsuarios` para resolver errores de "Module not found".
 
 #### 📄 **Archivo:** `src/components/layout/admin/usuarios/forms/FormAgregarUsuarios.jsx`
 * **Rol:** Formulario para que los administradores agreguen un nuevo usuario individualmente.

@@ -1,10 +1,11 @@
 "use client";
 import { useEffect } from "react";
-import { useActionState, useFormStatus } from 'react-dom';
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { usePopUp } from '@/context/PopUpContext';
 import { FiltrarUsuarios } from '@/app/acciones/UsuariosActions';
-import Input from '@/components/common/Input';
-import BotonGeneral from '@/components/common/BotonGeneral';
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
+import Input from '@/components/common/inputs/InputGeneral';
 
 function SubmitButton({ customText = 'Buscar' }) {
   const { pending } = useFormStatus();
