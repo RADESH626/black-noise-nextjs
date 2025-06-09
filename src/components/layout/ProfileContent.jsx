@@ -7,9 +7,9 @@ import { useCartStorage } from "@/hooks/useCartStorage"; // Import useCartStorag
 import { useEffect, useState } from "react"; // Import useEffect and useState
 import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions"; // Import the server action
 import DesignsComponent from "../common/DesignsComponent"; // Import DesignsComponent
-import PedidosComponent from "./PedidosComponent"; // Import PedidosComponent
-import CartComponent from "./CartComponent"; // Import CartComponent
-import PagosComponent from "./PagosComponent"; // Import PagosComponent
+import PedidosComponent from "../common/PedidosComponent"; // Import PedidosComponent
+import CartComponent from "../common/CartComponent"; // Import CartComponent
+import PagosComponent from "../common/PagosComponent"; // Import PagosComponent
 import { ObtenerUsuarioPorId } from "@/app/acciones/UsuariosActions"; // Import the server action
 
 function ProfileContent() { // Removed user, designs, and error props
