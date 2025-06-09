@@ -2,12 +2,10 @@
 
 import { useState, useEffect } from 'react'; // Import useState and useEffect
 import Link from 'next/link';
-import AdminPage from '../AdminLayout'; // Adjusted path, assuming AdminLayout is the correct component
-import SeccionAcciones from '../secciones/acciones/SeccionAcciones';
-import SeccionFooter from '../secciones/acciones/SeccionFooter';
 import SeccionHeader from '../secciones/acciones/SeccionHeader';
 import { obtenerDesigns } from '@/app/acciones/DesignActions.js';
 import FormFiltrarDesigns from './designs/FormFiltrarDesigns';
+import DesignsTable from './designs/DesignsTable'; // Import DesignsTable
 import BotonAgregarDesigns from '../../../common/botones/BotonAgregarDesigns';
 
 function DesignsDashboard() { // Remove async keyword
@@ -20,8 +18,8 @@ function DesignsDashboard() { // Remove async keyword
             try {
                 setLoading(true);
                 const result = await obtenerDesigns();
-                if (result && result.designs && Array.isArray(result.designs)) {
-                    setDesigns(result.designs);
+                if (result && result.data && Array.isArray(result.data)) {
+                    setDesigns(result.data);
                 } else {
                     setError(result?.error || "No se recibió un array de diseños.");
                     console.error("Error al cargar diseños en DesignsDashboard.jsx:", result?.error || "No se recibió un array de diseños.");
@@ -45,20 +43,20 @@ function DesignsDashboard() { // Remove async keyword
     }
 
     return (
-        <AdminPage>
-            <SeccionAcciones>
-                <SeccionHeader>
+        <>
+            <SeccionHeader>
+                <div className="flex justify-between items-center w-full">
                     <h4 className='font-bold text-2xl text-black'>Gestión de Diseños</h4>
-                </SeccionHeader>
-                <SeccionFooter>
                     <Link href="/admin/designs/agregar" className="flex flex-row justify-center items-center gap-4">
                         <BotonAgregarDesigns />
                     </Link>
-                </SeccionFooter>
-            </SeccionAcciones>
+                </div>
+            </SeccionHeader>
 
-            <FormFiltrarDesigns initialDesignsFromPage={designs} /> {/* Pass designs from state */}
-        </AdminPage>
+            <FormFiltrarDesigns /> {/* No longer needs initialDesignsFromPage */}
+
+            <DesignsTable designs={designs} /> {/* Pass designs to DesignsTable */}
+        </>
     );
 }
 

@@ -12,7 +12,7 @@ function AdminLayoutContent({ children }) {
         activeDashboard={activeDashboard}
         onSelectDashboard={handleSelectDashboard}
       />
-      <main className="flex-1 p-6 overflow-y-auto">
+      <main className="flex-1 p-6 overflow-y-auto bg-white !important">
         {children}
       </main>
     </div>

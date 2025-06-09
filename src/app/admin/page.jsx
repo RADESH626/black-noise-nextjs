@@ -9,9 +9,11 @@ import GestionProveedoresDashboard from '../../components/layout/admin/dashboard
 import PedidosDashboard from '../../components/layout/admin/dashboards/PedidosDashboard';
 import VentasDashboard from '../../components/layout/admin/dashboards/VentasDashboard';
 import PagosDashboard from '../../components/layout/admin/dashboards/PagosDashboard';
+import HomeDashboard from '../../components/layout/admin/dashboards/HomeDashboard'; // Import HomeDashboard
 
 // Mapa de componentes para un renderizado limpio
 const dashboardComponents = {
+  home: <HomeDashboard />, // Add HomeDashboard
   usuarios: <UsuariosDashboard />,
   designs: <DesignsDashboard />,
   proveedores: <GestionProveedoresDashboard />,
@@ -25,7 +27,8 @@ export default function AdminPage() {
 
   console.log('AdminPage: activeDashboard is', activeDashboard);
 
-  const CurrentDashboard = dashboardComponents[activeDashboard] || <p>Dashboard no encontrado.</p>;
+  // Set HomeDashboard as default if activeDashboard is not found
+  const CurrentDashboard = dashboardComponents[activeDashboard] || dashboardComponents.home;
 
   return (
     <>

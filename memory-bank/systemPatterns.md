@@ -278,14 +278,21 @@ src/
 │   ├── acciones/
 │   │   └── UsuariosActions.js    # All user-related Server Actions
 │   ├── admin/
+│   │   └── layout.jsx            # Admin layout with sidebar and main content area
 │   │   └── usuarios/
 │   │       └── components/       # Admin-specific components
 │   └── api/                      # API routes (legacy/external)
 ├── components/
 │   ├── common/                   # Reusable components
 │   └── layout/                   # Layout-specific components
+│       └── admin/
+│           └── AdminLayout.jsx   # Core Admin layout component (used by app/admin/layout.jsx)
+│           └── AdminSidebar.jsx  # Admin sidebar navigation
 └── models/                       # Database models
 ```
+
+### Admin Layout Styling
+The main content area within the admin layout (`src/app/admin/layout.jsx` and `src/components/layout/admin/AdminLayout.jsx`) should have a white background to ensure proper visibility of dashboard components. This is achieved by applying `bg-white` to the `main` element. If the background does not appear white, it may be necessary to use `!important` (e.g., `bg-white !important`) to override conflicting styles, though this should be a last resort.
 
 ### Import Patterns
 ```javascript
