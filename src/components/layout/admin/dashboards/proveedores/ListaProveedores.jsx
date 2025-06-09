@@ -11,6 +11,18 @@ import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import { usePopUp } from '@/context/PopUpContext';
 import { useActionState } from 'react'; // For React 19
 import { useFormStatus } from 'react-dom'; // For React 19
+import { MetodoPago } from '@/models/enums/pago/MetodoPago';
+
+const PAYMENT_METHODS = Object.values(MetodoPago);
+const PAYMENT_METHOD_DISPLAY_NAMES = {
+    EFECTIVO: 'Efectivo',
+    TRANSFERENCIA_BANCARIA: 'Transferencia Bancaria',
+    TARJETA_CREDITO: 'Tarjeta Crédito',
+    TARJETA_DEBITO: 'Tarjeta Débito',
+    NEQUI: 'Nequi',
+    DAVIPLATA: 'Daviplata',
+    PSE: 'PSE',
+};
 
 // Component for the delete provider button, using Server Actions pattern
 function DeleteProviderForm({ providerId, onProviderDeleted }) {
@@ -91,15 +103,17 @@ export default function ListaProveedores({ initialProviders }) {
               <th className="py-3 px-6 text-left">Dueño</th>
               <th className="py-3 px-6 text-left">Contacto</th>
               <th className="py-3 px-6 text-left">Dirección</th>
-              <th className="py-3 px-6 text-left">Métodos de Pago</th>
+              {PAYMENT_METHODS.map((method) => (
+                <th key={method} className="py-3 px-6 text-center whitespace-nowrap">{PAYMENT_METHOD_DISPLAY_NAMES[method]}</th>
+              ))}
               <th className="py-3 px-6 text-center">Acciones</th>
             </tr>
           </thead>
           <tbody className='bg-gray-300 divide-y divide-gray-400'>
             {loading ? (
-                <tr><TdGeneral colSpan="6" className="text-center py-4">Actualizando...</TdGeneral></tr>
+                <tr><TdGeneral colSpan={6 + PAYMENT_METHODS.length} className="text-center py-4">Actualizando...</TdGeneral></tr>
             ) : providers.length === 0 ? (
-                <tr><TdGeneral colSpan="6" className="text-center py-4">No se encontraron proveedores.</TdGeneral></tr>
+                <tr><TdGeneral colSpan={6 + PAYMENT_METHODS.length} className="text-center py-4">No se encontraron proveedores.</TdGeneral></tr>
             ) : (
                 providers.map((provider) => (
                     <tr key={provider._id} className="hover:bg-gray-200">
@@ -123,15 +137,11 @@ export default function ListaProveedores({ initialProviders }) {
                         <TdGeneral>
                             {provider.direccionEmpresa}
                         </TdGeneral>
-                        <TdGeneral>
-                            {provider.metodosDePago && provider.metodosDePago.length > 0 ? (
-                                <ul className="list-disc list-inside text-sm">
-                                    {provider.metodosDePago.map((method, index) => (
-                                        <li key={index}>{method}</li>
-                                    ))}
-                                </ul>
-                            ) : 'N/A'}
-                        </TdGeneral>
+                        {PAYMENT_METHODS.map((method) => (
+                            <TdGeneral key={method} className="text-center">
+                                {provider.metodosPagoAceptados && provider.metodosPagoAceptados.includes(method) ? 'X' : '-'}
+                            </TdGeneral>
+                        ))}
                         <TdGeneral>
                             <div className="flex flex-col md:flex-row gap-2 items-center justify-center">
                                 <BotonEditar onClick={() => {
