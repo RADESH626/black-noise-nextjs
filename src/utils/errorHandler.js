@@ -2,13 +2,14 @@ import { NextResponse } from 'next/server';
 
 export const handleError = (error, message = 'An unexpected error occurred', status = 500) => {
     console.error(message, error);
-    return NextResponse.json(
-        { 
-            error: message, 
-            details: error.message || 'No additional details available' 
-        }, 
-        { status }
-    );
+    // Ensure that the returned object is a plain JavaScript object
+    return {
+        success: false,
+        message: error.message || message,
+        statusCode: error.statusCode || status,
+        // Optionally, include more details if needed, ensuring they are serializable
+        details: error.details || null, 
+    };
 };
 
 export class CustomError extends Error {

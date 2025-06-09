@@ -178,7 +178,6 @@ export {
     guardarPedido,
     obtenerPedidos,
     obtenerPedidosPorUsuarioId, // This function is now deprecated for supplier use, but kept for user-specific orders
-    obtenerPedidosPorProveedorId, // New function for supplier-specific orders
     ObtenerPedidoPorId,
     EditarPedido
 };

@@ -42,10 +42,18 @@
 - **Login Page (`src/app/login/page.jsx`):**
     - Temporarily simplified to a basic text element for debugging.
     - Reverted to original complex component structure after fix verification.
+- **Error Handling (`src/utils/errorHandler.js`):**
+    - Modified `handleError` to return a plain JavaScript object instead of a `NextResponse` object or a class instance, resolving the "Classes or null prototypes are not supported" error when passing data from Server Actions to Client Components.
+- **Login Form Logic (`src/components/layout/general/forms/FormLogin.jsx`):**
+    - Refined the `useEffect` to ensure that success messages and redirection only occur if the client-side `signIn` function is successful, preventing contradictory messages when authentication fails.
+- **Duplicate Export (`src/app/acciones/PedidoActions.js`):**
+    - Removed a duplicate export of `obtenerPedidosPorProveedorId`, resolving a compilation error.
 
 ### Key Decisions:
 - Identified `SyntaxError: Unexpected token '<'` and `CLIENT_FETCH_ERROR` as symptoms of middleware incorrectly intercepting static asset and NextAuth API requests, returning HTML instead of expected JavaScript/JSON.
 - Prioritized fixing middleware configuration to ensure proper asset loading and NextAuth functionality.
+- Addressed Next.js Server Actions serialization limitations by ensuring plain object returns from error handling.
+- Corrected client-side login flow to accurately reflect `signIn` success/failure.
 
 ### Next Steps:
 - Update `progress.md`.

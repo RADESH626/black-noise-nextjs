@@ -99,11 +99,30 @@ async function EditarPago(id, data) {
     }
 }
 
+// Obtener pagos por usuario ID
+async function obtenerPagosPorUsuarioId(usuarioId) {
+    console.log('DEBUG: Entering obtenerPagosPorUsuarioId with usuarioId:', usuarioId);
+    try {
+        await connectDB();
+        console.log('DEBUG: Database connected for obtenerPagosPorUsuarioId.');
+        const pagos = await Pago.find({ usuarioId })
+            .populate('usuarioId', 'nombreUsuario correo') // Popula algunos campos de Usuario
+            .populate('ventaId', '_id') // Popula el ID de Venta
+            .lean();
+        console.log('DEBUG: Payments retrieved for user ID:', usuarioId, 'count:', pagos.length);
+        return { success: true, pagos: JSON.parse(JSON.stringify(pagos)) };
+    } catch (error) {
+        console.error('ERROR in obtenerPagosPorUsuarioId:', error);
+        return { success: false, message: 'Error al obtener los pagos del usuario: ' + error.message };
+    }
+}
+
 // No se implementa EliminarPago directamente, los pagos suelen cambiar de estado (ej. ANULADO)
 
 export {
     guardarPago,
     obtenerPagos,
     ObtenerPagoPorId,
-    EditarPago
+    EditarPago,
+    obtenerPagosPorUsuarioId
 };

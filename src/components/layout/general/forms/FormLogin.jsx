@@ -80,9 +80,10 @@ function FormLogin() {
         }
       };
       handleSignIn();
-    } else if (state.message) {
-       // Show messages from server-side validation or errors if any
-       showPopUp(state.message, state.success ? 'success' : 'error');
+    } else if (state.message && !state.success) { // Only show error messages from server if signIn was not attempted or failed
+       showPopUp(state.message, 'error');
+    } else if (state.message && state.success) { // Show success message from server if signIn was not needed (e.g., already authenticated)
+      showPopUp(state.message, 'success');
     }
   }, [state, showPopUp, router]); // Dependencias del useEffect
 
