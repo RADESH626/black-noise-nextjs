@@ -1,6 +1,6 @@
 "use client";
 
-import ProfileContent from "./ProfileContent"; // Import ProfileContent
+import ProfileContent from "@/components/layout/ProfileContent"; // Import ProfileContent
 
 function ProfilePage() {
   return <ProfileContent />; // Render ProfileContent directly

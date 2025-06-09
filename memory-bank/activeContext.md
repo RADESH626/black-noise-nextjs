@@ -1,89 +1,32 @@
-## Session Summary: Fix MongoDB Deprecation Warning - ✅ COMPLETED
-**Date**: 9/6/2025, 1:05:19 p. m.
-**Objective**: Address the MongoDB driver warning regarding the deprecated `useUnifiedTopology` option.
----
-### ✅ Changes Implemented:
-*   **File:** `src/utils/DBconection.js`
-    *   **Change:** Removed the deprecated `useNewUrlParser` and `useUnifiedTopology` options from the `mongoose.connect` call.
-### 💡 Key Decisions:
-*   Removed both `useNewUrlParser` and `useUnifiedTopology` as both are deprecated in newer MongoDB driver versions.
-### ➡️ Next Steps:
-*   None. The task is completed.
+### Component Modularity Refactoring
 
-## Session Summary: Refactor "Autenticación de Usuarios" - IN PROGRESS
-**Date**: 9/6/2025, 1:36:43 p. m.
-**Objective**: Refactor the "Autenticación de Usuarios" functionality to align with current patterns and best practices.
----
-### ➡️ Pending Tasks:
-*   **Update Documentation (`memory-bank/funcionalidades/autenticacin-de-usuarios.md`):** Reflect the planned refactoring, ensuring alignment with `systemPatterns.md`.
-*   **Review `src/app/acciones/UsuariosActions.js`:** Specifically review `loginAction` and `registerAction` to ensure they fully comply with the Server Action patterns and error handling.
-*   **Refactor UI Components (`src/components/layout/general/forms/FormLogin.jsx`, `src/components/layout/general/forms/FormRegistro.jsx`):**
-    *   Ensure strict adherence to the `useActionState` and `useFormStatus` patterns.
-    *   Verify consistent use of `usePopUp` for feedback.
-    *   Confirm correct field naming conventions.
-    *   Review `loginAction`'s client-side `signIn` call and redirection logic in `FormLogin.jsx`.
-*   **Review `src/middleware.js`:** Ensure it correctly handles role-based redirection and session protection.
-*   **Review `src/app/api/auth/[...nextauth]/route.js`:** Verify NextAuth.js configuration, especially `CredentialsProvider` and callbacks.
-*   **Testing and Verification:** Provide instructions for the user to verify the functionality after refactoring.
+**Summary:**
+The "Component Modularity" refactoring goal has been successfully completed. This involved identifying large `page.jsx` files and breaking them down into smaller, more focused components, and moving reusable UI components from page-specific directories to `src/components/common/` or `src/components/layout/`.
 
-### 💡 New Directives:
-*   **Proactive Task Suggestion**: When a refactoring aspect is completed, suggest starting the refactoring of another functionality in a new task. This should be saved in the memory bank.
+**Details of Changes:**
 
-## Session Summary: API Route Refactoring (`src/app/api/administrador/`) - ✅ COMPLETED
-**Date**: 9/6/2025, 1:50:18 p. m.
-**Objective**: Implement consistent error handling, centralize input validation, abstract common CRUD operations, and ensure robust authentication and authorization for admin API routes.
----
-### ✅ Changes Implemented:
-*   **File:** `src/utils/errorHandler.js`
-    *   **Change:** Created a centralized error handling utility with `handleError` and custom error classes (`CustomError`, `ValidationError`, `NotFoundError`, `UnauthorizedError`, `ForbiddenError`).
-*   **File:** `src/utils/validation.js`
-    *   **Change:** Created a centralized input validation utility with functions like `validateRequiredFields`, `validateEmail`, and `validatePassword`.
-*   **File:** `src/utils/crudHandler.js`
-    *   **Change:** Created a generic CRUD handler with `createHandler`, `getAllHandler`, `getByIdHandler`, `updateHandler`, and `deleteHandler` for reusable API operations.
-*   **File:** `src/utils/authMiddleware.js`
-    *   **Change:** Created an authorization middleware (`withAuthorization`) to enforce role-based access control for API routes using `getServerSession`.
-*   **File:** `src/app/api/administrador/usuarios/route.js`
-    *   **Change:** Refactored `GET` to use `getAllHandler` and `withAuthorization`.
-    *   **Change:** Refactored `POST` to use `validateRequiredFields`, `validateEmail`, `validatePassword`, `handleError`, and `withAuthorization`, while retaining specific user creation logic (password hashing, default fields, email uniqueness check).
-*   **File:** `src/app/api/administrador/usuarios/[id]/route.js`
-    *   **Change:** Refactored `GET`, `PUT`, and `DELETE` to use `getByIdHandler`, `updateHandler`, `deleteHandler` respectively, all wrapped with `withAuthorization` for `ADMINISTRADOR` role.
-*   **File:** `memory-bank/funcionalidades/panel-de-administracin.md`
-    *   **Change:** Updated documentation to include the proposed refactoring for `src/app/api/administrador/` directory.
-*   **File:** `memory-bank/refactoring_plan.md`
-    *   **Change:** Marked all sub-tasks under "API Route Refactoring (`src/app/api/administrador/`)" as complete.
+*   **`src/app/page.jsx`**:
+    *   Refactored into `HeroSection.jsx`, `DesignRealClothesSection.jsx`, `AddElementsSection.jsx`, `GarmentTypesSection.jsx`, and `SupplierRegistrationSection.jsx`.
+    *   New components are located in `src/components/home/`.
+*   **`src/app/carrito/page.jsx`**:
+    *   Refactored into `CartLeftPanel.jsx`, `CartItemsList.jsx`, and `CartSummaryAndPayment.jsx`.
+    *   New components are located in `src/components/carrito/`.
+*   **`src/app/catalogo/page.jsx`**:
+    *   Refactored into `CatalogTabs.jsx`, `NewPostSection.jsx`, `DesignCard.jsx`, and `DesignGrid.jsx`.
+    *   New components are located in `src/components/catalogo/`.
+*   **`src/app/login/page.jsx`**:
+    *   Refactored into `LoginInfoSection.jsx`.
+    *   New component is located in `src/components/login/`.
+*   **`src/app/pago/page.jsx`**:
+    *   Refactored into `OrderSummary.jsx` and `PaymentForm.jsx`.
+    *   New components are located in `src/components/pago/`.
+*   **Moved Reusable Components from `src/app/perfil/`**:
+    *   `src/app/perfil/PedidosComponent.jsx` moved to `src/components/common/PedidosComponent.jsx`.
+    *   `src/app/perfil/ProfileContent.jsx` moved to `src/components/layout/ProfileContent.jsx`.
+    *   `src/app/perfil/CartComponent.jsx` moved to `src/components/common/CartComponent.jsx`.
+    *   `src/app/perfil/DesignsComponent.jsx` moved to `src/components/common/DesignsComponent.jsx`.
+    *   `src/app/perfil/PagosComponent.jsx` moved to `src/components/common/PagosComponent.jsx`.
+    *   `src/app/perfil/ProfileData.jsx` was deleted as it became redundant after `ProfileContent.jsx` was moved.
 
-### 💡 Key Decisions:
-*   Implemented a layered approach for API route refactoring:
-    *   **Error Handling:** Centralized error responses for consistency.
-    *   **Validation:** Extracted common validation logic into a reusable utility.
-    *   **CRUD Abstraction:** Created generic CRUD handlers for common database operations.
-    *   **Authorization:** Implemented a role-based authorization middleware for API routes.
-*   Decided against using `createHandler` directly for the `POST` method in `usuarios/route.js` due to specific business logic (password hashing, default fields, email uniqueness) that requires custom handling before saving.
-### ➡️ Next Steps:
-*   The "API Route Refactoring (`src/app/api/administrador/`)" goal is fully completed. The next logical step is to continue with the next refactoring goal in `refactoring_plan.md`, which is "Action Files Review (`src/app/acciones/`)".
-
-## Session Summary: Action Files Review (`src/app/acciones/`) - ✅ COMPLETED
-**Date**: 9/6/2025, 1:54:16 p. m.
-**Objective**: Analyze and refactor `*Actions.js` files for complexity and redundancy, extracting reusable logic into utility functions.
----
-### ✅ Changes Implemented:
-*   **File:** `src/utils/dbUtils.js`
-    *   **Change:** Created a utility file to house common database-related helper functions, starting with `toPlainObject` for converting Mongoose documents to plain JavaScript objects.
-*   **File:** `src/utils/authUtils.js`
-    *   **Change:** Created a utility file for authentication-related helper functions, including `hashPassword` and `comparePassword` for secure password handling.
-*   **File:** `src/app/acciones/UsuariosActions.js`
-    *   **Change:** Refactored to use `toPlainObject` from `src/utils/dbUtils.js`.
-    *   **Change:** Replaced direct `bcrypt` calls with `hashPassword` and `comparePassword` from `src/utils/authUtils.js`.
-    *   **Change:** Integrated `handleError`, `ValidationError`, and `NotFoundError` from `src/utils/errorHandler.js` for consistent error handling across all functions.
-    *   **Change:** Applied `validateRequiredFields`, `validateEmail`, and `validatePassword` from `src/utils/validation.js` for robust input validation in `RegistrarUsuario`, `RegistroMasivoUsuario`, `loginAction`, and `EditarUsuario`.
-    *   **Change:** Ensured `connectDB` is called appropriately within each action.
-*   **File:** `memory-bank/funcionalidades/gestin-de-usuarios-admin.md`
-    *   **Change:** Updated documentation to include the detailed refactoring plan for `src/app/acciones/UsuariosActions.js`, outlining the extraction of utilities and standardization of error handling/validation.
-*   **File:** `memory-bank/refactoring_plan.md`
-    *   **Change:** Marked all sub-tasks under "Action Files Review (`src/app/acciones/`)" as complete.
-
-### 💡 Key Decisions:
-*   Adopted a modular approach by extracting common functionalities (DB object conversion, password handling, error handling, validation) into dedicated utility files to reduce redundancy and improve maintainability in action files.
-*   Prioritized consistent error responses and robust input validation across all user-related actions.
-### ➡️ Next Steps:
-*   The "Action Files Review (`src/app/acciones/`)" goal is fully completed for `UsuariosActions.js`. The next logical step is to continue with the next refactoring goal in `refactoring_plan.md`, which is "Component Modularity (`src/app/*/page.jsx` and `src/components/`)".
+**Next Steps:**
+The next refactoring goal is "Global Styles Optimization (`src/app/globals.css`)".

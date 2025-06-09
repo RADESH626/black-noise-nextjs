@@ -22,10 +22,10 @@ This document outlines the planned refactoring tasks for the project. Each item 
     - [x] Refactor overly complex actions into smaller, more manageable functions.
     - [x] Identify and extract reusable logic into utility functions in `src/utils/`.
 
-- [ ] **Component Modularity (`src/app/*/page.jsx` and `src/components/`)**:
-    - [ ] Identify large `page.jsx` files and break down their content into smaller, more focused components.
-    - [ ] Move truly reusable UI components from page-specific directories (e.g., `src/app/perfil/`) to `src/components/common/` or `src/components/layout/` as appropriate.
-    - [ ] Ensure components follow a clear separation of concerns (e.g., presentation vs. logic).
+- [x] **Component Modularity (`src/app/*/page.jsx` and `src/components/`)**:
+    - [x] Identify large `page.jsx` files and break down their content into smaller, more focused components. (Completed for `src/app/page.jsx`, `src/app/carrito/page.jsx`, `src/app/catalogo/page.jsx`, `src/app/login/page.jsx`, `src/app/pago/page.jsx`)
+    - [x] Move truly reusable UI components from page-specific directories (e.g., `src/app/perfil/`) to `src/components/common/` or `src/components/layout/` as appropriate. (Completed for `src/app/perfil/PedidosComponent.jsx`, `src/app/perfil/ProfileContent.jsx`, `src/app/perfil/CartComponent.jsx`, `src/app/perfil/DesignsComponent.jsx`, `src/app/perfil/PagosComponent.jsx`, `src/app/perfil/ProfileData.jsx` - deleted as redundant)
+    - [x] Ensure components follow a clear separation of concerns (e.g., presentation vs. logic). (Addressed by modularization)
 
 - [ ] **Global Styles Optimization (`src/app/globals.css`)**:
     - [ ] Assess the size and complexity of `globals.css`.

@@ -1,10 +1,12 @@
 'use client'
 
 import React, { useState, useEffect, useMemo } from 'react';
-import Link from 'next/link'; // Import Link for navigation
 import { useCartStorage } from '@/hooks/useCartStorage';
 import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
 import Footer from '@/components/layout/general/footer/Footer';
+import CatalogTabs from '@/components/catalogo/CatalogTabs';
+import NewPostSection from '@/components/catalogo/NewPostSection';
+import DesignGrid from '@/components/catalogo/DesignGrid';
 
 const ComunidadDiseños = () => {
   const [activo, setActivo] = useState('diseños');
@@ -72,114 +74,22 @@ const ComunidadDiseños = () => {
       <HeaderPrincipal />
 
       <main className="flex-grow p-4 flex flex-col">
-        <div className="flex gap-2 mb-4 justify-center">
-          <button
-            onClick={() => setActivo('diseños')}
-            className={`px-4 py-2 rounded-full transition-colors duration-300 ease-in-out transform ${
-              activo === 'diseños' ? 'bg-[#292727] text-white scale-105 shadow-lg' : 'bg-white text-black hover:bg-[#242a33] hover:text-white'
-            }`}
-          >
-            DISEÑOS
-          </button>
-          <button
-            onClick={() => setActivo('populares')}
-            className={`px-4 py-2 rounded-full transition-colors duration-300 ease-in-out transform ${
-              activo === 'populares' ? 'bg-[#292727] text-white scale-105 shadow-lg' : 'bg-white text-black hover:bg-[#242a33] hover:text-white'
-            }`}
-          >
-            MÁS POPULARES
-          </button>
-        </div>
+        <CatalogTabs activo={activo} setActivo={setActivo} />
 
         <div className="mb-4 text-center text-xl font-semibold text-white animate-fadeIn">
           DISEÑOS DE LA COMUNIDAD
         </div>
 
-        {/* New Post Section */}
-        <div className="bg-black/80 p-4 rounded-2xl shadow-lg mb-6 flex flex-col items-center">
-          <div className="flex items-center w-full mb-4">
-            <img
-              src="/img/perfil/FotoPerfil.webp"
-              alt="User Avatar"
-              className="w-12 h-12 rounded-full mr-4 object-cover"
-            />
-            <input
-              type="text"
-              placeholder="¿Qué diseño estás pensando hoy?"
-              className="flex-grow p-3 rounded-full bg-[#292727] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <Link href="/perfil" className="bg-blue-600 px-6 py-2 rounded-full text-white font-semibold hover:bg-blue-700 transition-colors duration-300">
-            Publicar Diseño
-          </Link>
-        </div>
+        <NewPostSection />
 
-        {tarjetas.length === 0 ? (
-          <div className="text-center text-white text-xl mt-8">
-            No hay diseños disponibles.
-          </div>
-        ) : (
-          <div
-            className={`grid gap-6 transition-all duration-500 ease-in-out ${
-              activo === 'diseños' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-4'
-            }`}
-          >
-            {tarjetas.map((diseño, index) => (
-              <div
-                key={diseño.id}
-                className="flex flex-col rounded-2xl overflow-hidden shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl bg-black/80"
-              >
-                {/* Social media post header */}
-                <div className="flex items-center p-4 pb-2">
-                  <img
-                    src={diseño.userAvatar}
-                    alt="User Avatar"
-                    className="w-10 h-10 rounded-full mr-3 object-cover"
-                  />
-                  <h3 className="font-semibold text-white">{diseño.usuario}</h3>
-                </div>
-
-                <div className="w-full h-64 flex items-center justify-center bg-black overflow-hidden">
-                  <img
-                    src={diseño.imagen}
-                    alt={`Imagen de ${diseño.prenda}`}
-                    className="h-full object-contain transition-transform duration-500 ease-in-out hover:scale-110"
-                  />
-                </div>
-
-                <div className="p-4 flex flex-col gap-2 text-white">
-                  <h2 className="font-semibold text-lg">{diseño.prenda}</h2>
-                  <p>Categoría: {diseño.categoria}</p>
-                  <p>Precio: ${diseño.price.toFixed(2)}</p>
-
-                  {/* Social media interaction buttons */}
-                  <div className="flex items-center justify-between mt-2">
-                    <div className="flex gap-3">
-                    <button
-                      className={`flex items-center transition ${
-                        likedDesigns[diseño.id] ? 'text-red-600' : 'text-red-400 hover:text-red-600'
-                      }`}
-                      onClick={() => handleLike(diseño.id)}
-                    >
-                      {likedDesigns[diseño.id] ? '❤️' : '♡'}{' '}
-                      {likesState[diseño.id] !== undefined ? likesState[diseño.id] : diseño.likes}
-                    </button>
-                      <button className="flex items-center text-green-400 hover:text-green-600 transition">
-                        ↗️ Compartir
-                      </button>
-                    </div>
-                    <button
-                      className="bg-green-600 px-3 py-1 rounded hover:bg-green-700 transition"
-                      onClick={() => addItem(diseño)}
-                    >
-                      Añadir al carrito
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <DesignGrid
+          tarjetas={tarjetas}
+          activo={activo}
+          likesState={likesState}
+          likedDesigns={likedDesigns}
+          handleLike={handleLike}
+          addItem={addItem}
+        />
       </main>
 
       <Footer />
