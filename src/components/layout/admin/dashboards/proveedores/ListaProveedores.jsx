@@ -116,8 +116,8 @@ export default function ListaProveedores({ initialProviders }) {
                         </TdGeneral>
                         <TdGeneral>
                             <div className="text-sm">
-                                <p><strong>Correo:</strong> {provider.correoEmpresa}</p>
-                                <p><strong>Teléfono:</strong> {provider.numeroTelefonoEmpresa}</p>
+                                <p><strong>Correo:</strong> {provider.emailContacto}</p>
+                                <p><strong>Teléfono:</strong> {provider.telefonoContacto}</p>
                             </div>
                         </TdGeneral>
                         <TdGeneral>

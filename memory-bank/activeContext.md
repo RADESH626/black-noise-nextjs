@@ -158,3 +158,18 @@
 
 **Próximos Pasos:**
 - La funcionalidad de la lista de proveedores debería estar operativa.
+
+### 9/6/2025, 3:24:08 p. m. - Corrección: Información de contacto del proveedor no se muestra correctamente
+
+**Descripción:** La información de correo electrónico y número de teléfono de los proveedores no se mostraba correctamente en la lista.
+
+**Acciones Realizadas:**
+- Se revisó `src/components/layout/admin/dashboards/proveedores/ListaProveedores.jsx` y se compararon los nombres de los campos con el modelo `Proveedor` (`src/models/Proveedor.js`).
+- Se identificó un desajuste en los nombres de los campos: `ListaProveedores.jsx` estaba usando `provider.correoEmpresa` y `provider.numeroTelefonoEmpresa`, mientras que el modelo define `emailContacto` y `telefonoContacto`.
+- Se actualizó `src/components/layout/admin/dashboards/proveedores/ListaProveedores.jsx` para usar los nombres de campo correctos: `provider.emailContacto` y `provider.telefonoContacto`.
+
+**Archivos Modificados:**
+- `src/components/layout/admin/dashboards/proveedores/ListaProveedores.jsx`
+
+**Próximos Pasos:**
+- Verificar que la información de contacto de los proveedores se muestra correctamente en la lista.
