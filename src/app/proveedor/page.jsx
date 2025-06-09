@@ -4,10 +4,10 @@ import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
-import ErrorMessage from '@/components/common/ErrorMessage';
-import BotonGeneral from '@/components/common/botones/BotonGeneral';
-import { obtenerMiPerfilProveedor } from '@/app/acciones/ProveedorActions';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
+import ErrorMessage from '../../components/common/ErrorMessage';
+import BotonGeneral from '../../components/common/botones/BotonGeneral';
+import { obtenerMiPerfilProveedor } from '../acciones/ProveedorActions';
 
 function ProveedorPage() {
     const { data: session, status } = useSession();
