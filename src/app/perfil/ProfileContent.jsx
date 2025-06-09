@@ -9,6 +9,7 @@ import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions"; // Im
 import DesignsComponent from "./DesignsComponent"; // Import DesignsComponent
 import PedidosComponent from "./PedidosComponent"; // Import PedidosComponent
 import CartComponent from "./CartComponent"; // Import CartComponent
+import { ObtenerUsuarioPorId } from "@/app/acciones/UsuariosActions"; // Import the server action
 
 function ProfileContent() { // Removed user, designs, and error props
   const { openModal } = useModal();
@@ -22,28 +23,36 @@ function ProfileContent() { // Removed user, designs, and error props
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Update currentUser when session changes
-    setCurrentUser(session?.user || null);
-
-    const fetchDesigns = async () => {
+    const fetchData = async () => {
       if (status === 'authenticated' && session?.user?.id) {
         setLoading(true);
         setError(null);
-        const { designs, error } = await obtenerDesignsPorUsuarioId(session.user.id);
-        if (error) {
-          setError(error);
+
+        // Fetch full user data
+        const fetchedUser = await ObtenerUsuarioPorId(session.user.id);
+        if (fetchedUser && fetchedUser.error) { // Check if fetchedUser is an error object
+          setError(fetchedUser.error);
+          setCurrentUser(null);
+        } else {
+          setCurrentUser(fetchedUser || null);
+        }
+
+        // Fetch designs
+        const { designs, error: designsError } = await obtenerDesignsPorUsuarioId(session.user.id);
+        if (designsError) {
+          setError(designsError);
         } else {
           setUserDesigns(designs || []);
         }
         setLoading(false);
       } else if (status === 'unauthenticated') {
-        // Handle unauthenticated state if necessary, maybe redirect to login
         setLoading(false);
-        setUserDesigns([]); // Clear designs if unauthenticated
+        setCurrentUser(null);
+        setUserDesigns([]);
       }
     };
 
-    fetchDesigns();
+    fetchData();
   }, [session, status]); // Rerun effect when session or status changes
 
   const user = currentUser; // Use the state variable for user
@@ -87,9 +96,15 @@ function ProfileContent() { // Removed user, designs, and error props
 
             {/* info */}
             <div className="text-gray-400 mb-3">
-              <p>CORREO: {user?.correo}</p> {/* Use fetched email */}
-              <p>NÚMERO DE LIKES: {user?.likes || 0}</p> {/* Use fetched likes */}
-              <p>BIOGRAFÍA: {user?.bio ? user.bio : "..."}</p> {/* Use fetched bio */}
+              <p>CORREO: {user?.correo}</p>
+              <p>TIPO DE DOCUMENTO: {user?.tipoDocumento}</p>
+              <p>NÚMERO DE DOCUMENTO: {user?.numeroDocumento}</p>
+              <p>FECHA DE NACIMIENTO: {user?.fechaNacimiento}</p>
+              <p>GÉNERO: {user?.genero}</p>
+              <p>NÚMERO DE TELÉFONO: {user?.numeroTelefono}</p>
+              <p>DIRECCIÓN: {user?.direccion}</p>
+              <p>NÚMERO DE LIKES: {user?.likes || 0}</p>
+              <p>BIOGRAFÍA: {user?.bio ? user.bio : "..."}</p>
             </div>
 
             {/* botones */}

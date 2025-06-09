@@ -28,8 +28,10 @@
     * **Componentes/Funciones Relevantes:** `ProfileContent` (componente), `useSession` (de `next-auth/react`), `useModal`, `useCart`, `useState`, `useEffect`, `DesignsComponent`, `PedidosComponent`, `CartComponent`, `FormEditarUsuario`.
     * **Lógica Principal:**
         *   Obtiene la sesión del usuario con `useSession`.
+        *   **Carga la información completa del perfil del usuario usando `ObtenerUsuarioPorId` de `UsuariosActions.js` una vez que la sesión está autenticada.**
         *   Maneja el estado de la pestaña activa (`activeTab`: 'designs', 'orders', 'cart').
         *   Carga los diseños del usuario usando `obtenerDesignsPorUsuarioId` de `DesignActions.js`.
+        *   **Muestra la información completa del perfil del usuario (nombre, correo, tipo de documento, número de documento, fecha de nacimiento, género, número de teléfono, dirección, biografía y likes).**
         *   Proporciona funciones `handleEditProfile` para abrir un modal con `FormEditarUsuario` y `handleEditDesign` para una futura edición de diseños.
         *   Renderiza condicionalmente `DesignsComponent`, `PedidosComponent` y `CartComponent` según la pestaña activa.
         *   Permite cerrar sesión (`signOut`).
