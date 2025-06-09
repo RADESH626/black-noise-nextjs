@@ -1,22 +1,17 @@
-### 2025-09-06 - Sesión de Trabajo
+# Active Context - 2025-09-06
 
-**Objetivo de la Sesión:** Resolver el error "Attempted import error: 'obtenerMiPerfilProveedor' is not exported from '../acciones/ProveedorActions'".
+## Task: Redirigir a proveedores a la lista de pedidos al iniciar sesión
 
-**Cambios Realizados:**
+### Descripción:
+Se ha modificado el flujo de autenticación para que, al iniciar sesión como proveedor, el usuario sea redirigido directamente a la página de lista de pedidos (`/proveedor/pedidos`) en lugar de la página principal del portal de proveedores (`/proveedor`).
 
-1.  **`src/app/acciones/ProveedorActions.js`**:
-    *   Se añadió la función `obtenerMiPerfilProveedor` para permitir a los proveedores obtener su propio perfil basado en la sesión de usuario. Esta función utiliza `getServerSession` para acceder al email del usuario en la sesión y buscar el proveedor correspondiente en la base de datos.
+### Archivos Modificados:
 
-2.  **`src/app/proveedor/page.jsx`**:
-    *   Se actualizó la importación de `obtenerMiPerfilProveedor` para que apunte correctamente a la nueva función en `../acciones/ProveedorActions`.
-    *   Se modificó la llamada a `obtenerMiPerfilProveedor` para que no reciba argumentos, ya que la función ahora obtiene la información del perfil directamente de la sesión del usuario.
-    *   Se actualizaron las rutas de importación para `LoadingSpinner` y `ErrorMessage` a usar el alias `@/components/common/`.
+#### 📄 **Archivo:** `src/components/layout/general/forms/FormLogin.jsx`
+*   **Cambio:** Se actualizó la lógica de redirección dentro del `useEffect` para el rol `PROVEEDOR`.
+*   **Detalle:** La línea `router.push('/proveedor');` fue cambiada a `router.push('/proveedor/pedidos');` para asegurar la redirección directa a la lista de pedidos.
 
-**Problemas Resueltos:**
-
-*   El error "Attempted import error: 'obtenerMiPerfilProveedor' is not exported from '../acciones/ProveedorActions'" ha sido resuelto al implementar la función faltante y ajustar su uso en `src/app/proveedor/page.jsx`.
-
-**Próximos Pasos:**
-
-*   Confirmar que la página del proveedor carga correctamente y muestra la información del perfil.
-*   Generar los comandos `git add` y `git commit` para registrar los cambios.
+### Próximos Pasos:
+1.  Generar y presentar el comando `git add`.
+2.  Esperar confirmación del usuario.
+3.  Generar y presentar el comando `git commit`.

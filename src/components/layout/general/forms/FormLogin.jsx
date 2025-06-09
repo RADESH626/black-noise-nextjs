@@ -71,8 +71,8 @@ function FormLogin() {
             console.log('Frontend Login: Redirigiendo administrador al panel de admin.');
             router.push('/admin');
           } else if (state.userRole === 'PROVEEDOR') {
-            console.log('Frontend Login: Redirigiendo proveedor al panel de proveedor.');
-            router.push('/proveedor');
+            console.log('Frontend Login: Redirigiendo proveedor a la lista de pedidos.');
+            router.push('/proveedor/pedidos');
           } else {
             console.log('Frontend Login: Redirigiendo cliente al catálogo. Rol actual:', state.userRole);
             router.push('/catalogo');
