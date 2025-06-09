@@ -75,27 +75,9 @@ function ProveedorPage() {
 
     return (
         <div className="min-h-screen bg-black text-white p-8">
-            {/* Sección para proveedor logueado */}
-            {session?.user?.rol === Rol.PROVEEDOR && miPerfil && (
-                <div className="mb-12 p-6 bg-gray-800 rounded-lg">
-                    <h2 className="text-2xl font-bold mb-6 text-purple-400">Mi Panel de Proveedor</h2>
-                    <div className="space-y-4">
-                        <p className="text-lg">Bienvenido, {miPerfil.nombreProveedor}</p>
-                        <div className="flex space-x-4">
-                            <Link href="/proveedor/editar-perfil">
-                                <BotonGeneral>Editar mi Información</BotonGeneral>
-                            </Link>
-                            <Link href="/proveedor/pedidos">
-                                <BotonGeneral>Dashboard de Pedidos</BotonGeneral>
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             {/* Sección principal: Lista de proveedores */}
             <div>
-                <h2 className="text-2xl font-bold mb-6">Nuestros Proveedores</h2>
+                <h2 className="text-2xl font-bold mb-6 text-center">Nuestros Proveedores</h2>
                 {proveedores.length === 0 ? (
                     <p className="text-gray-400">No hay proveedores disponibles en este momento.</p>
                 ) : (
