@@ -1,24 +1,16 @@
-### Task: Fix Syntax Error and Refactor `DesignActions.js`, `DesignsComponent.jsx`, and `ProfileContent.jsx`
+### Date: 2025-06-10
 
-**Date:** 10/6/2025
+### Task: Fix `Cast to ObjectId failed` error in `addDesignToCart`
 
-**Changes Made:**
-- **File:** `src/app/acciones/DesignActions.js`
-  - Fixed a syntax error by adding a missing comma in the `data` object definition within the `guardarDesigns` function.
-  - Removed duplicate image handling logic within `guardarDesigns` function.
-  - Removed duplicate properties (`nombreDesing`, `valorDesing`, `imagenDesing`, `estadoDesing`, `coloresDisponibles`, `tallasDisponibles`) in the `data` object within the `guardarDesigns` function.
-  - Removed duplicate properties (`coloresDisponibles`, `tallasDisponibles`) in the `data` object within the `actualizarDesign` function.
-- **File:** `src/components/common/DesignsComponent.jsx`
-  - Added a nullish coalescing operator to `cartItems` to ensure it's an array before calling `.some()`, preventing `TypeError: Cannot read properties of undefined (reading 'some')`.
-- **File:** `src/components/layout/ProfileContent.jsx`
-  - Passed `cartItems` and `handleAddItemToCart` (as `addItem`) as props to `DesignsComponent` to ensure proper functionality and prevent `TypeError: addItem is not a function`.
+### Changes Made:
+- Modified `src/app/acciones/CartActions.js` to correctly handle the `designId` parameter.
+- Implemented logic to extract the `id` property from `designId` if it's passed as an object, ensuring a string ID is used for database operations.
 
-**Reasoning for Changes:**
-- The initial error in `DesignActions.js` was a syntax error due to a missing comma, which was resolved.
-- Duplicate code blocks and object properties were identified, leading to re-declaration errors and unnecessary redundancy. These were refactored to improve code readability, maintainability, and prevent potential bugs.
-- The `TypeError` in `DesignsComponent.jsx` was due to `cartItems` being `undefined` when `.some()` was called. The fix ensures `cartItems` defaults to an empty array, making the component more robust.
-- The `TypeError: addItem is not a function` was caused by `addItem` not being passed as a prop to `DesignsComponent` from its parent, `ProfileContent.jsx`. Passing the `handleAddItemToCart` function as `addItem` resolves this.
+### Reason for Changes:
+The error log indicated that `designId` was being passed as an object instead of a string, causing a `Cast to ObjectId failed` error when interacting with the MongoDB `Cart` model. The fix ensures that the `designId` is always a string before being used to create or update cart items.
 
-**Next Steps:**
-- Generate a commit message for these changes.
-- Confirm the resolution of the original error.
+### Files Modified:
+- `src/app/acciones/CartActions.js`
+
+### Next Steps:
+- Verify the fix by testing the add to cart functionality.

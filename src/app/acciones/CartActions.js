@@ -12,7 +12,10 @@ export async function addDesignToCart(userId, designId) {
     await connectDB();
     logger.debug(`Entering addDesignToCart for userId: ${userId}, designId: ${designId}`);
 
-    if (!userId || !designId) {
+    // Ensure designId is a string, extracting from an object if necessary
+    const actualDesignId = typeof designId === 'object' && designId !== null ? designId.id : designId;
+
+    if (!userId || !actualDesignId) {
         return { success: false, message: 'User ID and Design ID are required.' };
     }
 
@@ -21,11 +24,11 @@ export async function addDesignToCart(userId, designId) {
 
         if (!cart) {
             // If no cart exists for the user, create a new one with the design
-            cart = await Cart.create({ userId, items: [{ designId: designId, quantity: 1 }] });
+            cart = await Cart.create({ userId, items: [{ designId: actualDesignId, quantity: 1 }] });
             logger.debug('New cart created with design:', cart);
         } else {
             // If cart exists, check if design is already present
-            const itemIndex = cart.items.findIndex(item => item.designId.toString() === designId);
+            const itemIndex = cart.items.findIndex(item => item.designId.toString() === actualDesignId);
 
             if (itemIndex > -1) {
                 // If design exists, increment quantity
@@ -33,7 +36,7 @@ export async function addDesignToCart(userId, designId) {
                 logger.debug('Design quantity incremented in cart:', cart);
             } else {
                 // If design not present, add new item
-                cart.items.push({ designId: designId, quantity: 1 });
+                cart.items.push({ designId: actualDesignId, quantity: 1 });
                 logger.debug('New design added to existing cart:', cart);
             }
             await cart.save();
