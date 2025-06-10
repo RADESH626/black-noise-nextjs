@@ -36,3 +36,17 @@ The new `Cart` model is necessary to store the IDs of designs that a user adds t
 
 **Reasoning:**
 The previous cart view did not match the desired design, with the total and action buttons incorrectly positioned. These changes align the UI with the provided image, improving the user experience by presenting a clear and functional cart summary. The additional change to `CartItemsList.jsx` ensures proper horizontal alignment of the cart items section, and the `justify-between` on the main section ensures the summary is pushed to the bottom.
+
+### 10/6/2025, 5:54:34 p. m.
+
+**Task:** Refactored cart item display to match design card styling.
+
+**Changes Made:**
+- Modified `src/components/carrito/CartItemsList.jsx` to:
+    - Change its main container to a responsive grid (`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6`).
+    - Style individual cart items as cards (`bg-gray-800 rounded-xl shadow-lg overflow-hidden`) with an image, name, price, quantity input, and an "Eliminar" button.
+    - Accept `updateQuantity` and `removeItem` functions as props from `src/app/carrito/page.jsx`.
+- Modified `src/app/carrito/page.jsx` to pass `updateQuantity` and `removeItem` functions from `useCartStorage` to `CartItemsList`.
+
+**Reasoning:**
+The user requested that the cart items be displayed with a similar visual style to the design cards in the profile's "DISEÑOS" tab. This refactoring provides a consistent and improved visual experience for cart items, making them more visually appealing and functional.

@@ -49,7 +49,7 @@ export default function Carrito() {
 
           {/* Panel derecho */}
           <section className="flex-1 p-6 flex flex-col justify-between gap-6">
-            <CartItemsList cartItems={cartItems} />
+            <CartItemsList cartItems={cartItems} updateQuantity={updateQuantity} removeItem={removeItem} />
             <CartSummaryAndPayment
               totalConEnvio={totalConEnvio}
               cartItemsLength={cartItems.length}
