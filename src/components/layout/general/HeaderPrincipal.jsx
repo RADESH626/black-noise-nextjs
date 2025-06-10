@@ -39,7 +39,7 @@ function HeaderPrincipal() {
                 </h1>
                 <div className='flex flex-row items-center gap-4'>
                     {/* Shopping Cart Link */}
-                    <Link href="/carrito">
+                    <Link href="/perfil">
                         <div
                             className="w-8 h-8 rounded-full flex items-center justify-center text-white"
                             style={{ backgroundColor: '#6b7280' }} // gray-500

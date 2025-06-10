@@ -67,3 +67,41 @@ The `Design` model defines the user ID as `usuarioId`, but the retrieval functio
     1.  Adjust the `setTimeout` duration to a more appropriate user experience (e.g., 2-3 seconds).
     2.  Remove temporary console logs from `src/context/PopUpContext.jsx` and `src/components/common/modales/PopUpMessage.jsx`.
     3.  Consider removing `!important` from `PopUpMessage.module.css` if the background remains solid without it.
+
+---
+
+### 10/6/2025, 6:43:29 p. m.
+
+## Session Summary: Refactor Cart Functionality - ✅ COMPLETADO
+**Date**: 10/6/2025, 6:37:44 p. m.
+**Objective**: Eliminate the dedicated cart page and integrate the list of designs in the cart into the user's profile section.
+
+### ✅ Changes Implemented:
+*   **`src/components/common/CartComponent.jsx`**:
+    *   Integrated summary and payment display logic, including total calculation, shipping cost, and "Pagar Ahora" button.
+    *   Removed "Agregar a Pedido" functionality.
+    *   Added `useRouter` import and `paymentSuccess` state.
+*   **Deleted Files:**
+    *   `src/components/carrito/CartLeftPanel.jsx`
+    *   `src/components/carrito/CartItemsList.jsx`
+    *   `src/components/carrito/CartSummaryAndPayment.jsx`
+    *   `src/app/carrito/page.jsx`
+*   **Deleted Directories:**
+    *   `src/components/carrito/` (if empty)
+    *   `src/app/carrito/` (if empty)
+*   **Updated Navigation/Links:**
+    *   `src/components/layout/general/HeaderPrincipal.jsx`: Updated cart link to `/perfil`.
+    *   `src/app/confirmacion/page.jsx`: Updated redirect to `/perfil`.
+    *   `src/app/acciones/CartActions.js`: Removed all `revalidatePath('/carrito');` instances.
+*   **Updated Documentation:**
+    *   `memory-bank/functionalities/Cart.md`: Updated to reflect the new cart functionality and integration into the user profile.
+
+### 💡 Key Decisions & Patterns:
+*   Consolidated cart display and logic into `src/components/common/CartComponent.jsx` to centralize functionality and eliminate redundancy.
+*   Leveraged existing `CartComponent.jsx` and enhanced it rather than moving components from `src/components/carrito/` to minimize changes.
+*   Ensured all `revalidatePath` calls were updated to target `/perfil` for proper cache invalidation.
+*   Followed the file deletion rule to remove empty directories after deleting their contents.
+
+### ➡️ Next Steps:
+*   Generate git commit.
+*   The task is completed.

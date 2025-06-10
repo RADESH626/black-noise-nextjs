@@ -27,7 +27,7 @@ export default function Confirmacion() {
       };
     } else {
       // If no order found in localStorage, redirect to home or cart
-      router.push("/carrito");
+      router.push("/perfil");
     }
   }, [router]);
 

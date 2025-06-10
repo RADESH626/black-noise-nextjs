@@ -40,7 +40,6 @@ export async function addDesignToCart(userId, designId) {
         }
 
         revalidatePath('/perfil'); // Revalidate profile page to reflect cart changes
-        revalidatePath('/carrito'); // Revalidate cart page
 
         return { success: true, message: 'Design added to cart successfully.', data: JSON.parse(JSON.stringify(cart)) };
     } catch (error) {
@@ -67,7 +66,6 @@ export async function removeDesignFromCart(userId, designId) {
                 await cart.save();
                 logger.debug('Design removed from cart:', cart);
                 revalidatePath('/perfil');
-                revalidatePath('/carrito');
                 return { success: true, message: 'Design removed from cart successfully.' };
             } else {
                 logger.debug('Design not found in cart, no action needed.');
@@ -150,7 +148,6 @@ export async function updateCartItemQuantity(userId, designId, newQuantity) {
             }
             await cart.save();
             revalidatePath('/perfil');
-            revalidatePath('/carrito');
             return { success: true, message: 'Cart item quantity updated successfully.', data: JSON.parse(JSON.stringify(cart)) };
         } else {
             logger.debug('Design not found in cart for quantity update, no action needed.');
@@ -180,7 +177,6 @@ export async function clearUserCart(userId) {
         if (result) {
             logger.debug('Cart cleared successfully for userId:', userId);
             revalidatePath('/perfil');
-            revalidatePath('/carrito');
             return { success: true, message: 'Cart cleared successfully.' };
         } else {
             logger.debug('Cart not found for user, nothing to clear.');
@@ -210,7 +206,6 @@ export async function createEmptyCartForUser(userId) {
             cart = await Cart.create({ userId, items: [] }); // Create with an empty items array
             logger.debug('Empty cart created successfully for userId:', cart);
             revalidatePath('/perfil'); // Revalidate profile page
-            revalidatePath('/carrito'); // Revalidate cart page
             return { success: true, message: 'Empty cart created successfully.', data: JSON.parse(JSON.stringify(cart)) };
         }
     } catch (error) {

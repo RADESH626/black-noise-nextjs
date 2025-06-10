@@ -12,7 +12,7 @@ const PopUpMessage = ({ message, type, onClose }) => {
       console.log('PopUpMessage: Auto-hide timer expired. Setting isVisible to false and calling onClose.');
       setIsVisible(false);
       onClose();
-    }, 2000); // Auto-hide after 2 seconds
+    }, 5000); // Auto-hide after 5 seconds (increased for debugging visibility)
 
     return () => {
       console.log('PopUpMessage: Clearing auto-hide timer.');
