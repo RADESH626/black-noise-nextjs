@@ -39,3 +39,8 @@
 1.  If the function is actually defined and exported in the specified file. If not, implement and export it.
 2.  If the function's signature (arguments) in the calling file matches the definition in the exporting file. Adjust as necessary.
 3.  Consider updating relative import paths to `@/` aliases for Next.js projects to improve clarity and maintainability, and as a potential solution for compiler parsing issues.
+
+### 2025-09-06 - Unexpected Leading Character in File
+**Error:** Encountered a TypeScript error (`Identificador o palabra clave inesperados`) on line 1 of `src/components/perfil/FormEditarUsuario.jsx`, where the file content unexpectedly started with `c"use client";` instead of the correct `"use client";`. This leading character also caused `replace_in_file` operations to fail due to a mismatch in the SEARCH block.
+**Correction:** The issue was resolved by using `write_to_file` to overwrite the entire file with its correct content, effectively removing the erroneous leading character.
+**Rule Update:** If an unexpected character appears at the beginning of a file, especially one that causes parsing errors or prevents `replace_in_file` from matching, use `write_to_file` to overwrite the file with its correct content. This ensures the file's integrity and resolves issues that might stem from corrupted file content.
