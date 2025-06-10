@@ -12,14 +12,15 @@ const DesignSchema = new Schema({
         type: String,
         required: true
     },
+    descripcion: {
+        type: String,
+        required: true
+    },
     categoria: {
         type: String,
         enum: Object.values(CategoriaProducto),
         required: true
     },
-    palabrasClave: [{
-        type: String
-    }],
     likes: {
         type: Number,
         default: 0
@@ -39,6 +40,14 @@ const DesignSchema = new Schema({
         ref: 'Elemento'
     }],
     imagenDesing: {
+        type: String,
+        required: true
+    },
+    tallasDisponibles: {
+        type: String,
+        required: true
+    },
+    coloresDisponibles: {
         type: String,
         required: true
     }

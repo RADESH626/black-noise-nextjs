@@ -7,16 +7,17 @@ import { useCartStorage } from "@/hooks/useCartStorage"; // Import useCartStorag
 import { useEffect, useState } from "react"; // Import useEffect and useState
 import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions"; // Import the server action
 import DesignsComponent from "../common/DesignsComponent"; // Import DesignsComponent
-import PedidosComponent from "../common/PedidosComponent"; // Import PedidosComponent
-import CartComponent from "../common/CartComponent"; // Import CartComponent
-import PagosComponent from "../common/PagosComponent"; // Import PagosComponent
-import { ObtenerUsuarioPorId } from "@/app/acciones/UsuariosActions"; // Import the server action
-import FormEditarUsuario from "@/components/perfil/FormEditarUsuario"; // Import FormEditarUsuario
+import PedidosComponent from "../common/PedidosComponent";
+import CartComponent from "../common/CartComponent";
+import PagosComponent from "../common/PagosComponent";
+import { ObtenerUsuarioPorId } from "@/app/acciones/UsuariosActions";
+import FormEditarUsuario from "@/components/perfil/FormEditarUsuario";
+import DesignUploadModal from "@/components/perfil/DesignUploadModal"; // Import DesignUploadModal
 
 function ProfileContent() {
   const { openModal } = useModal();
-  const { cartItems, addItem } = useCartStorage(); // Get cartItems and addItem from context
-  const { data: session, status } = useSession(); // Get session using useSession
+  const { cartItems, addItem } = useCartStorage();
+  const { data: session, status } = useSession();
 
   const [activeTab, setActiveTab] = useState('designs'); // State to manage active tab
   const [currentUser, setCurrentUser] = useState(null); // State for user data
@@ -24,38 +25,39 @@ function ProfileContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (status === 'authenticated' && session?.user?.id) {
-        setLoading(true);
-        setError(null);
+  const fetchData = async () => { // Moved fetchData outside useEffect to be callable
+    if (status === 'authenticated' && session?.user?.id) {
+      setLoading(true);
+      setError(null);
 
-        // Fetch full user data
-        const fetchedUser = await ObtenerUsuarioPorId(session.user.id);
-        if (fetchedUser && fetchedUser.error) { // Check if fetchedUser is an error object
-          setError(fetchedUser.error);
-          setCurrentUser(null);
-        } else {
-          setCurrentUser(fetchedUser || null);
-        }
-
-        // Fetch designs
-        const { designs, error: designsError } = await obtenerDesignsPorUsuarioId(session.user.id);
-        if (designsError) {
-          setError(designsError);
-        } else {
-          setUserDesigns(designs || []);
-        }
-        setLoading(false);
-      } else if (status === 'unauthenticated') {
-        setLoading(false);
+      // Fetch full user data
+      const fetchedUser = await ObtenerUsuarioPorId(session.user.id);
+      if (fetchedUser && fetchedUser.error) {
+        setError(fetchedUser.error);
         setCurrentUser(null);
-        setUserDesigns([]);
+      } else {
+        setCurrentUser(fetchedUser || null);
       }
-    };
 
+      // Fetch designs
+      const { designs, error: designsError } = await obtenerDesignsPorUsuarioId(session.user.id);
+      if (designsError) {
+        setError(designsError);
+      } else {
+        setUserDesigns(designs || []);
+      }
+      setLoading(false);
+    } else if (status === 'unauthenticated') {
+      setLoading(false);
+      setCurrentUser(null);
+      setUserDesigns([]);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, [session, status]); // Rerun effect when session or status changes
+
 
   const user = currentUser; // Use the state variable for user
 
@@ -89,7 +91,15 @@ function ProfileContent() {
         {/* Aquí puedes agregar el formulario de edición de diseño */}
         <p>Formulario de edición en desarrollo...</p>
       </div>,
-      'default' // Usamos tamaño default para edición de diseños
+      'default'
+    );
+  };
+
+  const handleAddDesign = () => {
+    openModal(
+      "Subir Nuevo Diseño",
+      <DesignUploadModal onDesignSaved={fetchData} />, // Pass fetchData as callback
+      'default'
     );
   };
 
@@ -176,12 +186,19 @@ function ProfileContent() {
       {/* Content Area */}
       <div className="flex-grow overflow-y-auto">
         {activeTab === 'designs' && (
-          <DesignsComponent
-            loading={loading}
-            error={error}
-            userDesigns={userDesigns}
-            handleEditDesign={handleEditDesign}
-          />
+          <>
+            <div className="mb-4 flex justify-end">
+              <BotonGeneral onClick={handleAddDesign}>
+                + Agregar Diseño
+              </BotonGeneral>
+            </div>
+            <DesignsComponent
+              loading={loading}
+              error={error}
+              userDesigns={userDesigns}
+              handleEditDesign={handleEditDesign}
+            />
+          </>
         )}
 
         {activeTab === 'orders' && (

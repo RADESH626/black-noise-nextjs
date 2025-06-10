@@ -1,32 +1,42 @@
 "use server"
 
 import connectDB from '@/utils/DBconection';
-import Design from '@/models/Design'; // Assuming you have a Design model
-import Papa from 'papaparse'; // Keep papaparse for CSV parsing for now
+import Design from '@/models/Design';
+import Papa from 'papaparse';
 import { revalidatePath } from 'next/cache';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Assuming this path for authOptions
 
 // Function to save a single design
 export async function guardarDesigns(prevState, formData) {
     await connectDB();
     console.log('DEBUG: Entering guardarDesigns with formData:', formData);
 
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user || !session.user.id) {
+        return { success: false, message: 'Usuario no autenticado.' };
+    }
+
     try {
         const data = {
-            nombre: formData.get('nombre'),
+            usuarioId: session.user.id,
+            nombreDesing: formData.get('nombreDesing'), // Changed to nombreDesing to match model
             descripcion: formData.get('descripcion'),
-            precio: parseFloat(formData.get('precio')),
+            valorDesing: parseFloat(formData.get('valorDesing')), // Changed to valorDesing to match model
             categoria: formData.get('categoria'),
-            tallasDisponibles: formData.getAll('tallasDisponibles'), // Assuming multiple checkboxes/select
-            coloresDisponibles: formData.getAll('coloresDisponibles'), // Assuming multiple checkboxes/select
-            imagen: formData.get('imagen'), // Assuming base64 string or URL
-            // Add other design-specific fields as per your Design model
+            imagenDesing: formData.get('imagenDesing'), // Changed to imagenDesing to match model
+            tallasDisponibles: formData.get('tallasDisponibles'), // Changed to get single string
+            coloresDisponibles: formData.get('coloresDisponibles'), // Changed to get single string
+            estadoDesing: 'PRIVADO' // Explicitly set to PRIVADO as per requirements
         };
 
         const newDesign = await Design.create(data);
         console.log('DEBUG: Design saved successfully:', newDesign);
 
-        revalidatePath('/admin/designs'); // Revalidate path for admin designs list
-        revalidatePath('/catalogo'); // Revalidate path for public catalog
+        revalidatePath('/admin/designs');
+        revalidatePath('/catalogo');
+        revalidatePath('/perfil'); // Revalidate path for user profile page
 
         return { success: true, message: 'Diseño registrado exitosamente', data: JSON.parse(JSON.stringify(newDesign)) };
     } catch (error) {
@@ -63,14 +73,6 @@ export async function obtenerDesignsPorUsuarioId(userId) {
     }
 }
 
-// Function to register a single design (from a form)
-// This function was previously named RegistrarDesing and had user-related fields.
-// It's now corrected to handle design registration.
-export async function RegistrarDesign(prevState, formData) {
-    console.log('DEBUG: Entering RegistrarDesign with formData:', formData);
-    // Call guardarDesigns directly
-    return await guardarDesigns(prevState, formData);
-}
 
 // Function for mass registration of designs from a file
 export async function RegistroMasivoDesigns(prevState, formData) {
@@ -100,14 +102,15 @@ export async function RegistroMasivoDesigns(prevState, formData) {
         }
 
         const designsToSave = resultadoParseo.data.map(designData => ({
-            nombre: designData.nombre,
+            usuarioId: session.user.id, // Assuming mass upload is also by a logged-in user
+            nombreDesing: designData.nombreDesing,
             descripcion: designData.descripcion,
-            precio: parseFloat(designData.precio),
+            valorDesing: parseFloat(designData.valorDesing),
             categoria: designData.categoria,
-            tallasDisponibles: designData.tallasDisponibles ? designData.tallasDisponibles.split(',').map(s => s.trim()) : [],
-            coloresDisponibles: designData.coloresDisponibles ? designData.coloresDisponibles.split(',').map(c => c.trim()) : [],
-            imagen: designData.imagen,
-            // Map other fields as per your Design model
+            imagenDesing: designData.imagenDesing,
+            tallasDisponibles: designData.tallasDisponibles,
+            coloresDisponibles: designData.coloresDisponibles,
+            estadoDesing: 'PRIVADO'
         }));
 
         const savedDesigns = await Design.insertMany(designsToSave);
@@ -145,21 +148,26 @@ export async function actualizarDesign(prevState, formData) {
     await connectDB();
     console.log('DEBUG: Entering actualizarDesign with formData:', formData);
 
-    const id = formData.get('id'); // Assuming ID is passed in formData for updates
+    const id = formData.get('id');
     if (!id) {
         return { success: false, message: 'ID del diseño no proporcionado para la actualización.' };
     }
 
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user || !session.user.id) {
+        return { success: false, message: 'Usuario no autenticado.' };
+    }
+
     try {
         const data = {
-            nombre: formData.get('nombre'),
+            nombreDesing: formData.get('nombreDesing'),
             descripcion: formData.get('descripcion'),
-            precio: parseFloat(formData.get('precio')),
+            valorDesing: parseFloat(formData.get('valorDesing')),
             categoria: formData.get('categoria'),
-            tallasDisponibles: formData.getAll('tallasDisponibles'),
-            coloresDisponibles: formData.getAll('coloresDisponibles'),
-            imagen: formData.get('imagen'),
-            // Add other design-specific fields for update
+            imagenDesing: formData.get('imagenDesing'),
+            tallasDisponibles: formData.get('tallasDisponibles'),
+            coloresDisponibles: formData.get('coloresDisponibles'),
+            // Do not update usuarioId or estadoDesing here unless explicitly required for updates
         };
 
         const updatedDesign = await Design.findByIdAndUpdate(id, data, { new: true }).lean();
