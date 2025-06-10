@@ -20,3 +20,17 @@ The `Design` model defines the user ID as `usuarioId`, but the retrieval functio
 
 **Reasoning:**
 The new `Cart` model is necessary to store the IDs of designs that a user adds to their shopping cart. This allows for persistent cart data that can be retrieved and used to display design information in the cart component within the user's profile. This approach separates cart content from design details, ensuring flexibility and up-to-date information.
+
+### 10/6/2025, 5:47:27 p. m.
+
+**Task:** Fixed the layout and functionality of the cart view.
+
+**Changes Made:**
+- Modified `src/app/carrito/page.jsx` to change the main cart section's layout from `flex-row` to `flex-col`, ensuring vertical stacking of cart items and summary.
+- Modified `src/components/carrito/CartSummaryAndPayment.jsx` to:
+    - Remove "TU PEDIDO" header, "Cantidad de productos", "Costo de envío", and the "PAGAR AHORA" button.
+    - Add "Agregar a Pedido" and "Vaciar Carrito" buttons, positioned horizontally alongside the "Total" display.
+    - Adjust the component's width to `w-full` and remove `mt-20` for proper alignment.
+
+**Reasoning:**
+The previous cart view did not match the desired design, with the total and action buttons incorrectly positioned. These changes align the UI with the provided image, improving the user experience by presenting a clear and functional cart summary.

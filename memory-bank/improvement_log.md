@@ -16,6 +16,10 @@ This document serves as a critical source of wisdom, detailing lessons learned f
   - **Correction**: Prioritize documentation updates in `functionalities/` before implementing any major scope code changes. Always consult `manifest.md` and `improvement_log.md` at the start of every task.
   - **Date**: 2025-10-06
 
+- **Error 4: Incorrect CLI Command Chaining on Windows**: Attempted to chain `git add` and `git commit` using `&&` which is not directly supported in the default Windows command prompt without quoting.
+  - **Correction**: When executing multiple CLI commands, especially `git add` and `git commit`, execute them as separate commands. Avoid using `&&` for chaining in a single `execute_command` call on Windows unless explicitly confirmed to be supported by the shell.
+  - **Date**: 2025-10-06
+
 ## Areas for Continuous Improvement:
 
 - **Enhanced Context Awareness**: Improve my ability to infer context from partial information and proactively gather necessary details using available tools.
