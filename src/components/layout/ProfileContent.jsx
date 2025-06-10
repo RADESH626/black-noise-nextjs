@@ -241,6 +241,8 @@ function ProfileContent() {
                 error={error}
                 userDesigns={userDesigns}
                 handleEditDesign={handleEditDesign}
+                cartItems={cartItems}
+                addItem={handleAddItemToCart}
               />
             )}
           </>
