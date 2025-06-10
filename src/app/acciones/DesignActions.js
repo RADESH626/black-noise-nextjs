@@ -40,36 +40,12 @@ export async function guardarDesigns(prevState, formData) {
             return { success: false, message: 'No se proporcionó una imagen válida.' };
         }
 
-        const imageFile = formData.get('imagenDesing');
-        let imagePath = '';
-
-        if (imageFile && imageFile instanceof File) {
-            const bytes = await imageFile.arrayBuffer();
-            const buffer = Buffer.from(bytes);
-
-            // Generate a unique filename
-            const filename = `${Date.now()}-${imageFile.name}`;
-            const absolutePath = path.join(process.cwd(), 'public', 'img', 'designs', filename);
-            const relativePath = `/img/designs/${filename}`; // Path to store in DB
-
-            await fs.writeFile(absolutePath, buffer);
-            imagePath = relativePath;
-        } else {
-            return { success: false, message: 'No se proporcionó una imagen válida.' };
-        }
-
         const data = {
             usuarioId: session.user.id,
             nombreDesing: formData.get('nombreDesing'),
-            nombreDesing: formData.get('nombreDesing'),
             descripcion: formData.get('descripcion'),
             valorDesing: parseFloat(formData.get('valorDesing')),
-            valorDesing: parseFloat(formData.get('valorDesing')),
             categoria: formData.get('categoria'),
-            imagenDesing: imagePath, // Use the path of the saved image
-            estadoDesing: 'PRIVADO',
-            coloresDisponibles: formData.get('coloresDisponibles') ? formData.get('coloresDisponibles').split(',') : [],
-            tallasDisponibles: formData.get('tallasDisponibles') ? formData.get('tallasDisponibles').split(',') : []
             imagenDesing: imagePath, // Use the path of the saved image
             estadoDesing: 'PRIVADO',
             coloresDisponibles: formData.get('coloresDisponibles') ? formData.get('coloresDisponibles').split(',') : [],
