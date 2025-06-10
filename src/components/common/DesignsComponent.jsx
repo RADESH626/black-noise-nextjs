@@ -41,7 +41,7 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartI
                 <p className="font-semibold">categoría: {design.categoria}</p>
                 <p className="font-semibold text-purple-400">likes: {design.likes}</p>
               </div>
-              {cartItems.some(item => item.id === design._id) ? (
+              {(cartItems || []).some(item => item.id === design._id) ? (
                 <button
                   disabled
                   className="bg-gray-600 text-white font-semibold py-2 px-4 rounded-md text-sm cursor-not-allowed"
