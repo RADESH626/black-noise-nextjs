@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useActionState, useFormStatus } from "react-dom";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { usePopUp } from "@/context/PopUpContext";
 import BotonGeneral from "@/components/common/BotonGeneral"; // Assuming this component exists
 import { updateUserAction } from "@/app/acciones/UsuariosActions"; // Import the server action

@@ -11,8 +11,9 @@ import PedidosComponent from "../common/PedidosComponent"; // Import PedidosComp
 import CartComponent from "../common/CartComponent"; // Import CartComponent
 import PagosComponent from "../common/PagosComponent"; // Import PagosComponent
 import { ObtenerUsuarioPorId } from "@/app/acciones/UsuariosActions"; // Import the server action
+import FormEditarUsuario from "@/components/perfil/FormEditarUsuario"; // Import FormEditarUsuario
 
-function ProfileContent() { // Removed user, designs, and error props
+function ProfileContent() {
   const { openModal } = useModal();
   const { cartItems, addItem } = useCartStorage(); // Get cartItems and addItem from context
   const { data: session, status } = useSession(); // Get session using useSession
@@ -61,10 +62,21 @@ function ProfileContent() { // Removed user, designs, and error props
   const handleEditProfile = () => {
     openModal(
       "Editar Perfil",
-      <div className="text-white">
-        <h3 className="text-lg mb-4">Funcionalidad de edición de perfil no disponible.</h3>
-        <p>El componente FormEditarUsuario no fue encontrado.</p>
-      </div>,
+      <FormEditarUsuario
+        userData={currentUser}
+        userId={session.user.id}
+        onSuccess={() => {
+          openModal(
+            "Perfil Actualizado",
+            <div className="text-white">
+              <h3 className="text-lg mb-4">¡Tu perfil ha sido actualizado exitosamente!</h3>
+            </div>,
+            'default'
+          );
+          // Re-fetch user data to update the displayed profile
+          fetchData();
+        }}
+      />,
       'default'
     );
   };
