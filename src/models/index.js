@@ -6,6 +6,7 @@ import Proveedor from './Proveedor';
 import SolicitudProveedor from './SolicitudProveedor';
 import Usuario from './Usuario';
 import Venta from './Venta';
+import Cart from './Cart';
 
 export {
   Design,
@@ -16,4 +17,5 @@ export {
   SolicitudProveedor,
   Usuario,
   Venta,
+  Cart,
 };
