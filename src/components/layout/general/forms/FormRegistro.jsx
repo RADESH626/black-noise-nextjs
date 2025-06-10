@@ -55,7 +55,7 @@ function FormRegistro() {
       // This assumes the server action doesn't reset the state itself.
       // If the action always returns a new state object, this might not be strictly necessary,
       // but it's a good practice for robust UI feedback.
-      state.message = null; 
+      // state.message = null; 
     }
     if (state.success) {
       // Redirigir al login después del registro exitoso

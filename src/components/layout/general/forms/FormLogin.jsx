@@ -45,14 +45,14 @@ function FormLogin() {
     console.log('Frontend Login: State changed:', state);
     
     // If the server action was successful and indicates readiness for client-side signIn
-    if (state.success && state.readyForSignIn && state.email && state.password) {
+    if (state.success && state.data?.readyForSignIn && state.data?.email && state.data?.password) { // Access data from state.data
       console.log('Frontend Login: Datos recibidos de Server Action, intentando signIn.');
-      console.log('Frontend Login: User role from state:', state.userRole);
+      console.log('Frontend Login: User role from state:', state.data.userRole); // Access userRole from state.data
       
       const handleSignIn = async () => {
         const result = await signIn('credentials', {
-          email: state.email,
-          password: state.password,
+          email: state.data.email, // Access email from state.data
+          password: state.data.password, // Access password from state.data
           redirect: false,
         });
 
@@ -63,18 +63,18 @@ function FormLogin() {
           showPopUp('Credenciales incorrectas', 'error');
         } else {
           console.log('Frontend Login: Inicio de sesión exitoso.');
-          console.log('Frontend Login: Verificando rol para redirección:', state.userRole);
+          console.log('Frontend Login: Verificando rol para redirección:', state.data.userRole); // Access userRole from state.data
           showPopUp('¡Inicio de sesión exitoso!', 'success');
           
           // Redirección basada en el rol del usuario
-          if (state.userRole === 'ADMINISTRADOR') {
+          if (state.data.userRole === 'ADMINISTRADOR') { // Access userRole from state.data
             console.log('Frontend Login: Redirigiendo administrador al panel de admin.');
             router.push('/admin');
-          } else if (state.userRole === 'PROVEEDOR') {
+          } else if (state.data.userRole === 'PROVEEDOR') { // Access userRole from state.data
             console.log('Frontend Login: Redirigiendo proveedor a la lista de pedidos.');
             router.push('/proveedor/pedidos');
           } else {
-            console.log('Frontend Login: Redirigiendo cliente al catálogo. Rol actual:', state.userRole);
+            console.log('Frontend Login: Redirigiendo cliente al catálogo. Rol actual:', state.data.userRole); // Access userRole from state.data
             router.push('/catalogo');
           }
         }

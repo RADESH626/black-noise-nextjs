@@ -42,12 +42,14 @@ export async function loginAction(prevState, formData) {
       if (isValid) {
         console.log('Server Action Login: Usuario autenticado, rol:', user.rol);
         return { 
-          email, 
-          password, 
-          userRole: user.rol,
-          message: null, 
+          message: 'Inicio de sesión exitoso.', 
           success: true, 
-          readyForSignIn: true 
+          data: { 
+            email, 
+            password, 
+            userRole: user.rol, 
+            readyForSignIn: true 
+          } 
         };
       }
     }
@@ -60,13 +62,15 @@ export async function loginAction(prevState, formData) {
       if (isValidAccessKey) {
         console.log('Server Action Login: Proveedor autenticado, ID:', proveedor._id);
         return {
-          email: proveedor.emailContacto,
-          password: password, // NextAuth needs the raw password for CredentialsProvider
-          isSupplier: true,
-          proveedorId: proveedor._id.toString(),
-          message: null,
+          message: 'Inicio de sesión exitoso.',
           success: true,
-          readyForSignIn: true
+          data: {
+            email: proveedor.emailContacto,
+            password: password, // NextAuth needs the raw password for CredentialsProvider
+            isSupplier: true,
+            proveedorId: proveedor._id.toString(),
+            readyForSignIn: true
+          }
         };
       }
     }
@@ -564,6 +568,7 @@ export async function registerAction(prevState, formData) {
     const result = await RegistrarUsuario(formData);
 
     if (result.success) {
+      revalidatePath('/'); // Add revalidatePath for general consistency
       return { message: result.message || '¡Registro exitoso!', success: true, data: result.data };
     } else {
       throw new ValidationError(result.error);
