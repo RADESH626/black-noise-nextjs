@@ -80,12 +80,12 @@ export async function obtenerDesigns() {
 }
 
 // Function to get designs by user ID
-export async function obtenerDesignsPorUsuarioId(userId) {
+export async function obtenerDesignsPorUsuarioId(usuarioId) {
     await connectDB();
-    console.log('DEBUG: Entering obtenerDesignsPorUsuarioId with userId:', userId);
+    console.log('DEBUG: Entering obtenerDesignsPorUsuarioId with usuarioId:', usuarioId);
     try {
-        const designs = await Design.find({ userId: userId }).lean(); // Assuming 'userId' field in Design model
-        console.log('DEBUG: Designs obtained by userId successfully:', designs);
+        const designs = await Design.find({ usuarioId: usuarioId }).lean(); // Corrected field name to 'usuarioId'
+        console.log('DEBUG: Designs obtained by usuarioId successfully:', designs);
         return { designs: JSON.parse(JSON.stringify(designs)), error: null };
     } catch (error) {
         console.error('ERROR in obtenerDesignsPorUsuarioId:', error);
