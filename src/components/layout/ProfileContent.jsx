@@ -3,9 +3,9 @@
 import { useModal } from "@/context/ModalContext";
 import { signOut, useSession } from "next-auth/react"; // Import signOut and useSession
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
-import { useCartStorage } from "@/hooks/useCartStorage"; // Import useCartStorage
 import { useEffect, useState } from "react"; // Import useEffect and useState
 import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions"; // Import the server action
+import { getCartByUserId, addDesignToCart } from "@/app/acciones/CartActions"; // Import CartActions for cart management
 import DesignsComponent from "../common/DesignsComponent"; // Import DesignsComponent
 import PedidosComponent from "../common/PedidosComponent";
 import CartComponent from "../common/CartComponent";
@@ -16,8 +16,8 @@ import DesignUploadModal from "@/components/perfil/DesignUploadModal"; // Import
 
 function ProfileContent() {
   const { openModal } = useModal();
-  const { cartItems, addItem } = useCartStorage();
   const { data: session, status } = useSession();
+  const userId = session?.user?.id;
 
   const [activeTab, setActiveTab] = useState('designs'); // State to manage active tab
   const [currentUser, setCurrentUser] = useState(null); // State for user data
@@ -25,13 +25,17 @@ function ProfileContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [cartItems, setCartItems] = useState([]);
+  const [cartLoading, setCartLoading] = useState(true);
+  const [cartError, setCartError] = useState(null);
+
   const fetchData = async () => { // Moved fetchData outside useEffect to be callable
-    if (status === 'authenticated' && session?.user?.id) {
+    if (status === 'authenticated' && userId) {
       setLoading(true);
       setError(null);
 
       // Fetch full user data
-      const fetchedUser = await ObtenerUsuarioPorId(session.user.id);
+      const fetchedUser = await ObtenerUsuarioPorId(userId);
       if (fetchedUser && fetchedUser.error) {
         setError(fetchedUser.error);
         setCurrentUser(null);
@@ -40,7 +44,7 @@ function ProfileContent() {
       }
 
       // Fetch designs
-      const { designs, error: designsError } = await obtenerDesignsPorUsuarioId(session.user.id);
+      const { designs, error: designsError } = await obtenerDesignsPorUsuarioId(userId);
       if (designsError) {
         setError(designsError);
       } else {
@@ -54,10 +58,43 @@ function ProfileContent() {
     }
   };
 
+  const fetchCartData = async () => {
+    if (status === 'authenticated' && userId) {
+      setCartLoading(true);
+      setCartError(null);
+      const { cart, error: fetchError } = await getCartByUserId(userId);
+      if (fetchError) {
+        setCartError({ message: fetchError });
+        setCartItems([]);
+      } else {
+        setCartItems(cart?.items || []);
+      }
+      setCartLoading(false);
+    } else if (status === 'unauthenticated') {
+      setCartLoading(false);
+      setCartItems([]);
+    }
+  };
+
   useEffect(() => {
     fetchData();
-  }, [session, status]); // Rerun effect when session or status changes
+    fetchCartData(); // Fetch cart data as well
+  }, [session, status, userId]); // Rerun effect when session, status, or userId changes
 
+  const handleAddItemToCart = async (designId) => {
+    if (!userId) {
+      alert("Debes iniciar sesión para agregar ítems al carrito.");
+      return;
+    }
+    setCartLoading(true); // Indicate loading for cart operation
+    const { success, message } = await addDesignToCart(userId, designId);
+    if (success) {
+      await fetchCartData(); // Re-fetch cart to update UI
+    } else {
+      setCartError({ message: message || "Error al agregar el diseño al carrito." });
+    }
+    setCartLoading(false);
+  };
 
   const user = currentUser; // Use the state variable for user
 
@@ -66,7 +103,7 @@ function ProfileContent() {
       "Editar Perfil",
       <FormEditarUsuario
         userData={currentUser}
-        userId={session.user.id}
+        userId={userId}
         onSuccess={() => {
           openModal(
             "Perfil Actualizado",
@@ -204,6 +241,8 @@ function ProfileContent() {
                 error={error}
                 userDesigns={userDesigns}
                 handleEditDesign={handleEditDesign}
+                cartItems={cartItems} // Pass cartItems to DesignsComponent
+                addItem={handleAddItemToCart} // Pass addItem to DesignsComponent
               />
             )}
           </>

@@ -6,10 +6,11 @@ import Design from '@/models/Design'; // Import Design model
 import { revalidatePath } from 'next/cache';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import logger from '@/utils/logger';
 
 export async function addDesignToCart(userId, designId) {
     await connectDB();
-    console.log(`DEBUG: Entering addDesignToCart for userId: ${userId}, designId: ${designId}`);
+    logger.debug(`Entering addDesignToCart for userId: ${userId}, designId: ${designId}`);
 
     if (!userId || !designId) {
         return { success: false, message: 'User ID and Design ID are required.' };
@@ -19,19 +20,23 @@ export async function addDesignToCart(userId, designId) {
         let cart = await Cart.findOne({ userId });
 
         if (!cart) {
-            // If no cart exists for the user, create a new one
-            cart = await Cart.create({ userId, designIds: [designId] });
-            console.log('DEBUG: New cart created:', cart);
+            // If no cart exists for the user, create a new one with the design
+            cart = await Cart.create({ userId, items: [{ designId: designId, quantity: 1 }] });
+            logger.debug('New cart created with design:', cart);
         } else {
-            // If cart exists, add designId if not already present
-            if (!cart.designIds.includes(designId)) {
-                cart.designIds.push(designId);
-                await cart.save();
-                console.log('DEBUG: Design added to existing cart:', cart);
+            // If cart exists, check if design is already present
+            const itemIndex = cart.items.findIndex(item => item.designId.toString() === designId);
+
+            if (itemIndex > -1) {
+                // If design exists, increment quantity
+                cart.items[itemIndex].quantity += 1;
+                logger.debug('Design quantity incremented in cart:', cart);
             } else {
-                console.log('DEBUG: Design already in cart, no action needed.');
-                return { success: true, message: 'Design already in cart.' };
+                // If design not present, add new item
+                cart.items.push({ designId: designId, quantity: 1 });
+                logger.debug('New design added to existing cart:', cart);
             }
+            await cart.save();
         }
 
         revalidatePath('/perfil'); // Revalidate profile page to reflect cart changes
@@ -39,14 +44,14 @@ export async function addDesignToCart(userId, designId) {
 
         return { success: true, message: 'Design added to cart successfully.', data: JSON.parse(JSON.stringify(cart)) };
     } catch (error) {
-        console.error('ERROR in addDesignToCart:', error);
+        logger.error('ERROR in addDesignToCart:', error);
         return { success: false, message: 'Error adding design to cart: ' + error.message };
     }
 }
 
 export async function removeDesignFromCart(userId, designId) {
     await connectDB();
-    console.log(`DEBUG: Entering removeDesignFromCart for userId: ${userId}, designId: ${designId}`);
+    logger.debug(`Entering removeDesignFromCart for userId: ${userId}, designId: ${designId}`);
 
     if (!userId || !designId) {
         return { success: false, message: 'User ID and Design ID are required.' };
@@ -56,72 +61,110 @@ export async function removeDesignFromCart(userId, designId) {
         let cart = await Cart.findOne({ userId });
 
         if (cart) {
-            const initialLength = cart.designIds.length;
-            cart.designIds = cart.designIds.filter(id => id !== designId);
-            if (cart.designIds.length < initialLength) {
+            const initialLength = cart.items.length;
+            cart.items = cart.items.filter(item => item.designId.toString() !== designId);
+            if (cart.items.length < initialLength) {
                 await cart.save();
-                console.log('DEBUG: Design removed from cart:', cart);
+                logger.debug('Design removed from cart:', cart);
                 revalidatePath('/perfil');
                 revalidatePath('/carrito');
                 return { success: true, message: 'Design removed from cart successfully.' };
             } else {
-                console.log('DEBUG: Design not found in cart, no action needed.');
+                logger.debug('Design not found in cart, no action needed.');
                 return { success: true, message: 'Design not found in cart.' };
             }
         } else {
-            console.log('DEBUG: Cart not found for user, no action needed.');
+            logger.debug('Cart not found for user, no action needed.');
             return { success: true, message: 'Cart not found for user.' };
         }
     } catch (error) {
-        console.error('ERROR in removeDesignFromCart:', error);
+        logger.error('ERROR in removeDesignFromCart:', error);
         return { success: false, message: 'Error removing design from cart: ' + error.message };
     }
 }
 
 export async function getCartByUserId(userId) {
     await connectDB();
-    console.log(`DEBUG: Entering getCartByUserId for userId: ${userId}`);
+    logger.debug(`Entering getCartByUserId for userId: ${userId}`);
 
     if (!userId) {
         return { cart: null, error: 'User ID is required.' };
     }
 
     try {
-        const cart = await Cart.findOne({ userId }).lean();
+        // Populate the 'designId' field within the 'items' array
+        const cart = await Cart.findOne({ userId }).populate('items.designId').lean();
         if (!cart) {
             return { cart: null, error: null }; // No cart found, but not an error
         }
 
-        // Fetch full design details for each designId in the cart
-        const designDetails = await Design.find({ _id: { $in: cart.designIds } }).lean();
-
-        // Map design details to a more usable format for the client,
-        // including a default quantity of 1 for now, as the server cart only stores IDs.
-        const populatedCartItems = designDetails.map(design => ({
-            id: design._id.toString(),
-            nombre: design.nombreDesing,
-            price: design.valorDesing,
-            imagen: design.imagenDesing,
-            quantity: 1, // Assuming quantity is 1 for items stored by ID in DB
+        // Map populated design details to a more usable format for the client
+        const populatedCartItems = (cart.items || []).map(item => ({
+            id: item.designId._id.toString(),
+            nombre: item.designId.nombreDesing,
+            price: item.designId.valorDesing,
+            imagen: item.designId.imagenDesing,
+            quantity: item.quantity, // Use the quantity from the cart item
         }));
 
         // Reconstruct the cart object with populated items
         const populatedCart = {
             ...cart,
-            items: populatedCartItems, // Add a new 'items' array with full design details
+            items: populatedCartItems, // Replace the original items array with the populated one
         };
 
-        console.log('DEBUG: Populated cart obtained by userId:', populatedCart);
+        logger.debug('Populated cart obtained by userId:', populatedCart);
         return { cart: JSON.parse(JSON.stringify(populatedCart)), error: null };
     } catch (error) {
-        console.error('ERROR in getCartByUserId:', error);
+        logger.error('ERROR in getCartByUserId:', error);
         return { cart: null, error: 'Error obtaining cart by user ID: ' + error.message };
+    }
+}
+
+export async function updateCartItemQuantity(userId, designId, newQuantity) {
+    await connectDB();
+    logger.debug(`Entering updateCartItemQuantity for userId: ${userId}, designId: ${designId}, newQuantity: ${newQuantity}`);
+
+    if (!userId || !designId || newQuantity === undefined || newQuantity < 0) {
+        return { success: false, message: 'User ID, Design ID, and a valid non-negative quantity are required.' };
+    }
+
+    try {
+        let cart = await Cart.findOne({ userId });
+
+        if (!cart) {
+            return { success: false, message: 'Cart not found for user.' };
+        }
+
+        const itemIndex = cart.items.findIndex(item => item.designId.toString() === designId);
+
+        if (itemIndex > -1) {
+            if (newQuantity === 0) {
+                // Remove item if quantity is 0
+                cart.items.splice(itemIndex, 1);
+                logger.debug('Design removed from cart due to zero quantity:', cart);
+            } else {
+                // Update quantity
+                cart.items[itemIndex].quantity = newQuantity;
+                logger.debug('Design quantity updated in cart:', cart);
+            }
+            await cart.save();
+            revalidatePath('/perfil');
+            revalidatePath('/carrito');
+            return { success: true, message: 'Cart item quantity updated successfully.', data: JSON.parse(JSON.stringify(cart)) };
+        } else {
+            logger.debug('Design not found in cart for quantity update, no action needed.');
+            return { success: false, message: 'Design not found in cart for quantity update.' };
+        }
+    } catch (error) {
+        logger.error('ERROR in updateCartItemQuantity:', error);
+        return { success: false, message: 'Error updating cart item quantity: ' + error.message };
     }
 }
 
 export async function clearUserCart(userId) {
     await connectDB();
-    console.log(`DEBUG: Entering clearUserCart for userId: ${userId}`);
+    logger.debug(`Entering clearUserCart for userId: ${userId}`);
 
     if (!userId) {
         return { success: false, message: 'User ID is required.' };
@@ -130,21 +173,48 @@ export async function clearUserCart(userId) {
     try {
         const result = await Cart.findOneAndUpdate(
             { userId },
-            { $set: { designIds: [] } },
+            { $set: { items: [] } }, // Clear the 'items' array
             { new: true }
         ).lean();
 
         if (result) {
-            console.log('DEBUG: Cart cleared successfully for userId:', userId);
+            logger.debug('Cart cleared successfully for userId:', userId);
             revalidatePath('/perfil');
             revalidatePath('/carrito');
             return { success: true, message: 'Cart cleared successfully.' };
         } else {
-            console.log('DEBUG: Cart not found for user, nothing to clear.');
+            logger.debug('Cart not found for user, nothing to clear.');
             return { success: true, message: 'Cart not found for user.' };
         }
     } catch (error) {
-        console.error('ERROR in clearUserCart:', error);
+        logger.error('ERROR in clearUserCart:', error);
         return { success: false, message: 'Error clearing cart: ' + error.message };
+    }
+}
+
+export async function createEmptyCartForUser(userId) {
+    await connectDB();
+    logger.debug(`Entering createEmptyCartForUser for userId: ${userId}`);
+
+    if (!userId) {
+        return { success: false, message: 'User ID is required to create an empty cart.' };
+    }
+
+    try {
+        let cart = await Cart.findOne({ userId });
+
+        if (cart) {
+            logger.debug('Cart already exists for user, no new cart created.');
+            return { success: true, message: 'Cart already exists for this user.' };
+        } else {
+            cart = await Cart.create({ userId, items: [] }); // Create with an empty items array
+            logger.debug('Empty cart created successfully for userId:', cart);
+            revalidatePath('/perfil'); // Revalidate profile page
+            revalidatePath('/carrito'); // Revalidate cart page
+            return { success: true, message: 'Empty cart created successfully.', data: JSON.parse(JSON.stringify(cart)) };
+        }
+    } catch (error) {
+        logger.error('ERROR in createEmptyCartForUser:', error);
+        return { success: false, message: 'Error creating empty cart: ' + error.message };
     }
 }

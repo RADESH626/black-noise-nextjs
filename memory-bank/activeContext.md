@@ -50,3 +50,14 @@ The previous cart view did not match the desired design, with the total and acti
 
 **Reasoning:**
 The user requested that the cart items be displayed with a similar visual style to the design cards in the profile's "DISEÑOS" tab. This refactoring provides a consistent and improved visual experience for cart items, making them more visually appealing and functional.
+
+### 10/6/2025, 6:29:00 p. m.
+
+**Task:** Fixed `TypeError: Cannot read properties of undefined (reading 'map')` in `getCartByUserId`.
+
+**Changes Made:**
+- Modified `src/app/acciones/CartActions.js`.
+- Added a nullish coalescing operator (`|| []`) to `cart.items.map` to ensure `map` is always called on an array, even if `cart.items` is `undefined` or `null`.
+
+**Reasoning:**
+The error occurred because `cart.items` was `undefined` when `map` was called. This fix ensures that `cart.items` defaults to an empty array if it's not defined, preventing the `TypeError` and making the `getCartByUserId` function more robust.

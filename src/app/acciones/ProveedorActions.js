@@ -7,6 +7,7 @@ import Proveedor from "@/models/Proveedor";
 import { revalidatePath } from "next/cache";
 import { Rol } from "@/models/enums/usuario/Rol";
 import bcrypt from "bcryptjs";
+import logger from '@/utils/logger';
 
 export async function crearProveedor(prevState, formData) {
   const session = await getServerSession(authOptions);
@@ -72,11 +73,11 @@ export async function crearProveedor(prevState, formData) {
 
         const emailResult = await emailResponse.json();
         if (!emailResult.success) {
-          console.warn("Advertencia: No se pudo enviar el correo electrónico al proveedor. Detalles:", emailResult.message);
+          logger.warn("Advertencia: No se pudo enviar el correo electrónico al proveedor. Detalles:", emailResult.message);
           // Decide if you want to return an error here or just log a warning
         }
       } catch (emailError) {
-        console.error("Error al intentar enviar el correo electrónico de la clave de acceso:", emailError);
+        logger.error("Error al intentar enviar el correo electrónico de la clave de acceso:", emailError);
         // Decide if you want to return an error here or just log a warning
       }
 
@@ -87,7 +88,7 @@ export async function crearProveedor(prevState, formData) {
         accessKey: generatedAccessKey // Add the generated access key here
       };
     } catch (error) {
-      console.error("Error al crear proveedor:", error);
+      logger.error("Error al crear proveedor:", error);
       return { message: `Error al crear proveedor: ${error.message}`, success: false };
     }
   }
@@ -109,7 +110,7 @@ export async function generarYGuardarAccessKey(proveedorId, newAccessKey) {
     revalidatePath("/admin/proveedores");
     return { message: "Clave de acceso actualizada exitosamente.", success: true };
   } catch (error) {
-    console.error("Error al generar y guardar clave de acceso:", error);
+    logger.error("Error al generar y guardar clave de acceso:", error);
     return { message: `Error al generar y guardar clave de acceso: ${error.message}`, success: false };
   }
 }
@@ -167,7 +168,7 @@ export async function actualizarProveedor(prevState, formData) {
     revalidatePath("/admin/proveedores");
     return { message: "Proveedor actualizado exitosamente.", success: true };
   } catch (error) {
-    console.error("Error al actualizar proveedor:", error);
+    logger.error("Error al actualizar proveedor:", error);
     return { message: `Error al actualizar proveedor: ${error.message}`, success: false };
   }
 }
@@ -186,7 +187,7 @@ export async function obtenerProveedoresHabilitados() {
       success: true
     };
   } catch (error) {
-    console.error("Error al obtener proveedores habilitados:", error);
+    logger.error("Error al obtener proveedores habilitados:", error);
     return { proveedores: [], success: false, message: "Error al obtener proveedores habilitados." };
   }
 }
@@ -205,7 +206,7 @@ export async function obtenerProveedores() {
       success: true
     };
   } catch (error) {
-    console.error("Error al obtener todos los proveedores:", error);
+    logger.error("Error al obtener todos los proveedores:", error);
     return { proveedores: [], success: false, message: "Error al obtener todos los proveedores." };
   }
 }
@@ -227,7 +228,7 @@ export async function obtenerProveedorPorId(id) {
       success: true
     };
   } catch (error) {
-    console.error("Error al obtener proveedor por ID:", error);
+    logger.error("Error al obtener proveedor por ID:", error);
     return { proveedor: null, success: false, message: "Error al obtener proveedor por ID." };
   }
 }
@@ -249,7 +250,7 @@ export async function eliminarProveedor(prevState, formData) {
     revalidatePath("/admin/proveedores");
     return { message: "Proveedor eliminado exitosamente.", success: true };
   } catch (error) {
-    console.error("Error al eliminar proveedor:", error);
+    logger.error("Error al eliminar proveedor:", error);
     return { message: `Error al eliminar proveedor: ${error.message}`, success: false };
   }
 }
@@ -280,7 +281,7 @@ export async function obtenerMiPerfilProveedor() {
       success: true
     };
   } catch (error) {
-    console.error("Error al obtener el perfil del proveedor:", error);
+    logger.error("Error al obtener el perfil del proveedor:", error);
     return { proveedor: null, success: false, message: `Error al obtener el perfil del proveedor: ${error.message}` };
   }
 }

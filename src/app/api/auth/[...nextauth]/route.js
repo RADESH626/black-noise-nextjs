@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { ObtenerUsuarioPorCorreo } from "@/app/acciones/UsuariosActions";
 import Proveedor from "@/models/Proveedor"; // Import Proveedor model
 import connectDB from "@/utils/DBconection"; // Import connectDB
+import logger from '@/utils/logger';
 
 export const authOptions = {
   providers: [
@@ -57,7 +58,7 @@ export const authOptions = {
           return null;
 
         } catch (error) {
-          console.error("Auth error in authorize callback:", error);
+          logger.error("Auth error in authorize callback:", error);
           return null;
         }
       },

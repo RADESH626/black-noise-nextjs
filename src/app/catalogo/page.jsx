@@ -1,16 +1,18 @@
 'use client'
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { useCartStorage } from '@/hooks/useCartStorage';
 import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
 import Footer from '@/components/layout/general/footer/Footer';
 import CatalogTabs from '@/components/catalogo/CatalogTabs';
 import NewPostSection from '@/components/catalogo/NewPostSection';
 import DesignGrid from '@/components/catalogo/DesignGrid';
+import { addDesignToCart } from '@/app/acciones/CartActions'; // Import addDesignToCart
+import { useSession } from 'next-auth/react'; // Import useSession
 
 const ComunidadDiseños = () => {
   const [activo, setActivo] = useState('diseños');
-  const { addItem } = useCartStorage();
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
 
   const allDesigns = useMemo(() => {
     return []; // Aquí se debería implementar la lógica para obtener diseños reales
@@ -69,6 +71,20 @@ const ComunidadDiseños = () => {
     });
   };
 
+  const handleAddItemToCart = async (item) => {
+    if (!userId) {
+      alert("Debes iniciar sesión para agregar ítems al carrito.");
+      return;
+    }
+    const { success, message } = await addDesignToCart(userId, item.id);
+    if (!success) {
+      alert(message || "Error al agregar el diseño al carrito.");
+    } else {
+      alert("Diseño agregado al carrito!");
+      // Optionally, revalidate cart path here if needed, but CartComponent will fetch its own data
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(to bottom, #000000, #0A1828, #000000)' }}>
       <HeaderPrincipal />
@@ -88,7 +104,7 @@ const ComunidadDiseños = () => {
           likesState={likesState}
           likedDesigns={likedDesigns}
           handleLike={handleLike}
-          addItem={addItem}
+          addItem={handleAddItemToCart} // Pass the new addItem function
         />
       </main>
 

@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
+import logger from './logger';
 
 export const handleError = (error, message = 'An unexpected error occurred', status = 500) => {
-    console.error(message, error);
+    logger.error(message, error);
     // Ensure that the returned object is a plain JavaScript object
     return {
         success: false,

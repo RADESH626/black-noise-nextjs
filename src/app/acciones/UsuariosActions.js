@@ -14,6 +14,7 @@ import { hashPassword, comparePassword } from '@/utils/authUtils'; // Import pas
 import { handleError, ValidationError, NotFoundError, UnauthorizedError } from '@/utils/errorHandler'; // Import error handling utilities
 import { validateRequiredFields, validateEmail, validatePassword } from '@/utils/validation'; // Import validation utilities
 import Proveedor from '@/models/Proveedor'; // Import Proveedor model
+import logger from '@/utils/logger';
 
 const DEFAULT_PROFILE_PICTURE_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAKwAAACUCAMAAAA5xjIqAAAAMFBMVEXk5ueutLenrrHn6eqrsbTq7O3Lz9Hh4+S4vcDGyszT1tjP0VbTe4OKyuLvCx8nW2dvDGAcOAAAECUlEQVR4nO2c23LjIAxAbcTVBvP/f7vQZLNJ47SAsGTPcp4605czqpC4yJ2mwWAwGAwGg8FgMBgMBq+AUmDisizR5x+5dT4Dk4kuiAfSOm+mUworv25ByPkZKcK2mNPpqsmF+dX07jvbByfTdWLP9O4r9XmSAaY1fFbNiLCcxBYm+7PqV3DdKVIX4i9hvesGz28LukQ124p4Gdesu/LGtsY12ypWV1HhmqoCY2xhrYnrV2wjly3EStVEMEyy5vf6+h5ay+MKW71rSlvHkQgQW1xTbDmaAzSp8iQCuLbA5mpLLutDoytHaKta1ytiIXY1zYHN0HZdWOr67LfQ0vYxZTGBlRtpaA0msKnpekLXup3hDpRHMkBlQcoDR+eKKLJ3WUu3+UpnRJxs2iDQyWJTdqY8PDbvCx6R1WQrzDTtZF9k6SqtQRaDRKCTxa6vmXB74PGukk4Wm7KpHJAtsCE7ZKeLLbBLla5rNYWGS65XpKU72FxpI3OpLSIsSFfKzTf6WDNbQln0gXGnc73WUfxSlxyTwiUtYZWd8qPShS7mLnXliWpi7O+MiFIbiFVRDyCaXHaaWmUJL+UewNL4aMfy1tz2HEp8Rf+gZY1xPTQ3JQLfWI+q3s9Ixvmu3rQVdKeZPapsJcuswQOosSU8JX7SLe5kgv7p/t22bARJcq6tf4AvuPOQ2ykGJ3Piut053yfVoM8z8AvG/jDsO4uzhPWO8jbI3TFqGTbDOYK4B4B3dv4+oC5nq08wN/tOysqvgXohZCLP/odt9eY8yfoGpAjHVWu9Rn9izRtJFtSN/CO3zgeynfFxyVF1Ce30usTov37BLfcMgInOhqd19VQYgt3WU2QE5M9pVmfzovqhJaTVNm86si42NUW9vZWrj8bSbi7y+ILyLsy/tNn3BhHsQq2bKqqTZRF9Qwgb6T68SjFd7W5rLQ2wsC7SxFeZbf9jqirf2R5/1wF584p/Zr75xkOTASBunVQzwq7HbR3BbOi//wupmh2WDLqv6g17RHAhBtwLzQek0L11cwYcRcqFricJ8EdkwMO25+0HYEbnixC219mn6oqoERn6lAXAz22U2M493psgHpmuz7r4K0Yy1w4fX+FnNipAxrb1+ajVdkPYtnykiEK0vzsd2wp2aW4PNDXrO61Xzsf3gj2aeln7szcKGRpkATmz027rGhZZh7HTRuq3CZrNtf4rIfQAH8a28sFM8VSCO6LKFTzT6rpRN0ChONrBMxVnSOgwLo+iZv/VNv3Sk4r52g7T8khk+RfatLvYXdnynS17FiTb4sgyNoS/FI/bc21hnikttfivELpQJov7wr4Xsmw3o7g9bxQmLbfmjbKjY+P/h+lNWcddxCmwRbLmJJS4Dv5D/gBmFDnwIIZzJgAAAABJRU5ErkJggg==';
 
@@ -23,8 +24,8 @@ export async function loginAction(prevState, formData) {
   const email = formData.get('correo');
   const password = formData.get('password');
 
-  console.log('Server Action Login: Iniciado.');
-  console.log('Server Action Login: Datos recibidos.');
+  logger.info('Server Action Login: Iniciado.');
+  logger.info('Server Action Login: Datos recibidos.');
 
   // Perform basic server-side validation if needed
   if (!email || !password) {
@@ -40,7 +41,7 @@ export async function loginAction(prevState, formData) {
       const isValid = await comparePassword(password, user.password);
       
       if (isValid) {
-        console.log('Server Action Login: Usuario autenticado, rol:', user.rol);
+        logger.info('Server Action Login: Usuario autenticado, rol:', user.rol);
         return { 
           message: 'Inicio de sesión exitoso.', 
           success: true, 
@@ -60,7 +61,7 @@ export async function loginAction(prevState, formData) {
     if (proveedor) {
       const isValidAccessKey = await comparePassword(password, proveedor.accessKey);
       if (isValidAccessKey) {
-        console.log('Server Action Login: Proveedor autenticado, ID:', proveedor._id);
+        logger.info('Server Action Login: Proveedor autenticado, ID:', proveedor._id);
         return {
           message: 'Inicio de sesión exitoso.',
           success: true,
@@ -85,7 +86,7 @@ export async function loginAction(prevState, formData) {
 
 // Server Action para manejar la adición de un solo usuario (Admin)
 export async function addSingleUserAction(prevState, formData) {
-    console.log('Server Action Add Single User: Iniciado.');
+    logger.info('Server Action Add Single User: Iniciado.');
 
     try {
         // RegistrarUsuario expects formData with password field named 'password'
@@ -125,17 +126,29 @@ async function guardarUsuarios(data, enviarCorreo = false) {
             data.fotoPerfil = `data:image/webp;base64,${DEFAULT_PROFILE_PICTURE_BASE64}`;
         } 
 
-        console.log('datos de usuario obtenidos:', data);
+        logger.debug('datos de usuario obtenidos:', data);
 
         await connectDB();
 
         const NuevoUsuario = new Usuario(data);
 
-        console.log('usuario para guardar en la base de datos:', NuevoUsuario);
+        logger.debug('usuario para guardar en la base de datos:', NuevoUsuario);
 
         const UsuarioGuardado = await NuevoUsuario.save();
 
-        console.log('Usuario guardado en la base de datos:', UsuarioGuardado);
+        logger.info('Usuario guardado en la base de datos:', UsuarioGuardado);
+
+        // Create an empty cart for the new user
+        const cartCreationResult = await createEmptyCartForUser(UsuarioGuardado._id.toString());
+        if (!cartCreationResult.success) {
+            logger.error('ERROR: Failed to create empty cart for new user:', cartCreationResult.message);
+            // Decide how to handle this error:
+            // - Rollback user creation (complex)
+            // - Log and proceed (cart will be created on first add to cart)
+            // For now, we'll log and proceed, as the cart will be created if it doesn't exist on first add.
+        } else {
+            logger.debug('Empty cart created for new user:', UsuarioGuardado._id);
+        }
 
         if (enviarCorreo && UsuarioGuardado && UsuarioGuardado.correo) {
             const asunto = 'Bienvenido/a a Black Noise';
@@ -151,7 +164,7 @@ async function guardarUsuarios(data, enviarCorreo = false) {
             `;
             const resultadoEnvioCorreo = await enviarCorreoElectronico(UsuarioGuardado.correo, asunto, contenidoHtml);
             if (resultadoEnvioCorreo.error) {
-                console.error("Error al enviar correo de bienvenida:", resultadoEnvioCorreo.error);
+                logger.error("Error al enviar correo de bienvenida:", resultadoEnvioCorreo.error);
             }
         }
         
@@ -186,7 +199,7 @@ async function enviarCorreoElectronico(to, subject, html) {
         };
 
         await transporter.sendMail(mailOptions);
-        console.log(`Correo enviado exitosamente a: ${to} en usuarioActions.enviarCorreoElectronico`);
+        logger.info(`Correo enviado exitosamente a: ${to} en usuarioActions.enviarCorreoElectronico`);
         return { success: true, message: 'Correo enviado exitosamente' };
     } catch (error) {
         return handleError(error, `Error al enviar el correo: ${error.message}`);
@@ -224,19 +237,19 @@ async function obtenerUsuariosHabilitados() {
 
 //obtener usuario por id
 async function ObtenerUsuarioPorId(id) {
-    console.log('DEBUG: Entering ObtenerUsuarioPorId with ID:', id);
+    logger.debug('Entering ObtenerUsuarioPorId with ID:', id);
     try {
         await connectDB();
-        console.log('DEBUG: Database connected for ObtenerUsuarioPorId.');
+        logger.debug('Database connected for ObtenerUsuarioPorId.');
         
         const response = await Usuario.findById(id).lean();
-        console.log('DEBUG: Raw response from DB for ObtenerUsuarioPorId:', response);
+        logger.debug('Raw response from DB for ObtenerUsuarioPorId:', response);
 
         if (!response) {
             throw new NotFoundError(`User not found with ID: ${id}`);
         }
         const plainUser = toPlainObject(response);
-        console.log('DEBUG: Exiting ObtenerUsuarioPorId with plain user:', plainUser);
+        logger.debug('Exiting ObtenerUsuarioPorId with plain user:', plainUser);
         return plainUser;
     } catch (error) {
         if (error instanceof NotFoundError) {
@@ -249,7 +262,7 @@ async function ObtenerUsuarioPorId(id) {
 //obtener usuario por correo
 async function ObtenerUsuarioPorCorreo(email) {
     try {
-        console.log('Iniciando la función ObtenerUsuarioPorCorreo para el correo:', email);
+        logger.info('Iniciando la función ObtenerUsuarioPorCorreo para el correo:', email);
         await connectDB();
         const user = await Usuario.findOne({ correo: { $regex: new RegExp(`^${email.trim()}$`, 'i') } }).lean();
 
@@ -324,11 +337,11 @@ async function RegistroMasivoUsuario(formData) {
         });
 
         if (resultadoParseo.errors.length > 0) {
-            console.error("Errores al parsear CSV:", resultadoParseo.errors);
+            logger.error("Errores al parsear CSV:", resultadoParseo.errors);
             return { success: false, error: 'Errores al parsear el archivo CSV.' };
         } else {
             const usuarios = resultadoParseo.data;
-            console.log("usuarios a procesar:", usuarios);
+            logger.debug("usuarios a procesar:", usuarios);
 
             const results = [];
             for (const usuarioData of usuarios) {
@@ -357,7 +370,7 @@ async function RegistroMasivoUsuario(formData) {
                     const usuarioGuardado = await nuevoUsuario.save();
                     results.push({ success: true, data: toPlainObject(usuarioGuardado) });
                 } catch (error) {
-                    console.error(`Error al guardar usuario ${usuarioData.correo || usuarioData.numeroDocumento}:`, error.message);
+                    logger.error(`Error al guardar usuario ${usuarioData.correo || usuarioData.numeroDocumento}:`, error.message);
                     if (error.code === 11000) {
                         results.push({ success: false, error: `Usuario ${usuarioData.correo || usuarioData.numeroDocumento} ya existe.` });
                     } else if (error instanceof ValidationError) {

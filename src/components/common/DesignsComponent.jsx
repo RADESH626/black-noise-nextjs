@@ -1,10 +1,8 @@
 "use client";
 
 import React from 'react';
-import { useCartStorage } from "@/hooks/useCartStorage"; // Import useCartStorage
 
-function DesignsComponent({ loading, error, userDesigns, handleEditDesign }) {
-  const { cartItems, addItem } = useCartStorage(); // Get cartItems and addItem from useCartStorage
+function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartItems, addItem }) { // Accept cartItems and addItem as props
 
   return (
     <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -8,11 +8,12 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Assuming this path for authOptions
 import fs from 'fs/promises'; // Import Node.js file system module
 import path from 'path'; // Import Node.js path module
+import logger from '@/utils/logger';
 
 // Function to save a single design
 export async function guardarDesigns(prevState, formData) {
     await connectDB();
-    console.log('DEBUG: Entering guardarDesigns with formData:', formData);
+    logger.debug('Entering guardarDesigns with formData:', formData);
 
     const session = await getServerSession(authOptions);
 
@@ -52,7 +53,7 @@ export async function guardarDesigns(prevState, formData) {
         };
 
         const newDesign = await Design.create(data);
-        console.log('DEBUG: Design saved successfully:', newDesign);
+        logger.debug('Design saved successfully:', newDesign);
 
         revalidatePath('/admin/designs');
         revalidatePath('/catalogo');
@@ -60,7 +61,7 @@ export async function guardarDesigns(prevState, formData) {
 
         return { success: true, message: 'Diseño registrado exitosamente', data: JSON.parse(JSON.stringify(newDesign)) };
     } catch (error) {
-        console.error('ERROR in guardarDesigns:', error);
+        logger.error('ERROR in guardarDesigns:', error);
         return { success: false, message: 'Error al registrar el diseño: ' + error.message };
     }
 }
@@ -68,13 +69,13 @@ export async function guardarDesigns(prevState, formData) {
 // Function to get all designs
 export async function obtenerDesigns() {
     await connectDB();
-    console.log('DEBUG: Entering obtenerDesigns.');
+    logger.debug('Entering obtenerDesigns.');
     try {
         const designs = await Design.find({}).lean();
-        console.log('DEBUG: Designs obtained successfully:', designs);
+        logger.debug('Designs obtained successfully:', designs);
         return { data: JSON.parse(JSON.stringify(designs)) };
     } catch (error) {
-        console.error('ERROR in obtenerDesigns:', error);
+        logger.error('ERROR in obtenerDesigns:', error);
         return { error: 'Error al obtener los diseños: ' + error.message };
     }
 }
@@ -82,13 +83,13 @@ export async function obtenerDesigns() {
 // Function to get designs by user ID
 export async function obtenerDesignsPorUsuarioId(usuarioId) {
     await connectDB();
-    console.log('DEBUG: Entering obtenerDesignsPorUsuarioId with usuarioId:', usuarioId);
+    logger.debug('Entering obtenerDesignsPorUsuarioId with usuarioId:', usuarioId);
     try {
         const designs = await Design.find({ usuarioId: usuarioId }).lean(); // Corrected field name to 'usuarioId'
-        console.log('DEBUG: Designs obtained by usuarioId successfully:', designs);
+        logger.debug('Designs obtained by usuarioId successfully:', designs);
         return { designs: JSON.parse(JSON.stringify(designs)), error: null };
     } catch (error) {
-        console.error('ERROR in obtenerDesignsPorUsuarioId:', error);
+        logger.error('ERROR in obtenerDesignsPorUsuarioId:', error);
         return { designs: null, error: 'Error al obtener los diseños por usuario: ' + error.message };
     }
 }
@@ -97,11 +98,11 @@ export async function obtenerDesignsPorUsuarioId(usuarioId) {
 // Function for mass registration of designs from a file
 export async function RegistroMasivoDesigns(prevState, formData) {
     await connectDB();
-    console.log('DEBUG: Entering RegistroMasivoDesigns with formData:', formData);
+    logger.debug('Entering RegistroMasivoDesigns with formData:', formData);
 
     const file = formData.get('file');
     if (!file) {
-        console.log('DEBUG: No file uploaded.');
+        logger.debug('No file uploaded.');
         return { success: false, message: 'No se ha subido ningún archivo' };
     }
 
@@ -117,7 +118,7 @@ export async function RegistroMasivoDesigns(prevState, formData) {
         });
 
         if (resultadoParseo.errors.length > 0) {
-            console.error("ERROR in RegistroMasivoDesigns (CSV parsing errors):", resultadoParseo.errors);
+            logger.error("ERROR in RegistroMasivoDesigns (CSV parsing errors):", resultadoParseo.errors);
             return { success: false, message: 'Errores al parsear el archivo CSV: ' + resultadoParseo.errors.map(e => e.message).join(', ') };
         }
 
@@ -134,14 +135,14 @@ export async function RegistroMasivoDesigns(prevState, formData) {
         }));
 
         const savedDesigns = await Design.insertMany(designsToSave);
-        console.log('DEBUG: All designs processed for mass registration:', savedDesigns);
+        logger.debug('All designs processed for mass registration:', savedDesigns);
 
         revalidatePath('/admin/designs');
         revalidatePath('/catalogo');
 
         return { success: true, message: `Se registraron ${savedDesigns.length} diseños masivamente.`, data: JSON.parse(JSON.stringify(savedDesigns)) };
     } catch (error) {
-        console.error("ERROR in RegistroMasivoDesigns:", error);
+        logger.error("ERROR in RegistroMasivoDesigns:", error);
         return { success: false, message: 'Error en el registro masivo de diseños: ' + error.message };
     }
 }
@@ -149,16 +150,16 @@ export async function RegistroMasivoDesigns(prevState, formData) {
 // Function to find a design by ID
 export async function encontrarDesignsPorId(id) {
     await connectDB();
-    console.log('DEBUG: Entering encontrarDesignsPorId with ID:', id);
+    logger.debug('Entering encontrarDesignsPorId with ID:', id);
     try {
         const design = await Design.findById(id).lean();
-        console.log('DEBUG: Design found by ID:', design);
+        logger.debug('Design found by ID:', design);
         if (!design) {
             return { error: 'Diseño no encontrado.' };
         }
         return { data: JSON.parse(JSON.stringify(design)) };
     } catch (error) {
-        console.error('ERROR in encontrarDesignsPorId:', error);
+        logger.error('ERROR in encontrarDesignsPorId:', error);
         return { error: 'Error al encontrar el diseño por ID: ' + error.message };
     }
 }
@@ -166,7 +167,7 @@ export async function encontrarDesignsPorId(id) {
 // Function to update a design
 export async function actualizarDesign(prevState, formData) {
     await connectDB();
-    console.log('DEBUG: Entering actualizarDesign with formData:', formData);
+    logger.debug('Entering actualizarDesign with formData:', formData);
 
     const id = formData.get('id');
     if (!id) {
@@ -191,7 +192,7 @@ export async function actualizarDesign(prevState, formData) {
         };
 
         const updatedDesign = await Design.findByIdAndUpdate(id, data, { new: true }).lean();
-        console.log('DEBUG: Design updated successfully:', updatedDesign);
+        logger.debug('Design updated successfully:', updatedDesign);
 
         revalidatePath('/admin/designs');
         revalidatePath('/catalogo');
@@ -199,7 +200,7 @@ export async function actualizarDesign(prevState, formData) {
 
         return { success: true, message: 'Diseño actualizado exitosamente', data: JSON.parse(JSON.stringify(updatedDesign)) };
     } catch (error) {
-        console.error('ERROR in actualizarDesign:', error);
+        logger.error('ERROR in actualizarDesign:', error);
         return { success: false, message: 'Error al actualizar el diseño: ' + error.message };
     }
 }
@@ -207,17 +208,17 @@ export async function actualizarDesign(prevState, formData) {
 // Function to delete a design
 export async function eliminarDesign(id) {
     await connectDB();
-    console.log('DEBUG: Entering eliminarDesign with ID:', id);
+    logger.debug('Entering eliminarDesign with ID:', id);
     try {
         const deletedDesign = await Design.findByIdAndDelete(id).lean();
-        console.log('DEBUG: Design deleted successfully:', deletedDesign);
+        logger.debug('Design deleted successfully:', deletedDesign);
 
         revalidatePath('/admin/designs');
         revalidatePath('/catalogo');
 
         return { success: true, message: 'Diseño eliminado exitosamente' };
     } catch (error) {
-        console.error('ERROR in eliminarDesign:', error);
+        logger.error('ERROR in eliminarDesign:', error);
         return { success: false, message: 'Error al eliminar el diseño: ' + error.message };
     }
 }

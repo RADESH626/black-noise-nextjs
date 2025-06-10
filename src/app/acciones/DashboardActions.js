@@ -4,9 +4,10 @@ import connectDB from "@/utils/DBconection";
 import Venta from "@/models/Venta";
 import Usuario from "@/models/Usuario";
 import Pedido from "@/models/Pedido";
+import logger from '@/utils/logger';
 
 export async function obtenerMetricasDashboard() {
-  console.log("Server Action: obtenerMetricasDashboard Started");
+  logger.info("Server Action: obtenerMetricasDashboard Started");
 
   try {
     await connectDB();
@@ -37,7 +38,7 @@ export async function obtenerMetricasDashboard() {
       },
     };
   } catch (error) {
-    console.error("Error en obtenerMetricasDashboard:", error.message);
+    logger.error("Error en obtenerMetricasDashboard:", error.message);
     return {
       success: false,
       error: "Error al obtener las métricas del dashboard.",

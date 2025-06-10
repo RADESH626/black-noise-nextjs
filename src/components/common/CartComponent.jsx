@@ -2,23 +2,105 @@
 
 import React, { useEffect, useState } from 'react';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
-import { useCartStorage } from "@/hooks/useCartStorage";
 import { useSession } from "next-auth/react";
 import { guardarPedido } from "@/app/acciones/PedidoActions";
+import { getCartByUserId, addDesignToCart, removeDesignFromCart, updateCartItemQuantity, clearUserCart } from "@/app/acciones/CartActions"; // Import CartActions
 
 function CartComponent() {
-  const { cartItems, removeItem, updateQuantity, clearCart } = useCartStorage();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const userId = session?.user?.id;
+
+  const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
 
+  const fetchCart = async () => {
+    if (status === 'authenticated' && userId) {
+      setLoading(true);
+      setError(null);
+      const { cart, error: fetchError } = await getCartByUserId(userId);
+      if (fetchError) {
+        setError({ message: fetchError });
+        setCartItems([]);
+      } else {
+        setCartItems(cart?.items || []);
+      }
+      setLoading(false);
+    } else if (status === 'unauthenticated') {
+      setLoading(false);
+      setCartItems([]); // Clear cart if user is unauthenticated
+    }
+  };
+
   useEffect(() => {
-    setLoading(false); 
-  }, []);
+    fetchCart();
+  }, [status, userId]); // Re-fetch cart when session status or userId changes
+
+  const handleAddItem = async (designId) => {
+    if (!userId) {
+      alert("Debes iniciar sesión para agregar ítems al carrito.");
+      return;
+    }
+    setIsCreatingOrder(true); // Use this for general cart operations loading
+    const { success, message } = await addDesignToCart(userId, designId);
+    if (success) {
+      await fetchCart(); // Re-fetch cart to update UI
+    } else {
+      setError({ message: message || "Error al agregar el diseño al carrito." });
+    }
+    setIsCreatingOrder(false);
+  };
+
+  const handleRemoveItem = async (designId) => {
+    if (!userId) {
+      alert("Debes iniciar sesión para eliminar ítems del carrito.");
+      return;
+    }
+    setIsCreatingOrder(true);
+    const { success, message } = await removeDesignFromCart(userId, designId);
+    if (success) {
+      await fetchCart();
+    } else {
+      setError({ message: message || "Error al eliminar el diseño del carrito." });
+    }
+    setIsCreatingOrder(false);
+  };
+
+  const handleUpdateQuantity = async (designId, quantity) => {
+    if (!userId) {
+      alert("Debes iniciar sesión para actualizar la cantidad del carrito.");
+      return;
+    }
+    if (quantity < 0) return; // Prevent negative quantities
+
+    setIsCreatingOrder(true);
+    const { success, message } = await updateCartItemQuantity(userId, designId, quantity);
+    if (success) {
+      await fetchCart();
+    } else {
+      setError({ message: message || "Error al actualizar la cantidad del diseño." });
+    }
+    setIsCreatingOrder(false);
+  };
+
+  const handleClearCart = async () => {
+    if (!userId) {
+      alert("Debes iniciar sesión para vaciar el carrito.");
+      return;
+    }
+    setIsCreatingOrder(true);
+    const { success, message } = await clearUserCart(userId);
+    if (success) {
+      await fetchCart();
+    } else {
+      setError({ message: message || "Error al vaciar el carrito." });
+    }
+    setIsCreatingOrder(false);
+  };
 
   const handleCreateOrder = async () => {
-    if (!session?.user?.id) {
+    if (!userId) {
       alert("Debes iniciar sesión para crear un pedido.");
       return;
     }
@@ -35,7 +117,7 @@ function CartComponent() {
     const valorTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     const orderData = {
-      usuarioId: session.user.id,
+      usuarioId: userId,
       designIds: designIds,
       detallesPedido: detallesPedido,
       valorTotal: valorTotal,
@@ -46,7 +128,7 @@ function CartComponent() {
       const result = await guardarPedido(orderData);
       if (result.success) {
         alert("Pedido creado exitosamente!");
-        clearCart(); // Clear cart after successful order creation
+        await handleClearCart(); // Clear cart after successful order creation
       } else {
         setError({ message: result.error || "Error al crear el pedido." });
       }
@@ -57,18 +139,6 @@ function CartComponent() {
       setIsCreatingOrder(false);
     }
   };
-
-  if (loading) {
-    return <div className="text-center text-white">Cargando carrito...</div>;
-  }
-
-  if (error) {
-    return <div className="text-center text-red-500">Error al cargar el carrito: {error.message}</div>;
-  }
-
-  if (!cartItems || cartItems.length === 0) {
-    return <div className="text-center text-gray-400">El carrito está vacío.</div>;
-  }
 
   const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -90,12 +160,12 @@ function CartComponent() {
             <div className="flex items-center space-x-4">
               <input
                 type="number"
-                min="1"
+                min="0" // Allow 0 to trigger removal
                 value={item.quantity}
-                onChange={(e) => updateQuantity(item.id, parseInt(e.target.value))}
+                onChange={(e) => handleUpdateQuantity(item.id, parseInt(e.target.value))}
                 className="w-20 p-2 bg-gray-700 border border-gray-600 rounded-md text-white"
               />
-              <BotonGeneral onClick={() => removeItem(item.id)}>
+              <BotonGeneral onClick={() => handleRemoveItem(item.id)}>
                 Eliminar
               </BotonGeneral>
             </div>
@@ -111,7 +181,7 @@ function CartComponent() {
           >
             {isCreatingOrder ? "Creando Pedido..." : "Agregar a Pedido"}
           </BotonGeneral>
-          <BotonGeneral onClick={clearCart} disabled={cartItems.length === 0}>
+          <BotonGeneral onClick={handleClearCart} disabled={cartItems.length === 0}>
             Vaciar Carrito
           </BotonGeneral>
         </div>

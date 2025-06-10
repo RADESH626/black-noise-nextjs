@@ -5,73 +5,74 @@ import Pago from '@/models/Pago';
 import Usuario from '@/models/Usuario'; // Necesario para popular
 import Venta from '@/models/Venta';   // Necesario para popular
 import { revalidatePath } from 'next/cache';
+import logger from '@/utils/logger';
 
 // Crear un nuevo pago
 async function guardarPago(data) {
-    console.log('DEBUG: Entering guardarPago with data:', data);
+    logger.debug('Entering guardarPago with data:', data);
     try {
         await connectDB();
-        console.log('DEBUG: Database connected for guardarPago.');
+        logger.debug('Database connected for guardarPago.');
         const nuevoPago = new Pago(data);
-        console.log('DEBUG: New Pago instance created:', nuevoPago);
+        logger.debug('New Pago instance created:', nuevoPago);
         const pagoGuardado = await nuevoPago.save();
-        console.log('DEBUG: Pago saved to DB:', pagoGuardado);
+        logger.debug('Pago saved to DB:', pagoGuardado);
         revalidatePath('/admin/pagos');
-        console.log('DEBUG: Revalidated path /admin/pagos.');
+        logger.debug('Revalidated path /admin/pagos.');
         return { success: true, data: JSON.parse(JSON.stringify(pagoGuardado)) };
     } catch (error) {
-        console.error('ERROR in guardarPago:', error);
+        logger.error('ERROR in guardarPago:', error);
         return { error: 'Error al guardar el pago: ' + error.message };
     }
 }
 
 // Obtener todos los pagos
 async function obtenerPagos() {
-    console.log('DEBUG: Entering obtenerPagos.');
+    logger.debug('Entering obtenerPagos.');
     try {
         await connectDB();
-        console.log('DEBUG: Database connected for obtenerPagos.');
+        logger.debug('Database connected for obtenerPagos.');
         const pagos = await Pago.find({})
             .populate('usuarioId', 'nombreUsuario correo') // Popula algunos campos de Usuario
             .populate('ventaId', '_id') // Popula el ID de Venta
             .lean();
-        console.log('DEBUG: Payments retrieved from DB:', pagos.length, 'payments found.');
+        logger.debug('Payments retrieved from DB:', pagos.length, 'payments found.');
         return { pagos: JSON.parse(JSON.stringify(pagos)) };
     } catch (error) {
-        console.error('ERROR in obtenerPagos:', error);
+        logger.error('ERROR in obtenerPagos:', error);
         return { error: 'Error al obtener los pagos: ' + error.message };
     }
 }
 
 // Obtener pago por ID
 async function ObtenerPagoPorId(id) {
-    console.log('DEBUG: Entering ObtenerPagoPorId with ID:', id);
+    logger.debug('Entering ObtenerPagoPorId with ID:', id);
     try {
         await connectDB();
-        console.log('DEBUG: Database connected for ObtenerPagoPorId.');
+        logger.debug('Database connected for ObtenerPagoPorId.');
         const pago = await Pago.findById(id)
             .populate('usuarioId', 'nombreUsuario correo')
             .populate('ventaId', '_id')
             .lean();
-        console.log('DEBUG: Payment retrieved from DB:', pago);
+        logger.debug('Payment retrieved from DB:', pago);
         if (!pago) {
-            console.log('DEBUG: Payment not found for ID:', id);
+            logger.debug('Payment not found for ID:', id);
             return { error: 'Pago no encontrado' };
         }
-        console.log('DEBUG: Exiting ObtenerPagoPorId with payment:', JSON.parse(JSON.stringify(pago)));
+        logger.debug('Exiting ObtenerPagoPorId with payment:', JSON.parse(JSON.stringify(pago)));
         return JSON.parse(JSON.stringify(pago));
     } catch (error) {
-        console.error('ERROR in ObtenerPagoPorId:', error);
+        logger.error('ERROR in ObtenerPagoPorId:', error);
         return { error: 'Error al obtener el pago: ' + error.message };
     }
 }
 
 // Editar pago (principalmente para cambiar estado)
 async function EditarPago(id, data) {
-    console.log('DEBUG: Entering EditarPago with ID:', id, 'and data:', data);
+    logger.debug('Entering EditarPago with ID:', id, 'and data:', data);
     try {
         await connectDB();
-        console.log('DEBUG: Database connected for EditarPago.');
+        logger.debug('Database connected for EditarPago.');
         // Asegurarse de que solo se actualicen campos permitidos, ej. estadoPago
         const updateData = {
             estadoPago: data.estadoPago,
@@ -80,39 +81,39 @@ async function EditarPago(id, data) {
         };
         if (data.metodoPago) updateData.metodoPago = data.metodoPago;
         if (data.valorPago) updateData.valorPago = parseFloat(data.valorPago);
-        console.log('DEBUG: Update data prepared:', updateData);
+        logger.debug('Update data prepared:', updateData);
 
 
         const pagoActualizado = await Pago.findByIdAndUpdate(id, updateData, { new: true }).lean();
-        console.log('DEBUG: Payment updated in DB:', pagoActualizado);
+        logger.debug('Payment updated in DB:', pagoActualizado);
         if (!pagoActualizado) {
-            console.log('DEBUG: Payment not found for update with ID:', id);
+            logger.debug('Payment not found for update with ID:', id);
             return { error: 'Pago no encontrado para actualizar' };
         }
         revalidatePath('/admin/pagos');
         revalidatePath(`/admin/pagos/editar/${id}`);
-        console.log('DEBUG: Revalidated paths /admin/pagos and /admin/pagos/editar/${id}.');
+        logger.debug('Revalidated paths /admin/pagos and /admin/pagos/editar/${id}.');
         return { success: true, data: JSON.parse(JSON.stringify(pagoActualizado)) };
     } catch (error) {
-        console.error('ERROR in EditarPago:', error);
+        logger.error('ERROR in EditarPago:', error);
         return { error: 'Error al editar el pago: ' + error.message };
     }
 }
 
 // Obtener pagos por usuario ID
 async function obtenerPagosPorUsuarioId(usuarioId) {
-    console.log('DEBUG: Entering obtenerPagosPorUsuarioId with usuarioId:', usuarioId);
+    logger.debug('Entering obtenerPagosPorUsuarioId with usuarioId:', usuarioId);
     try {
         await connectDB();
-        console.log('DEBUG: Database connected for obtenerPagosPorUsuarioId.');
+        logger.debug('Database connected for obtenerPagosPorUsuarioId.');
         const pagos = await Pago.find({ usuarioId })
             .populate('usuarioId', 'nombreUsuario correo') // Popula algunos campos de Usuario
             .populate('ventaId', '_id') // Popula el ID de Venta
             .lean();
-        console.log('DEBUG: Payments retrieved for user ID:', usuarioId, 'count:', pagos.length);
+        logger.debug('Payments retrieved for user ID:', usuarioId, 'count:', pagos.length);
         return { success: true, pagos: JSON.parse(JSON.stringify(pagos)) };
     } catch (error) {
-        console.error('ERROR in obtenerPagosPorUsuarioId:', error);
+        logger.error('ERROR in obtenerPagosPorUsuarioId:', error);
         return { success: false, message: 'Error al obtener los pagos del usuario: ' + error.message };
     }
 }
