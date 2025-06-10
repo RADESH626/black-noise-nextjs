@@ -5,17 +5,17 @@ import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import CartItem from './CartItem';
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation"; // Import useRouter
-import { getCartByUserId, addDesignToCart, removeDesignFromCart, updateCartItemQuantity, clearUserCart } from "@/app/acciones/CartActions"; // Import CartActions
+import { getCartByUserId, addDesignToCart, removeDesignFromCart, updateCartItemQuantity, clearUserCart } from "@/app/acciones/CartActions";
+import { guardarPedido } from "@/app/acciones/PedidoActions"; // Import guardarPedido
 
 function CartComponent() {
-  const router = useRouter(); // Initialize useRouter
+  const router = useRouter();
   const { data: session, status } = useSession();
   const userId = session?.user?.id;
 
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [paymentSuccess, setPaymentSuccess] = useState(false); // Add paymentSuccess state
 
   const fetchCart = async () => {
     if (status === 'authenticated' && userId) {
@@ -31,15 +31,15 @@ function CartComponent() {
       setLoading(false);
     } else if (status === 'unauthenticated') {
       setLoading(false);
-      setCartItems([]); // Clear cart if user is unauthenticated
+      setCartItems([]);
     }
   };
 
   useEffect(() => {
     fetchCart();
-  }, [status, userId]); // Re-fetch cart when session status or userId changes
+  }, [status, userId]);
 
-  const getTotal = () => { // Add getTotal function
+  const getTotal = () => {
     return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
@@ -48,10 +48,10 @@ function CartComponent() {
       alert("Debes iniciar sesión para agregar ítems al carrito.");
       return;
     }
-    setLoading(true); // Use loading for general cart operations
+    setLoading(true);
     const { success, message } = await addDesignToCart(userId, designId);
     if (success) {
-      await fetchCart(); // Re-fetch cart to update UI
+      await fetchCart();
     } else {
       setError({ message: message || "Error al agregar el diseño al carrito." });
     }
@@ -78,7 +78,7 @@ function CartComponent() {
       alert("Debes iniciar sesión para actualizar la cantidad del carrito.");
       return;
     }
-    if (quantity < 0) return; // Prevent negative quantities
+    if (quantity < 0) return;
 
     setLoading(true);
     const { success, message } = await updateCartItemQuantity(userId, designId, quantity);
@@ -105,17 +105,37 @@ function CartComponent() {
     setLoading(false);
   };
 
-  const handlePagarAhora = () => { // Add handlePagarAhora function
-    router.push("/pago");
+  const handleCreateOrder = async () => {
+    if (!userId) {
+      alert("Debes iniciar sesión para crear un pedido.");
+      return;
+    }
+    if (cartItems.length === 0) {
+      alert("Tu carrito está vacío. Agrega diseños antes de crear un pedido.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    const orderItems = cartItems.map(item => ({
+      designId: item.designId, // Assuming item.designId is already the ObjectId
+      quantity: item.quantity
+    }));
+    const totalOrderValue = getTotal();
+
+    const { success, error: orderError } = await guardarPedido(userId, orderItems, totalOrderValue);
+
+    if (success) {
+      await handleClearCart(); // Clear cart after successful order creation
+      router.push("/confirmacion"); // Redirect to confirmation page
+    } else {
+      setError({ message: orderError || "Error al crear el pedido." });
+    }
+    setLoading(false);
   };
 
-  const handlePagoExitoso = async () => { // Add handlePagoExitoso function
-    setPaymentSuccess(true);
-    await handleClearCart();
-    setTimeout(() => setPaymentSuccess(false), 3000);
-  };
-
-  const totalConEnvio = getTotal() + 50; // Calculate totalConEnvio
+  const totalConEnvio = getTotal() + 50;
 
   if (loading) {
     return (
@@ -136,9 +156,9 @@ function CartComponent() {
   return (
     <div className="bg-black p-6 md:p-8 rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold mb-6 text-white">Tu Carrito de Compras</h2>
-      {paymentSuccess && (
-        <div className="bg-green-500 text-white p-3 rounded-md mb-4 text-center">
-          ¡Pago exitoso! Tu carrito ha sido vaciado.
+      {error && ( // Display error message if present
+        <div className="bg-red-500 text-white p-3 rounded-md mb-4 text-center">
+          {error.message}
         </div>
       )}
       <div className="space-y-4">
@@ -163,7 +183,7 @@ function CartComponent() {
           </div>
           <div className="flex justify-between items-center text-white text-lg font-semibold mb-4">
             <span>Envío:</span>
-            <span>$50.00</span> {/* Assuming fixed shipping cost */}
+            <span>$50.00</span>
           </div>
           <div className="flex justify-between items-center text-white text-xl font-bold mb-6">
             <span>Total a Pagar:</span>
@@ -173,7 +193,7 @@ function CartComponent() {
             <BotonGeneral onClick={handleClearCart} disabled={loading}>
               Vaciar Carrito
             </BotonGeneral>
-            <BotonGeneral onClick={handlePagarAhora} disabled={loading}>
+            <BotonGeneral onClick={handleCreateOrder} disabled={loading}>
               Pagar Ahora
             </BotonGeneral>
           </div>

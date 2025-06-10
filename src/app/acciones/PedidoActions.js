@@ -8,27 +8,26 @@ import { revalidatePath } from 'next/cache';
 import logger from '@/utils/logger';
 
 // Crear un nuevo pedido
-async function guardarPedido(data) {
-    logger.debug('Entering guardarPedido with data:', data);
+async function guardarPedido(userId, items, valorPedido, proveedorId = null, fechaEstimadaEntrega = null, detallesPedido = []) {
+    logger.debug('Entering guardarPedido with data:', { userId, items, valorPedido, proveedorId, fechaEstimadaEntrega, detallesPedido });
     try {
         await connectDB();
         logger.debug('Database connected for guardarPedido.');
-        // Convertir desingIds y detallesPedido a arrays si vienen como strings separados por comas
-        if (data.desingIds && typeof data.desingIds === 'string') {
-            data.desingIds = data.desingIds.split(',').map(id => id.trim()).filter(id => id);
-            logger.debug('Converted desingIds to array:', data.desingIds);
-        }
-        if (data.detallesPedido && typeof data.detallesPedido === 'string') {
-            data.detallesPedido = data.detallesPedido.split(',').map(detalle => detalle.trim()).filter(detalle => detalle);
-            logger.debug('Converted detallesPedido to array:', data.detallesPedido);
-        }
 
-        const nuevoPedido = new Pedido(data);
+        const nuevoPedido = new Pedido({
+            userId,
+            items,
+            valorPedido,
+            proveedorId,
+            fechaEstimadaEntrega,
+            detallesPedido
+        });
         logger.debug('New Pedido instance created:', nuevoPedido);
         const pedidoGuardado = await nuevoPedido.save();
         logger.debug('Pedido saved to DB:', pedidoGuardado);
-        revalidatePath('/admin/pedidos');
-        logger.debug('Revalidated path /admin/pedidos.');
+        revalidatePath('/admin/pedidos'); // Revalidate admin orders page
+        revalidatePath('/perfil'); // Revalidate user profile page
+        logger.debug('Revalidated paths /admin/pedidos and /perfil.');
         return { success: true, data: JSON.parse(JSON.stringify(pedidoGuardado)) };
     } catch (error) {
         logger.error('ERROR in guardarPedido:', error);
@@ -43,7 +42,8 @@ async function obtenerPedidos() {
         await connectDB();
         logger.debug('Database connected for obtenerPedidos.');
         const pedidos = await Pedido.find({})
-            .populate('desingIds', 'nombreDesing') // Popula nombre de los diseños
+            .populate('userId', 'nombre email') // Popula el usuario
+            .populate('items.designId', 'nombreDesing imagenDesing') // Popula nombre e imagen de los diseños dentro de items
             .populate('proveedorId', 'nombreProveedor contactoPrincipal') // Popula algunos campos de Proveedor
             .lean();
         logger.debug('Orders retrieved from DB:', pedidos.length, 'orders found.');
@@ -60,15 +60,15 @@ async function obtenerPedidosPorUsuarioId(usuarioId) {
     try {
         await connectDB();
         logger.debug('Database connected for obtenerPedidosPorUsuarioId.');
-        const pedidos = await Pedido.find({ usuarioId })
-            .populate('designIds', 'name imageUrl')
+        const pedidos = await Pedido.find({ userId: usuarioId }) // Changed from usuarioId to userId to match schema
+            .populate('items.designId', 'nombreDesing imagenDesing') // Popula nombre e imagen de los diseños dentro de items
             .populate('proveedorId', 'nombreProveedor contactoPrincipal')
             .lean();
         logger.debug('Orders retrieved for user ID:', usuarioId, 'count:', pedidos.length);
         return { pedidos: JSON.parse(JSON.stringify(pedidos)) };
     } catch (error) {
         logger.error('ERROR in obtenerPedidosPorUsuarioId:', error);
-    return { success: false, message: 'Error al obtener los pedidos del usuario: ' + error.message };
+        return { success: false, message: 'Error al obtener los pedidos del usuario: ' + error.message };
     }
 }
 
@@ -89,7 +89,7 @@ export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId)
         }
 
         const pedidos = await Pedido.find(query)
-            .populate('desingIds', 'nombreDesing imagenDesing') // Popula nombre e imagen de los diseños
+            .populate('items.designId', 'nombreDesing imagenDesing') // Popula nombre e imagen de los diseños dentro de items
             .populate('proveedorId', 'nombreEmpresa emailContacto') // Popula algunos campos de Proveedor
             .lean();
 
@@ -120,7 +120,8 @@ async function ObtenerPedidoPorId(id) {
         await connectDB();
         logger.debug('Database connected for ObtenerPedidoPorId.');
         const pedido = await Pedido.findById(id)
-            .populate('desingIds', 'nombreDesing imagenDesing')
+            .populate('userId', 'nombre email') // Popula el usuario
+            .populate('items.designId', 'nombreDesing imagenDesing') // Popula nombre e imagen de los diseños dentro de items
             .populate('proveedorId', 'nombreEmpresa emailContacto')
             .lean();
         logger.debug('Order retrieved from DB:', pedido);
@@ -144,17 +145,12 @@ async function EditarPedido(id, data) {
         logger.debug('Database connected for EditarPedido.');
         
         const updateData = { ...data };
-        if (updateData.desingIds && typeof updateData.desingIds === 'string') {
-            updateData.desingIds = updateData.desingIds.split(',').map(id => id.trim()).filter(id => id);
-            logger.debug('Converted updateData.desingIds to array:', updateData.desingIds);
-        }
+        // Assuming 'items' will be passed as an array of objects directly
+        // No need for string splitting for desingIds or items
         if (updateData.detallesPedido && typeof updateData.detallesPedido === 'string') {
             updateData.detallesPedido = updateData.detallesPedido.split(',').map(detalle => detalle.trim()).filter(detalle => detalle);
             logger.debug('Converted updateData.detallesPedido to array:', updateData.detallesPedido);
         }
-        // No permitir cambiar proveedorId o valorPedido fácilmente desde aquí, podría requerir lógica de negocio más compleja.
-        // delete updateData.proveedorId; 
-        // delete updateData.valorPedido;
         logger.debug('Update data prepared:', updateData);
 
         const pedidoActualizado = await Pedido.findByIdAndUpdate(id, updateData, { new: true }).lean();

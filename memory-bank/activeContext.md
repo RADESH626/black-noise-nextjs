@@ -1,16 +1,28 @@
 ### Date: 2025-06-10
 
-### Task: Fix `Cast to ObjectId failed` error in `addDesignToCart`
+### Task: Implement "Create Order" functionality from Cart
 
 ### Changes Made:
-- Modified `src/app/acciones/CartActions.js` to correctly handle the `designId` parameter.
-- Implemented logic to extract the `id` property from `designId` if it's passed as an object, ensuring a string ID is used for database operations.
+- Updated `memory-bank/functionalities/Cart.md` to document the new order creation flow from the cart.
+- Modified `src/models/Pedido.js` to include `userId` and an `items` array (with `designId` and `quantity`) for order details, making `proveedorId` and `fechaEstimadaEntrega` optional.
+- Updated `src/app/acciones/PedidoActions.js`:
+    - Refactored `guardarPedido` to accept `userId`, `items`, and `valorPedido` directly, aligning with the new `Pedido` model schema.
+    - Adjusted `populate` calls in `obtenerPedidos`, `obtenerPedidosPorUsuarioId`, `obtenerPedidosPorProveedorId`, and `ObtenerPedidoPorId` to correctly populate `items.designId`.
+- Modified `src/components/common/CartComponent.jsx`:
+    - Renamed `handlePagarAhora` to `handleCreateOrder`.
+    - Implemented logic within `handleCreateOrder` to gather cart data, call `guardarPedido`, clear the cart using `clearUserCart` from `CartActions.js` upon success, and redirect to `/confirmacion`.
+    - Removed `paymentSuccess` state and `handlePagoExitoso` function as they are no longer relevant.
 
 ### Reason for Changes:
-The error log indicated that `designId` was being passed as an object instead of a string, causing a `Cast to ObjectId failed` error when interacting with the MongoDB `Cart` model. The fix ensures that the `designId` is always a string before being used to create or update cart items.
+The user requested that the "Pagar Ahora" button in the cart section should create an order instead of navigating to a payment page. This functionality allows users to finalize their purchases by creating a `Pedido` document based on their current cart contents.
 
 ### Files Modified:
-- `src/app/acciones/CartActions.js`
+- `memory-bank/functionalities/Cart.md`
+- `src/models/Pedido.js`
+- `src/app/acciones/PedidoActions.js`
+- `src/components/common/CartComponent.jsx`
 
 ### Next Steps:
-- Verify the fix by testing the add to cart functionality.
+- Verify the order creation functionality by testing the "Pagar Ahora" button in the cart.
+- Ensure orders are correctly saved in the database and the cart is cleared.
+- Confirm redirection to the confirmation page.

@@ -2,14 +2,26 @@ import { Schema, model, models } from 'mongoose'
 import { EstadoPedido } from './enums/PedidoEnums'
 
 const PedidoSchema = new Schema({
-    desingIds: [{
+    userId: {
         type: Schema.Types.ObjectId,
-        ref: 'Design'
+        ref: 'Usuario',
+        required: true
+    },
+    items: [{
+        designId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Design',
+            required: true
+        },
+        quantity: {
+            type: Number,
+            required: true,
+            default: 1
+        }
     }],
     proveedorId: {
         type: Schema.Types.ObjectId,
-        ref: 'Proveedor',
-        required: true
+        ref: 'Proveedor'
     },
     estadoPedido: {
         type: String,
@@ -26,8 +38,7 @@ const PedidoSchema = new Schema({
         default: Date.now
     },
     fechaEstimadaEntrega: {
-        type: Date,
-        required: true
+        type: Date
     },
     detallesPedido: [{
         type: String
