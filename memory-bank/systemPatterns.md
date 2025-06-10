@@ -1,364 +1,57 @@
 # System Patterns and Best Practices
 
-## Server Actions Pattern (Next.js 14+ / React 19+) - ESTABLISHED ✅
+## Arquitectura General
 
-### React 19 Hook Changes - UPDATED ✅
-**Important:** In React 19, `useActionState` has moved from `react-dom` to `react`. Update imports accordingly:
-
-```jsx
-// ✅ Correct for React 19
-import { useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
-
-// ❌ Incorrect for React 19
-import { useActionState, useFormStatus } from 'react-dom';
+```mermaid
+graph TD
+    A[Cliente/Admin/Proveedor] -->|Interactúa con| B(UI - Next.js Pages/Components)
+    B -->|Envía datos/acciones| C{Server Actions}
+    C -->|Lógica de Negocio/Validación| D[Utilidades/Librerías]
+    C -->|Autenticación/Autorización| E(NextAuth.js API)
+    C -->|Persistencia de Datos| F[MongoDB - Mongoose Models]
+    E -->|Gestiona Sesiones/Usuarios| F
+    F -->|Devuelve Datos| C
+    C -->|Devuelve Estado/Mensajes| B
+    B -->|Muestra Feedback| A
 ```
 
-## Server Actions Pattern (Next.js 14+ / React 19+) - ESTABLISHED ✅
+*   **Next.js App Router:** La aplicación sigue la estructura del App Router de Next.js, organizando las rutas y la lógica de renderizado.
+*   **Separación de Capas:**
+    *   **Presentación (UI):** Componentes React en `src/components/` y páginas en `src/app/`.
+    *   **Lógica de Negocio/Acciones:** Server Actions en `src/app/acciones/` para operaciones del lado del servidor.
+    *   **Acceso a Datos:** Modelos Mongoose en `src/models/` para interactuar con MongoDB.
+    *   **Utilidades:** Funciones auxiliares y middlewares en `src/utils/`.
 
-### Form Component Structure
-All forms in the application now follow this standardized pattern:
+## Patrones de Interacción
+*   **Server Actions:** Utilización extensiva de Server Actions para manejar envíos de formularios y lógica de negocio del lado del servidor, reduciendo la necesidad de rutas API REST tradicionales para operaciones internas.
+    *   **Estructura de Formularios:** Componentes de formulario (`"use client"`) que utilizan `useActionState` y `useFormStatus` para manejar estados de envío y retroalimentación.
+    *   **Estructura de Server Actions:** Funciones asíncronas (`"use server"`) que validan datos, ejecutan lógica de negocio, manejan errores y revalidan rutas (`revalidatePath`).
+*   **Autenticación y Autorización:**
+    *   **NextAuth.js:** Implementación de autenticación basada en sesiones con NextAuth.js.
+    *   **Roles:** Gestión de roles de usuario (cliente, administrador, proveedor) para control de acceso.
+    *   **Middleware:** Uso de `src/middleware.js` y `src/utils/authMiddleware.js` para proteger rutas y gestionar sesiones.
 
-```jsx
-"use client";
-import { useEffect } = "react";
-import { useActionState, useFormStatus } = "react-dom";
-import { usePopUp } = "@/context/PopUpContext";
+## Patrones de Datos
+*   **MongoDB con Mongoose:** Base de datos NoSQL con esquemas definidos por Mongoose para estructurar los datos (Usuarios, Pedidos, Diseños, Proveedores, Pagos, Ventas).
+*   **Normalización de Datos:** Los modelos reflejan las entidades del negocio.
+*   **Conversión de Objetos:** Conversión de objetos de Mongoose a objetos planos de JavaScript para su uso en componentes de React (serialización).
 
-// Submit button component with pending state
-function SubmitButton({ customText = "Submit" }) {
-  const { pending } = useFormStatus();
-  return (
-    <BotonGeneral type="submit" disabled={pending}>
-      {pending ? "Loading..." : customText}
-    </BotonGeneral>
-  );
-}
+## Patrones de UI/UX
+*   **Componentes Reutilizables:** Componentes modulares en `src/components/common/` y `src/components/layout/`.
+*   **Gestión de Estado Global:** Uso del Context API de React (`src/context/`) para estados compartidos como modales (`ModalContext`), pop-ups (`PopUpContext`) y contexto de usuario (`UserContext`).
+*   **Feedback al Usuario:** Integración consistente de pop-ups para mensajes de éxito/error y estados de carga en formularios.
+*   **Estilizado:** Uso de Tailwind CSS para un enfoque de "utility-first" en el estilizado de componentes.
 
-// Initial state for useActionState
-const initialState = {
-  message: null,
-  success: false,
-};
+## Patrones de Manejo de Errores
+*   **Centralización:** Uso de `src/utils/errorHandler.js` para un manejo consistente de errores en el lado del servidor.
+*   **Feedback al Cliente:** Los Server Actions devuelven mensajes de error y estados de éxito/fracaso para ser mostrados en la interfaz de usuario.
 
-function FormComponent({ onSuccess }) {
-  const { showPopUp } = usePopUp();
-  const [state, formAction] = useActionState(serverAction, initialState);
+## Patrones de Rendimiento y Seguridad
+*   **Optimización de Bundle:** Reducción del JavaScript del lado del cliente mediante Server Actions.
+*   **Validación de Entrada:** Validación de datos tanto en el cliente como en el servidor para seguridad y robustez.
+*   **Hashing de Contraseñas:** Uso de `bcryptjs` para almacenar contraseñas de forma segura.
+*   **Revalidación de Caché:** Uso de `revalidatePath` de Next.js para mantener la frescura de los datos.
 
-  useEffect(() => {
-    if (state.message) {
-      showPopUp(state.message, state.success ? "success" : "error");
-      if (state.success && onSuccess) {
-        onSuccess();
-      }
-    }
-  }, [state, showPopUp, onSuccess]);
-
-  return (
-    <form action={formAction}>
-      {/* Form fields */}
-      <SubmitButton />
-    </form>
-  );
-}
-```
-
-### Server Action Structure
-All server actions follow this standardized pattern:
-
-```javascript
-"use server"
-import { revalidatePath } from "next/cache";
-
-export async function actionName(prevState, formData) {
-    console.log("Server Action: Started");
-
-    // Validation
-    const requiredField = formData.get("requiredField");
-    if (!requiredField) {
-        return { message: "Required field missing.", success: false };
-    }
-
-    try {
-        // Business logic
-        const result = await businessLogicFunction(formData);
-
-        if (result.success) {
-            // Revalidate relevant paths
-            revalidatePath("/relevant/path");
-            return { 
-                message: result.message || "Operation completed successfully.", 
-                success: true, 
-                data: result.data 
-            };
-        } else {
-            return { message: result.error || "Operation failed.", success: false };
-        }
-    } catch (error) {
-        console.error("Server Action Error:", error.message);
-        return { message: "Unexpected error occurred.", success: false };
-    }
-}
-```
-
-## Form Field Naming Conventions - STANDARDIZED ✅
-
-### User Forms Field Mapping
-- `tipoDocumento` → Document type
-- `numeroDocumento` → Document number
-- `primerNombre` → First name
-- `segundoNombre` → Second name (optional)
-- `primerApellido` → First surname
-- `segundoApellido` → Second surname
-- `fechaNacimiento` → Birth date
-- `genero` → Gender
-- `numeroTelefono` → Phone number (NOT `telefono`)
-- `direccion` → Address
-- `correo` → Email
-- `contrasena` → Password (mapped to `password` in server action)
-- `rol` → Role
-
-### File Upload Fields
-- Use `name="file"` for single file uploads
-- Use `name="bulkFile"` for bulk upload files
-- Always include `accept` attribute for file type restrictions
-
-## UI/UX Patterns - ESTABLISHED ✅
-
-### PopUp Integration
-All forms use the PopUp context for user feedback:
-
-```jsx
-const { showPopUp } = usePopUp();
-
-useEffect(() => {
-  if (state.message) {
-    showPopUp(state.message, state.success ? "success" : "error");
-  }
-}, [state, showPopUp]);
-```
-
-### Loading States
-All forms implement consistent loading states:
-
-```jsx
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <button type="submit" disabled={pending}>
-      {pending ? "Processing..." : "Submit"}
-    </button>
-  );
-}
-```
-
-### Form Styling
-Standard form styling patterns:
-
-```jsx
-<form className="space-y-5 text-white">
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div className="relative">
-      <label className="block mb-1 text-sm font-medium text-purple-400">
-        Field Label
-      </label>
-      <InputComponent required />
-    </div>
-  </div>
-</form>
-```
-
-## Database Patterns - ESTABLISHED ✅
-
-### User Model Fields
-Standard user document structure:
-- `tipoDocumento`: String (enum)
-- `numeroDocumento`: String (unique)
-- `primerNombre`: String (required)
-- `segundoNombre`: String (optional)
-- `primerApellido`: String (required)
-- `segundoApellido`: String (required)
-- `nombreUsuario`: String (auto-generated)
-- `fechaNacimiento`: Date
-- `genero`: String (enum)
-- `numeroTelefono`: String
-- `direccion`: String
-- `correo`: String (unique)
-- `password`: String (hashed)
-- `rol`: String (enum)
-- `habilitado`: Boolean
-- `fotoPerfil`: String (base64 or URL)
-
-### Data Conversion Patterns
-Always convert MongoDB objects to plain objects:
-
-```javascript
-const plainUser = {
-  ...mongoUser,
-  _id: mongoUser._id.toString(),
-  fechaNacimiento: mongoUser.fechaNacimiento ? 
-    new Date(mongoUser.fechaNacimiento).toISOString().split("T")[0] : null,
-  createdAt: mongoUser.createdAt ? 
-    new Date(mongoUser.createdAt).toISOString() : null,
-};
-```
-
-## Authentication Patterns - ESTABLISHED ✅
-
-### Login Flow
-1. Server Action validates form data
-2. Returns credentials to client
-3. Client calls NextAuth `signIn`
-4. Handles authentication result
-5. Redirects on success
-
-### Session Management
-- Use `getServerSession` for server-side session access
-- Implement proper role-based access control
-- Handle session expiration gracefully
-
-## Error Handling Patterns - ESTABLISHED ✅
-
-### Server-Side Error Handling
-```javascript
-try {
-  // Business logic
-} catch (error) {
-  console.error("Detailed error:", error.message);
-  return { message: "User-friendly error message", success: false };
-}
-```
-
-### Client-Side Error Display
-```jsx
-useEffect(() => {
-  if (state.message) {
-    showPopUp(state.message, state.success ? "success" : "error");
-  }
-}, [state, showPopUp]);
-```
-
-## File Upload Patterns - ESTABLISHED ✅
-
-### CSV Processing
-```javascript
-const buffer = await file.arrayBuffer();
-const text = new TextDecoder().decode(buffer);
-const result = Papa.parse(text, {
-  header: true,
-  skipEmptyLines: true,
-  transformHeader: header => header.trim(),
-  transform: value => typeof value === "string" ? value.trim() : value,
-});
-```
-
-### Image Upload
-- Store as base64 strings in database
-- Provide default profile pictures
-- Validate file types and sizes
-
-## Revalidation Patterns - ESTABLISHED ✅
-
-### Path Revalidation
-```javascript
-import { revalidatePath } from "next/cache";
-
-// After successful mutation
-revalidatePath("/admin/usuarios");           // Admin user list
-revalidatePath("/perfil/editar");            // Profile edit page
-revalidatePath(`/admin/usuarios/editar/${userId}`); // Specific edit page
-```
-
-## Code Organization Patterns - ESTABLISHED ✅
-
-### File Structure
-```
-src/
-├── app/
-│   ├── acciones/
-│   │   └── UsuariosActions.js    # All user-related Server Actions
-│   ├── admin/
-│   │   └── layout.jsx            # Admin layout with sidebar and main content area
-│   │   └── usuarios/
-│   │       └── components/       # Admin-specific components
-│   └── api/                      # API routes (legacy/external)
-├── components/
-│   ├── common/                   # Reusable components
-│   └── layout/                   # Layout-specific components
-│       └── admin/
-│           └── AdminLayout.jsx   # Core Admin layout component (used by app/admin/layout.jsx)
-│           └── AdminSidebar.jsx  # Admin sidebar navigation
-└── models/                       # Database models
-```
-
-### Admin Layout Styling
-The main content area within the admin layout (`src/app/admin/layout.jsx` and `src/components/layout/admin/AdminLayout.jsx`) should have a white background to ensure proper visibility of dashboard components. This is achieved by applying `bg-white` to the `main` element. If the background does not appear white, it may be necessary to use `!important` (e.g., `bg-white !important`) to override conflicting styles, though this should be a last resort.
-
-### Import Patterns
-```javascript
-// Server Actions imports
-import { actionName } from "@/app/acciones/ModuleActions";
-
-// Component imports
-import { useActionState, useFormStatus } from "react-dom";
-import { usePopUp } from "@/context/PopUpContext";
-
-// Database imports
-import connectDB from "@/utils/DBconection";
-import Model from "@/models/Model";
-```
-
-## Performance Patterns - ESTABLISHED ✅
-
-### Client Bundle Optimization
-- Use Server Actions to reduce client-side JavaScript
-- Implement proper loading states
-- Minimize unnecessary re-renders
-
-### Database Optimization
-- Use `.lean()` for read operations
-- Convert MongoDB objects to plain objects
-- Implement proper indexing
-
-### Caching Strategy
-- Use `revalidatePath` for targeted cache invalidation
-- Implement `cache: "no-store"` for real-time data
-- Optimize API call patterns
-
-## Security Patterns - ESTABLISHED ✅
-
-### Input Validation
-- Server-side validation for all inputs
-- Proper field type checking
-- Sanitization of user inputs
-
-### Authentication Security
-- Password hashing with bcrypt
-- Session management with NextAuth
-- Role-based access control
-
-### Data Protection
-- Sensitive data handling
-- Proper error message sanitization
-- Secure file upload processing
-
-## Testing Patterns - TO BE ESTABLISHED
-
-Future patterns to establish:
-- Unit testing for Server Actions
-- Integration testing for forms
-- E2E testing for user workflows
-
----
-
-## Existence Verification Principle
-
-To prevent build errors and ensure code integrity, it is mandatory to follow this verification pattern before using any module or component.
-
-1.  **Verify Before Importing:** Before writing a line of code that imports a component, module, or Server Action (e.g., `import MyComponent from ''components/MyComponent'`)' (see below for file content), it is required to first verify that the corresponding file (`src/components/MyComponent.jsx`) actually exists in the project's file structure.
-
-2.  **No Assumptions:** Code should not reference "ghost" files. The existence of components must not be assumed or invented.
-
-3.  **Corrective Action:** If a needed component does not exist, the correct procedure is:
-    * **a.** Include the creation of said component as part of the work plan.
-    * **b.** If creating the component is outside the scope of the current task, the user must be notified of the missing dependency instead of generating code that will fail.
+## Patrones de Organización de Código
+*   **Estructura de Carpetas:** Organización lógica de archivos por dominio o tipo (e.g., `acciones`, `models`, `components`).
+*   **Importaciones:** Uso de alias (`@/`) para importaciones absolutas, mejorando la legibilidad y mantenibilidad.

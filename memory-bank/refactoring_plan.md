@@ -1,42 +1,18 @@
-# Refactoring Plan
+# Plan de Refactorización
 
-This document outlines the planned refactoring tasks for the project. Each item will be marked as complete once implemented and verified.
+**Objetivo General:** Alinear toda la estructura y contenido del `memory-bank/` del proyecto con las nuevas instrucciones operativas.
+**Estado:** COMPLETADO
+---
+### Plan de Sub-tareas
 
-## Pending Tasks:
-
-- [x] **Initial Refactoring Setup**:
-    - [x] Create `refactoring_plan.md` (Done by Cline)
-    - [x] Review existing codebase for immediate refactoring opportunities.
-    - [x] Document initial refactoring goals in `refactoring_plan.md`.
-
-## Proposed Refactoring Goals:
-
-- [x] **API Route Refactoring (`src/app/api/administrador/`)**:
-    - [x] Implement consistent error handling across all API routes.
-    - [x] Centralize input validation logic.
-    - [x] Abstract common CRUD operations into reusable functions or a base handler to reduce code duplication.
-    - [x] Ensure robust authentication and authorization checks are in place for all admin routes. (Completed for `crearProveedor` in `ProveedorActions.js`)
-    - [x] Refactor `usuarios` API routes (`src/app/api/administrador/usuarios/route.js` and `src/app/api/administrador/usuarios/[id]/route.js`) to use generic CRUD handlers and specific validations.
-    - [x] Refactor `proveedores` API routes (`src/app/api/administrador/proveedores/route.js` and `src/app/api/administrador/proveedores/[id]/route.js`) to use generic CRUD handlers, authorization, and specific validations.
-    - [x] Refactor `designs` API routes (`src/app/api/administrador/designs/route.js` and `src/app/api/administrador/designs/[id]/route.js`) to use generic CRUD handlers, authorization, and specific validations.
-    - [x] Refactor `pagos` API routes (`src/app/api/administrador/pagos/route.js` and `src/app/api/administrador/pagos/[id]/route.js`) to use generic CRUD handlers, authorization, and specific validations.
-    - [x] Refactor `pedidos` API routes (`src/app/api/administrador/pedidos/route.js` and `src/app/api/administrador/pedidos/[id]/route.js`) to use generic CRUD handlers, authorization, and specific validations.
-    - [x] Refactor `ventas` API routes (`src/app/api/administrador/ventas/route.js` and `src/app/api/administrador/ventas/[id]/route.js`) to use generic CRUD handlers, authorization, and specific validations.
-
-- [x] **Action Files Review (`src/app/acciones/`)**:
-    - [x] Analyze `*Actions.js` files for complexity and redundancy.
-    - [x] Refactor overly complex actions into smaller, more manageable functions.
-    - [x] Identify and extract reusable logic into utility functions in `src/utils/`.
-
-- [x] **Component Modularity (`src/app/*/page.jsx` and `src/components/`)**:
-    - [x] Identify large `page.jsx` files and break down their content into smaller, more focused components. (Completed for `src/app/page.jsx`, `src/app/carrito/page.jsx`, `src/app/catalogo/page.jsx`, `src/app/login/page.jsx`, `src/app/pago/page.jsx`)
-    - [x] Move truly reusable UI components from page-specific directories (e.g., `src/app/perfil/`) to `src/components/common/` or `src/components/layout/` as appropriate. (Completed for `src/app/perfil/PedidosComponent.jsx`, `src/app/perfil/ProfileContent.jsx`, `src/app/perfil/CartComponent.jsx`, `src/app/perfil/DesignsComponent.jsx`, `src/app/perfil/PagosComponent.jsx`, `src/app/perfil/ProfileData.jsx` - deleted as redundant)
-    - [x] Ensure components follow a clear separation of concerns (e.g., presentation vs. logic). (Addressed by modularization)
-
-- [x] **Global Styles Optimization (`src/app/globals.css`)**:
-    - [x] Assess the size and complexity of `globals.css`.
-    - [x] If necessary, propose a strategy for modularizing styles (e.g., using CSS Modules, Tailwind utility classes, or a component-based styling approach) to improve maintainability and reduce global scope pollution.
-
-- [x] **Authentication Module Review (`src/app/api/auth/`)**:
-    - [x] Verify the security and efficiency of authentication routes.
-    - [x] Ensure proper session management and token handling.
+*   [x] **Sub-tarea 1:** Crear `memory-bank/projectbrief.md` con la plantilla de "misión y objetivos principales del proyecto".
+*   [x] **Sub-tarea 2:** Crear `memory-bank/productContext.md` con la plantilla de "el porqué del proyecto y la perspectiva del usuario".
+*   [x] **Sub-tarea 3:** Renombrar la carpeta `memory-bank/funcionalidades/` a `memory-bank/functionalities/`.
+*   [x] **Sub-tarea 4:** Eliminar el archivo `memory-bank/manifest.md`.
+*   [x] **Sub-tarea 5:** Eliminar el archivo `memory-bank/project_overview.md`.
+*   [x] **Sub-tarea 6:** Verificar y actualizar el contenido de `memory-bank/improvement_log.md` para asegurar que cumple con el propósito de "registro de errores y reglas obligatorias".
+*   [x] **Sub-tarea 7:** Verificar y actualizar el contenido de `memory-bank/techContext.md` para asegurar que cumple con el propósito de "entorno tecnológico y sus limitaciones".
+*   [x] **Sub-tarea 8:** Verificar y actualizar el contenido de `memory-bank/systemPatterns.md` para asegurar que cumple con el propósito de "arquitectura y patrones de diseño".
+*   [x] **Sub-tarea 9:** Verificar y actualizar el contenido de `memory-bank/activeContext.md` para asegurar que incluye la sección de "Auto-Reflexión y Oportunidades de Mejora (Obligatorio)".
+*   [x] **Sub-tarea 10:** Verificar y actualizar el contenido de `memory-bank/progress.md` para asegurar que cumple con el propósito de "estado general del proyecto".
+*   [x] **Sub-tarea 11:** Verificar la existencia de la carpeta `memory-bank/techniques/`.

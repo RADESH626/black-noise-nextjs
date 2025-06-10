@@ -1,78 +1,44 @@
 # Tech Context
 
-## Technologies Used
+## Tecnologías Utilizadas
 
 ### Frontend
-- **Next.js:** React framework for building server-rendered React applications. Used for both frontend rendering and API routes.
-- **React:** JavaScript library for building user interfaces.
-- **CSS Modules:** For component-scoped styling.
-- **Tailwind CSS (Implicit):** While not explicitly confirmed, the presence of `postcss.config.mjs` and `globals.css` often indicates Tailwind CSS usage for utility-first styling.
-- **JavaScript (ES6+):** Primary programming language.
+*   **Next.js (v15.3.1):** Framework de React para la construcción de aplicaciones web con renderizado del lado del servidor (SSR), generación de sitios estáticos (SSG) y rutas API.
+*   **React (v19.1.0):** Librería principal para la construcción de interfaces de usuario interactivas.
+*   **Tailwind CSS (v4):** Framework CSS de utilidad para un estilizado rápido y consistente.
+*   **Framer Motion (v12.15.0):** Librería para animaciones y transiciones fluidas en la interfaz de usuario.
+*   **JavaScript (ES6+):** Lenguaje de programación principal.
 
 ### Backend / API
-- **Next.js API Routes:** Serverless functions within the Next.js application for handling API requests.
-- **Node.js:** Runtime environment for Next.js.
-- **Mongoose:** MongoDB Object Data Modeling (ODM) library for Node.js, used for schema definition and interaction with MongoDB.
-- **NextAuth.js:** Authentication library for Next.js applications.
+*   **Next.js API Routes / Server Actions:** Utilizados para manejar la lógica del lado del servidor, incluyendo operaciones CRUD y autenticación.
+*   **Node.js:** Entorno de ejecución para Next.js.
+*   **Mongoose (v8.14.0):** ODM (Object Data Modeling) para MongoDB, facilitando la interacción con la base de datos.
+*   **NextAuth.js (v4.24.11):** Librería de autenticación para Next.js, que soporta múltiples estrategias de autenticación.
+*   **Bcryptjs (v3.0.2):** Para el hashing seguro de contraseñas.
+*   **Nodemailer (v6.10.1):** Para el envío de correos electrónicos (posiblemente para confirmaciones de pedidos, restablecimiento de contraseñas, etc.).
 
-### Database
-- **MongoDB:** NoSQL document database.
+### Base de Datos
+*   **MongoDB:** Base de datos NoSQL orientada a documentos, utilizada para almacenar la información del proyecto.
 
-### Development Tools
-- **ESLint:** For code linting and maintaining code quality (`eslint.config.mjs`).
-- **npm/yarn:** Package managers (`package.json`, `package-lock.json`).
-- **VS Code:** Integrated Development Environment (IDE).
+### Herramientas y Librerías Adicionales
+*   **Axios (v1.9.0):** Cliente HTTP para realizar solicitudes a APIs.
+*   **PapaParse (v5.5.2):** Para el parseo de archivos CSV (posiblemente para carga masiva de datos, como productos o usuarios).
+*   **jsPDF (v3.0.1) & jspdf-autotable (v5.0.2):** Para la generación de documentos PDF (posiblemente para facturas, reportes de ventas, etc.).
+*   **ESLint (v9):** Herramienta de linting para mantener la calidad y consistencia del código.
+*   **npm/yarn:** Gestores de paquetes.
 
-## Development Setup
+## Entorno de Desarrollo
+*   **Prerrequisitos:** Node.js, npm/yarn, instancia de MongoDB.
+*   **Configuración:** Uso de variables de entorno (`.env.local`) para la URI de MongoDB, el secreto de NextAuth y la URL de NextAuth.
+*   **Ejecución:** `npm run dev` para iniciar el servidor de desarrollo.
 
-### Prerequisites
-- Node.js (LTS version recommended)
-- npm or yarn
-- MongoDB instance (local or cloud-hosted)
+## Justificación de Decisiones Clave
+*   **Next.js:** Se eligió por su capacidad de renderizado en el servidor (SSR) y generación estática (SSG), lo que es ideal para el SEO de los productos y un rendimiento rápido en el catálogo. Las Server Actions simplifican el backend y permiten una arquitectura full-stack con React.
+*   **Tailwind CSS:** Se seleccionó para acelerar el desarrollo de la UI y mantener una consistencia visual sin necesidad de escribir CSS personalizado extensivo, promoviendo un enfoque de "utility-first".
+*   **MongoDB con Mongoose:** Se optó por MongoDB debido a su flexibilidad de esquema, ideal para un proyecto que podría evolucionar rápidamente en sus modelos de datos. Mongoose proporciona una capa de abstracción robusta para la interacción con la base de datos.
+*   **NextAuth.js:** Elegido por su integración nativa con Next.js y su soporte para múltiples proveedores de autenticación, facilitando la implementación de un sistema de autenticación seguro y escalable.
 
-### Installation Steps
-1. **Clone the repository:**
-   `git clone [repository-url]`
-   `cd black-noise-nextjs`
-2. **Install dependencies:**
-   `npm install` or `yarn install`
-3. **Configure environment variables:**
-   Create a `.env.local` file in the root directory based on a `.env.example` (if available) or the following:
-   ```
-   MONGODB_URI=your_mongodb_connection_string
-   NEXTAUTH_SECRET=your_nextauth_secret
-   NEXTAUTH_URL=http://localhost:3000
-   ```
-   (Note: `NEXTAUTH_SECRET` should be a long, random string. `NEXTAUTH_URL` should be the deployment URL in production.)
-4. **Run the development server:**
-   `npm run dev` or `yarn dev`
-   The application should be accessible at `http://localhost:3000`.
-
-## Test Credentials
-
-### Client User
-- **Email:** `vscodeCliente@gmail.com`
-- **Password:** `Contraseña123@`
-
-### Provider User
-- **Email:** `vscodeProveedor@gmail.com`
-- **Password:** `Contraseña123@`
-
-## Technical Constraints
-- **Next.js API Route Limitations:** API routes are serverless functions, which might have cold start issues or execution time limits in certain deployment environments.
-- **MongoDB Schema Flexibility:** While flexible, lack of strict schema enforcement can lead to data inconsistencies if not managed carefully with Mongoose schemas.
-- **Authentication Strategy:** NextAuth.js provides a robust solution, but custom authentication logic might require deeper integration.
-
-## Dependencies (from package.json - inferred)
-- `react`
-- `react-dom`
-- `next`
-- `mongoose`
-- `next-auth`
-- Other potential dependencies based on file structure: `bcrypt` (for password hashing), `jsonwebtoken` (if custom JWTs are used), `swr` (for data fetching).
-
-## Tool Usage Patterns
-- **File System Interaction:** Direct file reading/writing for configuration and content.
-- **CLI Commands:** `npm` or `yarn` commands for dependency management and running the development server.
-- **Browser Interaction:** For testing UI, user flows, and API interactions.
-- **Database Inspection:** Tools like MongoDB Compass or Atlas UI for inspecting database contents.
+## Limitaciones Técnicas
+*   **Next.js Server Actions/API Routes:** Posibles problemas de "cold start" o límites de tiempo de ejecución en entornos serverless.
+*   **Flexibilidad de MongoDB:** Requiere una gestión cuidadosa de los esquemas con Mongoose para evitar inconsistencias de datos.
+*   **Autenticación:** La personalización de la lógica de autenticación con NextAuth.js puede requerir una integración profunda.
