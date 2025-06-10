@@ -61,3 +61,15 @@ The user requested that the cart items be displayed with a similar visual style 
 
 **Reasoning:**
 The error occurred because `cart.items` was `undefined` when `map` was called. This fix ensures that `cart.items` defaults to an empty array if it's not defined, preventing the `TypeError` and making the `getCartByUserId` function more robust.
+
+### 10/6/2025, 6:32:45 p. m.
+
+**Task:** Refactored how the cart is displayed in the user profile.
+
+**Changes Made:**
+- Updated `memory-bank/functionalities/Cart.md` to document the proposed refactoring of the `CartComponent`.
+- Created `src/components/common/CartItem.jsx` to encapsulate the rendering of a single cart item.
+- Modified `src/components/common/CartComponent.jsx` to import and utilize `CartItem.jsx` for rendering individual cart items, passing necessary props for quantity updates and item removal.
+
+**Reasoning:**
+The refactoring was performed to improve the modularity, readability, and reusability of the cart display within the user profile. By separating the rendering of individual cart items into a dedicated `CartItem` component, the `CartComponent` now has a clearer responsibility, focusing on overall cart management. This approach enhances maintainability and allows for easier future modifications to the cart item display.

@@ -63,3 +63,39 @@ The cart view has been updated to improve its layout and functionality based on 
     - Remove the "TU PEDIDO" header, "Cantidad de productos", "Costo de envío", and the "PAGAR AHORA" button.
     - Introduce "Agregar a Pedido" and "Vaciar Carrito" buttons, positioned horizontally alongside the "Total" display.
     - Adjust its width to `w-full` and remove `mt-20` to ensure proper alignment and responsiveness within its parent container.
+
+### CartComponent (in User Profile)
+
+The `CartComponent` located at `src/components/common/CartComponent.jsx` is responsible for displaying the user's shopping cart within the user profile section (`src/components/layout/ProfileContent.jsx`).
+
+**Current Implementation:**
+-   **State Management**: Manages `cartItems`, `loading`, `error`, and `isCreatingOrder` states.
+-   **Data Fetching**: Fetches cart data using `getCartByUserId` from `src/app/acciones/CartActions.js`.
+-   **Item Rendering**: Iterates over `cartItems` to display each item's image, name, price, quantity input, and a remove button.
+-   **Total Calculation**: Calculates and displays the total price of all items.
+-   **Actions**: Provides buttons for "Agregar a Pedido" (Add to Order) and "Vaciar Carrito" (Clear Cart), interacting with `PedidoActions.js` and `CartActions.js` respectively.
+
+**Proposed Refactoring:**
+
+To improve modularity, readability, and reusability, the `CartComponent` will be refactored into two distinct components:
+
+1.  **`CartItem.jsx` (New Component)**:
+    *   **Location**: `src/components/common/CartItem.jsx`
+    *   **Responsibility**: Render a single cart item.
+    *   **Props**: Will receive `item` data, `onUpdateQuantity` handler, and `onRemoveItem` handler.
+    *   **Content**: Will display the item's image, name, price, a quantity input field, and a button to remove the item from the cart.
+
+2.  **`CartComponent.jsx` (Modified)**:
+    *   **Location**: `src/components/common/CartComponent.jsx`
+    *   **Responsibility**: Act as a container for the cart, managing overall cart state, data fetching, total calculation, and orchestrating cart-level actions.
+    *   **Changes**:
+        *   Will no longer directly render individual cart item details.
+        *   Will iterate over `cartItems` and render a `CartItem` component for each item, passing the necessary props.
+        *   Will retain its current logic for fetching cart data, calculating the total, and handling "Agregar a Pedido" and "Vaciar Carrito" actions.
+
+**Rationale for Refactoring:**
+
+-   **Separation of Concerns**: Clearly separates the responsibility of displaying a single cart item from managing the entire cart's state and actions.
+-   **Improved Readability**: Makes `CartComponent.jsx` less cluttered and easier to understand by delegating item-level rendering to `CartItem.jsx`.
+-   **Increased Reusability**: `CartItem.jsx` can be potentially reused in other parts of the application where a single cart item needs to be displayed (e.g., order summaries).
+-   **Easier Maintenance**: Changes to the display or interaction of a single cart item will only require modifications to `CartItem.jsx`, reducing the risk of unintended side effects in the main `CartComponent.jsx`.

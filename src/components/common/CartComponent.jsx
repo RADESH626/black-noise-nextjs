@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+import CartItem from './CartItem';
 import { useSession } from "next-auth/react";
 import { guardarPedido } from "@/app/acciones/PedidoActions";
 import { getCartByUserId, addDesignToCart, removeDesignFromCart, updateCartItemQuantity, clearUserCart } from "@/app/acciones/CartActions"; // Import CartActions
@@ -147,29 +148,12 @@ function CartComponent() {
       <h2 className="text-2xl font-bold mb-6 text-white">Tu Carrito de Compras</h2>
       <div className="space-y-4">
         {cartItems.map((item) => (
-          <div key={item.id} className="flex items-center justify-between bg-gray-800 p-4 rounded-lg">
-            <div className="flex items-center">
-              {item.image && (
-                <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-md mr-4" />
-              )}
-              <div>
-                <h3 className="text-lg font-semibold text-white">{item.name}</h3>
-                <p className="text-gray-400">Precio: ${item.price.toFixed(2)}</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <input
-                type="number"
-                min="0" // Allow 0 to trigger removal
-                value={item.quantity}
-                onChange={(e) => handleUpdateQuantity(item.id, parseInt(e.target.value))}
-                className="w-20 p-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-              />
-              <BotonGeneral onClick={() => handleRemoveItem(item.id)}>
-                Eliminar
-              </BotonGeneral>
-            </div>
-          </div>
+          <CartItem
+            key={item.id}
+            item={item}
+            onUpdateQuantity={handleUpdateQuantity}
+            onRemoveItem={handleRemoveItem}
+          />
         ))}
       </div>
       <div className="mt-8 pt-4 border-t border-700 flex justify-between items-center">
