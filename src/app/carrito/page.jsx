@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import PageLayout from "@/components/layout/PageLayout";
 import { useCartStorage } from "@/hooks/useCartStorage";
 import { useRouter } from "next/navigation";

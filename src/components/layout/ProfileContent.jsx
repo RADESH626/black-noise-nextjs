@@ -187,17 +187,25 @@ function ProfileContent() {
       <div className="flex-grow overflow-y-auto">
         {activeTab === 'designs' && (
           <>
-            <div className="mb-4 flex justify-end">
-              <BotonGeneral onClick={handleAddDesign}>
-                + Agregar Diseño
-              </BotonGeneral>
-            </div>
-            <DesignsComponent
-              loading={loading}
-              error={error}
-              userDesigns={userDesigns}
-              handleEditDesign={handleEditDesign}
-            />
+            {userDesigns.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-64">
+                <p className="text-gray-400 text-lg mb-4">No tienes diseños publicados aún.</p>
+                <button
+                  onClick={handleAddDesign}
+                  className="w-16 h-16 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center shadow-lg transform transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+                  aria-label="Agregar nuevo diseño"
+                >
+                  <img src="/icons/icono +.svg" alt="Agregar" className="w-8 h-8" />
+                </button>
+              </div>
+            ) : (
+              <DesignsComponent
+                loading={loading}
+                error={error}
+                userDesigns={userDesigns}
+                handleEditDesign={handleEditDesign}
+              />
+            )}
           </>
         )}
 

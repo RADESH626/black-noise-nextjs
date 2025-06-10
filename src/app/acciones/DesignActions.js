@@ -6,6 +6,8 @@ import Papa from 'papaparse';
 import { revalidatePath } from 'next/cache';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Assuming this path for authOptions
+import fs from 'fs/promises'; // Import Node.js file system module
+import path from 'path'; // Import Node.js path module
 
 // Function to save a single design
 export async function guardarDesigns(prevState, formData) {
@@ -19,16 +21,34 @@ export async function guardarDesigns(prevState, formData) {
     }
 
     try {
+        const imageFile = formData.get('imagenDesing');
+        let imagePath = '';
+
+        if (imageFile && imageFile instanceof File) {
+            const bytes = await imageFile.arrayBuffer();
+            const buffer = Buffer.from(bytes);
+
+            // Generate a unique filename
+            const filename = `${Date.now()}-${imageFile.name}`;
+            const absolutePath = path.join(process.cwd(), 'public', 'img', 'designs', filename);
+            const relativePath = `/img/designs/${filename}`; // Path to store in DB
+
+            await fs.writeFile(absolutePath, buffer);
+            imagePath = relativePath;
+        } else {
+            return { success: false, message: 'No se proporcionó una imagen válida.' };
+        }
+
         const data = {
             usuarioId: session.user.id,
-            nombreDesing: formData.get('nombreDesing'), // Changed to nombreDesing to match model
+            nombreDesing: formData.get('nombreDesing'),
             descripcion: formData.get('descripcion'),
-            valorDesing: parseFloat(formData.get('valorDesing')), // Changed to valorDesing to match model
+            valorDesing: parseFloat(formData.get('valorDesing')),
             categoria: formData.get('categoria'),
-            imagenDesing: formData.get('imagenDesing'), // Changed to imagenDesing to match model
-            tallasDisponibles: formData.get('tallasDisponibles'), // Changed to get single string
-            coloresDisponibles: formData.get('coloresDisponibles'), // Changed to get single string
-            estadoDesing: 'PRIVADO' // Explicitly set to PRIVADO as per requirements
+            imagenDesing: imagePath, // Use the path of the saved image
+            estadoDesing: 'PRIVADO',
+            coloresDisponibles: formData.get('coloresDisponibles') ? formData.get('coloresDisponibles').split(',') : [],
+            tallasDisponibles: formData.get('tallasDisponibles') ? formData.get('tallasDisponibles').split(',') : []
         };
 
         const newDesign = await Design.create(data);
@@ -165,8 +185,8 @@ export async function actualizarDesign(prevState, formData) {
             valorDesing: parseFloat(formData.get('valorDesing')),
             categoria: formData.get('categoria'),
             imagenDesing: formData.get('imagenDesing'),
-            tallasDisponibles: formData.get('tallasDisponibles'),
-            coloresDisponibles: formData.get('coloresDisponibles'),
+            coloresDisponibles: formData.get('coloresDisponibles') ? formData.get('coloresDisponibles').split(',') : [],
+            tallasDisponibles: formData.get('tallasDisponibles') ? formData.get('tallasDisponibles').split(',') : [],
             // Do not update usuarioId or estadoDesing here unless explicitly required for updates
         };
 

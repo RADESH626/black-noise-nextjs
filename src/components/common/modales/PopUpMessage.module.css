@@ -1,11 +1,11 @@
-.popup-shadow {
+/* .popup-shadow {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
+} */
 
 .popup-success {
-    background: linear-gradient(to right, #34d399, #10b981);
+    background-color: #28a745; /* Solid green for success */
 }
 
 .popup-error {
-    background: linear-gradient(to right, #ef4444, #dc2626);
+    background-color: #dc3545; /* Solid red for error */
 }

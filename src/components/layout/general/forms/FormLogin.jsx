@@ -96,7 +96,6 @@ function FormLogin() {
         <div className="relative">
           {/* InputEmail ahora es uncontrolled o usa name para FormData */}
           <InputEmail
-            required
             placeholder="ejemplo@gmail.com"
             name="correo" // Name is crucial for FormData
           />
@@ -108,7 +107,6 @@ function FormLogin() {
         <div className="relative">
           {/* InputPassword ahora es uncontrolled o usa name para FormData */}
           <InputPassword
-            required
             placeholder="contraseña"
             name="password" // Name is crucial for FormData
           />

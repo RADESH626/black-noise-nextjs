@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import InputGeneral from '@/components/common/inputs/InputGeneral';
-import { actualizarPerfilProveedor } from '@/app/acciones/ProveedorActions';
+import { actualizarProveedor } from '@/app/acciones/ProveedorActions';
 import { Disponibilidad } from '@/models/enums/proveedor/Disponibilidad';
 import { MetodoPago } from '@/models/enums/pago/MetodoPago';
 

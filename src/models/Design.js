@@ -14,7 +14,7 @@ const DesignSchema = new Schema({
     },
     descripcion: {
         type: String,
-        required: true
+        required: false
     },
     categoria: {
         type: String,
@@ -43,12 +43,12 @@ const DesignSchema = new Schema({
         type: String,
         required: true
     },
-    tallasDisponibles: {
-        type: String,
+    coloresDisponibles: {
+        type: [String],
         required: true
     },
-    coloresDisponibles: {
-        type: String,
+    tallasDisponibles: {
+        type: [String],
         required: true
     }
 }, {
