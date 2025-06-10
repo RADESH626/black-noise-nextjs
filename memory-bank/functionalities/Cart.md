@@ -55,6 +55,7 @@ The client-side cart management (using `useCartStorage` hook) will now be synchr
 
 The cart view has been updated to improve its layout and functionality based on the provided design. Key changes include:
 - The main cart section in `src/app/carrito/page.jsx` now uses a `flex-col` layout to stack cart items and the summary vertically, improving readability and flow.
+- The `CartItemsList` component (`src/components/carrito/CartItemsList.jsx`) has been updated to take full width (`w-full`) within its container, ensuring proper alignment with the `CartSummaryAndPayment` component.
 - The `CartSummaryAndPayment` component (`src/components/carrito/CartSummaryAndPayment.jsx`) has been refactored to:
     - Remove the "TU PEDIDO" header, "Cantidad de productos", "Costo de envío", and the "PAGAR AHORA" button.
     - Introduce "Agregar a Pedido" and "Vaciar Carrito" buttons, positioned horizontally alongside the "Total" display.

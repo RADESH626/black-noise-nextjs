@@ -7,7 +7,7 @@ function CartItemsList({ cartItems }) {
       initial={{ x: 50, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.5, delay: 0.3 }}
-      className="w-1/2 flex flex-col gap-4"
+      className="w-full flex flex-col gap-4"
     >
       {cartItems.map((item, index) => (
         <motion.div

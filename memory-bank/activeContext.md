@@ -31,6 +31,7 @@ The new `Cart` model is necessary to store the IDs of designs that a user adds t
     - Remove "TU PEDIDO" header, "Cantidad de productos", "Costo de envío", and the "PAGAR AHORA" button.
     - Add "Agregar a Pedido" and "Vaciar Carrito" buttons, positioned horizontally alongside the "Total" display.
     - Adjust the component's width to `w-full` and remove `mt-20` for proper alignment.
+- Modified `src/components/carrito/CartItemsList.jsx` to remove the `w-1/2` class, ensuring it takes full width within its container.
 
 **Reasoning:**
-The previous cart view did not match the desired design, with the total and action buttons incorrectly positioned. These changes align the UI with the provided image, improving the user experience by presenting a clear and functional cart summary.
+The previous cart view did not match the desired design, with the total and action buttons incorrectly positioned. These changes align the UI with the provided image, improving the user experience by presenting a clear and functional cart summary. The additional change to `CartItemsList.jsx` ensures proper horizontal alignment of the cart items section.
