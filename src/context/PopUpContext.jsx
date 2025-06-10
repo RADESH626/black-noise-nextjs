@@ -10,6 +10,7 @@ export const PopUpProvider = ({ children }) => {
   const [type, setType] = useState('success'); // 'success' or 'error'
 
   const showPopUp = useCallback((msg, msgType = 'success') => {
+    console.log('PopUpContext: showPopUp called with message:', msg, 'and type:', msgType);
     setMessage(msg);
     setType(msgType);
   }, []);

@@ -4,22 +4,32 @@ import styles from './PopUpMessage.module.css';
 const PopUpMessage = ({ message, type, onClose }) => {
   const [isVisible, setIsVisible] = useState(true);
 
+  console.log('PopUpMessage: Component rendered with message:', message, 'type:', type, 'isVisible:', isVisible);
+
   useEffect(() => {
+    console.log('PopUpMessage: useEffect triggered. Setting auto-hide timer.');
     const timer = setTimeout(() => {
+      console.log('PopUpMessage: Auto-hide timer expired. Setting isVisible to false and calling onClose.');
       setIsVisible(false);
       onClose();
-    }, 2000); // Auto-hide after 2 seconds
+    }, 5000); // Auto-hide after 5 seconds (increased for debugging visibility)
 
-    return () => clearTimeout(timer);
+    return () => {
+      console.log('PopUpMessage: Clearing auto-hide timer.');
+      clearTimeout(timer);
+    };
   }, [onClose]);
 
-  if (!isVisible) return null;
+  if (!isVisible) {
+    console.log('PopUpMessage: isVisible is false, returning null.');
+    return null;
+  }
 
   const popupClass = type === 'success' ? styles.popupSuccess : styles.popupError;
 
   return (
-    <div className="fixed top-0 left-0 right-0 flex justify-center z-50 animate-slideDown">
-      <div className={`${popupClass} text-secondary px-6 py-4 rounded-b-lg ${styles.popupShadow} min-w-[300px] max-w-[500px] mx-4 mt-0 backdrop-blur-sm bg-opacity-95`}>
+   <div className="fixed top-0 left-0 right-0 flex justify-center z-50 animate-slideDown">
+      <div className={`${popupClass} text-secondary px-6 py-4 rounded-b-lg popup-shadow min-w-[300px] max-w-[500px] mx-4 mt-0`}>
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-3">
             <span className={`text-2xl ${type === 'success' ? 'text-neutral-100' : 'text-neutral-100'}`}>
