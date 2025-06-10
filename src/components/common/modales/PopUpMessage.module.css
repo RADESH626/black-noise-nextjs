@@ -3,9 +3,9 @@
 } */
 
 .popup-success {
-    background-color: #28a745; /* Solid green for success */
+    background-color: #28a745 !important; /* Solid green for success */
 }
 
 .popup-error {
-    background-color: #dc3545; /* Solid red for error */
+    background-color: #dc3545 !important; /* Solid red for error */
 }

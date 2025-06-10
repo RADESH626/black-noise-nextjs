@@ -241,8 +241,6 @@ function ProfileContent() {
                 error={error}
                 userDesigns={userDesigns}
                 handleEditDesign={handleEditDesign}
-                cartItems={cartItems} // Pass cartItems to DesignsComponent
-                addItem={handleAddItemToCart} // Pass addItem to DesignsComponent
               />
             )}
           </>

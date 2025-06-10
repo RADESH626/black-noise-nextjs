@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import React, { useState } from "react";
 import PageLayout from "@/components/layout/PageLayout";
 import { useRouter } from "next/navigation";
 import CartLeftPanel from "@/components/carrito/CartLeftPanel";
