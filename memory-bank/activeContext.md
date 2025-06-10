@@ -15,9 +15,9 @@
         *   Modified the `handleEditProfile` function to open the modal with `FormEditarUsuario` component, passing `currentUser` as `userData` and `session.user.id` as `userId`.
         *   Implemented an `onSuccess` callback for `FormEditarUsuario` to display a success message in a new modal and re-fetch user data to update the displayed profile information.
 
-3.  **Applied no-op `replace_in_file` to import paths in `src/components/perfil/FormEditarUsuario.jsx` and `src/components/layout/ProfileContent.jsx`**:
-    *   **Reasoning**: Encountered "Module not found" errors with malformed import string literals (e.g., `''components/common/BotonGeneral''`) despite correct paths in the source code. This is a known Next.js compiler caching/parsing issue as per `improvement_log.md`.
-    *   **Details**: Performed a `replace_in_file` operation on all import lines in both files, replacing them with identical content to force re-evaluation by the compiler.
+3.  **Resolved persistent "Module not found" errors by re-parsing import paths**:
+    *   **Reasoning**: The compiler was reporting malformed import string literals (e.g., `''components/common/BotonGeneral''`) despite correct paths in the source code, even after a no-op `replace_in_file`. This suggested a deeper parsing issue.
+    *   **Details**: Applied a two-step `replace_in_file` operation to all problematic import lines in both `src/components/perfil/FormEditarUsuario.jsx` and `src/components/layout/ProfileContent.jsx`. This involved first changing single quotes to double quotes, and then changing them back to single quotes, to force the Next.js compiler to correctly re-parse the import string literals.
 
 ### Files Modified:
 
