@@ -44,5 +44,31 @@ El usuario reportó que los `console.log` dentro de `handleEditUserClick` no se 
     *   Pasar la prop `onClick` al elemento `<button>` interno.
     *   Cambiar el `type` del botón de `"submit"` a `"button"` para evitar envíos de formulario no deseados.
 
+### Tarea: Refactorizar `ModalEditarUsuario` para utilizar `ModalContext` en lugar de estado local.
+
+**Alcance:** Minor.
+
+**Modificaciones Realizadas:**
+*   **`src/components/layout/admin/dashboards/UsuariosClientPage.jsx`:**
+    *   Se eliminó el estado local `showEditUserModal`.
+    *   Se importó `useModal` del `ModalContext`.
+    *   La función `handleEditUserClick` ahora utiliza `openModal()` para mostrar `ModalEditarUsuario`, pasando `userData` y `onUserUpdated` como props.
+    *   Se eliminó la renderización directa de `ModalEditarUsuario`.
+    *   La función `handleRefreshUsers` ahora llama a `closeModal()` para asegurar el cierre del modal.
+*   **`src/components/layout/admin/usuarios/modals/ModalEditarUsuario.jsx`:**
+    *   Se eliminaron las props `isOpen` y `onClose`.
+    *   Se eliminaron `dialogRef` y el `useEffect` asociado, ya que la visibilidad del modal es gestionada por `ModalContext`.
+    *   Se importó `useModal` del `ModalContext`.
+    *   Las llamadas a `onClose()` fueron reemplazadas por `closeModal()` (tanto en el botón de cerrar como en `handleSuccess`).
+    *   Se eliminó el elemento `<dialog>` y el componente ahora solo renderiza el contenido interno del modal.
+
+### Tarea: Corregir `ReferenceError: showEditUserModal is not defined` en `UsuariosClientPage.jsx`.
+
+**Alcance:** Fix.
+
+**Modificaciones Realizadas:**
+*   **`src/components/layout/admin/dashboards/UsuariosClientPage.jsx`:**
+    *   Se eliminó la línea de `console.log` que causaba el error.
+
 **Próximos Pasos:**
 1.  El usuario debe realizar pruebas en el navegador para confirmar que el botón "Editar" ahora invoca `handleEditUserClick` y que el `ModalEditarUsuario` se muestra correctamente.

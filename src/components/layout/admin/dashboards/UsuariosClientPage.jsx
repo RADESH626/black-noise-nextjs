@@ -8,12 +8,13 @@ import THUsuarios from '@/components/layout/admin/usuarios/THUsuarios';
 import Image from 'next/image';
 import BotonEditar from '@/components/common/botones/BotonEditar';
 import FormBuscarUsuario from '@/components/layout/admin/usuarios/forms/FormBuscarUsuario';
-import ModalAgregarUsuario from '@/components/common/modales/ModalAgregarUsuario';
-import ModalEditarUsuario from '@/components/layout/admin/usuarios/modals/ModalEditarUsuario';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import { usePopUp } from '@/context/PopUpContext';
+import { useModal } from '@/context/ModalContext';
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
+import ModalAgregarUsuario from '@/components/common/modales/ModalAgregarUsuario';
+import ModalEditarUsuario from '@/components/layout/admin/usuarios/modals/ModalEditarUsuario';
 
 // Utility function for date formatting
 const formatDate = (dateString) => {
@@ -60,9 +61,9 @@ export default function UsuariosClientPage() {
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [errorUsers, setErrorUsers] = useState(null);
   const [showAddUserModal, setShowAddUserModal] = useState(false);
-  const [showEditUserModal, setShowEditUserModal] = useState(false);
   const [userToEdit, setUserToEdit] = useState(null);
   const { showPopUp } = usePopUp();
+  const { openModal, closeModal } = useModal();
 
   const fetchUsers = useCallback(async () => {
     setLoadingUsers(true);
@@ -90,7 +91,7 @@ export default function UsuariosClientPage() {
   const handleRefreshUsers = () => {
     fetchUsers(); // Re-fetch users to update the table
     setShowAddUserModal(false);
-    setShowEditUserModal(false);
+    closeModal(); // Close any open modal, including edit user modal
     setUserToEdit(null);
   };
 
@@ -98,16 +99,17 @@ export default function UsuariosClientPage() {
     console.log('handleEditUserClick called with user:', user);
     setUserToEdit(user);
     console.log('After setUserToEdit, userToEdit state (next render):', user); // Log what it will be
-    setShowEditUserModal(true);
-    console.log('After setShowEditUserModal, showEditUserModal state (next render):', true); // Log what it will be
+    openModal(
+      'Editar Usuario',
+      <ModalEditarUsuario userData={user} onUserUpdated={handleRefreshUsers} />,
+      'large' // You can adjust the size as needed: 'small', 'default', 'large', or 'full'
+    );
   };
 
   const handleSearchSuccess = (filteredUsers) => {
     setUsers(filteredUsers);
     setErrorUsers(null); // Clear any previous errors
   };
-
-  console.log('UsuariosClientPage Render: showEditUserModal =', showEditUserModal, 'userToEdit =', userToEdit);
 
   return (
     <div>
@@ -183,7 +185,10 @@ export default function UsuariosClientPage() {
                           {/* Acciones */}
                           <TdGeneral>
                               <div className="flex flex-col md:flex-row gap-2 items-center justify-center">
-                                  <BotonEditar onClick={() => handleEditUserClick(user)}>
+                                  <BotonEditar onClick={() => {
+                                      console.log('BotonEditar clickeado en JSX para usuario:', user._id);
+                                      handleEditUserClick(user);
+                                  }}>
                                       Editar
                                   </BotonEditar>
                                   <ToggleUserStatusForm
@@ -202,21 +207,10 @@ export default function UsuariosClientPage() {
           <p className="text-center text-white">No hay usuarios para mostrar.</p>
       )}
 
-      {console.log('Rendering ModalEditarUsuario with isOpen:', showEditUserModal, 'userData:', userToEdit)}
       <ModalAgregarUsuario 
         isOpen={showAddUserModal} 
         onClose={() => setShowAddUserModal(false)} 
         onUserAdded={handleRefreshUsers}
-      />
-
-      <ModalEditarUsuario
-        isOpen={showEditUserModal}
-        onClose={() => {
-            setShowEditUserModal(false);
-            setUserToEdit(null);
-        }}
-        userData={userToEdit}
-        onUserUpdated={handleRefreshUsers}
       />
     </div>
   );
