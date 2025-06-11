@@ -7,6 +7,7 @@ import CatalogTabs from '@/components/catalogo/CatalogTabs';
 import NewPostSection from '@/components/catalogo/NewPostSection';
 import DesignGrid from '@/components/catalogo/DesignGrid';
 import { addDesignToCart } from '@/app/acciones/CartActions'; // Import addDesignToCart
+import { obtenerDesigns } from '@/app/acciones/DesignActions'; // Import obtenerDesigns
 import { useSession } from 'next-auth/react'; // Import useSession
 
 const ComunidadDiseños = () => {
@@ -14,11 +15,30 @@ const ComunidadDiseños = () => {
   const { data: session } = useSession();
   const userId = session?.user?.id;
 
-  const allDesigns = useMemo(() => {
-    return []; // Aquí se debería implementar la lógica para obtener diseños reales
-  }, []);
+  const [allDesigns, setAllDesigns] = useState([]); // State to store all designs
+  const [loadingDesigns, setLoadingDesigns] = useState(true);
+  const [errorDesigns, setErrorDesigns] = useState(null);
 
-  // Filtramos populares, por ejemplo, más de 100 likes
+  useEffect(() => {
+    async function fetchDesigns() {
+      try {
+        setLoadingDesigns(true);
+        const result = await obtenerDesigns();
+        if (result?.data) {
+          setAllDesigns(result.data);
+        } else {
+          setErrorDesigns(result?.error || "Error al cargar los diseños.");
+        }
+      } catch (err) {
+        setErrorDesigns("Error de red o del servidor al cargar diseños: " + err.message);
+      } finally {
+        setLoadingDesigns(false);
+      }
+    }
+    fetchDesigns();
+  }, []); // Empty dependency array to run once on mount
+
+  // Filtramos populares, por ejemplo, más de 100 likes (assuming 'likes' property exists in design data)
   const populares = useMemo(() => allDesigns.filter(d => d.likes > 100), [allDesigns]);
 
   // Elegimos qué mostrar según la pestaña activa
@@ -31,7 +51,7 @@ const ComunidadDiseños = () => {
   useEffect(() => {
     const initialLikes = {};
     tarjetas.forEach(design => {
-      initialLikes[design.id] = design.likes;
+      initialLikes[design.id] = design.likes || 0; // Ensure default to 0 if likes is undefined
     });
     setLikesState(initialLikes);
 
