@@ -24,13 +24,28 @@ export async function guardarDesigns(prevState, formData) {
         let mimeType = '';
         let imageData = null;
 
-        if (imageFile && imageFile instanceof File) {
+        const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+        const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15 MB
+
+        if (imageFile) {
+            if (!(imageFile instanceof File)) {
+                return { success: false, message: 'El archivo de imagen proporcionado no es válido.' };
+            }
+
+            if (!ALLOWED_MIME_TYPES.includes(imageFile.type)) {
+                return { success: false, message: `Tipo de archivo no soportado: ${imageFile.type}. Solo se permiten JPG, PNG y WEBP.` };
+            }
+
+            if (imageFile.size > MAX_FILE_SIZE) {
+                return { success: false, message: `El tamaño del archivo excede el límite de ${MAX_FILE_SIZE / (1024 * 1024)} MB.` };
+            }
+
             const bytes = await imageFile.arrayBuffer();
             const buffer = Buffer.from(bytes);
             mimeType = imageFile.type;
             imageData = buffer;
         } else {
-            return { success: false, message: 'No se proporcionó una imagen válida.' };
+            return { success: false, message: 'No se proporcionó una imagen para el diseño.' };
         }
 
         const data = {
@@ -176,8 +191,22 @@ export async function actualizarDesign(prevState, formData) {
     try {
         const imageFile = formData.get('imagenDesing');
         let updateImageData = {};
+        const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+        const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15 MB
 
-        if (imageFile && imageFile instanceof File) {
+        if (imageFile) {
+            if (!(imageFile instanceof File)) {
+                return { success: false, message: 'El archivo de imagen proporcionado no es válido para la actualización.' };
+            }
+
+            if (!ALLOWED_MIME_TYPES.includes(imageFile.type)) {
+                return { success: false, message: `Tipo de archivo no soportado para la actualización: ${imageFile.type}. Solo se permiten JPG, PNG y WEBP.` };
+            }
+
+            if (imageFile.size > MAX_FILE_SIZE) {
+                return { success: false, message: `El tamaño del archivo excede el límite de ${MAX_FILE_SIZE / (1024 * 1024)} MB para la actualización.` };
+            }
+
             const bytes = await imageFile.arrayBuffer();
             const buffer = Buffer.from(bytes);
             const mimeType = imageFile.type;
