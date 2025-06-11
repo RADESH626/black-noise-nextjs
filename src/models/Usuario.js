@@ -69,7 +69,10 @@ const UsuarioSchema = new Schema({
         default: Rol.CLIENTE, // Asignar CLIENTE como valor predeterminado
         required: true
     },
-    fotoPerfil: {
+    imageData: {
+        type: Buffer
+    },
+    imageMimeType: {
         type: String
     },
     habilitado: {
