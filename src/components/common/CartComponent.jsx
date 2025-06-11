@@ -130,17 +130,8 @@ function CartComponent() {
 
     if (success) {
       await handleClearCart(); // Clear cart after successful order creation
-      openModal(
-        "Pago Confirmado",
-        <div className="text-center p-4">
-          <p className="text-lg font-semibold mb-2">¡Tu pago ha sido procesado exitosamente!</p>
-          <p className="text-gray-600">Serás redirigido a la página de confirmación en breve.</p>
-        </div>
-      );
-      setTimeout(() => {
-        closeModal();
-        router.push("/confirmacion"); // Redirect to confirmation page after modal
-      }, 3000); // Redirect after 3 seconds
+      alert("Pedido creado exitosamente. Puedes pagarlo desde tu historial de pedidos.");
+      router.push("/perfil"); // Redirect to profile/orders page
     } else {
       setError({ message: orderError || "Error al crear el pedido." });
     }
@@ -206,7 +197,7 @@ function CartComponent() {
               Vaciar Carrito
             </BotonGeneral>
             <BotonGeneral onClick={handleCreateOrder} disabled={loading}>
-              Pagar Ahora
+              Realizar Pedido
             </BotonGeneral>
           </div>
         </div>

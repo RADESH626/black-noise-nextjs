@@ -32,12 +32,10 @@ The cart information is now displayed exclusively within the user's profile, und
 
 ### Order Creation
 
-The "Pagar Ahora" button in the cart now triggers the creation of a new order. This process involves:
+The "Realizar Pedido" button in the cart now triggers the creation of a new order. This process involves:
 1.  Gathering the current cart items and user information. In `CartComponent.jsx`, the `designId` for each item is now correctly extracted from `item.id` (which is populated by `getCartByUserId`).
 2.  Sending this data to a new server action responsible for creating a `Pedido` (Order) document in the database.
-3.  Clearing the user's cart after successful order creation.
-4.  Displaying a payment confirmation modal to the user.
-5.  Redirecting the user to a confirmation or order details page after the modal.
+3.  Clearing the user's cart after successful order creation. The payment for this order will be handled separately from the user's order history.
 
 ## Interaction Flow: Client-side to Server-side Cart
 
@@ -72,5 +70,5 @@ The cart functionality has been fully integrated into the user profile.
     -   Display of all cart items with quantity controls and removal options.
     -   Calculation and display of subtotal, shipping, and total to pay.
     -   "Vaciar Carrito" (Clear Cart) button.
-    -   "Pagar Ahora" (Pay Now) button, which now triggers the order creation process.
+    -   "Realizar Pedido" (Place Order) button, which now triggers the order creation process.
 -   The `CartLeftPanel`, `CartItemsList`, and `CartSummaryAndPayment` components from `src/components/carrito/` have been removed as their functionality is now consolidated.

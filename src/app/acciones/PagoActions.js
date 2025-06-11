@@ -2,10 +2,12 @@
 
 import connectDB from '@/utils/DBconection';
 import Pago from '@/models/Pago';
+import Pedido from '@/models/Pedido'; // Import Pedido model
 import Usuario from '@/models/Usuario'; // Necesario para popular
 import Venta from '@/models/Venta';   // Necesario para popular
 import { revalidatePath } from 'next/cache';
 import logger from '@/utils/logger';
+import { EditarPedido } from '@/app/acciones/PedidoActions'; // Import EditarPedido
 
 // Crear un nuevo pago
 async function guardarPago(data) {
@@ -120,10 +122,53 @@ async function obtenerPagosPorUsuarioId(usuarioId) {
 
 // No se implementa EliminarPago directamente, los pagos suelen cambiar de estado (ej. ANULADO)
 
+// Procesar un pago para un pedido existente
+async function procesarPagoDePedido(paymentData) {
+    logger.debug('Entering procesarPagoDePedido with data:', paymentData);
+    try {
+        await connectDB();
+        logger.debug('Database connected for procesarPagoDePedido.');
+
+        const { pedidoId, valorPedido, cardNumber, expiryDate, cvv, metodoPago } = paymentData;
+
+        // 1. Crear un nuevo registro de Pago
+        const nuevoPago = new Pago({
+            pedidoId,
+            usuarioId: paymentData.userId, // Assuming userId is passed in paymentData
+            valorPago: valorPedido,
+            metodoPago,
+            estadoTransaccion: 'PAGADO', // Consistent with EstadoPago enum
+            detallesTarjeta: { cardNumber: cardNumber.slice(-4), expiryDate, cvv: '***' } // Store last 4 digits, mask CVV
+        });
+        const pagoGuardado = await nuevoPago.save();
+        logger.debug('Pago record created:', pagoGuardado);
+
+        // 2. Actualizar el estadoPago del Pedido correspondiente a PAGADO
+        const { success: pedidoUpdateSuccess, error: pedidoUpdateError } = await EditarPedido(pedidoId, { estadoPago: 'PAGADO' });
+
+        if (!pedidoUpdateSuccess) {
+            logger.error('Error updating pedido status:', pedidoUpdateError);
+            // Optionally, revert the payment record or mark it as failed
+            return { success: false, message: pedidoUpdateError || 'Error al actualizar el estado del pedido.' };
+        }
+
+        revalidatePath('/perfil'); // Revalidate user profile/orders page
+        revalidatePath('/admin/pedidos'); // Revalidate admin orders page
+        logger.debug('Revalidated paths /perfil and /admin/pedidos.');
+
+        return { success: true, message: 'Pago procesado y pedido actualizado exitosamente.' };
+
+    } catch (error) {
+        logger.error('ERROR in procesarPagoDePedido:', error);
+        return { success: false, message: 'Error al procesar el pago: ' + error.message };
+    }
+}
+
 export {
     guardarPago,
     obtenerPagos,
     ObtenerPagoPorId,
     EditarPago,
-    obtenerPagosPorUsuarioId
+    obtenerPagosPorUsuarioId,
+    procesarPagoDePedido // Export the new server action
 };

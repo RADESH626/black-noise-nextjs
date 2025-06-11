@@ -7,9 +7,9 @@ const PagoSchema = new Schema({
         ref: 'Usuario',
         required: true
     },
-    ventaId: {
+    pedidoId: {
         type: Schema.Types.ObjectId,
-        ref: 'Venta',
+        ref: 'Pedido',
         required: true
     },
     valorPago: {
