@@ -98,7 +98,7 @@ const PedidosContent = () => {
               <div className="absolute top-0 right-0 m-3">
                 {pedido.estadoPago === "PENDIENTE" && (
                   <button
-                    onClick={() => handlePayOrder(pedido._id, pedido.total)}
+                    onClick={() => handlePayOrder(pedido._id, pedido.valorPedido)}
                     className="bg-green-500 text-white font-semibold py-1 px-4 rounded-md text-sm hover:bg-green-600 transition duration-150 mr-2"
                   >
                     Pagar
@@ -116,7 +116,7 @@ const PedidosContent = () => {
               <div>
                 <p className="font-semibold">Pedido ID: {pedido._id}</p>
                 <p className="font-semibold">Estado: {pedido.estadoPago}</p>
-                <p className="font-semibold">Total: ${pedido.total.toFixed(2)}</p>
+                <p className="font-semibold">Total: ${pedido.valorPedido.toFixed(2)}</p>
                 {/* Display other relevant order details here */}
               </div>
             </div>

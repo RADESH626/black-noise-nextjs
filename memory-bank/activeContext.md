@@ -76,3 +76,17 @@
 
 ### Next Steps:
 - Generate git commit command.
+
+---
+
+## Task: Fix 'toFixed' error in PedidosComponent.jsx
+
+### Changes Made:
+- Modified `src/components/common/PedidosComponent.jsx`:
+    - Replaced `pedido.total` with `pedido.valorPedido` for displaying the total and in the `handlePayOrder` function.
+
+### Rationale:
+- The error occurred because `PedidosComponent.jsx` was attempting to access `pedido.total`, which was `undefined`. The `Pedido` model defines the order total as `valorPedido`. This fix aligns the component's data access with the actual data structure.
+
+### Next Steps:
+- Generate git commit command.
