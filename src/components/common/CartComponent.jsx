@@ -7,10 +7,12 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation"; // Import useRouter
 import { getCartByUserId, addDesignToCart, removeDesignFromCart, updateCartItemQuantity, clearUserCart } from "@/app/acciones/CartActions";
 import { guardarPedido } from "@/app/acciones/PedidoActions"; // Import guardarPedido
+import { useModal } from '@/context/ModalContext'; // Import useModal
 
 function CartComponent() {
   const router = useRouter();
   const { data: session, status } = useSession();
+  const { openModal, closeModal } = useModal(); // Use the modal hook
   const userId = session?.user?.id;
 
   const [cartItems, setCartItems] = useState([]);
@@ -128,7 +130,17 @@ function CartComponent() {
 
     if (success) {
       await handleClearCart(); // Clear cart after successful order creation
-      router.push("/confirmacion"); // Redirect to confirmation page
+      openModal(
+        "Pago Confirmado",
+        <div className="text-center p-4">
+          <p className="text-lg font-semibold mb-2">¡Tu pago ha sido procesado exitosamente!</p>
+          <p className="text-gray-600">Serás redirigido a la página de confirmación en breve.</p>
+        </div>
+      );
+      setTimeout(() => {
+        closeModal();
+        router.push("/confirmacion"); // Redirect to confirmation page after modal
+      }, 3000); // Redirect after 3 seconds
     } else {
       setError({ message: orderError || "Error al crear el pedido." });
     }

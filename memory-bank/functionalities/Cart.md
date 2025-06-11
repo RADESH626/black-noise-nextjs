@@ -36,7 +36,8 @@ The "Pagar Ahora" button in the cart now triggers the creation of a new order. T
 1.  Gathering the current cart items and user information. In `CartComponent.jsx`, the `designId` for each item is now correctly extracted from `item.id` (which is populated by `getCartByUserId`).
 2.  Sending this data to a new server action responsible for creating a `Pedido` (Order) document in the database.
 3.  Clearing the user's cart after successful order creation.
-4.  Redirecting the user to a confirmation or order details page.
+4.  Displaying a payment confirmation modal to the user.
+5.  Redirecting the user to a confirmation or order details page after the modal.
 
 ## Interaction Flow: Client-side to Server-side Cart
 

@@ -24,6 +24,7 @@ async function guardarPedido(userId, items, valorPedido, proveedorId = null, fec
         });
         logger.debug('New Pedido instance created:', nuevoPedido);
         const pedidoGuardado = await nuevoPedido.save();
+        console.log(`Nuevo pedido agregado a la base de datos con ID: ${pedidoGuardado._id}`);
         logger.debug('Pedido saved to DB:', pedidoGuardado);
         revalidatePath('/admin/pedidos'); // Revalidate admin orders page
         revalidatePath('/perfil'); // Revalidate user profile page
