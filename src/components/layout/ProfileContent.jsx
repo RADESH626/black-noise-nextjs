@@ -1,47 +1,54 @@
 "use client";
 
 import { useModal } from "@/context/ModalContext";
-import { signOut, useSession } from "next-auth/react"; // Import signOut and useSession
+import { signOut, useSession } from "next-auth/react";
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
-import { useEffect, useState } from "react"; // Import useEffect and useState
-import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions"; // Import the server action
-import { getCartByUserId, addDesignToCart } from "@/app/acciones/CartActions"; // Import CartActions for cart management
-import { obtenerPedidosPorUsuarioId } from "@/app/acciones/PedidoActions"; // Import the server action for orders
-import DesignsComponent from "../common/DesignsComponent"; // Import DesignsComponent
+import { useEffect, useState } from "react";
+import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions";
+import { getCartByUserId, addDesignToCart } from "@/app/acciones/CartActions";
+import { obtenerPedidosPorUsuarioId } from "@/app/acciones/PedidoActions";
+import DesignsComponent from "../common/DesignsComponent";
 import PedidosComponent from "../common/PedidosComponent";
 import CartComponent from "../common/CartComponent";
 import PagosComponent from "../common/PagosComponent";
 import { ObtenerUsuarioPorId } from "@/app/acciones/UsuariosActions";
 import FormEditarUsuario from "@/components/perfil/FormEditarUsuario";
-import DesignUploadModal from "@/components/perfil/DesignUploadModal"; // Import DesignUploadModal
+import DesignUploadModal from "@/components/perfil/DesignUploadModal";
 
-function ProfileContent() {
+function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [] }) {
+  // --- INICIO DE DEBUGGING EN CLIENTE ---
+  console.log('--- [CLIENTE] Props iniciales recibidas del servidor ---');
+  console.log('[CLIENTE] initialUserDesigns:', initialUserDesigns);
+  console.log('[CLIENTE] initialOrderedDesignIds:', initialOrderedDesignIds);
+  
   const { openModal } = useModal();
   const { data: session, status } = useSession();
   const userId = session?.user?.id;
 
-  const [activeTab, setActiveTab] = useState('designs'); // State to manage active tab
-  const [currentUser, setCurrentUser] = useState(null); // State for user data
-  const [userDesigns, setUserDesigns] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('designs');
+  const [currentUser, setCurrentUser] = useState(null);
+  const [userDesigns, setUserDesigns] = useState(initialUserDesigns);
+  
+  const [loading, setLoading] = useState(initialUserDesigns.length === 0); // Solo loading si no hay datos iniciales
   const [error, setError] = useState(null);
 
   const [cartItems, setCartItems] = useState([]);
   const [cartLoading, setCartLoading] = useState(true);
   const [cartError, setCartError] = useState(null);
+  
+  // Inicializa el estado con los datos del servidor
+  const [orderedDesignIds, setOrderedDesignIds] = useState(new Set(initialOrderedDesignIds));
+  
+  // Log para verificar el estado inicializado
+  console.log('[CLIENTE] Estado "orderedDesignIds" inicializado como Set:', orderedDesignIds);
+  console.log('--- [CLIENTE] FIN DEBUGGING INICIAL ---');
 
-  const [userOrders, setUserOrders] = useState([]); // State for user orders
-  const [ordersLoading, setOrdersLoading] = useState(true);
-  const [ordersError, setOrdersError] = useState(null);
-
-  const [orderedDesignIds, setOrderedDesignIds] = useState(new Set()); // Set to store IDs of designs already in orders
-
-  const fetchData = async () => { // Moved fetchData outside useEffect to be callable
+  const fetchUserData = async () => {
     if (status === 'authenticated' && userId) {
       setLoading(true);
       setError(null);
 
-      // Fetch full user data
+      // Fetch user data
       const fetchedUser = await ObtenerUsuarioPorId(userId);
       if (fetchedUser && fetchedUser.error) {
         setError(fetchedUser.error);
@@ -50,18 +57,18 @@ function ProfileContent() {
         setCurrentUser(fetchedUser || null);
       }
 
-      // Fetch designs
-      const { designs, error: designsError } = await obtenerDesignsPorUsuarioId(userId);
-      if (designsError) {
-        setError(designsError);
-      } else {
-        setUserDesigns(designs || []);
+      // Fetch designs if they were not passed as props
+      if (initialUserDesigns.length === 0) {
+        const { designs, error: designsError } = await obtenerDesignsPorUsuarioId(userId);
+        if (designsError) {
+          setError(designsError);
+        } else {
+          setUserDesigns(designs || []);
+        }
       }
       setLoading(false);
     } else if (status === 'unauthenticated') {
       setLoading(false);
-      setCurrentUser(null);
-      setUserDesigns([]);
     }
   };
 
@@ -77,64 +84,32 @@ function ProfileContent() {
         setCartItems(cart?.items || []);
       }
       setCartLoading(false);
-    } else if (status === 'unauthenticated') {
-      setCartLoading(false);
-      setCartItems([]);
     }
   };
-
-  const fetchOrdersData = async () => {
-    if (status === 'authenticated' && userId) {
-      setOrdersLoading(true);
-      setOrdersError(null);
-      const { orders, error: fetchError } = await obtenerPedidosPorUsuarioId(userId);
-      if (fetchError) {
-        setOrdersError({ message: fetchError });
-        setUserOrders([]);
-        setOrderedDesignIds(new Set());
-      } else {
-        setUserOrders(orders || []);
-        // Extract design IDs from orders
-        const designIds = new Set();
-        orders?.forEach(order => {
-          order.items.forEach(item => {
-            if (item.designId) { // Assuming designId is present in order items
-              designIds.add(item.designId);
-            }
-          });
-        });
-        setOrderedDesignIds(designIds);
-      }
-      setOrdersLoading(false);
-    } else if (status === 'unauthenticated') {
-      setOrdersLoading(false);
-      setUserOrders([]);
-      setOrderedDesignIds(new Set());
-    }
-  };
-
+  
+  // Este useEffect se encarga de obtener los datos del lado del cliente si es necesario
   useEffect(() => {
-    fetchData();
-    fetchCartData(); // Fetch cart data as well
-    fetchOrdersData(); // Fetch orders data as well
-  }, [session, status, userId]); // Rerun effect when session, status, or userId changes
+    fetchUserData();
+    fetchCartData();
+  }, [userId, status]); // Se ejecuta cuando el userId o el estado de la sesión cambian
+
 
   const handleAddItemToCart = async (item) => {
     if (!userId) {
       alert("Debes iniciar sesión para agregar ítems al carrito.");
       return;
     }
-    setCartLoading(true); // Indicate loading for cart operation
+    setCartLoading(true);
     const { success, message } = await addDesignToCart(userId, item.id);
     if (success) {
-      await fetchCartData(); // Re-fetch cart to update UI
+      await fetchCartData();
     } else {
       setCartError({ message: message || "Error al agregar el diseño al carrito." });
     }
     setCartLoading(false);
   };
 
-  const user = currentUser; // Use the state variable for user
+  const user = currentUser;
 
   const handleEditProfile = () => {
     openModal(
@@ -150,8 +125,7 @@ function ProfileContent() {
             </div>,
             'default'
           );
-          // Re-fetch user data to update the displayed profile
-          fetchData();
+          fetchUserData();
         }}
       />,
       'default'
@@ -163,7 +137,6 @@ function ProfileContent() {
       "Editar Diseño",
       <div className="text-white">
         <h3 className="text-lg mb-4">Editando: {design.nombreDesing}</h3>
-        {/* Aquí puedes agregar el formulario de edición de diseño */}
         <p>Formulario de edición en desarrollo...</p>
       </div>,
       'default'
@@ -173,7 +146,7 @@ function ProfileContent() {
   const handleAddDesign = () => {
     openModal(
       "Subir Nuevo Diseño",
-      <DesignUploadModal onDesignSaved={fetchData} />, // Pass fetchData as callback
+      <DesignUploadModal onDesignSaved={fetchUserData} />,
       'default'
     );
   };
@@ -183,42 +156,20 @@ function ProfileContent() {
       {/* User Info Section */}
       <div className="bg-black p-6 md:p-8 rounded-lg shadow-lg mb-8 flex-shrink-0">
         <div className="flex flex-col md:flex-row items-center">
-          {/* imagen */}
           <div className="w-32 h-32 md:w-60 md:h-60 bg-gray-700 rounded-lg mb-4 md:mb-0 md:mr-8 ">
             <img src="/img/perfil/FotoPerfil.webp" alt="User Image" className="w-full h-full object-cover rounded-lg" />
           </div>
-
-          {/* seccion info */}
           <div className="flex-grow text-center md:text-left">
             <h1 className="text-3xl md:text-4xl font-bold mb-1">{user?.primerNombre} {user?.primerApellido}</h1>
-
-            {/* info */}
             <div className="text-gray-400 mb-3">
               <p>CORREO: {user?.correo}</p>
-              <p>TIPO DE DOCUMENTO: {user?.tipoDocumento}</p>
               <p>NÚMERO DE DOCUMENTO: {user?.numeroDocumento}</p>
-              <p>FECHA DE NACIMIENTO: {user?.fechaNacimiento}</p>
-              <p>GÉNERO: {user?.genero}</p>
               <p>NÚMERO DE TELÉFONO: {user?.numeroTelefono}</p>
               <p>DIRECCIÓN: {user?.direccion}</p>
-              <p>NÚMERO DE LIKES: {user?.likes || 0}</p>
-              <p>BIOGRAFÍA: {user?.bio ? user.bio : "..."}</p>
             </div>
-
-            {/* botones */}
             <div className="flex flex-col sm:flex-row justify-center md:justify-start space-y-2 sm:space-y-0 sm:space-x-3">
-              <BotonGeneral onClick={handleEditProfile}>
-                EDITAR PERFIL
-              </BotonGeneral>
-
-              <BotonGeneral onClick={() => signOut({ callbackUrl: '/login' })}>
-                CERRAR SESIÓN
-              </BotonGeneral>
-
-              {/* <BotonGeneral onClick={handleGoToCatalog}>
-                REGRESAR AL CATÁLOGO
-              </BotonGeneral> */}
-              
+              <BotonGeneral onClick={handleEditProfile}>EDITAR PERFIL</BotonGeneral>
+              <BotonGeneral onClick={() => signOut({ callbackUrl: '/login' })}>CERRAR SESIÓN</BotonGeneral>
             </div>
           </div>
         </div>
@@ -227,49 +178,22 @@ function ProfileContent() {
       {/* nav */}
       <nav className="mb-8 flex-shrink-0">
         <div className="flex border-b border-gray-700">
-          <button
-            className={`py-3 px-6 text-lg font-medium ${activeTab === 'designs' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`}
-            onClick={() => setActiveTab('designs')}
-          >
-            DISEÑOS
-          </button>
-
-          <button
-            className={`py-3 px-6 text-lg font-medium ${activeTab === 'cart' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`}
-            onClick={() => setActiveTab('cart')}
-          >
-            CARRITO
-          </button>
-
-          <button
-            className={`py-3 px-6 text-lg font-medium ${activeTab === 'orders' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`}
-            onClick={() => setActiveTab('orders')}
-          >
-            PEDIDOS
-          </button>
-
-          <button
-            className={`py-3 px-6 text-lg font-medium ${activeTab === 'payments' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`}
-            onClick={() => setActiveTab('payments')}
-          >
-            PAGOS
-          </button>
-          
+          <button className={`py-3 px-6 text-lg font-medium ${activeTab === 'designs' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`} onClick={() => setActiveTab('designs')}>DISEÑOS</button>
+          <button className={`py-3 px-6 text-lg font-medium ${activeTab === 'cart' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`} onClick={() => setActiveTab('cart')}>CARRITO</button>
+          <button className={`py-3 px-6 text-lg font-medium ${activeTab === 'orders' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`} onClick={() => setActiveTab('orders')}>PEDIDOS</button>
+          <button className={`py-3 px-6 text-lg font-medium ${activeTab === 'payments' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`} onClick={() => setActiveTab('payments')}>PAGOS</button>
         </div>
       </nav>
 
       {/* Content Area */}
       <div className="flex-grow overflow-y-auto">
         {activeTab === 'designs' && (
+          loading ? <p>Cargando diseños...</p> : error ? <p>Error: {error}</p> :
           <>
             {userDesigns.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-64">
                 <p className="text-gray-400 text-lg mb-4">No tienes diseños publicados aún.</p>
-                <button
-                  onClick={handleAddDesign}
-                  className="w-16 h-16 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center shadow-lg transform transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
-                  aria-label="Agregar nuevo diseño"
-                >
+                <button onClick={handleAddDesign} className="w-16 h-16 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center shadow-lg transform transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50" aria-label="Agregar nuevo diseño">
                   <img src="/icons/icono +.svg" alt="Agregar" className="w-8 h-8" />
                 </button>
               </div>
@@ -281,29 +205,17 @@ function ProfileContent() {
                 handleEditDesign={handleEditDesign}
                 cartItems={cartItems}
                 addItem={handleAddItemToCart}
-                orderedDesignIds={orderedDesignIds} // Pass orderedDesignIds to DesignsComponent
+                orderedDesignIds={orderedDesignIds}
               />
             )}
           </>
         )}
-
-        {activeTab === 'orders' && (
-          <PedidosComponent userId={user?.id} />
-        )}
-
-        {activeTab === 'cart' && (
-          <CartComponent />
-        )}
-
-        {activeTab === 'payments' && (
-          <PagosComponent userId={user?.id} />
-        )}
+        {activeTab === 'orders' && (<PedidosComponent userId={user?.id} />)}
+        {activeTab === 'cart' && (<CartComponent />)}
+        {activeTab === 'payments' && (<PagosComponent userId={user?.id} />)}
       </div>
     </div>
   );
 }
 
 export default ProfileContent;
-
-
-//TODO: Implementar función para cerrar sesión

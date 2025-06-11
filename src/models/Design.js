@@ -42,14 +42,6 @@ const DesignSchema = new Schema({
     imagenDesing: {
         type: String,
         required: true
-    },
-    coloresDisponibles: {
-        type: [String],
-        required: true
-    },
-    tallasDisponibles: {
-        type: [String],
-        required: true
     }
 }, {
     timestamps: true
