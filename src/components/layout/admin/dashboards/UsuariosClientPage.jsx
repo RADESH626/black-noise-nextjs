@@ -95,14 +95,19 @@ export default function UsuariosClientPage() {
   };
 
   const handleEditUserClick = (user) => {
+    console.log('handleEditUserClick called with user:', user);
     setUserToEdit(user);
+    console.log('After setUserToEdit, userToEdit state (next render):', user); // Log what it will be
     setShowEditUserModal(true);
+    console.log('After setShowEditUserModal, showEditUserModal state (next render):', true); // Log what it will be
   };
 
   const handleSearchSuccess = (filteredUsers) => {
     setUsers(filteredUsers);
     setErrorUsers(null); // Clear any previous errors
   };
+
+  console.log('UsuariosClientPage Render: showEditUserModal =', showEditUserModal, 'userToEdit =', userToEdit);
 
   return (
     <div>
@@ -140,7 +145,7 @@ export default function UsuariosClientPage() {
                           <TdGeneral>
                               <div className="flex items-center space-x-3">
                                   <Image
-                                      src={user.imageData && user.imageMimeType ? `data:${user.imageMimeType};base64,${Buffer.from(user.imageData.data).toString('base64')}` : '/img/perfil/FotoPerfil.webp'}
+                                      src={user.imageData && user.imageMimeType ? `data:${user.imageMimeType};base64,\${Buffer.from(user.imageData.data).toString('base64')}` : '/img/perfil/FotoPerfil.webp'}
                                       alt={`Foto de ${user.nombreUsuario || user.primerNombre}`}
                                       width={40}
                                       height={40}
@@ -197,6 +202,7 @@ export default function UsuariosClientPage() {
           <p className="text-center text-white">No hay usuarios para mostrar.</p>
       )}
 
+      {console.log('Rendering ModalEditarUsuario with isOpen:', showEditUserModal, 'userData:', userToEdit)}
       <ModalAgregarUsuario 
         isOpen={showAddUserModal} 
         onClose={() => setShowAddUserModal(false)} 
