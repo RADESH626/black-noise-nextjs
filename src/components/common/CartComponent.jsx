@@ -119,7 +119,7 @@ function CartComponent() {
     setError(null);
 
     const orderItems = cartItems.map(item => ({
-      designId: item.designId, // Assuming item.designId is already the ObjectId
+      designId: item.id, // Use item.id which contains the designId
       quantity: item.quantity
     }));
     const totalOrderValue = getTotal();
