@@ -82,11 +82,19 @@ const PedidosContent = () => {
             className="bg-gray-800 rounded-xl shadow-lg overflow-hidden"
           >
             <div className="w-full h-56 bg-gray-700 relative">
-              <img
-                src={pedido.productos[0]?.img || "/public/img/Fondos/Fondo 1.jpg"} // Assuming first product image
-                alt={pedido.productos[0]?.nombre || "Producto"}
-                className="w-full h-full object-cover"
-              />
+              {pedido.items && pedido.items.length > 0 ? (
+                <img
+                  src={pedido.items[0]?.designId?.imagenDesing || "/public/img/Fondos/Fondo 1.jpg"} // Assuming first product image
+                  alt={pedido.items[0]?.designId?.nombreDesing || "Producto"}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <img
+                  src="/public/img/Fondos/Fondo 1.jpg" // Default image if no items
+                  alt="No hay imagen disponible"
+                  className="w-full h-full object-cover"
+                />
+              )}
               <div className="absolute top-0 right-0 m-3">
                 {pedido.estadoPago === "PENDIENTE" && (
                   <button
