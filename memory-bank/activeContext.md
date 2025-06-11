@@ -33,5 +33,16 @@ El usuario solicitó refactorizar `src/components/layout/admin/dashboards/Usuari
 *   Se eliminó el archivo `src/components/layout/admin/dashboards/users/UsersTable.jsx`, ya que ya no es necesario.
 *   Se actualizó `memory-bank/functionalities/admin_manage_user_details.md` para reflejar que la tabla de usuarios ahora está directamente incrustada en `UsuariosClientPage.jsx`.
 
+**Diagnóstico Adicional (Fase 3 - `onClick` del Botón "Editar"):**
+El usuario reportó que los `console.log` dentro de `handleEditUserClick` no se mostraban, indicando que la función no se estaba invocando.
+
+**Acciones Realizadas (Diagnóstico y Solución del `onClick`):**
+*   Se agregó un `console.log` directamente en el `onClick` del `<BotonEditar>` en `src/components/layout/admin/dashboards/UsuariosClientPage.jsx` para verificar si el evento de clic se registraba a ese nivel.
+*   Se examinó `src/components/common/botones/BotonEditar.jsx` y se encontró que no estaba aceptando ni propagando la prop `onClick` a su elemento `<button>` interno.
+*   **Solución Implementada:** Se modificó `src/components/common/botones/BotonEditar.jsx` para:
+    *   Aceptar la prop `onClick`.
+    *   Pasar la prop `onClick` al elemento `<button>` interno.
+    *   Cambiar el `type` del botón de `"submit"` a `"button"` para evitar envíos de formulario no deseados.
+
 **Próximos Pasos:**
-1.  Diagnosticar por qué el `ModalEditarUsuario` no se muestra visualmente, a pesar de que el botón "Editar" lo está intentando abrir. Esto requerirá la inspección del navegador por parte del usuario.
+1.  El usuario debe realizar pruebas en el navegador para confirmar que el botón "Editar" ahora invoca `handleEditUserClick` y que el `ModalEditarUsuario` se muestra correctamente.

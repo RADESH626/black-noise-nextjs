@@ -1,9 +1,10 @@
 import { IconoEditar } from '@/components/common/iconos'
 
-function BotonEditar({ children }) {
+function BotonEditar({ children, onClick }) {
     return (
         <button
-            type="submit"
+            type="button" // Changed from "submit" to "button" to prevent unintended form submissions
+            onClick={onClick} // Pass the onClick prop to the button
             className="
             px-2 py-2
             font-semibold 
@@ -15,10 +16,10 @@ function BotonEditar({ children }) {
             bg-blue-600 
             text-white 
             hover:bg-blue-700 
-            focus:ring-green-500
+            focus:ring-blue-500
             "
         >
-            editar
+            {children || 'Editar'} {/* Render children or default text */}
             {/* <IconoEditar /> */}
         </button>
     )
