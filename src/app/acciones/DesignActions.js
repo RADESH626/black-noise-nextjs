@@ -6,8 +6,6 @@ import Papa from 'papaparse';
 import { revalidatePath } from 'next/cache';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Assuming this path for authOptions
-import fs from 'fs/promises'; // Import Node.js file system module
-import path from 'path'; // Import Node.js path module
 import logger from '@/utils/logger';
 
 // Function to save a single design
@@ -23,19 +21,14 @@ export async function guardarDesigns(prevState, formData) {
 
     try {
         const imageFile = formData.get('imagenDesing');
-        let imagePath = '';
+        let mimeType = '';
+        let imageData = null;
 
         if (imageFile && imageFile instanceof File) {
             const bytes = await imageFile.arrayBuffer();
             const buffer = Buffer.from(bytes);
-
-            // Generate a unique filename
-            const filename = `${Date.now()}-${imageFile.name}`;
-            const absolutePath = path.join(process.cwd(), 'public', 'img', 'designs', filename);
-            const relativePath = `/img/designs/${filename}`; // Path to store in DB
-
-            await fs.writeFile(absolutePath, buffer);
-            imagePath = relativePath;
+            mimeType = imageFile.type;
+            imageData = buffer;
         } else {
             return { success: false, message: 'No se proporcionó una imagen válida.' };
         }
@@ -46,7 +39,8 @@ export async function guardarDesigns(prevState, formData) {
             descripcion: formData.get('descripcion'),
             valorDesing: parseFloat(formData.get('valorDesing')),
             categoria: formData.get('categoria'),
-            imagenDesing: imagePath, // Use the path of the saved image
+            imageData: imageData,
+            imageMimeType: mimeType,
             estadoDesing: 'PRIVADO',
             coloresDisponibles: formData.get('coloresDisponibles') ? formData.get('coloresDisponibles').split(',') : [],
             tallasDisponibles: formData.get('tallasDisponibles') ? formData.get('tallasDisponibles').split(',') : []
