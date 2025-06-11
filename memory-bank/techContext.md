@@ -42,3 +42,7 @@
 *   **Next.js Server Actions/API Routes:** Posibles problemas de "cold start" o límites de tiempo de ejecución en entornos serverless.
 *   **Flexibilidad de MongoDB:** Requiere una gestión cuidadosa de los esquemas con Mongoose para evitar inconsistencias de datos.
 *   **Autenticación:** La personalización de la lógica de autenticación con NextAuth.js puede requerir una integración profunda.
+
+---
+
+**Nota:** Las directivas operativas de Cline, que rigen su comportamiento y flujo de trabajo, han sido actualizadas y documentadas en detalle en `memory-bank/systemPatterns.md`.

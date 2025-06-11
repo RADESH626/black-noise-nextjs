@@ -25,4 +25,8 @@
 *   **Beneficios Clave:**
     *   **Para Clientes:** Acceso fácil a un catálogo diverso y curado, proceso de compra simplificado y seguro, y seguimiento transparente de pedidos.
     *   **Para Proveedores:** Un canal de ventas dedicado y profesional, herramientas intuitivas para la gestión eficiente de pedidos y productos, y mayor visibilidad para sus creaciones.
-    *   **Para Administradores:** Panel de control centralizado con herramientas de automatización, visibilidad completa de las operaciones y reportes detallados para la toma de decisiones.
+*   **Para Administradores:** Panel de control centralizado con herramientas de automatización, visibilidad completa de las operaciones y reportes detallados para la toma de decisiones.
+
+---
+
+**Nota:** Las directivas operativas de Cline, que rigen su comportamiento y flujo de trabajo, han sido actualizadas y documentadas en detalle en `memory-bank/systemPatterns.md`.

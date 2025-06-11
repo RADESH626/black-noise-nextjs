@@ -5,7 +5,7 @@ This document serves as the master index for the entire Memory Bank, providing a
 ## Core Project Knowledge:
 - [project_overview.md](project_overview.md): Comprehensive overview of the project.
 - [techContext.md](techContext.md): Details on the technologies and frameworks used.
-- [systemPatterns.md](systemPatterns.md): Documentation of system-wide design patterns and architectural decisions.
+- [systemPatterns.md](systemPatterns.md): Documentation of system-wide design patterns, architectural decisions, and Cline's operational directives.
 
 ## Feature Documentation:
 - [functionalities/](functionalities/): Directory containing detailed documentation for each feature.
