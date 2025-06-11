@@ -174,14 +174,27 @@ export async function actualizarDesign(prevState, formData) {
     }
 
     try {
+        const imageFile = formData.get('imagenDesing');
+        let updateImageData = {};
+
+        if (imageFile && imageFile instanceof File) {
+            const bytes = await imageFile.arrayBuffer();
+            const buffer = Buffer.from(bytes);
+            const mimeType = imageFile.type;
+            updateImageData = {
+                imageData: buffer,
+                imageMimeType: mimeType,
+            };
+        }
+
         const data = {
             nombreDesing: formData.get('nombreDesing'),
             descripcion: formData.get('descripcion'),
             valorDesing: parseFloat(formData.get('valorDesing')),
             categoria: formData.get('categoria'),
-            imagenDesing: formData.get('imagenDesing'),
             coloresDisponibles: formData.get('coloresDisponibles') ? formData.get('coloresDisponibles').split(',') : [],
             tallasDisponibles: formData.get('tallasDisponibles') ? formData.get('tallasDisponibles').split(',') : [],
+            ...updateImageData, // Spread the image data if available
             // Do not update usuarioId or estadoDesing here unless explicitly required for updates
         };
 
