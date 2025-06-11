@@ -1,22 +1,15 @@
 # Session Change Log
 
-## Task: Fix - Prevent adding already ordered designs to cart
+## Task: Fix - Optimize ProfileContent.jsx data fetching
 
 ### Description:
-Corrected a logic issue where designs already part of a user's order (paid or pending) still showed the "Add to Cart" button in the "Diseños" tab of the user profile.
+Refactored the `useEffect` and state handling in `src/components/layout/ProfileContent.jsx` to eliminate redundant client-side data fetching, ensuring efficient use of initial data provided by the Server Component.
 
 ### Changes Made:
-1.  **Identified Parent Component**: Confirmed `src/components/layout/ProfileContent.jsx` as the parent component rendering `DesignsComponent.jsx`.
-2.  **Modified `src/components/layout/ProfileContent.jsx`**:
-    *   Imported `obtenerPedidosPorUsuarioId` from `src/app/acciones/PedidoActions.js`.
-    *   Added `userOrders`, `ordersLoading`, `ordersError`, and `orderedDesignIds` states.
-    *   Implemented `fetchOrdersData` to fetch user orders and extract `designId`s from all items within those orders, storing them in a `Set` called `orderedDesignIds`.
-    *   Called `fetchOrdersData` within the `useEffect` hook.
-    *   Passed `orderedDesignIds` as a new prop to `DesignsComponent`.
-3.  **Modified `src/components/common/DesignsComponent.jsx`**:
-    *   Accepted `orderedDesignIds` as a new prop.
-    *   Updated the conditional rendering logic for the "Agregar al carrito" button. Now, it first checks if `design._id` is present in `orderedDesignIds`. If true, it displays a disabled button with the text "Ya en un pedido". Otherwise, it proceeds to check if the design is in the current `cartItems`.
+1.  **Modified `src/components/layout/ProfileContent.jsx`**:
+    *   Removed the conditional logic within `fetchUserData` that was previously fetching user designs if `initialUserDesigns` was empty. The `userDesigns` state is now solely initialized from the `initialUserDesigns` prop.
+    *   Confirmed that the `useEffect` hook correctly depends only on `[userId, status]`.
+    *   Verified that `userDesigns` and `orderedDesignIds` states are initialized directly from their respective `initialUserDesigns` and `initialOrderedDesignIds` props.
 
 ### Files Modified:
 - `src/components/layout/ProfileContent.jsx`
-- `src/components/common/DesignsComponent.jsx`

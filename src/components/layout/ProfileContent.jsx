@@ -57,15 +57,6 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [] 
         setCurrentUser(fetchedUser || null);
       }
 
-      // Fetch designs if they were not passed as props
-      if (initialUserDesigns.length === 0) {
-        const { designs, error: designsError } = await obtenerDesignsPorUsuarioId(userId);
-        if (designsError) {
-          setError(designsError);
-        } else {
-          setUserDesigns(designs || []);
-        }
-      }
       setLoading(false);
     } else if (status === 'unauthenticated') {
       setLoading(false);
