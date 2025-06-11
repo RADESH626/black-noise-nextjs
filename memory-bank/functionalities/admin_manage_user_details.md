@@ -8,7 +8,7 @@ Esta funcionalidad permite a los administradores ver una lista de todos los usua
 ### Frontend
 *   **`src/app/admin/page.jsx`**: El dashboard principal de administración que renderiza dinámicamente los sub-dashboards.
 *   **`src/components/layout/admin/dashboards/UsuariosDashboard.jsx`**: El componente que actualmente gestiona la foto de perfil. Será modificado para incluir o integrar un nuevo componente de tabla de usuarios.
-*   **`src/components/layout/admin/dashboards/users/UsersTable.jsx` (NUEVO)**: Un nuevo componente que mostrará una tabla paginada de usuarios con sus detalles y acciones (Editar, Deshabilitar/Habilitar).
+*   **`src/components/layout/admin/dashboards/UsuariosClientPage.jsx`**: Este componente ahora contiene directamente la lógica y el JSX para renderizar la tabla de usuarios, incluyendo sus detalles y acciones (Editar, Deshabilitar/Habilitar).
 *   **`src/app/admin/users/editar/[id]/page.jsx` (NUEVO)**: Una nueva página de Next.js que contendrá el formulario para editar los detalles de un usuario específico.
 *   **`src/components/layout/admin/users/EditUserForm.jsx` (NUEVO)**: Un componente de formulario reutilizable para la edición de usuarios.
 
@@ -23,8 +23,8 @@ Esta funcionalidad permite a los administradores ver una lista de todos los usua
 ## Flujo de Trabajo
 
 1.  El administrador navega a la sección de "Usuarios" en el panel de administración.
-2.  `UsuariosDashboard.jsx` renderiza `UsersTable.jsx`.
-3.  `UsersTable.jsx` obtiene la lista de usuarios usando `ObtenerTodosLosUsuarios` de `UsuariosActions.js`.
+2.  `UsuariosDashboard.jsx` renderiza `UsuariosClientPage.jsx`.
+3.  `UsuariosClientPage.jsx` obtiene la lista de usuarios usando `ObtenerTodosLosUsuarios` de `UsuariosActions.js` y renderiza la tabla directamente.
 4.  La tabla muestra los usuarios con un botón "Editar" para cada uno.
 5.  Al hacer clic en "Editar", el usuario es redirigido a `/admin/users/editar/[id]`, donde `[id]` es el ID del usuario.
 6.  `src/app/admin/users/editar/[id]/page.jsx` carga el `EditUserForm.jsx`.
@@ -37,4 +37,4 @@ Esta funcionalidad permite a los administradores ver una lista de todos los usua
 
 *   Se debe asegurar la validación de datos tanto en el frontend como en el backend para la edición de usuarios.
 *   Se debe manejar el estado de carga y los errores durante la obtención y actualización de datos.
-*   Se considerará la paginación y filtrado en `UsersTable.jsx` para mejorar la experiencia de usuario si la lista de usuarios es extensa.
+*   Se considerará la paginación y filtrado en la tabla de usuarios dentro de `UsuariosClientPage.jsx` para mejorar la experiencia de usuario si la lista de usuarios es extensa.
