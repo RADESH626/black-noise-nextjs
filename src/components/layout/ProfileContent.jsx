@@ -81,13 +81,13 @@ function ProfileContent() {
     fetchCartData(); // Fetch cart data as well
   }, [session, status, userId]); // Rerun effect when session, status, or userId changes
 
-  const handleAddItemToCart = async (designId) => {
+  const handleAddItemToCart = async (item) => {
     if (!userId) {
       alert("Debes iniciar sesión para agregar ítems al carrito.");
       return;
     }
     setCartLoading(true); // Indicate loading for cart operation
-    const { success, message } = await addDesignToCart(userId, designId);
+    const { success, message } = await addDesignToCart(userId, item.id);
     if (success) {
       await fetchCartData(); // Re-fetch cart to update UI
     } else {

@@ -188,8 +188,6 @@ export async function actualizarDesign(prevState, formData) {
             imagenDesing: formData.get('imagenDesing'),
             coloresDisponibles: formData.get('coloresDisponibles') ? formData.get('coloresDisponibles').split(',') : [],
             tallasDisponibles: formData.get('tallasDisponibles') ? formData.get('tallasDisponibles').split(',') : [],
-            coloresDisponibles: formData.get('coloresDisponibles') ? formData.get('coloresDisponibles').split(',') : [],
-            tallasDisponibles: formData.get('tallasDisponibles') ? formData.get('tallasDisponibles').split(',') : [],
             // Do not update usuarioId or estadoDesing here unless explicitly required for updates
         };
 
