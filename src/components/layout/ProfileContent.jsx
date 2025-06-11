@@ -6,6 +6,7 @@ import BotonGeneral from "@/components/common/botones/BotonGeneral";
 import { useEffect, useState } from "react"; // Import useEffect and useState
 import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions"; // Import the server action
 import { getCartByUserId, addDesignToCart } from "@/app/acciones/CartActions"; // Import CartActions for cart management
+import { obtenerPedidosPorUsuarioId } from "@/app/acciones/PedidoActions"; // Import the server action for orders
 import DesignsComponent from "../common/DesignsComponent"; // Import DesignsComponent
 import PedidosComponent from "../common/PedidosComponent";
 import CartComponent from "../common/CartComponent";
@@ -28,6 +29,12 @@ function ProfileContent() {
   const [cartItems, setCartItems] = useState([]);
   const [cartLoading, setCartLoading] = useState(true);
   const [cartError, setCartError] = useState(null);
+
+  const [userOrders, setUserOrders] = useState([]); // State for user orders
+  const [ordersLoading, setOrdersLoading] = useState(true);
+  const [ordersError, setOrdersError] = useState(null);
+
+  const [orderedDesignIds, setOrderedDesignIds] = useState(new Set()); // Set to store IDs of designs already in orders
 
   const fetchData = async () => { // Moved fetchData outside useEffect to be callable
     if (status === 'authenticated' && userId) {
@@ -76,9 +83,40 @@ function ProfileContent() {
     }
   };
 
+  const fetchOrdersData = async () => {
+    if (status === 'authenticated' && userId) {
+      setOrdersLoading(true);
+      setOrdersError(null);
+      const { orders, error: fetchError } = await obtenerPedidosPorUsuarioId(userId);
+      if (fetchError) {
+        setOrdersError({ message: fetchError });
+        setUserOrders([]);
+        setOrderedDesignIds(new Set());
+      } else {
+        setUserOrders(orders || []);
+        // Extract design IDs from orders
+        const designIds = new Set();
+        orders?.forEach(order => {
+          order.items.forEach(item => {
+            if (item.designId) { // Assuming designId is present in order items
+              designIds.add(item.designId);
+            }
+          });
+        });
+        setOrderedDesignIds(designIds);
+      }
+      setOrdersLoading(false);
+    } else if (status === 'unauthenticated') {
+      setOrdersLoading(false);
+      setUserOrders([]);
+      setOrderedDesignIds(new Set());
+    }
+  };
+
   useEffect(() => {
     fetchData();
     fetchCartData(); // Fetch cart data as well
+    fetchOrdersData(); // Fetch orders data as well
   }, [session, status, userId]); // Rerun effect when session, status, or userId changes
 
   const handleAddItemToCart = async (item) => {
@@ -243,6 +281,7 @@ function ProfileContent() {
                 handleEditDesign={handleEditDesign}
                 cartItems={cartItems}
                 addItem={handleAddItemToCart}
+                orderedDesignIds={orderedDesignIds} // Pass orderedDesignIds to DesignsComponent
               />
             )}
           </>
