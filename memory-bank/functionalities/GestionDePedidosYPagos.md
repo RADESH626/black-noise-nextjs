@@ -47,6 +47,10 @@ Este documento describe la nueva funcionalidad de gestión de pedidos y el flujo
 *   **`Pago` Model (`src/models/Pago.js`):**
     *   Nuevo modelo para registrar cada transacción de pago. Incluirá campos como `pedidoId`, `monto`, `fechaPago`, `metodoPago`, `estadoTransaccion`.
 
+## Integración con la Vista de Diseños del Perfil
+
+Para mejorar la experiencia del usuario en la pestaña "Diseños" del perfil, se implementará una lógica para ocultar el botón "Agregar al carrito" para aquellos diseños que ya forman parte de un pedido existente o pendiente. Esto se logrará obteniendo todos los `designId` de los pedidos del usuario y pasándolos al componente de diseños para su validación.
+
 ## Archivos Clave
 
 *   `src/components/common/PedidosComponent.jsx`: Componente principal del historial de pedidos.

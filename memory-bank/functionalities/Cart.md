@@ -30,6 +30,8 @@ When a user adds a design to their cart, the `designId` and quantity are managed
 
 The cart information is now displayed exclusively within the user's profile, under the "Carrito" tab. The `CartComponent` fetches the cart data and renders the list of items, along with a summary of the total cost and options to clear the cart or proceed to order creation.
 
+Additionally, the cart data (specifically `cartItems`) obtained from the database via `getCartByUserId` is passed as a prop to `DesignsComponent.jsx`. This ensures that the "En el carrito" status for individual designs in the "Diseños" tab of the user's profile is accurately reflected based on the persistent cart data.
+
 ### Order Creation
 
 The "Realizar Pedido" button in the cart now triggers the creation of a new order. This process involves:
