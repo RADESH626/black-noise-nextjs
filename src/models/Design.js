@@ -39,7 +39,11 @@ const DesignSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Elemento'
     }],
-    imagenDesing: {
+    imageData: {
+        type: Buffer,
+        required: true
+    },
+    imageMimeType: {
         type: String,
         required: true
     }

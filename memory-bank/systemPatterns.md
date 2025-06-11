@@ -130,3 +130,21 @@ flowchart TD
 *   **Generación de Commits:** Después de completar una tarea, Cline generará los comandos Git necesarios. En lugar de `git add .`, identificará y listará explícitamente cada archivo modificado para el commit (`git add <path/to/file1> <path/to/file2>...`). Luego, generará el mensaje de commit siguiendo el estándar de Conventional Commits.
 
 **RECORDATORIO FINAL:** Todo el contexto operativo de Cline se deriva del Banco de Memoria. Siempre comenzará verificando el estado de refactorización antes de proceder con cualquier tarea.
+
+## Estrategia de Almacenamiento de Archivos Binarios en MongoDB
+
+Para el almacenamiento de archivos binarios como imágenes, se prioriza el uso de tipos de datos nativos de MongoDB para optimizar el rendimiento y el uso del espacio, en lugar de codificaciones como Base64.
+
+*   **`BinData` (Opción Principal):**
+    *   **Descripción:** Permite incrustar datos binarios directamente dentro de un documento BSON.
+    *   **Casos de Uso:** Ideal para imágenes y archivos de tamaño pequeño a mediano (hasta 16MB, el límite de tamaño de un documento BSON).
+    *   **Ventajas:** Simplicidad de implementación, los datos están directamente asociados al documento principal, lo que puede simplificar las operaciones de lectura y escritura para archivos pequeños.
+    *   **Consideraciones:** Estricto límite de 16MB por documento. Es crucial almacenar también el `mimetype` del archivo para una correcta interpretación al recuperarlo.
+
+*   **GridFS (Opción de Contingencia/Archivos Grandes):**
+    *   **Descripción:** Una especificación para almacenar archivos que exceden el límite de tamaño de documento BSON (16MB). Divide el archivo en "chunks" y los almacena en colecciones separadas (`fs.files` y `fs.chunks`).
+    *   **Casos de Uso:** Adecuado para archivos muy grandes (ej. videos, documentos extensos, imágenes de alta resolución que superan los 16MB).
+    *   **Ventajas:** Permite almacenar archivos de tamaño ilimitado, gestiona la fragmentación automáticamente.
+    *   **Consideraciones:** Mayor complejidad en la implementación y gestión. Requiere una API de GridFS para interactuar con los archivos.
+
+**Decisión de Implementación:** La estrategia inicial para las imágenes de diseño es utilizar `BinData`. GridFS se considerará si el análisis de los tamaños de imagen reales revela que exceden consistentemente el límite de 16MB, o si se requiere una solución más escalable para archivos muy grandes en el futuro.
