@@ -5,8 +5,8 @@ Este plan guiará la refactorización y el desarrollo para cumplir con los requi
 ## Fase 1: Autenticación y Perfil Básico
 
 - [x] **Tarea 1.1:** Instalar y configurar todas las dependencias necesarias: `zod`, `react-hook-form`, `react-pdf`, `papaparse`, `resend`.
-- [ ] **Tarea 1.2:** Implementar la lógica de registro de usuario, incluyendo el formulario con validaciones (React Hook Form + Zod) y la API route que guarda el usuario en la base de datos (hasheando la contraseña).
-- [ ] **Tarea 1.3:** Implementar la lógica de inicio de sesión utilizando NextAuth.js.
+- [x] **Tarea 1.2:** Implementar la lógica de registro de usuario, incluyendo el formulario con validaciones (React Hook Form + Zod) y la API route que guarda el usuario en la base de datos (hasheando la contraseña).
+- [x] **Tarea 1.3:** Implementar la lógica de inicio de sesión utilizando NextAuth.js.
 - [ ] **Tarea 1.4:** Crear la página de perfil de usuario (`/my-profile`) donde el usuario pueda ver y editar su información básica.
 
 ## Fase 2: Flujo de Cliente (Carrito y Pedido)

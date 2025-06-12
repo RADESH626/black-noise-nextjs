@@ -30,7 +30,7 @@ Please verify the solution by opening the modal and checking if the form content
 - None (branch creation is a Git operation)
 
 **Next Steps for User:**
-The branch `re-imagine` has been created remotely. You can now switch to this branch and begin working on it.
+The branch `re_imagine` has been created remotely. You can now switch to this branch and begin working on it.
 
 ### Task: Switch to branch "re-imagine" and revert unexpected file changes
 
@@ -53,4 +53,30 @@ You are now on the `re-imagine` branch, and any unintended file changes from pre
 - `package-lock.json`
 
 **Next Steps for User:**
-The dependencies `zod`, `react-hook-form`, `react-pdf`, `papaparse`, and `resend` have been successfully installed.
+The dependencies `zod`, `react-hook-form`, `react-pdf`, `papaparse`, and `resend` han sido successfully installed.
+
+### Task: Implement user registration logic
+
+**Action:** Verified that the client-side user registration form with React Hook Form and Zod validation, and the server-side API route to handle user registration, including password hashing with bcryptjs, are already implemented.
+
+**Files Modified:**
+- `src/app/api/register/route.js` (verified existing implementation)
+- `src/app/registro/page.jsx` (verified existing implementation)
+
+**Next Steps for User:**
+The user registration functionality (Tarea 1.2) is already implemented. You can test it by navigating to `/registro` in your browser.
+
+### Task: Implement login logic using NextAuth.js
+
+**Action:** Implemented the NextAuth.js API route for authentication, created the client-side login form, and verified the existing `SessionProviderWrapper` and `middleware.js` for session management and route protection.
+
+**Files Modified:**
+- `package.json` (added next-auth)
+- `package-lock.json` (added next-auth)
+- `src/app/api/auth/[...nextauth]/route.js` (new file)
+- `src/app/login/page.jsx` (new file)
+- `src/app/SessionProviderWrapper.jsx` (verified existing implementation)
+- `src/middleware.js` (verified existing implementation)
+
+**Next Steps for User:**
+The login functionality using NextAuth.js is now implemented. You can test it by navigating to `/login` in your browser.
