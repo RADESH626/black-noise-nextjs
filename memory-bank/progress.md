@@ -1,15 +1,22 @@
 # Project Progress
 
 ## Current Status:
-- Documentation aligned with new operational directives.
+Se ha iniciado la Fase 4: Implementación de Refactorización. Se ha completado la refactorización de los componentes de botones, de los componentes de entrada (inputs) y de los componentes de modales y pop-ups.
 
-## Completed Tasks:
-- Implemented a notification mechanism for new orders being added to the database.
-- Added `console.log` in `src/app/acciones/PedidoActions.js` to show when a new order is saved.
-- Updated `memory-bank/systemPatterns.md` with Cline's new operational directives.
-- Updated `memory-bank/project_overview.md` to reference the new operational directives.
-- Updated `memory-bank/techContext.md` to reference the new operational directives.
-- Updated `memory-bank/manifest.md` to reflect the changes in `systemPatterns.md`.
+## Milestones Achieved:
+- **Fase 1: Mapeo de Vistas y Layouts** - Completada.
+- **Fase 2: Inventario de Componentes Repetidos** - Completada.
+- **Fase 3: Análisis y Sugerencias de Mejora** - Completada.
 
-## Next Milestones:
-- Continue with any further development tasks as requested by the user.
+## Remaining Work:
+- **Fase 4: Implementación de Refactorización** - En progreso.
+    - Refactorización de componentes de botones: Completada.
+    - Refactorización de componentes de entrada (inputs): Completada.
+    - Refactorización de componentes de modales y pop-ups: Completada.
+    - Refactorización de otros componentes comunes (dropdowns, iconos, textos): Pendiente.
+    - Refactorización de componentes de tablas: Completada.
+    - Refactorización de componentes de layout: Pendiente.
+    - Refactorización de vistas y componentes específicos de funcionalidad: Pendiente.
+
+## Next Steps:
+Continuar implementando las refactorizaciones propuestas en `memory-bank/refactoring_plan.md`, enfocándose en los siguientes componentes comunes.

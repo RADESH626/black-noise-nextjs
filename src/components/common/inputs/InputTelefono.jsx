@@ -1,24 +1,15 @@
+import React from 'react';
+import Input from './Input';
 
 function InputTelefono(props) {
     return (
-        <input type="text" pattern="[0-9]{10}"
-            className="
-            w-full
-            p-3
-            bg-bn-input-bg
-            text-bn-secondary
-            border
-            border-bn-accent
-            rounded-md
-            focus:outline-none
-            focus:ring-1
-            focus:ring-bn-accent-opaque 
-            focus:border-bn-accent-opaque 
-            placeholder:text-bn-accent"
+        <Input 
+            type="tel" // Changed to 'tel' for semantic correctness and mobile keypad
+            pattern="[0-9]{10}"
             placeholder="Teléfono" 
-            {...props}
-            />
-    )
+            {...props} 
+        />
+    );
 }
 
-export default InputTelefono
+export default InputTelefono;

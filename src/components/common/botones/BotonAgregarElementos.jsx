@@ -1,13 +1,13 @@
 // src/components/common/botones/BotonAgregarElementos.jsx
 import { IconoAgregarUsuario } from '../iconos';
-import { BotonAccion } from './BotonAccion';
+import { Boton } from './Boton';
 
 export function BotonAgregarElementos() {
     return (
-        <BotonAccion 
+        <Boton 
             texto="Agregar Elemento"
             href="/admin/elementos/agregar"
-            tipo="exito"
+            variant="exito"
             icono={IconoAgregarUsuario}
         />
     );

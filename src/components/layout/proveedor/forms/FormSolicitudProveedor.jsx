@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useFormStatus } from 'react-dom'; // Import hooks
 import { usePopUp } from '@/context/PopUpContext';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
-import InputGeneral from '@/components/common/inputs/InputGeneral';
+import Input from '@/components/common/inputs/Input';
 import { CategoriaProducto } from '@/models/enums/CategoriaProducto';
 import { MetodoPago } from '@/models/enums/pago/MetodoPago';
 import { submitSupplierApplicationAction } from '@/app/acciones/SolicitudProveedorActions'; // Import Server Action
@@ -66,21 +66,21 @@ function FormSolicitudProveedor() {
             {/* Usar la función formAction del useActionState en la prop action */}
             {/* Add a key prop to force form reset on success if needed */}
             <form action={formAction} className="space-y-6">
-                <InputGeneral
+                <Input
                     label="Nombre de la Empresa"
                     name="nombreEmpresa" // Name is crucial for FormData
                     type="text"
                     required
                     className="mb-4"
                 />
-                <InputGeneral
+                <Input
                     label="NIT"
                     name="nit" // Name is crucial for FormData
                     type="text"
                     required
                     className="mb-4"
                 />
-                <InputGeneral
+                <Input
                     label="Dirección de la Empresa"
                     name="direccionEmpresa" // Name is crucial for FormData
                     type="text"
@@ -129,7 +129,7 @@ function FormSolicitudProveedor() {
                     </div>
                 </div>
 
-                <InputGeneral
+                <Input
                     label="Comisión Propuesta (%)"
                     name="comisionPropuesta" // Name is crucial for FormData
                     type="number"
@@ -138,7 +138,7 @@ function FormSolicitudProveedor() {
                     step="0.01"
                     className="mb-4"
                 />
-                <InputGeneral
+                <Input
                     label="Mensaje Adicional (Opcional)"
                     name="mensajeAdicional" // Name is crucial for FormData
                     type="textarea"

@@ -4,7 +4,7 @@ import React, { useEffect, useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { usePopUp } from "@/context/PopUpContext";
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
-import InputGeneral from "@/components/common/inputs/InputGeneral";
+import Input from "@/components/common/inputs/Input";
 import { crearProveedor } from "@/app/acciones/ProveedorActions";
 import { CategoriaProducto } from "@/models/enums/CategoriaProducto"; // Import CategoriaProducto
 import { MetodoPago } from "@/models/enums/pago"; // Import MetodoPago
@@ -65,7 +65,7 @@ function FormularioAgregarProveedor({ onSuccess }) {
           <label className="block mb-1 text-sm font-medium text-purple-400">
             Nombre de la Empresa
           </label>
-          <InputGeneral
+          <Input
             type="text"
             id="nombreEmpresa"
             name="nombreEmpresa"
@@ -77,7 +77,7 @@ function FormularioAgregarProveedor({ onSuccess }) {
           <label className="block mb-1 text-sm font-medium text-purple-400">
             NIT
           </label>
-          <InputGeneral
+          <Input
             type="text"
             id="nit"
             name="nit"
@@ -89,7 +89,7 @@ function FormularioAgregarProveedor({ onSuccess }) {
           <label className="block mb-1 text-sm font-medium text-purple-400">
             Dirección de la Empresa
           </label>
-          <InputGeneral
+          <Input
             type="text"
             id="direccionEmpresa"
             name="direccionEmpresa"
@@ -119,7 +119,7 @@ function FormularioAgregarProveedor({ onSuccess }) {
           <label className="block mb-1 text-sm font-medium text-purple-400">
             Comisión (%)
           </label>
-          <InputGeneral
+          <Input
             type="number"
             id="comision"
             name="comision"
@@ -132,7 +132,7 @@ function FormularioAgregarProveedor({ onSuccess }) {
           <label className="block mb-1 text-sm font-medium text-purple-400">
             Nombre del Dueño
           </label>
-          <InputGeneral
+          <Input
             type="text"
             id="nombreDueño"
             name="nombreDueño"
@@ -144,7 +144,7 @@ function FormularioAgregarProveedor({ onSuccess }) {
           <label className="block mb-1 text-sm font-medium text-purple-400">
             Teléfono de Contacto (Empresa)
           </label>
-          <InputGeneral
+          <Input
             type="text"
             id="telefonoContacto"
             name="telefonoContacto"
@@ -156,7 +156,7 @@ function FormularioAgregarProveedor({ onSuccess }) {
           <label className="block mb-1 text-sm font-medium text-purple-400">
             Email de Contacto (Empresa)
           </label>
-          <InputGeneral
+          <Input
             type="email"
             id="emailContacto"
             name="emailContacto"
@@ -195,7 +195,7 @@ function FormularioAgregarProveedor({ onSuccess }) {
             <label className="block mb-1 text-sm font-medium text-purple-400">
               Clave de Acceso del Proveedor
             </label>
-            <InputGeneral
+            <Input
               type="text"
               id="accessKeyDisplay"
               name="accessKeyDisplay"

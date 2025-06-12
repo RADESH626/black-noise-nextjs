@@ -12,7 +12,7 @@ import {
   InputEmail,
   InputFecha,
   InputGenero,
-  InputTextoGeneral
+  Input
 } from "@/components/common/inputs";
 
 
@@ -113,7 +113,7 @@ function FormRegistro() {
           <label htmlFor="primerNombre" className="block mb-1 text-sm font-medium text-accent1">Primer nombre</label>
           <div className="relative">
 
-            <InputTextoGeneral id="primerNombre" name="primerNombre" required placeholder="Primer nombre" />
+            <Input id="primerNombre" name="primerNombre" required placeholder="Primer nombre" minLength="3" />
             <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
           </div>
@@ -127,7 +127,7 @@ function FormRegistro() {
           <label htmlFor="segundoNombre" className="block mb-1 text-sm font-medium text-accent1">Segundo nombre</label>
           <div className="relative">
 
-            <InputTextoGeneral id="segundoNombre" name="segundoNombre" placeholder="Segundo nombre (opcional)" />
+            <Input id="segundoNombre" name="segundoNombre" placeholder="Segundo nombre (opcional)" minLength="3" />
             <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
           </div>
@@ -147,7 +147,7 @@ function FormRegistro() {
           <label htmlFor="primerApellido" className="block mb-1 text-sm font-medium text-accent1">Primer apellido</label>
           <div className="relative">
 
-            <InputTextoGeneral id="primerApellido" name="primerApellido" required placeholder="Primer apellido" />
+            <Input id="primerApellido" name="primerApellido" required placeholder="Primer apellido" minLength="3" />
             <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
           </div>
@@ -160,7 +160,7 @@ function FormRegistro() {
           <label htmlFor="segundoApellido" className="block mb-1 text-sm font-medium text-accent1">Segundo apellido</label>
           <div className="relative">
 
-            <InputTextoGeneral id="segundoApellido" name="segundoApellido" required placeholder="Segundo apellido" />
+            <Input id="segundoApellido" name="segundoApellido" required placeholder="Segundo apellido" minLength="3" />
             <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
           </div>
@@ -218,7 +218,7 @@ function FormRegistro() {
         <label htmlFor="direccion" className="block mb-1 text-sm font-medium text-accent1">Dirección</label>
         <div className="relative">
 
-          <InputTextoGeneral id="direccion" name="direccion" required placeholder="Dirección" />
+          <Input id="direccion" name="direccion" required placeholder="Dirección" minLength="3" />
           <i className='bx bxs-home absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
         </div>

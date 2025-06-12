@@ -1,4 +1,3 @@
-export { BotonAccion } from './BotonAccion';
 export { BotonAgregarDesigns } from './BotonAgregarDesigns';
 export { BotonAgregarElementos } from './BotonAgregarElementos';
 export { BotonAgregarPagos } from './BotonAgregarPagos';
@@ -12,5 +11,5 @@ export { BotonEditar } from './BotonEditar';
 export { BotonEliminar } from './BotonEliminar';
 export { BotonEnviarCorreo } from './BotonEnviarCorreo';
 export { BotonExportarPDF } from './BotonExportarPDF';
-export { BotonGeneral } from './BotonGeneral';
 export { BotonDescargar } from './BotonDescargar';
+export { default as Boton } from './Boton';

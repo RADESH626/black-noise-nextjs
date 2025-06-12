@@ -1,13 +1,13 @@
 // src/components/common/botones/BotonAgregarPagos.jsx
 import { IconoAgregarUsuario } from '../iconos';
-import { BotonAccion } from './BotonAccion';
+import { Boton } from './Boton';
 
 export function BotonAgregarPagos() {
     return (
-        <BotonAccion 
+        <Boton 
             texto="Registrar Pago"
             href="/admin/pagos/agregar"
-            tipo="advertencia"
+            variant="advertencia"
             icono={IconoAgregarUsuario}
         />
     );

@@ -8,12 +8,8 @@ import InputTipoDocumentoIdentidad from "./InputTipoDocumentoIdentidad";
 import InputFecha from "./InputFecha";
 import InputGenero from "./InputGenero";
 import InputRol from "./InputRol";
-import InputNumerosGeneral from "./InputNumerosGeneral";
-import InputTextoGeneral from "./InputTextoGeneral";
-import  InputFiles from './InputFiles';
-
-
-
+import InputFiles from './InputFiles';
+import Input from './Input'; // New Input component
 
 export { 
     InputCheckBox,
@@ -26,8 +22,6 @@ export {
     InputFecha, 
     InputGenero, 
     InputRol, 
-    InputNumerosGeneral, 
-    InputTextoGeneral,
-    InputFiles
+    InputFiles,
+    Input // Export the new Input component
 };
-

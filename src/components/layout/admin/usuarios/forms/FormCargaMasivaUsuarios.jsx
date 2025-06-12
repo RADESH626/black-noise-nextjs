@@ -1,4 +1,4 @@
-import { BotonGeneral } from '@/components/common/botones'
+import { Boton } from '@/components/common/botones'
 import {RegistroMasivoUsuario} from '@/app/acciones/UsuariosActions'
 import { InputFiles } from '@/components/common/inputs'
 
@@ -9,7 +9,7 @@ function FormCargaMasivaUsuarios() {
 
       <InputFiles name="file" />
 
-      <BotonGeneral type="submit">Registrar Usuarios</BotonGeneral>
+      <Boton type="submit">Registrar Usuarios</Boton>
 
     </form>
   )

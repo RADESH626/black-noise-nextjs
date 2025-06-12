@@ -1,13 +1,13 @@
 // src/components/common/botones/BotonAgregarPedidos.jsx
 import { IconoAgregarUsuario } from '../iconos';
-import { BotonAccion } from './BotonAccion';
+import { Boton } from './Boton';
 
 export function BotonAgregarPedidos() {
     return (
-        <BotonAccion 
+        <Boton 
             texto="Registrar Pedido"
             href="/admin/pedidos/agregar"
-            tipo="destacado"
+            variant="destacado"
             icono={IconoAgregarUsuario}
         />
     );

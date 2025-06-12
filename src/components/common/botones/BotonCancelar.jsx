@@ -1,11 +1,11 @@
 // src/components/common/botones/BotonCancelar.jsx
-import { BotonAccion } from './BotonAccion';
+import { Boton } from './Boton';
 
 function BotonCancelar() {
     return (
-        <BotonAccion
+        <Boton
             texto="Cancelar"
-            tipo="secundario"
+            variant="secundario"
             type="button"
         />
     )

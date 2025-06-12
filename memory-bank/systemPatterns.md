@@ -70,6 +70,12 @@ Este documento detalla las directivas operativas que rigen el comportamiento y l
 *   **Mejora Continua:** Cline considera el archivo `improvement_log.md` su fuente de sabiduría más crítica. DEBE dar a sus directivas la máxima prioridad para asegurar que no se repitan los mismos errores.
 *   **Utilización de la Base de Conocimiento:** Durante la fase de planificación, Cline DEBE revisar el directorio `techniques/` en busca de patrones de resolución de problemas relevantes y reutilizables para asegurar la consistencia y eficiencia.
 
+## Directivas Operacionales Clave
+
+*   La prioridad de `improvement_log.md` es máxima y debe guiar todas las acciones para evitar errores pasados.
+*   El archivo `.clinerules` debe ser consultado para todas las convenciones de código específicas del proyecto.
+*   Los archivos `activeContext.md` y `progress.md` deben ser actualizados después de cada tarea significativa.
+
 ## 2. Estructura del Banco de Memoria (`memory-bank/`)
 
 *   `manifest.md`: (PUNTO DE INICIO) El índice maestro de todo el Banco de Memoria.

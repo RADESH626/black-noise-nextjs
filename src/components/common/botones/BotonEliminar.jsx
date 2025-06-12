@@ -1,9 +1,10 @@
-import React from 'react'
+import React from 'react';
+import { Boton } from './Boton';
 
 function BotonEliminar() {
   return (
-    <button className="bg-red-500 text-white px-2 py-1 rounded ml-2">Deshabilitar</button>
-  )
+    <Boton texto="Deshabilitar" variant="peligro" />
+  );
 }
 
 export default BotonEliminar

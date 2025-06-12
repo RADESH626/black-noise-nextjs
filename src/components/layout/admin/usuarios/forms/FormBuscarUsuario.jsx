@@ -5,7 +5,7 @@ import { useFormStatus } from 'react-dom';
 import { usePopUp } from '@/context/PopUpContext';
 import { FiltrarUsuarios } from '@/app/acciones/UsuariosActions';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
-import Input from '@/components/common/inputs/InputGeneral';
+import Input from '@/components/common/inputs/Input';
 
 function SubmitButton({ customText = 'Buscar' }) {
   const { pending } = useFormStatus();

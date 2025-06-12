@@ -3,8 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ObtenerTodosLosUsuarios, toggleUsuarioHabilitado } from '@/app/acciones/UsuariosActions.js';
 import Tabla from '@/components/common/tablas/Tabla';
-import TdGeneral from '@/components/common/tablas/TdGeneral';
-import THUsuarios from '@/components/layout/admin/usuarios/THUsuarios';
 import Image from 'next/image';
 import BotonEditar from '@/components/common/botones/BotonEditar';
 import FormBuscarUsuario from '@/components/layout/admin/usuarios/forms/FormBuscarUsuario';
@@ -13,7 +11,7 @@ import { usePopUp } from '@/context/PopUpContext';
 import { useModal } from '@/context/ModalContext';
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
-import ModalAgregarUsuario from '@/components/common/modales/ModalAgregarUsuario';
+import { ModalAgregarUsuario } from '@/components/common/modales';
 import ModalEditarUsuario from '@/components/layout/admin/usuarios/modals/ModalEditarUsuario';
 
 // Utility function for date formatting
@@ -129,79 +127,80 @@ export default function UsuariosClientPage() {
           <p className="text-center text-red-500">Error al cargar usuarios: {errorUsers}</p>
       ) : users && users.length > 0 ? (
           <div className="overflow-x-auto">
-            <Tabla>
-              <THUsuarios />
-              <tbody className='bg-gray-300 divide-y divide-gray-400 text-black'>
-                  {users.map((user) => (
-                      <tr key={user._id} className="hover:bg-gray-200">
-                          {/* Estado */}
-                          <TdGeneral>
-                              <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                                  user.habilitado ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'
-                              }`}>
-                                  {user.habilitado ? 'Activo' : 'Inactivo'}
-                              </span>
-                          </TdGeneral>
+          <div className="overflow-x-auto">
+            <Tabla
+                headers={['Estado', 'Usuario', 'Nombre', 'Información de Usuario', 'Contacto', 'Acciones']}
+                data={users}
+                renderRow={(user) => (
+                    <>
+                        {/* Estado */}
+                        <td>
+                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                                user.habilitado ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'
+                            }`}>
+                                {user.habilitado ? 'Activo' : 'Inactivo'}
+                            </span>
+                        </td>
 
-                          {/* Usuario (Foto, Nombre de Usuario, Rol) */}
-                          <TdGeneral>
-                              <div className="flex items-center space-x-3">
-                                  <Image
-                                      src={user.imageData && user.imageMimeType ? `data:${user.imageMimeType};base64,\${Buffer.from(user.imageData.data).toString('base64')}` : '/img/perfil/FotoPerfil.webp'}
-                                      alt={`Foto de ${user.nombreUsuario || user.primerNombre}`}
-                                      width={40}
-                                      height={40}
-                                      className="rounded-full object-cover"
-                                  />
-                                  <div>
-                                      <p className="font-bold">{user.nombreUsuario || `${user.primerNombre} ${user.primerApellido}`}</p>
-                                      <p className="text-sm text-gray-600">{user.rol}</p>
-                                  </div>
-                              </div>
-                          </TdGeneral>
+                        {/* Usuario (Foto, Nombre de Usuario, Rol) */}
+                        <td>
+                            <div className="flex items-center space-x-3">
+                                <Image
+                                    src={user.imageData && user.imageMimeType ? `data:${user.imageMimeType};base64,\${Buffer.from(user.imageData.data).toString('base64')}` : '/img/perfil/FotoPerfil.webp'}
+                                    alt={`Foto de ${user.nombreUsuario || user.primerNombre}`}
+                                    width={40}
+                                    height={40}
+                                    className="rounded-full object-cover"
+                                />
+                                <div>
+                                    <p className="font-bold">{user.nombreUsuario || `${user.primerNombre} ${user.primerApellido}`}</p>
+                                    <p className="text-sm text-gray-600">{user.rol}</p>
+                                </div>
+                            </div>
+                        </td>
 
-                          {/* Nombre Completo */}
-                          <TdGeneral>
-                              {user.primerNombre} {user.segundoNombre || ''} {user.primerApellido} {user.segundoApellido || ''}
-                          </TdGeneral>
+                        {/* Nombre Completo */}
+                        <td>
+                            {user.primerNombre} {user.segundoNombre || ''} {user.primerApellido} {user.segundoApellido || ''}
+                        </td>
 
-                          {/* Información Adicional (Nacimiento, Género, Dirección) */}
-                          <TdGeneral>
-                              <div className="text-sm">
-                                  <p><strong>Nacimiento:</strong> {formatDate(user.fechaNacimiento)}</p>
-                                  <p><strong>Género:</strong> {user.genero}</p>
-                                  <p><strong>Dirección:</strong> {user.direccion}</p>
-                              </div>
-                          </TdGeneral>
+                        {/* Información Adicional (Nacimiento, Género, Dirección) */}
+                        <td>
+                            <div className="text-sm">
+                                <p><strong>Nacimiento:</strong> {formatDate(user.fechaNacimiento)}</p>
+                                <p><strong>Género:</strong> {user.genero}</p>
+                                <p><strong>Dirección:</strong> {user.direccion}</p>
+                            </div>
+                        </td>
 
-                          {/* Contacto (Correo, Teléfono) */}
-                          <TdGeneral>
-                              <div className="text-sm">
-                                  <p><strong>Correo: </strong>{user.correo}</p>
-                                  <p><strong>Teléfono: </strong>{user.numeroTelefono}</p>
-                              </div>
-                          </TdGeneral>
+                        {/* Contacto (Correo, Teléfono) */}
+                        <td>
+                            <div className="text-sm">
+                                <p><strong>Correo: </strong>{user.correo}</p>
+                                <p><strong>Teléfono: </strong>{user.numeroTelefono}</p>
+                            </div>
+                        </td>
 
-                          {/* Acciones */}
-                          <TdGeneral>
-                              <div className="flex flex-col md:flex-row gap-2 items-center justify-center">
-                                  <BotonEditar onClick={() => {
-                                      console.log('BotonEditar clickeado en JSX para usuario:', user._id);
-                                      handleEditUserClick(user);
-                                  }}>
-                                      Editar
-                                  </BotonEditar>
-                                  <ToggleUserStatusForm
-                                      userId={user._id}
-                                      currentStatus={user.habilitado}
-                                      onStatusChanged={handleRefreshUsers}
-                                  />
-                              </div>
-                          </TdGeneral>
-                      </tr>
-                  ))}
-              </tbody>
-            </Tabla>
+                        {/* Acciones */}
+                        <td>
+                            <div className="flex flex-col md:flex-row gap-2 items-center justify-center">
+                                <BotonEditar onClick={() => {
+                                    console.log('BotonEditar clickeado en JSX para usuario:', user._id);
+                                    handleEditUserClick(user);
+                                }}>
+                                    Editar
+                                </BotonEditar>
+                                <ToggleUserStatusForm
+                                    userId={user._id}
+                                    currentStatus={user.habilitado}
+                                    onStatusChanged={handleRefreshUsers}
+                                />
+                            </div>
+                        </td>
+                    </>
+                )}
+            />
+          </div>
           </div>
       ) : (
           <p className="text-center text-white">No hay usuarios para mostrar.</p>

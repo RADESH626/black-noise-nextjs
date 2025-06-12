@@ -1,9 +1,10 @@
-import React from 'react'
+import React from 'react';
+import { Boton } from './Boton';
 
 function BotonCargaMasivaDatos() {
   return (
-    <div>BotonCargaMasivaDatos</div>
-  )
+    <Boton texto="Cargar Datos" variant="primario" />
+  );
 }
 
 export default BotonCargaMasivaDatos

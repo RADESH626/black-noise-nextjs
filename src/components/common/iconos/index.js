@@ -1,3 +1,1 @@
-export { default as IconoEditar } from './IconoEditar';
-export { default as IconoPersona } from './IconoPersona';
-export { default as IconoAgregarUsuario } from './IconoAgregarUsuario';
+export { default as Icono } from './Icono';

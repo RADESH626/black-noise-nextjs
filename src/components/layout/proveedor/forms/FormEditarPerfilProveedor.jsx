@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
-import InputGeneral from '@/components/common/inputs/InputGeneral';
+import Input from '@/components/common/inputs/Input';
 import { actualizarProveedor } from '@/app/acciones/ProveedorActions';
 import { Disponibilidad } from '@/models/enums/proveedor/Disponibilidad';
 import { MetodoPago } from '@/models/enums/pago/MetodoPago';
@@ -81,7 +81,7 @@ function FormEditarPerfilProveedor({ perfilInicial }) {
             </h2>
             
             <form onSubmit={handleSubmit} className="space-y-4">
-                <InputGeneral
+                <Input
                     label="Nombre de la Empresa"
                     name="nombreProveedor"
                     type="text"
@@ -90,7 +90,7 @@ function FormEditarPerfilProveedor({ perfilInicial }) {
                     required
                 />
 
-                <InputGeneral
+                <Input
                     label="Dirección de la Empresa"
                     name="direccionEmpresa"
                     type="text"

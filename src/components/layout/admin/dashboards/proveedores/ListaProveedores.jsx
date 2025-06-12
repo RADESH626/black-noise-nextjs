@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { obtenerProveedoresHabilitados, eliminarProveedor } from '@/app/acciones/ProveedorActions.js';
 import Tabla from '@/components/common/tablas/Tabla';
-import TdGeneral from '@/components/common/tablas/TdGeneral';
 import Image from 'next/image';
 import Link from 'next/link';
 import BotonEditar from '@/components/common/botones/BotonEditar';
@@ -132,71 +131,64 @@ export default function ListaProveedores({ initialProviders }) {
         </select>
       </div>
       {filteredProviders.length > 0 || loading ? (
-        <Tabla>
-          <thead>
-            <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-              <th className="py-3 px-6 text-left">Empresa</th>
-              <th className="py-3 px-6 text-left">Dueño</th>
-              <th className="py-3 px-6 text-left">Contacto</th>
-              <th className="py-3 px-6 text-left">Dirección</th>
-              {PAYMENT_METHODS.map((method) => (
-                <th key={method} className="py-3 px-6 text-center whitespace-nowrap">{PAYMENT_METHOD_DISPLAY_NAMES[method]}</th>
-              ))}
-              <th className="py-3 px-6 text-center">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className='bg-gray-300 divide-y divide-gray-400'>
-            {loading ? (
-                <tr><TdGeneral colSpan={6 + PAYMENT_METHODS.length} className="text-center py-4">Actualizando...</TdGeneral></tr>
-            ) : filteredProviders.length === 0 ? (
-                <tr><TdGeneral colSpan={6 + PAYMENT_METHODS.length} className="text-center py-4">No se encontraron proveedores con el filtro seleccionado.</TdGeneral></tr>
-            ) : (
-                filteredProviders.map((provider) => (
-                    <tr key={provider._id} className="hover:bg-gray-200">
-                        <TdGeneral>
-                            <div className="flex items-center space-x-3">
-                                <div>
-                                    <p className="font-bold">{provider.nombreEmpresa}</p>
-                                    <p className="text-sm text-gray-600">NIT: {provider.nit}</p>
-                                </div>
+        <Tabla
+            headers={[
+                'Empresa',
+                'Dueño',
+                'Contacto',
+                'Dirección',
+                ...PAYMENT_METHODS.map(method => ({ label: PAYMENT_METHOD_DISPLAY_NAMES[method], className: 'text-center whitespace-nowrap' })),
+                'Acciones'
+            ]}
+            data={filteredProviders}
+            renderRow={(provider) => (
+                <>
+                    <td>
+                        <div className="flex items-center space-x-3">
+                            <div>
+                                <p className="font-bold">{provider.nombreEmpresa}</p>
+                                <p className="text-sm text-gray-600">NIT: {provider.nit}</p>
                             </div>
-                        </TdGeneral>
-                        <TdGeneral>
-                            {provider.nombreDueño}
-                        </TdGeneral>
-                        <TdGeneral>
-                            <div className="text-sm">
-                                <p><strong>Correo:</strong> {provider.emailContacto}</p>
-                                <p><strong>Teléfono:</strong> {provider.telefonoContacto}</p>
-                            </div>
-                        </TdGeneral>
-                        <TdGeneral>
-                            {provider.direccionEmpresa}
-                        </TdGeneral>
-                        {PAYMENT_METHODS.map((method) => (
-                            <TdGeneral key={method} className="text-center">
-                                {provider.metodosPagoAceptados && provider.metodosPagoAceptados.includes(method) ? 'X' : '-'}
-                            </TdGeneral>
-                        ))}
-                        <TdGeneral>
-                            <div className="flex flex-col md:flex-row gap-2 items-center justify-center">
-                                <BotonEditar onClick={() => {
-                                    // TODO: Implement edit modal for provider
-                                    showPopUp('Funcionalidad de edición de proveedor pendiente.', 'info');
-                                }}>
-                                    Editar
-                                </BotonEditar>
-                                <DeleteProviderForm 
-                                    providerId={provider._id} 
-                                    onProviderDeleted={fetchAndSetProviders} 
-                                />
-                            </div>
-                        </TdGeneral>
-                    </tr>
-                ))
+                        </div>
+                    </td>
+                    <td>
+                        {provider.nombreDueño}
+                    </td>
+                    <td>
+                        <div className="text-sm">
+                            <p><strong>Correo:</strong> {provider.emailContacto}</p>
+                            <p><strong>Teléfono:</strong> {provider.telefonoContacto}</p>
+                        </div>
+                    </td>
+                    <td>
+                        {provider.direccionEmpresa}
+                    </td>
+                    {PAYMENT_METHODS.map((method) => (
+                        <td key={method} className="text-center">
+                            {provider.metodosPagoAceptados && provider.metodosPagoAceptados.includes(method) ? 'X' : '-'}
+                        </td>
+                    ))}
+                    <td>
+                        <div className="flex flex-col md:flex-row gap-2 items-center justify-center">
+                            <BotonEditar onClick={() => {
+                                // TODO: Implement edit modal for provider
+                                showPopUp('Funcionalidad de edición de proveedor pendiente.', 'info');
+                            }}>
+                                Editar
+                            </BotonEditar>
+                            <DeleteProviderForm 
+                                providerId={provider._id} 
+                                onProviderDeleted={fetchAndSetProviders} 
+                            />
+                        </div>
+                    </td>
+                </>
             )}
-          </tbody>
-        </Tabla>
+        />
+        {loading && <p className="text-center py-4">Actualizando...</p>}
+        {!loading && filteredProviders.length === 0 && (
+            <p className="text-center py-4">No se encontraron proveedores con el filtro seleccionado.</p>
+        )}
       ) : (
         <p>No hay proveedores para mostrar.</p>
       )}

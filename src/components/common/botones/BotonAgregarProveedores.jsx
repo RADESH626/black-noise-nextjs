@@ -1,10 +1,11 @@
 import React from 'react';
+import { Boton } from './Boton';
 
 function BotonAgregarProveedores({ children, ...props }) {
   return (
-    <button {...props}>
+    <Boton {...props}>
       {children || "Agregar Proveedor"}
-    </button>
+    </Boton>
   );
 }
 

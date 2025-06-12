@@ -6,7 +6,7 @@ import { usePopUp } from '@/context/PopUpContext';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import InputTipoDocumentoIdentidad from '@/components/common/inputs/InputTipoDocumentoIdentidad';
 import InputDocumentoIdentidad from '@/components/common/inputs/InputDocumentoIdentidad';
-import InputTextoGeneral from '@/components/common/inputs/InputTextoGeneral';
+import Input from '@/components/common/inputs/Input';
 import InputFecha from '@/components/common/inputs/InputFecha';
 import InputGenero from '@/components/common/inputs/InputGenero';
 import InputTelefono from '@/components/common/inputs/InputTelefono';
@@ -61,34 +61,38 @@ function FormEditarUsuario({ initialData, onSuccess }) {
                     />
                 </div>
                 <div className="relative">
-                    <InputTextoGeneral 
+                    <Input 
                         name="primerNombre" 
                         placeholder="Primer Nombre" 
                         defaultValue={initialData.primerNombre} 
                         required 
+                        minLength="3"
                     />
                 </div>
                 <div className="relative">
-                    <InputTextoGeneral 
+                    <Input 
                         name="segundoNombre" 
                         placeholder="Segundo Nombre (Opcional)" 
                         defaultValue={initialData.segundoNombre} 
+                        minLength="3"
                     />
                 </div>
                 <div className="relative">
-                    <InputTextoGeneral 
+                    <Input 
                         name="primerApellido" 
                         placeholder="Primer Apellido" 
                         defaultValue={initialData.primerApellido} 
                         required 
+                        minLength="3"
                     />
                 </div>
                 <div className="relative">
-                    <InputTextoGeneral 
+                    <Input 
                         name="segundoApellido" 
                         placeholder="Segundo Apellido" 
                         defaultValue={initialData.segundoApellido} 
                         required 
+                        minLength="3"
                     />
                 </div>
                 <div className="relative">
@@ -113,11 +117,12 @@ function FormEditarUsuario({ initialData, onSuccess }) {
                     />
                 </div>
                 <div className="relative">
-                    <InputTextoGeneral 
+                    <Input 
                         name="direccion" 
                         placeholder="Dirección" 
                         defaultValue={initialData.direccion} 
                         required 
+                        minLength="3"
                     />
                 </div>
                 <div className="relative">

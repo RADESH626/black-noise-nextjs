@@ -1,24 +1,14 @@
-function InputTipoDocumentoIdentidad(props) {
+import React from 'react';
+
+function InputTipoDocumentoIdentidad({ name, id, className = '', ...props }) {
+    const combinedClasses = `w-full p-3 bg-neutral-800 text-secondary border border-accent1 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-accent1 focus:border-accent1 ${className}`;
+
     return (
         <select 
-        name={props.name || "tipoDocumento"} 
-        id={props.id || "tipoDocumento"}
-        className='
-            w-full
-            p-3
-            bg-black
-            text-white
-            border
-            border-bn-accent
-            rounded-md
-            focus:outline-none
-            focus:ring-1
-            focus:ring-bn-accent-opaque
-            focus:border-bn-accent-opaque
-            '
-            
-        {...props}
-
+            name={name || "tipoDocumento"} 
+            id={id || "tipoDocumento"}
+            className={combinedClasses}
+            {...props}
         >
             <option value="">Seleccione un tipo de documento</option>
             <option value="CC">Cédula de Ciudadanía (CC)</option>
@@ -27,7 +17,7 @@ function InputTipoDocumentoIdentidad(props) {
             <option value="CE">Cédula de Extranjería (CE)</option>
             <option value="OTRO">Otro (Ej: Registro Civil)</option> 
         </select>
-    )
+    );
 }
 
-export default InputTipoDocumentoIdentidad
+export default InputTipoDocumentoIdentidad;

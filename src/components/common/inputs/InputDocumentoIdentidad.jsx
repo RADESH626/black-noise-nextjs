@@ -1,24 +1,15 @@
+import React from 'react';
+import Input from './Input';
 
 function InputDocumentoIdentidad(props) {
     return (
-        <input type="text" 
-        pattern="[0-9]{6,12}"
-            className="w-full
-            p-3
-            bg-bn-input-bg
-            text-bn-secondary
-            border
-            border-bn-accent
-            rounded-md
-            focus:outline-none
-            focus:ring-1
-            focus:ring-bn-accent-opaque
-            focus:border-bn-accent-opaque
-            placeholder:text-bn-accent "
+        <Input 
+            type="text" 
+            pattern="[0-9]{6,12}"
             placeholder="Número de documento"
-            {...props}
+            {...props} 
         />
-    )
+    );
 }
 
-export default InputDocumentoIdentidad
+export default InputDocumentoIdentidad;

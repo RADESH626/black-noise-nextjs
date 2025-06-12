@@ -7,7 +7,7 @@ import BotonGeneral from "@/components/common/botones/BotonGeneral";
 import {
   InputTipoDocumentoIdentidad,
   InputDocumentoIdentidad,
-  InputTextoGeneral,
+  Input,
   InputFecha,
   InputGenero,
   InputTelefono,
@@ -80,7 +80,7 @@ function FormAgregarUsuarios({ onSuccess }) {
             Primer nombre
           </label>
           <div className="relative">
-            <InputTextoGeneral id="primerNombre" name="primerNombre" required placeholder="Primer nombre" />
+            <Input id="primerNombre" name="primerNombre" required placeholder="Primer nombre" minLength="3" />
           </div>
         </div>
 
@@ -89,7 +89,7 @@ function FormAgregarUsuarios({ onSuccess }) {
             Segundo nombre
           </label>
           <div className="relative">
-            <InputTextoGeneral id="segundoNombre" name="segundoNombre" placeholder="Segundo nombre (opcional)" />
+            <Input id="segundoNombre" name="segundoNombre" placeholder="Segundo nombre (opcional)" minLength="3" />
           </div>
         </div>
       </div>
@@ -100,7 +100,7 @@ function FormAgregarUsuarios({ onSuccess }) {
             Primer apellido
           </label>
           <div className="relative">
-            <InputTextoGeneral id="primerApellido" name="primerApellido" required placeholder="Primer apellido" />
+            <Input id="primerApellido" name="primerApellido" required placeholder="Primer apellido" minLength="3" />
           </div>
         </div>
 
@@ -109,7 +109,7 @@ function FormAgregarUsuarios({ onSuccess }) {
             Segundo apellido
           </label>
           <div className="relative">
-            <InputTextoGeneral id="segundoApellido" name="segundoApellido" required placeholder="Segundo apellido" />
+            <Input id="segundoApellido" name="segundoApellido" required placeholder="Segundo apellido" minLength="3" />
           </div>
         </div>
       </div>
@@ -159,7 +159,7 @@ function FormAgregarUsuarios({ onSuccess }) {
           Dirección
         </label>
         <div className="relative">
-          <InputTextoGeneral id="direccion" name="direccion" required placeholder="Dirección" />
+          <Input id="direccion" name="direccion" required placeholder="Dirección" minLength="3" />
         </div>
       </div>
 

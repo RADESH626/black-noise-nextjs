@@ -1,31 +1,37 @@
-function InputFiles(props) {
-    return (
-            <input
-                type="file"
-                className="
-                inline-block 
-                cursor-pointer 
-                rounded-md border 
-                border-gray-300
-                bg-gray-100
-                text-sm
-                text-gray-700
-                hover:bg-gray-200
-                file:mr-3
-                file:py-[6px]
-                file:px-3
-                file:rounded-md
-                file:border-0
-                file:text-sm
-                file:font-medium
-                file:bg-gray-200
-                file:text-gray-700
-                hover:file:bg-gray-300"
-                accept=".csv"
+import React from 'react';
 
-                {...props}
-            />
-    )
+function InputFiles({ className = '', ...props }) {
+    const combinedClasses = `
+        inline-block 
+        cursor-pointer 
+        rounded-[10px] 
+        border 
+        border-accent1
+        bg-neutral-800
+        text-sm
+        text-secondary
+        hover:bg-neutral-700
+        file:mr-3
+        file:py-[6px]
+        file:px-3
+        file:rounded-md
+        file:border-0
+        file:text-sm
+        file:font-medium
+        file:bg-accent1
+        file:text-primary
+        hover:file:bg-accent2
+        ${className}
+    `;
+
+    return (
+        <input
+            type="file"
+            className={combinedClasses}
+            accept=".csv"
+            {...props}
+        />
+    );
 }
 
-export default InputFiles
+export default InputFiles;

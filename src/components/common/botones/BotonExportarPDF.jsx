@@ -1,7 +1,7 @@
 import React from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { BotonAccion } from './BotonAccion'; // Importar BotonAccion
+import { Boton } from './Boton';
 
 function BotonExportarPDF({ usuarios = [], ...props }) {
     const handleExportPDF = () => {
@@ -95,9 +95,9 @@ function BotonExportarPDF({ usuarios = [], ...props }) {
     };
 
     return (
-        <BotonAccion
+        <Boton
             texto="Exportar a PDF"
-            tipo="secundario" // Usar tipo secundario para el color gris
+            variant="secundario" // Usar tipo secundario para el color gris
             onClick={handleExportPDF}
             {...props}
         />
