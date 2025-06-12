@@ -1,82 +1,102 @@
-'use client'
-import { motion } from "framer-motion";
-import FormRegistro from "@/components/layout/general/forms/FormRegistro";
-import BotonGeneral from "@/components/common/botones/BotonGeneral";
+"use client";
 
-function Registro() {
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import axios from 'axios';
+import Link from 'next/link';
+
+// Define the validation schema using Zod
+const registerSchema = z.object({
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters long" }),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
+export default function RegisterPage() {
+  const { register, handleSubmit, formState: { errors }, reset } = useForm({
+    resolver: zodResolver(registerSchema),
+  });
+
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState(''); // 'success' or 'error'
+
+  const onSubmit = async (data) => {
+    setMessage('');
+    setMessageType('');
+    try {
+      const response = await axios.post('/api/register', {
+        email: data.email,
+        password: data.password,
+      });
+      setMessage(response.data.message);
+      setMessageType('success');
+      reset(); // Clear the form
+    } catch (error) {
+      console.error('Registration failed:', error.response?.data || error.message);
+      setMessage(error.response?.data?.message || 'Registration failed. Please try again.');
+      setMessageType('error');
+    }
+  };
+
   return (
-    <main className="min-h-screen flex items-center justify-center p-5 bg-gradient-to-br from-black via-[#0A1828] to-black">
-      <motion.div
-        className="rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.2)] overflow-hidden text-[#000000] max-w-6xl w-full"
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-      >
-        <div className="flex flex-row">
-          <motion.div
-            className="p-10 bg-[#f0eded] flex-1"
-            initial={{ x: -50, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.7 }}
-          >
-            <h2 className="text-3xl mb-8 text-bn-highlight text-center">Crear Cuenta</h2>
-            <FormRegistro />
-          </motion.div>
-
-          <motion.div
-            className="relative flex flex-1 flex-col min-h-[500px] bg-cover bg-center bg-no-repeat text-white justify-center text-center p-8"
-            style={{ backgroundImage: "url('/img/Fondos/Fondo 3.jpg')" }}
-            initial={{ x: 50, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.7 }}
-          >
-            {/* Overlay oscuro con fade-in */}
-            <motion.div
-              className="absolute inset-0 bg-[#27425e] bg-opacity-70 z-0"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.7 }}
-              transition={{ duration: 0.7 }}
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h2 className="text-2xl font-bold text-center mb-6">Register</h2>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              id="email"
+              {...register("email")}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             />
-
-            <div id="registerInfo" className="relative z-10">
-              <motion.h2
-                className="text-4xl mb-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-              >
-                ¡Hola!
-              </motion.h2>
-              <motion.p
-                className="text-base max-w-[300px] mx-auto"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-              >
-                Estás a punto de sumergirte en un mundo creativo. Crea tu ropa ahora y comienza a experimentar con diseños únicos.
-              </motion.p>
-
-              <motion.div
-                className="mt-6"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.8 }}
-              >
-                <a href="/">
-                  <BotonGeneral>
-                    <span className="flex items-center gap-2">
-                      <i className='bx bx-home-alt-2 text-xl transition-transform hover:scale-110'></i>
-                      Ir al inicio
-                    </span>
-                  </BotonGeneral>
-                </a>
-              </motion.div>
-            </div>
-          </motion.div>
-        </div>
-      </motion.div>
-    </main>
+            {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+            <input
+              type="password"
+              id="password"
+              {...register("password")}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+            {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>}
+          </div>
+          <div>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              {...register("confirmPassword")}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+            {errors.confirmPassword && <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>}
+          </div>
+          <button
+            type="submit"
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Register
+          </button>
+        </form>
+        {message && (
+          <p className={`mt-4 text-center ${messageType === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+            {message}
+          </p>
+        )}
+        <p className="mt-4 text-center text-sm text-gray-600">
+          Already have an account?{' '}
+          <Link href="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+            Login here
+          </Link>
+        </p>
+      </div>
+    </div>
   );
 }
-
-export default Registro;
