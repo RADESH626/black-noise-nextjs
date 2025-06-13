@@ -82,6 +82,7 @@ export async function obtenerDesigns() {
     try {
         const designs = await Design.find({}).lean();
         logger.debug('Designs obtained successfully:', designs);
+<<<<<<< HEAD
 
         // Manually convert Buffer to base64 string for imageData
         const processedDesigns = designs.map(design => {
@@ -95,6 +96,9 @@ export async function obtenerDesigns() {
         });
 
         return { data: JSON.parse(JSON.stringify(processedDesigns)) };
+=======
+        return { data: JSON.parse(JSON.stringify(designs)) };
+>>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
     } catch (error) {
         logger.error('ERROR in obtenerDesigns:', error);
         return { error: 'Error al obtener los diseños: ' + error.message };

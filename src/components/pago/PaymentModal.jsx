@@ -4,7 +4,11 @@ import React, { useState } from 'react';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import { procesarPagoDePedido } from '@/app/acciones/PagoActions'; // Import the new server action
 
+<<<<<<< HEAD
 const PaymentModal = ({ pedidoId, valorPedido, onClose, onPaymentSuccess }) => { // Accept onPaymentSuccess prop
+=======
+const PaymentModal = ({ pedidoId, valorPedido, onClose }) => {
+>>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
   const [cardNumber, setCardNumber] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');
@@ -38,6 +42,7 @@ const PaymentModal = ({ pedidoId, valorPedido, onClose, onPaymentSuccess }) => {
 
     if (success) {
       setSuccessMessage("¡Pago procesado exitosamente! El estado de tu pedido ha sido actualizado.");
+<<<<<<< HEAD
       // Call the success callback to refresh data in the parent component
       if (onPaymentSuccess) {
         onPaymentSuccess();
@@ -46,6 +51,15 @@ const PaymentModal = ({ pedidoId, valorPedido, onClose, onPaymentSuccess }) => {
       // Close the modal after a delay
       setTimeout(() => {
         onClose();
+=======
+      // Optionally, revalidate paths or trigger a refresh in PedidosComponent
+      // For now, we'll just close the modal after a delay
+      setTimeout(() => {
+        onClose();
+        // Consider a more robust way to refresh the PedidosComponent, e.g., revalidatePath('/perfil')
+        // or a callback passed from PedidosComponent to refetch data.
+        window.location.reload(); // Simple reload for demonstration
+>>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
       }, 2000);
     } else {
       setError(paymentError || message || "Error al procesar el pago. Inténtalo de nuevo.");

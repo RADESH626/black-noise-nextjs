@@ -1,8 +1,16 @@
 'use client'
+<<<<<<< HEAD
+=======
+import React from 'react';
+>>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
 
 function DesignCard({ diseño, likesState, likedDesigns, handleLike, addItem }) {
   return (
     <div
+<<<<<<< HEAD
+=======
+      key={diseño.id}
+>>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
       className="flex flex-col rounded-2xl overflow-hidden shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl bg-black/80"
     >
       {/* Social media post header */}
@@ -17,7 +25,11 @@ function DesignCard({ diseño, likesState, likedDesigns, handleLike, addItem }) 
 
       <div className="w-full h-64 flex items-center justify-center bg-black overflow-hidden">
         <img
+<<<<<<< HEAD
           src={diseño.imageData && diseño.imageMimeType ? `data:${diseño.imageMimeType};base64,${diseño.imageData}` : diseño.imagen}
+=======
+          src={diseño.imageData && diseño.imageMimeType ? `data:${diseño.imageMimeType};base64,${Buffer.from(diseño.imageData.data).toString('base64')}` : diseño.imagen}
+>>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
           alt={`Imagen de ${diseño.prenda}`}
           className="h-full object-contain transition-transform duration-500 ease-in-out hover:scale-110"
         />
@@ -26,7 +38,11 @@ function DesignCard({ diseño, likesState, likedDesigns, handleLike, addItem }) 
       <div className="p-4 flex flex-col gap-2 text-white">
         <h2 className="font-semibold text-lg">{diseño.prenda}</h2>
         <p>Categoría: {diseño.categoria}</p>
+<<<<<<< HEAD
         <p>Precio: ${diseño.price?.toFixed(2)}</p>
+=======
+        <p>Precio: ${diseño.price.toFixed(2)}</p>
+>>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
 
         {/* Social media interaction buttons */}
         <div className="flex items-center justify-between mt-2">

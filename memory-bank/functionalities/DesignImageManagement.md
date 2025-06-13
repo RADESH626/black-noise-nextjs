@@ -137,11 +137,14 @@ Una vez que esta documentación sea revisada y aprobada, el plan de acción para
     *   Ajustar las validaciones de frontend.
 5.  **Frontend - Modificación de la Lógica de Visualización:**
     *   Ajustar los componentes que muestran imágenes de diseño para manejar la respuesta binaria del backend.
+<<<<<<< HEAD
 
 ### 5.1.1. Comportamiento del Botón "Agregar al Carrito"
 
 *   En el componente `DesignsComponent.jsx`, la lógica del botón "Agregar al Carrito" ha sido modificada para permitir la recompra de diseños previamente adquiridos. Anteriormente, el botón se deshabilitaba si el diseño ya formaba parte de un pedido histórico. Ahora, el botón solo se deshabilita si el diseño ya se encuentra en el carrito actual del usuario.
 
+=======
+>>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
 6.  **Implementación de Manejo de Errores:**
     *   Añadir o mejorar el manejo de errores en frontend y backend para los escenarios identificados.
 7.  **Pruebas:**
