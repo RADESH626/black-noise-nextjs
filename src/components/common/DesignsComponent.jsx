@@ -1,8 +1,25 @@
+<<<<<<< HEAD
+'use client'; // Move to the top
+
+import React from 'react'; // Keep one import
+
+function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartItems, addItem, orderedDesignIds }) { // Keep orderedDesignIds prop for now, though not used for button logic
+
+  // Helper function to safely get the image source
+  const getImageSrc = (design) => {
+    // Expect design.imageData to be a base64 string now
+    if (design.imageData && design.imageMimeType) {
+     return`data:${design.imageMimeType};base64,${design.imageData}`; // Use imageData directly
+    }
+    return design.imagenDesing || '/placeholder.png'; // fallback if imagenDesing also fails
+  };
+=======
 "use client";
 
 import React from 'react';
 
 function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartItems, addItem, orderedDesignIds }) { // Accept orderedDesignIds as a new prop
+>>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
 
   return (
     <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -23,6 +40,7 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartI
               <img
                 src={design.imageData?.data && design.imageMimeType ? `data:${design.imageMimeType};base64,${Buffer.from(design.imageData.data).toString('base64')}` : design.imagenDesing}
                 alt={design.nombreDesing}
+>>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
                 className="w-full h-full object-cover"
               />
             </div>
@@ -33,6 +51,10 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartI
                 <p className="font-semibold">categoría: {design.categoria}</p>
                 <p className="font-semibold text-purple-400">likes: {design.likes}</p>
               </div>
+<<<<<<< HEAD
+              {/* Removed the check for orderedDesignIds.has(design._id) */}
+              {(cartItems || []).some(item => item.id === design._id) ? (
+=======
               {orderedDesignIds.has(design._id) ? (
                 <button
                   disabled
@@ -41,6 +63,7 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartI
                   Ya en un pedido
                 </button>
               ) : (cartItems || []).some(item => item.id === design._id) ? (
+>>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
                 <button
                   disabled
                   className="bg-gray-600 text-white font-semibold py-2 px-4 rounded-md text-sm cursor-not-allowed"

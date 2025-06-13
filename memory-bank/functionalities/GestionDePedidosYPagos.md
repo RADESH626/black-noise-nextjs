@@ -20,6 +20,15 @@ Este documento describe la nueva funcionalidad de gestión de pedidos y el flujo
 *   **Renderizado Condicional:** Cada pedido en la lista mostrará un botón "Pagar" solo si su `estadoPago` es `PENDIENTE`.
 *   **Integración del Modal:** Este componente será responsable de invocar y pasar la información necesaria (como `pedidoId` y `valorPedido`) al `PaymentModal`.
 
+<<<<<<< HEAD
+### Historial de Compras (`src/components/common/PagosComponent.jsx`)
+
+*   **Propósito:** Obtener y mostrar el historial de compras (pedidos con estado `PAGADO`) del usuario.
+*   **Server Action:** Utiliza `obtenerPedidosPagadosPorUsuarioId` (ubicada en `src/app/acciones/PedidoActions.js`) para recuperar los pedidos pagados.
+*   **Renderizado:** Muestra una lista de pedidos pagados, incluyendo detalles del pedido y los ítems comprados.
+
+=======
+>>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
 ### Modal de Pago (`src/components/pago/PaymentModal.jsx`)
 
 *   **Propósito:** Proporcionar una interfaz para que el usuario ingrese sus datos de pago y procese un pedido específico.
@@ -36,6 +45,11 @@ Este documento describe la nueva funcionalidad de gestión de pedidos y el flujo
     2.  Crea un nuevo documento `Pago` en la base de datos, registrando la transacción.
     3.  Actualiza el campo `estadoPago` del `Pedido` correspondiente a `PAGADO`.
     4.  Devuelve un objeto de resultado (`{ success: true }` o `{ success: false, error: '...' }`) para el feedback al cliente.
+<<<<<<< HEAD
+    5.  **Limpia el carrito del usuario** invocando la server action `clearUserCart` de `CartActions.js`.
+    6.  La interfaz de usuario (en `PedidosComponent.jsx` y `ProfileContent.jsx`) se actualiza para reflejar el carrito vacío y permitir la recompra de ítems.
+=======
+>>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
 *   **Modelos Involucrados:**
     *   `src/models/Pago.js`: Esquema para registrar las transacciones de pago.
     *   `src/models/Pedido.js`: Esquema del pedido, que incluye el campo `estadoPago`.
@@ -57,5 +71,9 @@ Para mejorar la experiencia del usuario en la pestaña "Diseños" del perfil, se
 *   `src/components/pago/PaymentModal.jsx`: Componente del modal de pago.
 *   `src/app/acciones/PedidoActions.js`: Contiene `obtenerPedidosPorUsuarioId`.
 *   `src/app/acciones/PagoActions.js`: Contendrá `procesarPagoDePedido`.
+<<<<<<< HEAD
+*   `src/app/acciones/PedidoActions.js`: Contiene `obtenerPedidosPorUsuarioId` y `obtenerPedidosPagadosPorUsuarioId`.
+=======
+>>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
 *   `src/models/Pedido.js`: Definición del modelo Pedido.
 *   `src/models/Pago.js`: Definición del modelo Pago.

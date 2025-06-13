@@ -55,7 +55,11 @@ async function obtenerPedidos() {
     }
 }
 
+<<<<<<< HEAD
+// Obtener pedidos por usuario ID (todos los estados)
+=======
 // Obtener pedidos por usuario ID
+>>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
 async function obtenerPedidosPorUsuarioId(usuarioId) {
     logger.debug('Entering obtenerPedidosPorUsuarioId with usuarioId:', usuarioId);
     try {
@@ -73,6 +77,27 @@ async function obtenerPedidosPorUsuarioId(usuarioId) {
     }
 }
 
+<<<<<<< HEAD
+// Obtener pedidos pagados por usuario ID (Historial de compras)
+async function obtenerPedidosPagadosPorUsuarioId(usuarioId) {
+    logger.debug('Entering obtenerPedidosPagadosPorUsuarioId with usuarioId:', usuarioId);
+    try {
+        await connectDB();
+        logger.debug('Database connected for obtenerPedidosPagadosPorUsuarioId.');
+        const pedidos = await Pedido.find({ userId: usuarioId, estadoPago: 'PAGADO' }) // Filter by PAGADO status
+            .populate('items.designId', 'nombreDesing imagenDesing') // Popula nombre e imagen de los diseños dentro de items
+            .populate('proveedorId', 'nombreProveedor contactoPrincipal')
+            .lean();
+        logger.debug('Paid orders retrieved for user ID:', usuarioId, 'count:', pedidos.length);
+        return { pedidos: JSON.parse(JSON.stringify(pedidos)) };
+    } catch (error) {
+        logger.error('ERROR in obtenerPedidosPagadosPorUsuarioId:', error);
+        return { success: false, message: 'Error al obtener los pedidos pagados del usuario: ' + error.message };
+    }
+}
+
+=======
+>>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
 // Obtener pedidos por ID de Proveedor (puede ser un pedido específico o todos los de un proveedor)
 export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId) {
     logger.debug('Entering obtenerPedidosPorProveedorId with pedidoId:', pedidoId, 'proveedorId:', proveedorId);
@@ -178,4 +203,8 @@ export {
     obtenerPedidosPorUsuarioId, // This function is now deprecated for supplier use, but kept for user-specific orders
     ObtenerPedidoPorId,
     EditarPedido,
+<<<<<<< HEAD
+    obtenerPedidosPagadosPorUsuarioId, // Export the new function
+=======
+>>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
 };

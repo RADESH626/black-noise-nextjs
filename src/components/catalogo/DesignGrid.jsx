@@ -34,4 +34,8 @@ function DesignGrid({ tarjetas, activo, likesState, likedDesigns, handleLike, ad
   );
 }
 
+<<<<<<< HEAD
+export default DesignGrid;
+=======
 export default DesignGrid;
+>>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6

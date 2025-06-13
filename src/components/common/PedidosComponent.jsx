@@ -6,7 +6,11 @@ import { obtenerPedidosPorUsuarioId } from "@/app/acciones/PedidoActions";
 import { useModal } from '@/context/ModalContext';
 import PaymentModal from '@/components/pago/PaymentModal'; // Assuming this path
 
+<<<<<<< HEAD
+const PedidosContent = ({ onPaymentSuccess }) => { // Accept onPaymentSuccess prop
+=======
 const PedidosContent = () => {
+>>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
   const { data: session, status } = useSession();
   const userId = session?.user?.id;
   const { openModal, closeModal } = useModal();
@@ -40,7 +44,16 @@ const PedidosContent = () => {
   const handlePayOrder = (pedidoId, valorPedido) => {
     openModal(
       "Realizar Pago",
+<<<<<<< HEAD
+      <PaymentModal
+        pedidoId={pedidoId}
+        valorPedido={valorPedido}
+        onClose={closeModal}
+        onPaymentSuccess={onPaymentSuccess} // Pass onPaymentSuccess to PaymentModal
+      />
+=======
       <PaymentModal pedidoId={pedidoId} valorPedido={valorPedido} onClose={closeModal} />
+>>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
     );
   };
 
