@@ -14,6 +14,7 @@ El proyecto "Black Noise Next.js Visual Tests" se enfoca en la implementación y
 - Implemented search functionality by name and date, and updated the payment status column header in the Pedidos Dashboard.
 - Fixed a runtime error in the Pedidos Dashboard filtering logic.
 - Added user names and order dates to the Pedidos Dashboard table.
+- **Retirada temporal de la funcionalidad de likes de los diseños:** Se eliminó la visualización de likes en el frontend (`src/components/common/DesignsComponent.jsx`) y se comentó el campo `likes` en el modelo `Design` (`src/models/Design.js`).
 
 *   **Gestión de Diseños:**
     *   Subida de diseños con imágenes (almacenamiento binario en MongoDB).
@@ -35,6 +36,11 @@ El proyecto "Black Noise Next.js Visual Tests" se enfoca en la implementación y
     *   **Solución (Workaround Temporal):** Se implementó una solución temporal donde las imágenes se convierten a "Data URLs" (base64) en el servidor (`src/app/acciones/DesignActions.js`) y se incrustan directamente en el `src` de la etiqueta `<img>` en el frontend. Esto resolvió la visualización de las imágenes.
     *   **Causa Raíz Identificada:** La ruta API (`src/app/api/images/[modelName]/[id]/route.js`) tenía dificultades para serializar correctamente el `Buffer` de la imagen (especialmente cuando provenía de Mongoose con `.lean()`) al enviarlo con `NextResponse`, resultando en un buffer vacío en la respuesta HTTP. Las soluciones intentadas para corregir la API directamente no tuvieron éxito en este entorno.
     *   **Estado:** **Resuelto (mediante workaround temporal).** Se recomienda una investigación más profunda o una solución de almacenamiento de imágenes externa a largo plazo.
+
+*   **Visualización de Imágenes en la Sección de Pedidos:**
+    *   **Problema:** Las imágenes de los diseños asociados a los pedidos en la sección "Tus Pedidos" del perfil de usuario no se mostraban correctamente, apareciendo el mensaje "No hay imagen disponible".
+    *   **Solución:** Se ajustó la acción del servidor (`src/app/acciones/PedidoActions.js`) para popular correctamente `imageData` y `imageMimeType` del modelo `Design`. Además, se creó un componente `DesignImageDisplay.jsx` (`src/components/common/DesignImageDisplay.jsx`) capaz de manejar tanto datos de imagen en formato Base64 (debido al workaround existente para diseños) como objetos `Buffer` serializados. Finalmente, `src/components/common/PedidosComponent.jsx` fue actualizado para utilizar este nuevo componente, asegurando la correcta visualización de las imágenes.
+    *   **Estado:** **Resuelto.**
 
 ## Funcionalidades Pendientes / En Desarrollo
 

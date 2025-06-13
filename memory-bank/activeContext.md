@@ -96,3 +96,24 @@ Ambos problemas (renderizado de imágenes y lógica del botón "Añadir al Carri
 *   Verificar visualmente la correcta renderización de las imágenes en `/catalogo`.
 *   Verificar la funcionalidad del botón "Añadir al carrito" (habilitado/deshabilitado y cambio de texto) en `/catalogo`.
 *   **Investigación a Profundidad (a Largo Plazo):** Se recomienda una investigación más profunda sobre por qué `NextResponse` no está sirviendo correctamente los `Buffer`s de Mongoose a través de la ruta API, con el objetivo de revertir las soluciones temporales de Base64 y optimizar el rendimiento.
+
+---
+
+## Tarea Actual: Retirar temporalmente la funcionalidad de likes de los diseños
+
+### Resumen del Problema:
+El usuario ha solicitado retirar temporalmente la funcionalidad de "likes" de los diseños.
+
+### Cambios Realizados:
+1.  **Frontend (`src/components/common/DesignsComponent.jsx`):**
+    *   Se eliminó la línea que mostraba el contador de likes (`<p className="font-semibold text-purple-400">likes: {design.likes}</p>`).
+2.  **Backend (`src/models/Design.js`):**
+    *   Se comentó el campo `likes` en el `DesignSchema` para deshabilitar su almacenamiento y uso en el modelo de base de datos.
+
+### Estado Actual:
+La funcionalidad de likes ha sido retirada temporalmente tanto del frontend como del backend.
+
+### Próximos Pasos:
+*   Actualizar `progress.md`.
+*   Preparar los comandos `git add` y `git commit`.
+*   Verificar visualmente la ausencia de la funcionalidad de likes en la interfaz de usuario.

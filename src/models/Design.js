@@ -21,10 +21,10 @@ const DesignSchema = new Schema({
         enum: Object.values(CategoriaProducto),
         required: true
     },
-    likes: {
-        type: Number,
-        default: 0
-    },
+    // likes: {
+    //     type: Number,
+    //     default: 0
+    // },
     valorDesing: {
         type: Number,
         required: true

@@ -37,7 +37,6 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartI
                 <p className="font-semibold">nombre: {design.nombreDesing}</p>
                 <p className="font-semibold">precio: ${design.valorDesing}</p>
                 <p className="font-semibold">categoría: {design.categoria}</p>
-                <p className="font-semibold text-purple-400">likes: {design.likes}</p>
               </div>
               {(cartItems || []).some(item => item.id === design._id) ? (
                 <button
