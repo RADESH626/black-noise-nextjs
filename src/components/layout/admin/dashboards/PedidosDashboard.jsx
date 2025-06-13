@@ -32,7 +32,11 @@ export default function PedidosDashboard() {
   useEffect(() => {
     const filterPedidos = () => {
       const filtered = pedidos.filter(pedido => {
-        const matchesSearchTerm = pedido.userId?.email.toLowerCase().includes(searchTerm.toLowerCase()) || pedido._id.toLowerCase().includes(searchTerm.toLowerCase());
+        const userEmail = pedido.userId?.email ? pedido.userId.email.toLowerCase() : '';
+        const pedidoId = pedido._id.toLowerCase();
+        const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
+        const matchesSearchTerm = userEmail.includes(lowerCaseSearchTerm) || pedidoId.includes(lowerCaseSearchTerm);
 
         const pedidoDate = new Date(pedido.createdAt);
         const start = startDate ? new Date(startDate) : null;
