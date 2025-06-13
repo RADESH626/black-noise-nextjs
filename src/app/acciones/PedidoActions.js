@@ -1,27 +1,21 @@
 "use server"
 
 import connectDB from '@/utils/DBconection';
-import Pedido from '@/models/Pedido';
 import Design from '@/models/Design';     // Necesario para popular
 import Proveedor from '@/models/Proveedor'; // Necesario para popular
 import { revalidatePath } from 'next/cache';
 import logger from '@/utils/logger';
+import { getModel } from '@/utils/modelLoader';
 
 // Crear un nuevo pedido
-async function guardarPedido(userId, items, valorPedido, proveedorId = null, fechaEstimadaEntrega = null, detallesPedido = []) {
-    logger.debug('Entering guardarPedido with data:', { userId, items, valorPedido, proveedorId, fechaEstimadaEntrega, detallesPedido });
+async function guardarPedido(pedidoData) {
+    logger.debug('Entering guardarPedido with data:', pedidoData);
     try {
         await connectDB();
         logger.debug('Database connected for guardarPedido.');
 
-        const nuevoPedido = new Pedido({
-            userId,
-            items,
-            valorPedido,
-            proveedorId,
-            fechaEstimadaEntrega,
-            detallesPedido
-        });
+        const Pedido = await getModel('Pedido');
+        const nuevoPedido = new Pedido(pedidoData);
         logger.debug('New Pedido instance created:', nuevoPedido);
         const pedidoGuardado = await nuevoPedido.save();
         console.log(`Nuevo pedido agregado a la base de datos con ID: ${pedidoGuardado._id}`);
@@ -42,9 +36,10 @@ async function obtenerPedidos() {
     try {
         await connectDB();
         logger.debug('Database connected for obtenerPedidos.');
+        const Pedido = await getModel('Pedido');
         const pedidos = await Pedido.find({})
             .populate('userId', 'nombre email') // Popula el usuario
-            .populate('items.designId', 'nombreDesing imagenDesing') // Popula nombre e imagen de los diseños dentro de items
+            .populate('items.designId', 'nombreDesing imageData imageMimeType') // Popula nombre, datos binarios y tipo MIME de los diseños dentro de items
             .populate('proveedorId', 'nombreProveedor contactoPrincipal') // Popula algunos campos de Proveedor
             .lean();
         console.log('Pedidos after populate in obtenerPedidos:', pedidos); // Add this line for debugging
@@ -62,8 +57,9 @@ async function obtenerPedidosPorUsuarioId(usuarioId) {
     try {
         await connectDB();
         logger.debug('Database connected for obtenerPedidosPorUsuarioId.');
+        const Pedido = await getModel('Pedido');
         const pedidos = await Pedido.find({ userId: usuarioId }) // Changed from usuarioId to userId to match schema
-            .populate('items.designId', 'nombreDesing imagenDesing') // Popula nombre e imagen de los diseños dentro de items
+            .populate('items.designId', 'nombreDesing imageData imageMimeType') // Popula nombre, datos binarios y tipo MIME de los diseños dentro de items
             .populate('proveedorId', 'nombreProveedor contactoPrincipal')
             .lean();
         logger.debug('Orders retrieved for user ID:', usuarioId, 'count:', pedidos.length);
@@ -80,8 +76,9 @@ async function obtenerPedidosPagadosPorUsuarioId(usuarioId) {
     try {
         await connectDB();
         logger.debug('Database connected for obtenerPedidosPagadosPorUsuarioId.');
+        const Pedido = await getModel('Pedido');
         const pedidos = await Pedido.find({ userId: usuarioId, estadoPago: 'PAGADO' }) // Filter by PAGADO status
-            .populate('items.designId', 'nombreDesing imagenDesing') // Popula nombre e imagen de los diseños dentro de items
+            .populate('items.designId', 'nombreDesing imageData imageMimeType') // Popula nombre, datos binarios y tipo MIME de los diseños dentro de items
             .populate('proveedorId', 'nombreProveedor contactoPrincipal')
             .lean();
         logger.debug('Paid orders retrieved for user ID:', usuarioId, 'count:', pedidos.length);
@@ -102,14 +99,14 @@ export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId)
         if (!proveedorId) {
             return { success: false, message: "ID de proveedor es requerido." };
         }
-
+        const Pedido = await getModel('Pedido');
         let query = { proveedorId: proveedorId };
         if (pedidoId) {
             query._id = pedidoId;
         }
 
         const pedidos = await Pedido.find(query)
-            .populate('items.designId', 'nombreDesing imagenDesing') // Popula nombre e imagen de los diseños dentro de items
+            .populate('items.designId', 'nombreDesing imageData imageMimeType') // Popula nombre, datos binarios y tipo MIME de los diseños dentro de items
             .populate('proveedorId', 'nombreEmpresa emailContacto') // Popula algunos campos de Proveedor
             .lean();
 
@@ -139,9 +136,10 @@ async function ObtenerPedidoPorId(id) {
     try {
         await connectDB();
         logger.debug('Database connected for ObtenerPedidoPorId.');
+        const Pedido = await getModel('Pedido');
         const pedido = await Pedido.findById(id)
             .populate('userId', 'nombre email') // Popula el usuario
-            .populate('items.designId', 'nombreDesing imagenDesing') // Popula nombre e imagen de los diseños dentro de items
+            .populate('items.designId', 'nombreDesing imageData imageMimeType') // Popula nombre, datos binarios y tipo MIME de los diseños dentro de items
             .populate('proveedorId', 'nombreEmpresa emailContacto')
             .lean();
         logger.debug('Order retrieved from DB:', pedido);
@@ -164,6 +162,7 @@ async function EditarPedido(id, data) {
         await connectDB();
         logger.debug('Database connected for EditarPedido.');
         
+        const Pedido = await getModel('Pedido');
         const updateData = { ...data };
         // Assuming 'items' will be passed as an array of objects directly
         // No need for string splitting for desingIds or items

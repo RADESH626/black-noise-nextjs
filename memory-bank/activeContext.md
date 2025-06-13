@@ -84,3 +84,42 @@ La funcionalidad de likes ha sido retirada temporalmente tanto del frontend como
 *   Actualizar `progress.md`.
 *   Preparar los comandos `git add` y `git commit`.
 *   Verificar visualmente la ausencia de la funcionalidad de likes en la interfaz de usuario.
+
+---
+
+## Tarea Actual: Implementación de Sistema de Pago Primero
+
+### Resumen del Problema:
+El usuario ha solicitado cambiar el flujo de pedidos para que el pago se realice *antes* de la creación formal del pedido, en lugar de después.
+
+### Plan de Implementación:
+1.  **Actualización de Documentación:**
+    *   Modificar `memory-bank/functionalities/GestionDePedidosYPagos.md` para reflejar el nuevo flujo de "pago primero". (Completado)
+    *   Actualizar `memory-bank/activeContext.md` y `memory-bank/progress.md`. (En progreso)
+2.  **Modificaciones en el Frontend:**
+    *   Página del Carrito (`src/app/carrito/page.jsx` y `src/components/carrito/`): Cambiar el botón "Realizar Pedido" por "Proceder al Pago".
+    *   Proceso de Pago (`src/app/proceso-pago/page.jsx` y `src/components/pago/PaymentModal.jsx`): Adaptar la interfaz para iniciar el pago y crear el pedido post-pago.
+    *   Página de Confirmación (`src/app/confirmacion/page.jsx`): Asegurar la correcta visualización de detalles post-pago.
+3.  **Modificaciones en el Backend:**
+    *   `src/app/acciones/CartActions.js`: Ajustar o eliminar la acción de creación de pedidos pendientes.
+    *   `src/app/acciones/PagoActions.js`: Modificar `procesarPagoDePedido` para crear el `Pedido` solo si el pago es exitoso.
+    *   `src/models/Pedido.js`: Asegurar que el modelo `Pedido` pueda ser creado directamente con el estado `PAGADO`.
+    *   `src/models/Pago.js`: Mantener el modelo `Pago` para registrar transacciones.
+4.  **Pruebas:**
+    *   Realizar pruebas de extremo a extremo del nuevo flujo.
+    *   Verificar creación de pedidos con pagos exitosos y ausencia de pedidos con pagos fallidos.
+
+### Estado Actual:
+La documentación `memory-bank/functionalities/GestionDePedidosYPagos.md` ha sido actualizada para reflejar el flujo de "pago primero".
+Todas las modificaciones de código en el frontend (`src/app/carrito/page.jsx`, `src/app/pago/page.jsx`, `src/components/pago/PaymentForm.jsx`, `src/app/confirmacion/page.jsx`) y el backend (`src/app/acciones/PagoActions.js`, `src/app/acciones/CartActions.js`, `src/models/Pedido.js`, `src/models/Pago.js`) han sido completadas para implementar el flujo de "pago primero".
+
+### Resolución de `TypeError` en Modelos Mongoose:
+**Problema:** Se encontró un `TypeError: First argument to Model constructor must be an object, not a string.` al intentar instanciar modelos de Mongoose en Next.js Server Actions, específicamente con el modelo `Pedido`. Esto se debía a la forma en que Mongoose maneja el registro y la carga de modelos en un entorno serverless, donde las instancias de modelos pueden no estar disponibles globalmente o ser re-registradas incorrectamente.
+
+**Solución Implementada:**
+1.  **Creación de `src/utils/modelLoader.js`:** Se implementó una utilidad centralizada para la carga de modelos. Esta utilidad asegura que la conexión a la base de datos esté establecida y que se obtenga la instancia correcta del modelo de Mongoose, ya sea que ya esté registrada o necesite ser obtenida por primera vez.
+2.  **Modificación de Server Actions:**
+    *   `src/app/acciones/PedidoActions.js`: Se eliminaron las importaciones directas del modelo `Pedido` y se reemplazó la instanciación del modelo por `const Pedido = await getModel('Pedido');` dentro de cada función relevante.
+    *   `src/app/acciones/PagoActions.js`: Se eliminaron las importaciones directas de los modelos `Pedido` y `Pago` y se reemplazó su instanciación por `const Pedido = await getModel('Pedido');` y `const Pago = await getModel('Pago');` respectivamente, dentro de la función `procesarPagoYCrearPedido`.
+
+**Estado de la Resolución:** El `TypeError` relacionado con la instanciación de modelos de Mongoose ha sido abordado y resuelto mediante la implementación de `modelLoader.js` y la adaptación de las Server Actions para utilizar esta utilidad.

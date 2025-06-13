@@ -51,6 +51,9 @@ El proyecto "Black Noise Next.js Visual Tests" se enfoca en la implementación y
     *   Actualización de cantidades, eliminación de ítems, persistencia del carrito.
 *   **Proceso de Pago Completo:**
     *   Integración real con pasarelas de pago.
+*   **Implementación de Sistema de Pago Primero:**
+    *   Modificación del flujo de usuario para que el pago preceda a la creación del pedido. (Completado: Documentación y código actualizados en frontend y backend).
+    *   **Resolución de `TypeError` en Modelos Mongoose:** Se implementó `src/utils/modelLoader.js` y se adaptaron las Server Actions (`src/app/acciones/PedidoActions.js` y `src/app/acciones/PagoActions.js`) para asegurar la correcta instanciación de los modelos de Mongoose, resolviendo el `TypeError` persistente. (Completado)
 *   **Dashboard de Administración:**
     *   Funcionalidades completas para la gestión de usuarios, diseños, pedidos, etc.
 *   **Mejoras de UI/UX:**
