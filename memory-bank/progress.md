@@ -12,6 +12,7 @@
 - Updated `memory-bank/techContext.md` to reference the new operational directives.
 - Updated `memory-bank/manifest.md` to reflect the changes in `systemPatterns.md`.
 - Fixed designs not displaying correctly in the user profile by ensuring consistent image data handling between backend and frontend.
+- Implemented search functionality by name and date, and updated the payment status column header in the Pedidos Dashboard.
 
 ## Next Milestones:
 - Continue with any further development tasks as requested by the user.
