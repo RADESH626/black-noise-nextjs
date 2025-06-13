@@ -3,10 +3,7 @@
 import { useModal } from "@/context/ModalContext";
 import { signOut, useSession } from "next-auth/react";
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
-<<<<<<< HEAD
 import Link from "next/link"; // Import Link
-=======
->>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
 import { useEffect, useState } from "react";
 import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions";
 import { getCartByUserId, addDesignToCart } from "@/app/acciones/CartActions";
@@ -164,12 +161,9 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [] 
             </div>
             <div className="flex flex-col sm:flex-row justify-center md:justify-start space-y-2 sm:space-y-0 sm:space-x-3">
               <BotonGeneral onClick={handleEditProfile}>EDITAR PERFIL</BotonGeneral>
-<<<<<<< HEAD
               <Link href="/catalogo"> {/* Add Link */}
                 <BotonGeneral>VER DISEÑOS DE LA COMUNIDAD</BotonGeneral> {/* Add new button */}
               </Link>
-=======
->>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
               <BotonGeneral onClick={() => signOut({ callbackUrl: '/login' })}>CERRAR SESIÓN</BotonGeneral>
             </div>
           </div>
@@ -191,7 +185,6 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [] 
         {activeTab === 'designs' && (
           loading ? <p>Cargando diseños...</p> : error ? <p>Error: {error}</p> :
           <>
-<<<<<<< HEAD
             {/* Always show the Add Design button */}
             <div className="flex justify-center mb-4">
               <button onClick={handleAddDesign} className="w-16 h-16 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center shadow-lg transform transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50" aria-label="Agregar nuevo diseño">
@@ -202,14 +195,6 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [] 
             {userDesigns.length === 0 ? (
               <div className="text-center text-gray-400 text-lg mb-4">
                 No tienes diseños publicados aún.
-=======
-            {userDesigns.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-64">
-                <p className="text-gray-400 text-lg mb-4">No tienes diseños publicados aún.</p>
-                <button onClick={handleAddDesign} className="w-16 h-16 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center shadow-lg transform transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50" aria-label="Agregar nuevo diseño">
-                  <img src="/icons/icono +.svg" alt="Agregar" className="w-8 h-8" />
-                </button>
->>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
               </div>
             ) : (
               <DesignsComponent
@@ -224,15 +209,9 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [] 
             )}
           </>
         )}
-<<<<<<< HEAD
         {activeTab === 'orders' && (<PedidosComponent userId={user?.id} onPaymentSuccess={fetchCartData} />)} {/* Pass fetchCartData as onPaymentSuccess */}
         {activeTab === 'cart' && (<CartComponent />)}
         {activeTab === 'payments' && (<PagosComponent userId={user?.id} />)} {/* PagosComponent doesn't need cart refresh */}
-=======
-        {activeTab === 'orders' && (<PedidosComponent userId={user?.id} />)}
-        {activeTab === 'cart' && (<CartComponent />)}
-        {activeTab === 'payments' && (<PagosComponent userId={user?.id} />)}
->>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
       </div>
     </div>
   );

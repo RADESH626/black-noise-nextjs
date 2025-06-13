@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 'use client'; // Move to the top
 
 import React from 'react'; // Keep one import
@@ -13,13 +12,6 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartI
     }
     return design.imagenDesing || '/placeholder.png'; // fallback if imagenDesing also fails
   };
-=======
-"use client";
-
-import React from 'react';
-
-function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartItems, addItem, orderedDesignIds }) { // Accept orderedDesignIds as a new prop
->>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
 
   return (
     <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -51,19 +43,8 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartI
                 <p className="font-semibold">categoría: {design.categoria}</p>
                 <p className="font-semibold text-purple-400">likes: {design.likes}</p>
               </div>
-<<<<<<< HEAD
               {/* Removed the check for orderedDesignIds.has(design._id) */}
               {(cartItems || []).some(item => item.id === design._id) ? (
-=======
-              {orderedDesignIds.has(design._id) ? (
-                <button
-                  disabled
-                  className="bg-gray-600 text-white font-semibold py-2 px-4 rounded-md text-sm cursor-not-allowed"
-                >
-                  Ya en un pedido
-                </button>
-              ) : (cartItems || []).some(item => item.id === design._id) ? (
->>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
                 <button
                   disabled
                   className="bg-gray-600 text-white font-semibold py-2 px-4 rounded-md text-sm cursor-not-allowed"

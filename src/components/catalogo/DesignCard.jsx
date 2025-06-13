@@ -1,16 +1,9 @@
 'use client'
-<<<<<<< HEAD
-=======
 import React from 'react';
->>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
 
 function DesignCard({ diseño, likesState, likedDesigns, handleLike, addItem }) {
   return (
     <div
-<<<<<<< HEAD
-=======
-      key={diseño.id}
->>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
       className="flex flex-col rounded-2xl overflow-hidden shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl bg-black/80"
     >
       {/* Social media post header */}

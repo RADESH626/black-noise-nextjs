@@ -38,10 +38,7 @@ The "Realizar Pedido" button in the cart now triggers the creation of a new orde
 1.  Gathering the current cart items and user information. In `CartComponent.jsx`, the `designId` for each item is now correctly extracted from `item.id` (which is populated by `getCartByUserId`).
 2.  Sending this data to a new server action responsible for creating a `Pedido` (Order) document in the database.
 3.  Clearing the user's cart after successful order creation. The payment for this order will be handled separately from the user's order history.
-<<<<<<< HEAD
     *   **Update:** The user's cart is now explicitly cleared on the backend using the `clearUserCart` server action after a successful payment is processed for an order. This ensures that items are removed from the cart once they have been purchased.
-=======
->>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
 
 ## Interaction Flow: Client-side to Server-side Cart
 

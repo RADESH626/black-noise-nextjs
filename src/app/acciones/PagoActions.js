@@ -8,10 +8,7 @@ import Venta from '@/models/Venta';   // Necesario para popular
 import { revalidatePath } from 'next/cache';
 import logger from '@/utils/logger';
 import { EditarPedido } from '@/app/acciones/PedidoActions'; // Import EditarPedido
-<<<<<<< HEAD
 import { clearUserCart } from '@/app/acciones/CartActions'; // Import clearUserCart
-=======
->>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
 
 // Crear un nuevo pago
 async function guardarPago(data) {
@@ -156,7 +153,6 @@ async function procesarPagoDePedido(paymentData) {
             return { success: false, message: pedidoUpdateError || 'Error al actualizar el estado del pedido.' };
         }
 
-<<<<<<< HEAD
         // 3. Clear the user's cart after successful payment
         const { success: clearCartSuccess, message: clearCartMessage } = await clearUserCart(paymentData.userId);
         if (!clearCartSuccess) {
@@ -167,8 +163,6 @@ async function procesarPagoDePedido(paymentData) {
         }
 
 
-=======
->>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
         revalidatePath('/perfil'); // Revalidate user profile/orders page
         revalidatePath('/admin/pedidos'); // Revalidate admin orders page
         logger.debug('Revalidated paths /perfil and /admin/pedidos.');

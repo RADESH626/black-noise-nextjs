@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Session Context and Changes
 
 **Date:** 12/6/2025
