@@ -9,11 +9,13 @@ import DesignGrid from '@/components/catalogo/DesignGrid';
 import { addDesignToCart } from '@/app/acciones/CartActions'; // Import addDesignToCart
 import { obtenerDesigns } from '@/app/acciones/DesignActions'; // Import obtenerDesigns
 import { useSession } from 'next-auth/react'; // Import useSession
+import { useCartStorage } from '@/hooks/useCartStorage'; // Import useCartStorage
 
 const ComunidadDiseños = () => {
   const [activo, setActivo] = useState('diseños');
   const { data: session } = useSession();
   const userId = session?.user?.id;
+  const { cartItems } = useCartStorage(); // Get cart items from storage
 
   const [allDesigns, setAllDesigns] = useState([]); // State to store all designs
   const [loadingDesigns, setLoadingDesigns] = useState(true);
@@ -125,6 +127,7 @@ const ComunidadDiseños = () => {
           likedDesigns={likedDesigns}
           handleLike={handleLike}
           addItem={handleAddItemToCart} // Pass the new addItem function
+          cartItems={cartItems} // Pass cart items to DesignGrid
         />
       </main>
 

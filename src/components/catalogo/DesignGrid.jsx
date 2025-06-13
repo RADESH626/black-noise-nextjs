@@ -2,7 +2,7 @@
 import React from 'react';
 import DesignCard from './DesignCard';
 
-function DesignGrid({ tarjetas, activo, likesState, likedDesigns, handleLike, addItem }) {
+function DesignGrid({ tarjetas, activo, likesState, likedDesigns, handleLike, addItem, cartItems }) {
   return (
     <>
       {tarjetas.length === 0 ? (
@@ -16,6 +16,7 @@ function DesignGrid({ tarjetas, activo, likesState, likedDesigns, handleLike, ad
           }`}
         >
           {tarjetas.map((diseño) => {
+            const isInCart = cartItems.some(item => item.id === diseño.id);
             console.log('Design ID:', diseño.id); // Added for debugging key prop warning
             return (
               <DesignCard
@@ -25,6 +26,7 @@ function DesignGrid({ tarjetas, activo, likesState, likedDesigns, handleLike, ad
                 likedDesigns={likedDesigns}
                 handleLike={handleLike}
                 addItem={addItem}
+                isInCart={isInCart} // Pass isInCart prop
               />
             );
           })}

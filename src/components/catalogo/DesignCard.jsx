@@ -1,7 +1,7 @@
 'use client'
 import React from 'react';
 
-function DesignCard({ diseño, likesState, likedDesigns, handleLike, addItem }) {
+function DesignCard({ diseño, likesState, likedDesigns, handleLike, addItem, isInCart }) {
   return (
     <div
       className="flex flex-col rounded-2xl overflow-hidden shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl bg-black/80"
@@ -46,10 +46,13 @@ function DesignCard({ diseño, likesState, likedDesigns, handleLike, addItem }) 
             </button> */}
           </div>
           <button
-            className="bg-green-600 px-3 py-1 rounded hover:bg-green-700 transition"
+            className={`px-3 py-1 rounded transition ${
+              isInCart ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
+            }`}
             onClick={() => addItem(diseño)}
+            disabled={isInCart}
           >
-            Añadir al carrito
+            {isInCart ? 'En el carrito' : 'Añadir al carrito'}
           </button>
         </div>
       </div>
