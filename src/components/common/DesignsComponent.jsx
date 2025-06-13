@@ -6,9 +6,9 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartI
 
   // Helper function to safely get the image source
   const getImageSrc = (design) => {
-    // Expect design.imageData to be a base64 string now
-    if (design.imageData && design.imageMimeType) {
-     return`data:${design.imageMimeType};base64,${design.imageData}`; // Use imageData directly
+    // design.imageData is now expected to be a base64 string (e.g., "data:image/jpeg;base64,...")
+    if (design.imageData) {
+      return design.imageData;
     }
     return design.imagenDesing || '/placeholder.png'; // fallback if imagenDesing also fails
   };
@@ -30,9 +30,8 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartI
           <div key={design._id} className="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
             <div className="w-full h-56 bg-gray-700 relative">
               <img
-                src={design.imageData?.data && design.imageMimeType ? `data:${design.imageMimeType};base64,${Buffer.from(design.imageData.data).toString('base64')}` : design.imagenDesing}
+                src={getImageSrc(design)}
                 alt={design.nombreDesing}
->>>>>>> 23672fd20f631b662f6c2b26b31a77a6288784c6
                 className="w-full h-full object-cover"
               />
             </div>

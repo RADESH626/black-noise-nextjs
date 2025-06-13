@@ -254,3 +254,22 @@ Modified line 24 in `src/components/common/DesignsComponent.jsx` to include opti
 
 **Next Steps for User:**
 The fix has been applied. The application should no longer encounter the `Buffer.from` error when rendering designs. You can verify this by navigating to the page where `DesignsComponent` is used (e.g., `/perfil` or `/catalogo`) and checking if the images load correctly.
+
+### Task: Fix designs not displaying correctly in user profile
+
+**Problem:** Designs were not displaying correctly in the user profile's design section. This was due to an inconsistency in how `imageData` was handled: the backend (`obtenerDesignsPorUsuarioId`) was sending `imageData` as a Buffer, while the frontend (`DesignsComponent.jsx`) was expecting a base64 string or attempting an incorrect conversion.
+
+**Analysis:**
+1.  **`src/models/Design.js`**: Confirmed `imageData` is stored as a `Buffer`.
+2.  **`src/app/acciones/DesignActions.js`**: The `obtenerDesignsPorUsuarioId` function was returning the raw `Buffer` for `imageData`.
+3.  **`src/components/common/DesignsComponent.jsx`**: The image rendering logic and the `getImageSrc` helper function were not consistently handling the `Buffer` data, leading to display issues.
+
+**Solution:**
+1.  **Modified `src/app/acciones/DesignActions.js`**: In `obtenerDesignsPorUsuarioId`, converted the `imageData` Buffer to a base64 string before sending it to the frontend.
+2.  **Modified `src/components/common/DesignsComponent.jsx`**: Simplified the image rendering logic and the `getImageSrc` helper to directly use the base64 string provided by the backend, removing client-side Buffer conversions.
+
+**Files Modified:**
+- `src/app/acciones/DesignActions.js`
+- `src/components/common/DesignsComponent.jsx`
+
+**Conclusion:** The designs should now display correctly in the user profile due to consistent image data handling between the backend and frontend.

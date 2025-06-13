@@ -130,9 +130,22 @@ export async function obtenerDesignsPorUsuarioId(usuarioId) {
     await connectDB();
     logger.debug('Entering obtenerDesignsPorUsuarioId with usuarioId:', usuarioId);
     try {
-        const designs = await Design.find({ usuarioId: usuarioId }).lean(); // Corrected field name to 'usuarioId'
-        logger.debug('Designs obtained by usuarioId successfully:', designs);
-        return { designs: JSON.parse(JSON.stringify(designs)), error: null };
+        const designs = await Design.find({ usuarioId: usuarioId }).lean();
+
+        const formattedDesigns = designs.map(design => {
+            const designImageSrc = design.imageData && design.imageMimeType
+                ? `data:${design.imageMimeType};base64,${Buffer.from(design.imageData).toString('base64')}`
+                : null; // Or a default image path if no image data
+
+            return {
+                ...design,
+                imageData: designImageSrc, // Overwrite imageData with the base64 string
+                imageMimeType: undefined, // Remove mime type as it's now part of imageData
+            };
+        });
+
+        logger.debug('Designs obtained by usuarioId successfully and formatted:', formattedDesigns);
+        return { designs: JSON.parse(JSON.stringify(formattedDesigns)), error: null };
     } catch (error) {
         logger.error('ERROR in obtenerDesignsPorUsuarioId:', error);
         return { designs: null, error: 'Error al obtener los diseños por usuario: ' + error.message };
