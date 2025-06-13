@@ -126,13 +126,19 @@ export default function PedidosDashboard() {
                 ID Pedido
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Usuario
+                Nombre Usuario
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Email Usuario
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Valor Total
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Estado Pedido
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Fecha Pedido
               </th>
               {/* Add more headers for other relevant fields */}
             </tr>
@@ -144,6 +150,9 @@ export default function PedidosDashboard() {
                   {pedido._id}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {pedido.userId ? pedido.userId.nombre : 'N/A'} {/* Display user name */}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {pedido.userId ? pedido.userId.email : 'N/A'} {/* Display user email */}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -151,6 +160,9 @@ export default function PedidosDashboard() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {pedido.estadoPago}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {pedido.createdAt ? new Date(pedido.createdAt).toLocaleDateString() : 'N/A'} {/* Display order date */}
                 </td>
                 {/* Add more cells for other relevant fields */}
               </tr>

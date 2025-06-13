@@ -21,5 +21,6 @@
 - Updated `activeContext.md` to log the successful merge conflict resolution.
 - Modified `src/components/layout/admin/dashboards/PedidosDashboard.jsx` to change "Estado Pago" to "Estado Pedido" and add search functionality by name and date.
 - Fixed a runtime error in `src/components/layout/admin/dashboards/PedidosDashboard.jsx` by adding a check for undefined `pedido.userId` in the filtering logic.
+- Added user names and order dates to the Pedidos Dashboard table.
 
 **Outcome:** Merge conflicts resolved and changes accepted. Memory bank updated. Ready for the next task.
