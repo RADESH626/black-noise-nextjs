@@ -100,8 +100,8 @@ export async function obtenerDesigns() {
                 : '/img/perfil/FotoPerfil.webp'; // Default avatar if no image data
 
             const designImageUrl = design.imageData && design.imageMimeType
-                ? `/api/images/design/${design._id}`
-                : null; // Or a default image path if no image data
+                ? `data:${design.imageMimeType};base64,${design.imageData.toString('base64')}`
+                : null; // Provide the image as a data URL
 
             return {
                 ...design,
@@ -110,10 +110,8 @@ export async function obtenerDesigns() {
                 price: design.valorDesing,   // Map valorDesing to price
                 usuario: design.usuarioId ? design.usuarioId.nombreUsuario : 'Usuario Desconocido', // Map user name
                 userAvatar: userAvatar, // Add user avatar URL
-                imagen: designImageUrl, // Provide the image URL
-                // Remove original imageData and imageMimeType as they are now processed into 'imagen'
-                imageData: undefined,
-                imageMimeType: undefined,
+                imagen: designImageUrl, // Provide the image as a data URL
+                // Keep imageData and imageMimeType as they are used for data URL
             };
         });
 

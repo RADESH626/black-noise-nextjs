@@ -66,9 +66,10 @@ El usuario reportó que las imágenes no se estaban renderizando correctamente e
 ### Diagnóstico y Hallazgos Clave:
 1.  **Problema de Renderizado de Imágenes:**
     *   `src/app/catalogo/page.jsx` utiliza `obtenerDesigns` para obtener los diseños.
-    *   `obtenerDesigns` en `src/app/acciones/DesignActions.js` construye la URL de la imagen como `/api/images/design/${design._id}`.
+    *   `obtenerDesigns` en `src/app/acciones/DesignActions.js` inicialmente construía la URL de la imagen como `/api/images/design/${design._id}`.
     *   Se descubrió que la ruta API `src/app/api/images/design/[id]/route.js` **no existía**, lo que impedía que las imágenes fueran servidas correctamente.
     *   El modelo `src/models/Design.js` confirma que `imageData` se almacena como `Buffer` y `imageMimeType` como `String`, lo cual es correcto para el almacenamiento binario.
+    *   A pesar de la creación de la ruta API, las imágenes aún no se renderizaban, lo que sugiere un problema subyacente con el servicio de `Buffer`s en este entorno Next.js, similar a lo documentado para la sección de perfil.
 
 2.  **Problema del Botón "Añadir al Carrito":**
     *   El botón "Añadir al carrito" en `src/components/catalogo/DesignCard.jsx` no tenía lógica para deshabilitarse si el diseño ya estaba en el carrito del usuario.
@@ -76,19 +77,22 @@ El usuario reportó que las imágenes no se estaban renderizando correctamente e
 
 ### Solución Implementada:
 
-1.  **Creación de la Ruta API para Imágenes:**
+1.  **Creación de la Ruta API para Imágenes (Intento Inicial):**
     *   Se creó el archivo `src/app/api/images/design/[id]/route.js`.
-    *   Esta ruta ahora se encarga de conectar a la base de datos, encontrar el diseño por ID, extraer `imageData` y `imageMimeType`, y servir el `Buffer` binario con el `Content-Type` correcto. Esto debería resolver el problema de renderizado de imágenes en el catálogo.
+    *   Esta ruta se encarga de conectar a la base de datos, encontrar el diseño por ID, extraer `imageData` y `imageMimeType`, y servir el `Buffer` binario con el `Content-Type` correcto.
 
-2.  **Implementación de Lógica para el Botón "Añadir al Carrito":**
+2.  **Workaround de Base64 para Renderizado de Imágenes en Catálogo:**
+    *   Dado que la ruta API no resolvió el problema de renderizado, se modificó `src/app/acciones/DesignActions.js` para que la función `obtenerDesigns` devuelva la propiedad `imagen` como una "Data URL" (Base64), similar a la solución temporal para el perfil de usuario. Esto permite que las imágenes se muestren correctamente en el catálogo.
+
+3.  **Implementación de Lógica para el Botón "Añadir al Carrito":**
     *   **`src/app/catalogo/page.jsx`:** Se importó `useCartStorage` y se obtuvieron `cartItems`. Estos `cartItems` se pasaron como prop a `DesignGrid`.
     *   **`src/components/catalogo/DesignGrid.jsx`:** Se aceptó la prop `cartItems`. Dentro del mapeo de diseños, se calculó una nueva prop `isInCart` (booleana) para cada diseño, verificando si su ID existe en `cartItems`. Esta prop `isInCart` se pasó a `DesignCard`.
     *   **`src/components/catalogo/DesignCard.jsx`:** Se aceptó la prop `isInCart`. El botón "Añadir al carrito" ahora está deshabilitado (`disabled={isInCart}`) y su texto cambia a "En el carrito" cuando `isInCart` es `true`.
 
 ### Estado Actual:
-Ambos problemas (renderizado de imágenes y lógica del botón "Añadir al carrito") en la página `/catalogo` han sido abordados con las implementaciones descritas.
+Ambos problemas (renderizado de imágenes y lógica del botón "Añadir al Carrito") en la página `/catalogo` han sido abordados con las implementaciones descritas. El problema de renderizado de imágenes se ha resuelto mediante un workaround de Base64, mientras se investiga la causa raíz del problema con el servicio de `Buffer`s a través de la ruta API.
 
 ### Próximos Pasos Sugeridos:
 *   Verificar visualmente la correcta renderización de las imágenes en `/catalogo`.
 *   Verificar la funcionalidad del botón "Añadir al carrito" (habilitado/deshabilitado y cambio de texto) en `/catalogo`.
-*   Considerar la posibilidad de unificar la estrategia de servicio de imágenes (API route vs. Base64 Data URL) en todo el proyecto para optimizar el rendimiento y la coherencia, revirtiendo la solución temporal en `obtenerDesignsPorUsuarioId` una vez que se confirme que la ruta API funciona de manera robusta.
+*   **Investigación a Profundidad (a Largo Plazo):** Se recomienda una investigación más profunda sobre por qué `NextResponse` no está sirviendo correctamente los `Buffer`s de Mongoose a través de la ruta API, con el objetivo de revertir las soluciones temporales de Base64 y optimizar el rendimiento.
