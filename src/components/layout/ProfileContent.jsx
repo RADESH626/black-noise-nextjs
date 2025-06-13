@@ -22,6 +22,8 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
   console.log('[CLIENTE] initialUserDesigns:', initialUserDesigns);
   console.log('[CLIENTE] initialOrderedDesignIds:', initialOrderedDesignIds);
   console.log('[CLIENTE] initialUserPayments:', initialUserPayments); // Log de los pagos
+  console.log('[CLIENTE] typeof initialUserPayments:', typeof initialUserPayments);
+  console.log('[CLIENTE] Array.isArray(initialUserPayments):', Array.isArray(initialUserPayments));
   
   const { openModal } = useModal();
   const { data: session, status } = useSession();
@@ -44,6 +46,9 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
   // Log para verificar el estado inicializado
   console.log('[CLIENTE] Estado "orderedDesignIds" inicializado como Set:', orderedDesignIds);
   console.log('--- [CLIENTE] FIN DEBUGGING INICIAL ---');
+
+  // Ensure initialUserPayments is always an array for PaymentHistory
+  const paymentsForHistory = Array.isArray(initialUserPayments) ? initialUserPayments : (initialUserPayments ? [initialUserPayments] : []);
 
   const fetchUserData = async () => {
     if (status === 'authenticated' && userId) {
@@ -212,7 +217,7 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
         )}
         {activeTab === 'orders' && (<PedidosComponent userId={user?.id} onPaymentSuccess={fetchCartData} />)} {/* Pass fetchCartData as onPaymentSuccess */}
         {activeTab === 'cart' && (<CartComponent />)}
-        {activeTab === 'payments' && (<PaymentHistory payments={initialUserPayments} />)} {/* Usar PaymentHistory y pasar los pagos */}
+        {activeTab === 'payments' && (<PaymentHistory payments={paymentsForHistory} />)} {/* Usar PaymentHistory y pasar los pagos */}
       </div>
     </div>
   );
