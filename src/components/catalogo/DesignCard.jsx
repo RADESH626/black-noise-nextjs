@@ -19,7 +19,7 @@ function DesignCard({ diseño, likesState, likedDesigns, handleLike, addItem }) 
 
       <div className="w-full h-64 flex items-center justify-center bg-black overflow-hidden">
         <img
-          src={diseño.imageData?.data && diseño.imageMimeType ? `data:${diseño.imageMimeType};base64,${btoa(String.fromCharCode(...new Uint8Array(diseño.imageData.data)))}` : diseño.imagen}
+          src={diseño.imagen || '/next.svg'}
           alt={`Imagen de ${diseño.prenda}`}
           className="h-full object-contain transition-transform duration-500 ease-in-out hover:scale-110"
         />

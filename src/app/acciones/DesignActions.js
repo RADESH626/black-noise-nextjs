@@ -80,9 +80,45 @@ export async function obtenerDesigns() {
     await connectDB();
     logger.debug('Entering obtenerDesigns.');
     try {
-        const designs = await Design.find({}).lean();
-        logger.debug('Designs obtained successfully:', designs);
-        return { data: JSON.parse(JSON.stringify(designs)) };
+        const designs = await Design.find({})
+            .populate({
+                path: 'usuarioId',
+                select: 'nombreUsuario imageData imageMimeType' // Select only necessary fields
+            })
+            .lean();
+
+        const formattedDesigns = designs.map(design => {
+            const userAvatar = design.usuarioId && design.usuarioId.imageData && design.usuarioId.imageMimeType
+                ? `data:${design.usuarioId.imageMimeType};base64,${Buffer.from(design.usuarioId.imageData).toString('base64')}`
+                : '/img/perfil/FotoPerfil.webp'; // Default avatar if no image data
+
+            logger.debug(`Processing design ID: ${design._id}`);
+            logger.debug(`Design imageData (exists): ${!!design.imageData}`);
+            logger.debug(`Design imageMimeType: ${design.imageMimeType}`);
+            logger.debug(`Design imageData length: ${design.imageData ? design.imageData.length : 'N/A'}`);
+
+            const designImageSrc = design.imageData && design.imageMimeType
+                ? `data:${design.imageMimeType};base64,${Buffer.from(design.imageData).toString('base64')}`
+                : null; // Or a default image path if no image data
+
+            logger.debug(`Constructed designImageSrc (first 50 chars): ${designImageSrc ? designImageSrc.substring(0, 50) : 'null'}`);
+
+            return {
+                ...design,
+                id: design._id.toString(), // Ensure a string ID for frontend key
+                prenda: design.nombreDesing, // Map nombreDesing to prenda
+                price: design.valorDesing,   // Map valorDesing to price
+                usuario: design.usuarioId ? design.usuarioId.nombreUsuario : 'Usuario Desconocido', // Map user name
+                userAvatar: userAvatar, // Add user avatar
+                imagen: designImageSrc, // Provide the pre-encoded base64 image string
+                // Remove original imageData and imageMimeType as they are now processed into 'imagen'
+                imageData: undefined,
+                imageMimeType: undefined,
+            };
+        });
+
+        logger.debug('Designs obtained and formatted successfully:', formattedDesigns);
+        return { data: JSON.parse(JSON.stringify(formattedDesigns)) };
     } catch (error) {
         logger.error('ERROR in obtenerDesigns:', error);
         return { error: 'Error al obtener los diseños: ' + error.message };
