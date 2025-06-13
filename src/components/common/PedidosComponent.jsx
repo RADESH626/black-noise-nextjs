@@ -13,7 +13,7 @@ const PedidosContent = ({ onPaymentSuccess }) => { // Accept onPaymentSuccess pr
 
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError, ] = useState(null);
 
   useEffect(() => {
     const fetchPedidos = async () => {

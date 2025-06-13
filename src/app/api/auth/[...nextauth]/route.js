@@ -53,7 +53,6 @@ export const authOptions = {
           if (proveedor) {
             logger.info('Supplier found. Comparing accessKey for supplier:', proveedor.emailContacto);
             const isValidAccessKey = await bcrypt.compare(credentials.password, proveedor.accessKey);
-            logger.info('AccessKey comparison result for supplier:', isValidAccessKey);
             if (isValidAccessKey) {
               logger.info('Supplier authenticated successfully:', proveedor.emailContacto);
               return {

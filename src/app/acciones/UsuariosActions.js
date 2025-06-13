@@ -671,22 +671,3 @@ export async function bulkUploadUsersAction(prevState, formData) {
         return handleError(error, 'Error durante la carga masiva.');
     }
 }
-<environment_details>
-# VSCode Visible Files
-src/app/acciones/DesignActions.js
-
-# VSCode Open Tabs
-memory-bank/activeContext.md
-memory-bank/progress.md
-src/app/api/images/[modelName]/[id]/route.js
-src/app/acciones/DesignActions.js
-
-# Current Time
-12/6/2025, 10:40:54 p. m. (America/Bogota, UTC-5:00)
-
-# Context Window Usage
-191.259 / 1048,576K tokens used (18%)
-
-# Current Mode
-ACT MODE
-</environment_details>

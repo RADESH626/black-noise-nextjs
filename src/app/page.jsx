@@ -38,8 +38,6 @@ function indexPage() {
 
         <GarmentTypesSection />
 
-        <SupplierRegistrationSection />
-
         {/* Footer */}
         <Footer />
       </main>

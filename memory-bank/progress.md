@@ -3,7 +3,17 @@
 ## Resumen General
 El proyecto "Black Noise Next.js Visual Tests" se enfoca en la implementación y verificación de funcionalidades clave de una aplicación Next.js, con énfasis en la gestión visual de diseños y perfiles de usuario.
 
-## Funcionalidades Implementadas y Verificadas
+## Completed Tasks:
+- Implemented a notification mechanism for new orders being added to the database.
+- Added `console.log` in `src/app/acciones/PedidoActions.js` to show when a new order is saved.
+- Updated `memory-bank/systemPatterns.md` with Cline's new operational directives.
+- Updated `memory-bank/project_overview.md` to reference the new operational directives.
+- Updated `memory-bank/techContext.md` to reference the new operational directives.
+- Updated `memory-bank/manifest.md` to reflect the changes in `systemPatterns.md`.
+- Fixed designs not displaying correctly in the user profile by ensuring consistent image data handling between backend and frontend.
+- Implemented search functionality by name and date, and updated the payment status column header in the Pedidos Dashboard.
+- Fixed a runtime error in the Pedidos Dashboard filtering logic.
+- Added user names and order dates to the Pedidos Dashboard table.
 
 *   **Gestión de Diseños:**
     *   Subida de diseños con imágenes (almacenamiento binario en MongoDB).

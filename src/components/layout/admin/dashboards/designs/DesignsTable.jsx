@@ -47,7 +47,7 @@ function DesignsTable({ designs }) {
                 {design.categoria}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                ${design.precio.toFixed(2)}
+                ${typeof design.precio === 'number' ? design.precio.toFixed(2) : '0.00'}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <Link href={`/admin/designs/editar/${design._id}`} className="text-blue-600 hover:text-blue-900 mr-4">

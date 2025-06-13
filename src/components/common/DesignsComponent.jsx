@@ -1,8 +1,8 @@
-'use client'; // Move to the top
+'use client';
 
-import React from 'react'; // Keep one import
+import React from 'react';
 
-function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartItems, addItem, orderedDesignIds }) { // Keep orderedDesignIds prop for now, though not used for button logic
+function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartItems, addItem, orderedDesignIds }) {
 
   return (
     <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -39,7 +39,6 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartI
                 <p className="font-semibold">categoría: {design.categoria}</p>
                 <p className="font-semibold text-purple-400">likes: {design.likes}</p>
               </div>
-              {/* Removed the check for orderedDesignIds.has(design._id) */}
               {(cartItems || []).some(item => item.id === design._id) ? (
                 <button
                   disabled
@@ -53,7 +52,7 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartI
                     id: design._id,
                     nombre: design.nombreDesing,
                     price: design.valorDesing,
-                    imagen: design.imagen, // Use the new image URL
+                    imagen: design.imagen,
                   })}
                   className="bg-purple-700 text-white font-semibold py-2 px-4 rounded-md text-sm hover:bg-purple-800 transition duration-150"
                 >
