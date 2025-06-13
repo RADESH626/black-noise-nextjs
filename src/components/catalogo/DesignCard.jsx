@@ -19,7 +19,7 @@ function DesignCard({ diseño, likesState, likedDesigns, handleLike, addItem }) 
 
       <div className="w-full h-64 flex items-center justify-center bg-black overflow-hidden">
         <img
-          src={diseño.imageData && diseño.imageMimeType ? `data:${diseño.imageMimeType};base64,${Buffer.from(diseño.imageData.data).toString('base64')}` : diseño.imagen}
+          src={diseño.imageData?.data && diseño.imageMimeType ? `data:${diseño.imageMimeType};base64,${btoa(String.fromCharCode(...new Uint8Array(diseño.imageData.data)))}` : diseño.imagen}
           alt={`Imagen de ${diseño.prenda}`}
           className="h-full object-contain transition-transform duration-500 ease-in-out hover:scale-110"
         />
@@ -28,7 +28,7 @@ function DesignCard({ diseño, likesState, likedDesigns, handleLike, addItem }) 
       <div className="p-4 flex flex-col gap-2 text-white">
         <h2 className="font-semibold text-lg">{diseño.prenda}</h2>
         <p>Categoría: {diseño.categoria}</p>
-        <p>Precio: ${diseño.price.toFixed(2)}</p>
+        <p>Precio: ${diseño.price !== undefined && diseño.price !== null ? diseño.price.toFixed(2) : '0.00'}</p>
 
         {/* Social media interaction buttons */}
         <div className="flex items-center justify-between mt-2">
@@ -42,9 +42,9 @@ function DesignCard({ diseño, likesState, likedDesigns, handleLike, addItem }) 
             {likedDesigns[diseño.id] ? '❤️' : '♡'}{' '}
             {likesState[diseño.id] !== undefined ? likesState[diseño.id] : diseño.likes}
           </button>
-            <button className="flex items-center text-green-400 hover:text-green-600 transition">
+            {/* <button className="flex items-center text-green-400 hover:text-green-600 transition">
               ↗️ Compartir
-            </button>
+            </button> */}
           </div>
           <button
             className="bg-green-600 px-3 py-1 rounded hover:bg-green-700 transition"

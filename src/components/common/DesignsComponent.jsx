@@ -21,7 +21,7 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartI
           <div key={design._id} className="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
             <div className="w-full h-56 bg-gray-700 relative">
               <img
-                src={design.imageData && design.imageMimeType ? `data:${design.imageMimeType};base64,${Buffer.from(design.imageData.data).toString('base64')}` : design.imagenDesing}
+                src={design.imageData?.data && design.imageMimeType ? `data:${design.imageMimeType};base64,${Buffer.from(design.imageData.data).toString('base64')}` : design.imagenDesing}
                 alt={design.nombreDesing}
                 className="w-full h-full object-cover"
               />

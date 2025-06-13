@@ -16,15 +16,24 @@ export const authOptions = {
       },
       id: "credentials",
       async authorize(credentials, req) {
+        logger.info('Authorize callback initiated.');
+        logger.info('Credentials received:', credentials);
+
         await connectDB(); // Ensure DB connection for direct model access
+        logger.info('Database connection established in authorize callback.');
 
         try {
           // Attempt to authenticate as a regular user first
+          logger.info('Attempting to find user by email:', credentials.email);
           const user = await ObtenerUsuarioPorCorreo(credentials.email);
+          logger.info('Result of ObtenerUsuarioPorCorreo:', user);
           
           if (user) {
+            logger.info('User found. Comparing password for user:', user.email);
             const isValid = await bcrypt.compare(credentials.password, user.password);
+            logger.info('Password comparison result for user:', isValid);
             if (isValid) {
+              logger.info('User authenticated successfully:', user.email);
               return {
                 id: user._id.toString(),
                 name: user.primerNombre + ' ' + user.primerApellido,
@@ -36,12 +45,17 @@ export const authOptions = {
             }
           }
 
+          logger.info('User not found or password invalid. Attempting to authenticate as a supplier.');
           // If not a regular user or password invalid, attempt to authenticate as a supplier
           const proveedor = await Proveedor.findOne({ emailContacto: { $regex: new RegExp(`^${credentials.email.trim()}$`, 'i') } }).lean();
+          logger.info('Result of Proveedor.findOne:', proveedor);
 
           if (proveedor) {
+            logger.info('Supplier found. Comparing accessKey for supplier:', proveedor.emailContacto);
             const isValidAccessKey = await bcrypt.compare(credentials.password, proveedor.accessKey);
+            logger.info('AccessKey comparison result for supplier:', isValidAccessKey);
             if (isValidAccessKey) {
+              logger.info('Supplier authenticated successfully:', proveedor.emailContacto);
               return {
                 id: proveedor._id.toString(), // Use supplier's _id as the session ID
                 name: proveedor.nombreEmpresa, // Use company name as user name
@@ -54,11 +68,14 @@ export const authOptions = {
             }
           }
 
+          logger.info('Neither user nor supplier found/authenticated. Returning null.');
           // If neither user nor supplier found/authenticated
           return null;
 
         } catch (error) {
           logger.error("Auth error in authorize callback:", error);
+          // Log the full error object for more details
+          logger.error("Full error object:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
           return null;
         }
       },

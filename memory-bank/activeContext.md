@@ -31,3 +31,33 @@ Please verify the solution by opening the modal and checking if the form content
 
 **Next Steps for User:**
 The branch `re-imagine` has been created remotely. You can now switch to this branch and begin working on it.
+
+### Task: Login Credentials and Process
+
+**Credentials:**
+- **Email:** `vscodeCliente@gmail.com`
+- **Password:** `Contraseña123@`
+
+**Login Process:**
+1. Launch browser to `http://localhost:3001/login`.
+2. Click on the email input field (approx. 400, 300).
+3. Type the provided email: `vscodeCliente@gmail.com`.
+4. Click on the password input field (approx. 400, 380).
+5. Type the provided password: `Contraseña123@`.
+6. Click the "Iniciar Sesión" button (approx. 450, 460).
+
+### Task: Fix `Buffer.from` undefined data error in `DesignsComponent.jsx`
+
+**Problem:** An error occurred in `src/components/common/DesignsComponent.jsx` on line 24, where `Buffer.from(design.imageData.data)` was called with `design.imageData.data` being `undefined`. This resulted in the error: "The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type undefined".
+
+**Analysis:**
+The `img` `src` attribute was attempting to construct a base64 image string using `design.imageData.data` without a sufficient check for its existence. While `design.imageData` was checked, `design.imageData.data` was not, leading to the `undefined` value being passed to `Buffer.from()`.
+
+**Solution:**
+Modified line 24 in `src/components/common/DesignsComponent.jsx` to include optional chaining (`?.`) for `design.imageData.data`. This ensures that `design.imageData.data` is safely accessed and only passed to `Buffer.from()` if it is a defined value.
+
+**Files Modified:**
+- `src/components/common/DesignsComponent.jsx`
+
+**Next Steps for User:**
+The fix has been applied. The application should no longer encounter the `Buffer.from` error when rendering designs. You can verify this by navigating to the page where `DesignsComponent` is used (e.g., `/perfil` or `/catalogo`) and checking if the images load correctly.

@@ -14,7 +14,7 @@ This document serves as the master index for the entire Memory Bank, providing a
 - [techniques/](techniques/): A collection of reusable problem-solving techniques and best practices.
 
 ## Operational Logs:
-- [activeContext.md](activeContext.md): Session change log, updated after every task.
+- [activeContext.md](activeContext.md): Session change log, updated after every task. Includes login credentials and process.
 - [progress.md](progress.md): High-level project status and milestones.
 - [improvement_log.md](improvement_log.md): Lessons learned from past errors and areas for improvement.
 

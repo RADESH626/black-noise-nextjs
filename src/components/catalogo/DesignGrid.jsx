@@ -15,16 +15,19 @@ function DesignGrid({ tarjetas, activo, likesState, likedDesigns, handleLike, ad
             activo === 'diseños' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-4'
           }`}
         >
-          {tarjetas.map((diseño) => (
-            <DesignCard
-              key={diseño.id}
-              diseño={diseño}
-              likesState={likesState}
-              likedDesigns={likedDesigns}
-              handleLike={handleLike}
-              addItem={addItem}
-            />
-          ))}
+          {tarjetas.map((diseño) => {
+            console.log('Design ID:', diseño.id); // Added for debugging key prop warning
+            return (
+              <DesignCard
+                key={diseño._id}
+                diseño={diseño}
+                likesState={likesState}
+                likedDesigns={likedDesigns}
+                handleLike={handleLike}
+                addItem={addItem}
+              />
+            );
+          })}
         </div>
       )}
     </>
