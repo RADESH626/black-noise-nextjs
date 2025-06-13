@@ -6,7 +6,7 @@ Este documento describe la funcionalidad de gestión de pedidos y el flujo de pa
 
 ## Flujo de Usuario (Pago Primero)
 
-1.  **Inicio del Proceso de Pago:** Desde el carrito, el usuario inicia el proceso de pago (ej. haciendo clic en "Proceder al Pago").
+1.  **Inicio del Proceso de Pago:** Desde el carrito, el usuario inicia el proceso de pago (ej. haciendo clic en "Proceder al Pago" o "Realizar Pedido" en el `CartComponent`).
 2.  **Procesamiento de Pago:** El usuario es dirigido a una interfaz de pago donde ingresa sus datos. Se intenta procesar la transacción.
 3.  **Confirmación y Creación del Pedido:**
     *   **Pago Exitoso:** Si el pago es exitoso, se crea un nuevo documento `Pedido` en la base de datos con un estado de pago `PAGADO` (o `COMPLETADO`). El usuario es redirigido a una página de confirmación del pedido.
@@ -64,8 +64,8 @@ Para mejorar la experiencia del usuario en la pestaña "Diseños" del perfil, se
 
 ## Archivos Clave
 
+*   `src/components/common/CartComponent.jsx`: Componente del carrito que ahora inicia el flujo de "pago primero" redirigiendo al usuario a la página de pago.
 *   `src/components/common/PedidosComponent.jsx`: Componente principal del historial de pedidos.
-*   `src/components/pago/PaymentModal.jsx`: Componente del modal de pago.
 *   `src/app/acciones/PedidoActions.js`: Contiene `obtenerPedidosPorUsuarioId` y ahora utiliza `src/utils/modelLoader.js` para la instanciación de modelos.
 *   `src/app/acciones/PagoActions.js`: Contendrá `procesarPagoDePedido` y ahora utiliza `src/utils/modelLoader.js` para la instanciación de modelos.
 *   `src/models/Pedido.js`: Definición del modelo Pedido.

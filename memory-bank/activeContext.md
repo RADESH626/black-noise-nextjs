@@ -111,15 +111,16 @@ El usuario ha solicitado cambiar el flujo de pedidos para que el pago se realice
 
 ### Estado Actual:
 La documentación `memory-bank/functionalities/GestionDePedidosYPagos.md` ha sido actualizada para reflejar el flujo de "pago primero".
-Todas las modificaciones de código en el frontend (`src/app/carrito/page.jsx`, `src/app/pago/page.jsx`, `src/components/pago/PaymentForm.jsx`, `src/app/confirmacion/page.jsx`) y el backend (`src/app/acciones/PagoActions.js`, `src/app/acciones/CartActions.js`, `src/models/Pedido.js`, `src/models/Pago.js`) han sido completadas para implementar el flujo de "pago primero".
+Todas las modificaciones de código en el frontend (`src/app/carrito/page.jsx`, `src/app/pago/page.jsx`, `src/components/pago/PaymentForm.jsx`, `src/app/confirmacion/page.jsx`, y ahora `src/components/common/CartComponent.jsx`) y el backend (`src/app/acciones/PagoActions.js`, `src/app/acciones/CartActions.js`, `src/models/Pedido.js`, `src/models/Pago.js`) han sido completadas para implementar el flujo de "pago primero".
 
-### Resolución de `TypeError` en Modelos Mongoose:
-**Problema:** Se encontró un `TypeError: First argument to Model constructor must be an object, not a string.` al intentar instanciar modelos de Mongoose en Next.js Server Actions, específicamente con el modelo `Pedido`. Esto se debía a la forma en que Mongoose maneja el registro y la carga de modelos en un entorno serverless, donde las instancias de modelos pueden no estar disponibles globalmente o ser re-registradas incorrectamente.
+### Resolución de `TypeError` en Modelos Mongoose y Ajuste del Flujo de Pago:
+**Problema Original:** Se encontró un `TypeError: First argument to Model constructor must be an object, not a string.` al intentar instanciar modelos de Mongoose en Next.js Server Actions, específicamente con el modelo `Pedido`.
+
+**Diagnóstico Adicional:** A pesar de implementar `modelLoader.js` para asegurar la correcta obtención de modelos, el error persistía. La depuración reveló que la función `guardarPedido` en `src/app/acciones/PedidoActions.js` estaba recibiendo una cadena (el `userId`) en lugar del objeto `pedidoData` esperado. Esto se debía a que el botón "Realizar Pedido" en `src/components/common/CartComponent.jsx` estaba llamando directamente a `guardarPedido` con argumentos incorrectos, en lugar de iniciar el flujo de "pago primero" que utiliza `procesarPagoYCrearPedido`.
 
 **Solución Implementada:**
 1.  **Creación de `src/utils/modelLoader.js`:** Se implementó una utilidad centralizada para la carga de modelos. Esta utilidad asegura que la conexión a la base de datos esté establecida y que se obtenga la instancia correcta del modelo de Mongoose, ya sea que ya esté registrada o necesite ser obtenida por primera vez.
-2.  **Modificación de Server Actions:**
-    *   `src/app/acciones/PedidoActions.js`: Se eliminaron las importaciones directas del modelo `Pedido` y se reemplazó la instanciación del modelo por `const Pedido = await getModel('Pedido');` dentro de cada función relevante.
-    *   `src/app/acciones/PagoActions.js`: Se eliminaron las importaciones directas de los modelos `Pedido` y `Pago` y se reemplazó su instanciación por `const Pedido = await getModel('Pedido');` y `const Pago = await getModel('Pago');` respectivamente, dentro de la función `procesarPagoYCrearPedido`.
+2.  **Modificación de Server Actions (`src/app/acciones/PedidoActions.js` y `src/app/acciones/PagoActions.js`):** Se adaptaron para utilizar `modelLoader.js` para la instanciación de modelos. Se eliminaron los logs de depuración temporales y las verificaciones de tipo una vez que la causa raíz fue identificada.
+3.  **Ajuste del Flujo en `src/components/common/CartComponent.jsx`:** El botón "Realizar Pedido" fue renombrado a "Proceder al Pago" y su lógica fue modificada para redirigir al usuario a la página `/pago`, pasando los datos del carrito a través de `localStorage`. Esto asegura que el flujo de "pago primero" se inicie correctamente, donde la página `/pago` se encargará de recolectar los detalles de pago y llamar a `procesarPagoYCrearPedido`.
 
-**Estado de la Resolución:** El `TypeError` relacionado con la instanciación de modelos de Mongoose ha sido abordado y resuelto mediante la implementación de `modelLoader.js` y la adaptación de las Server Actions para utilizar esta utilidad.
+**Estado de la Resolución:** El `TypeError` ha sido completamente resuelto al corregir la llamada a la función `guardarPedido` y al alinear el flujo del carrito con el sistema de "pago primero". La aplicación ahora debería seguir el flujo de pago deseado.

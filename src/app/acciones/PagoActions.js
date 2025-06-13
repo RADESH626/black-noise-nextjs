@@ -165,6 +165,8 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
             // Otros campos del pedido como información del cliente
             cliente: { nombre, correo, direccion },
         };
+        logger.debug('Value of nuevoPedidoData:', nuevoPedidoData);
+        logger.debug('Type of nuevoPedidoData:', typeof nuevoPedidoData);
 
         const { success: pedidoCreationSuccess, data: nuevoPedido, error: pedidoCreationError } = await guardarPedido(nuevoPedidoData);
 

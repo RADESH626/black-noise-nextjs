@@ -6,8 +6,8 @@ import CartItem from './CartItem';
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation"; // Import useRouter
 import { getCartByUserId, addDesignToCart, removeDesignFromCart, updateCartItemQuantity, clearUserCart } from "@/app/acciones/CartActions";
-import { guardarPedido } from "@/app/acciones/PedidoActions"; // Import guardarPedido
 import { useModal } from '@/context/ModalContext'; // Import useModal
+import { procesarPagoYCrearPedido } from "@/app/acciones/PagoActions"; // Import the payment action
 
 function CartComponent() {
   const router = useRouter();
@@ -107,35 +107,28 @@ function CartComponent() {
     setLoading(false);
   };
 
-  const handleCreateOrder = async () => {
+  const handleProceedToPayment = async () => {
     if (!userId) {
-      alert("Debes iniciar sesión para crear un pedido.");
+      alert("Debes iniciar sesión para proceder al pago.");
       return;
     }
     if (cartItems.length === 0) {
-      alert("Tu carrito está vacío. Agrega diseños antes de crear un pedido.");
+      alert("Tu carrito está vacío. Agrega diseños antes de proceder al pago.");
       return;
     }
 
-    setLoading(true);
-    setError(null);
+    // Redirigir a la página de pago, pasando los ítems del carrito y el total
+    // Se recomienda usar localStorage o un contexto para pasar datos complejos
+    // o una ruta dinámica si los datos son pequeños y seguros para la URL.
+    // Para este caso, simularemos una redirección simple a la página de pago.
+    // La página de pago (`src/app/pago/page.jsx`) se encargará de recolectar
+    // los detalles de pago y llamar a `procesarPagoYCrearPedido`.
 
-    const orderItems = cartItems.map(item => ({
-      designId: item.id, // Use item.id which contains the designId
-      quantity: item.quantity
-    }));
-    const totalOrderValue = getTotal();
+    // Guardar los datos del carrito en localStorage para que la página de pago los recupere
+    localStorage.setItem('currentCartItems', JSON.stringify(cartItems));
+    localStorage.setItem('currentCartTotal', JSON.stringify(totalConEnvio));
 
-    const { success, error: orderError } = await guardarPedido(userId, orderItems, totalOrderValue);
-
-    if (success) {
-      await handleClearCart(); // Clear cart after successful order creation
-      alert("Pedido creado exitosamente. Puedes pagarlo desde tu historial de pedidos.");
-      router.push("/perfil"); // Redirect to profile/orders page
-    } else {
-      setError({ message: orderError || "Error al crear el pedido." });
-    }
-    setLoading(false);
+    router.push("/pago"); // Redirigir a la página de pago
   };
 
   const totalConEnvio = getTotal() + 50;
@@ -196,8 +189,8 @@ function CartComponent() {
             <BotonGeneral onClick={handleClearCart} disabled={loading}>
               Vaciar Carrito
             </BotonGeneral>
-            <BotonGeneral onClick={handleCreateOrder} disabled={loading}>
-              Realizar Pedido
+            <BotonGeneral onClick={handleProceedToPayment} disabled={loading}>
+              Proceder al Pago
             </BotonGeneral>
           </div>
         </div>

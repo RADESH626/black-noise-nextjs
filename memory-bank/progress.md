@@ -53,7 +53,9 @@ El proyecto "Black Noise Next.js Visual Tests" se enfoca en la implementación y
     *   Integración real con pasarelas de pago.
 *   **Implementación de Sistema de Pago Primero:**
     *   Modificación del flujo de usuario para que el pago preceda a la creación del pedido. (Completado: Documentación y código actualizados en frontend y backend).
-    *   **Resolución de `TypeError` en Modelos Mongoose:** Se implementó `src/utils/modelLoader.js` y se adaptaron las Server Actions (`src/app/acciones/PedidoActions.js` y `src/app/acciones/PagoActions.js`) para asegurar la correcta instanciación de los modelos de Mongoose, resolviendo el `TypeError` persistente. (Completado)
+    *   **Resolución de `TypeError` en Modelos Mongoose y Ajuste del Flujo:** El `TypeError` persistente (`First argument to Model constructor must be an object, not a string.`) fue finalmente resuelto al identificar que la función `guardarPedido` en `src/app/acciones/PedidoActions.js` estaba siendo llamada con un argumento incorrecto (una cadena `userId` en lugar del objeto `pedidoData` completo) desde `src/components/common/CartComponent.jsx`. La solución implicó:
+        *   Implementar `src/utils/modelLoader.js` y adaptar las Server Actions para una correcta instanciación de modelos.
+        *   Modificar `src/components/common/CartComponent.jsx` para que el botón "Realizar Pedido" (ahora "Proceder al Pago") redirija al usuario a la página `/pago`, alineando el flujo del carrito con el sistema de "pago primero" y asegurando que `procesarPagoYCrearPedido` sea el punto de entrada para la creación del pedido post-pago. (Completado)
 *   **Dashboard de Administración:**
     *   Funcionalidades completas para la gestión de usuarios, diseños, pedidos, etc.
 *   **Mejoras de UI/UX:**
