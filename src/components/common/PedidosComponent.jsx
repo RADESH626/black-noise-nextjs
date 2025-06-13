@@ -13,7 +13,7 @@ const PedidosContent = ({ onPaymentSuccess }) => { // Accept onPaymentSuccess pr
 
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError, ] = useState(null);
 
   useEffect(() => {
     const fetchPedidos = async () => {
@@ -89,7 +89,7 @@ const PedidosContent = ({ onPaymentSuccess }) => { // Accept onPaymentSuccess pr
             <div className="w-full h-56 bg-gray-700 relative">
               {pedido.items && pedido.items.length > 0 ? (
                 <img
-                  src={pedido.items[0]?.designId?.imagenDesing || "/public/img/Fondos/Fondo 1.jpg"} // Assuming first product image
+                  src={pedido.items[0]?.designId?.imagen || "/public/img/Fondos/Fondo 1.jpg"} // Assuming first product image
                   alt={pedido.items[0]?.designId?.nombreDesing || "Producto"}
                   className="w-full h-full object-cover"
                 />

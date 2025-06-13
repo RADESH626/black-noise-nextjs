@@ -16,10 +16,10 @@ const PagosComponent = ({ userId }) => {
       }
       try {
         setLoading(true);
-        // Call the function to get payments
-        const response = await obtenerPagosPorUsuarioId(userId);
-        if (response.pagos) { // Check for 'pagos' array in response
-          setPagos(response.pagos);
+        // Call the new function to get paid orders
+        const response = await obtenerPedidosPagadosPorUsuarioId(userId);
+        if (response.pedidos) { // Check for 'pedidos' array in response
+          setPaidOrders(response.pedidos);
         } else {
           // Handle case where response might have an error property
           setError(response.message || response.error || 'Error al cargar el historial de compras.');
@@ -43,7 +43,7 @@ const PagosComponent = ({ userId }) => {
     return <div className="text-center py-4 text-red-500">Error: {error}</div>;
   }
 
-  if (pagos.length === 0) {
+  if (paidOrders.length === 0) {
     return <div className="text-center py-4 text-gray-500">No hay historial de compras registrado.</div>;
   }
 

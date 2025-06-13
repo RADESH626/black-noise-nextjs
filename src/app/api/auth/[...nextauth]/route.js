@@ -38,7 +38,7 @@ export const authOptions = {
                 id: user._id.toString(),
                 name: user.primerNombre + ' ' + user.primerApellido,
                 email: user.correo,
-                image: user.fotoPerfil || "/img/perfil/FotoPerfil.webp",
+                image: user.profileImageUrl, // Use the new profileImageUrl
                 rol: user.rol || "CLIENTE",
                 isSupplier: false // Explicitly mark as not a supplier
               };
@@ -53,7 +53,6 @@ export const authOptions = {
           if (proveedor) {
             logger.info('Supplier found. Comparing accessKey for supplier:', proveedor.emailContacto);
             const isValidAccessKey = await bcrypt.compare(credentials.password, proveedor.accessKey);
-            logger.info('AccessKey comparison result for supplier:', isValidAccessKey);
             if (isValidAccessKey) {
               logger.info('Supplier authenticated successfully:', proveedor.emailContacto);
               return {
@@ -91,6 +90,7 @@ export const authOptions = {
         token.rol = user.rol;
         token.isSupplier = user.isSupplier;
         token.proveedorId = user.proveedorId;
+        token.image = user.profileImageUrl; // Add image to token
       }
       return token;
     },
@@ -99,6 +99,7 @@ export const authOptions = {
       session.user.rol = token.rol;
       session.user.isSupplier = token.isSupplier;
       session.user.proveedorId = token.proveedorId;
+      session.user.image = token.image; // Add image to session
       return session;
     },
   },
