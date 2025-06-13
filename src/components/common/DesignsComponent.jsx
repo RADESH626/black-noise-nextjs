@@ -20,11 +20,17 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartI
         userDesigns.map((design) => (
           <div key={design._id} className="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
             <div className="w-full h-56 bg-gray-700 relative">
-              <img
-                src={design.imagen || '/placeholder.png'}
-                alt={design.nombreDesing}
-                className="w-full h-full object-cover"
-              />
+              {design.imagen && design.imagen !== '' ? (
+                <img
+                  src={design.imagen}
+                  alt={design.nombreDesing} 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gray-700 text-gray-400 text-center p-4">
+                  Imagen no disponible
+                </div>
+              )}
             </div>
             <div className="p-4 gradient-text-bg flex justify-between items-center">
               <div>
