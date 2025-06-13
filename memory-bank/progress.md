@@ -15,6 +15,7 @@ El proyecto "Black Noise Next.js Visual Tests" se enfoca en la implementación y
 - Fixed a runtime error in the Pedidos Dashboard filtering logic.
 - Added user names and order dates to the Pedidos Dashboard table.
 - **Retirada temporal de la funcionalidad de likes de los diseños:** Se eliminó la visualización de likes en el frontend (`src/components/common/DesignsComponent.jsx`, `src/app/catalogo/page.jsx`, `src/components/catalogo/DesignGrid.jsx`, `src/components/catalogo/DesignCard.jsx`) y se comentó el campo `likes` en el modelo `Design` (`src/models/Design.js`).
+- **Mostrar Historial de Pagos en el Perfil del Usuario:** Se implementó la visualización del historial de pagos en la sección de pagos del perfil del usuario, utilizando la función `obtenerPagosPorUsuarioId` y un nuevo componente `PaymentHistory.jsx`.
 
 *   **Gestión de Diseños:**
     *   Subida de diseños con imágenes (almacenamiento binario en MongoDB).
@@ -55,7 +56,8 @@ El proyecto "Black Noise Next.js Visual Tests" se enfoca en la implementación y
     *   Modificación del flujo de usuario para que el pago preceda a la creación del pedido. (Completado: Documentación y código actualizados en frontend y backend).
     *   **Resolución de `TypeError` en Modelos Mongoose y Ajuste del Flujo:** El `TypeError` persistente (`First argument to Model constructor must be an object, not a string.`) fue finalmente resuelto al identificar que la función `guardarPedido` en `src/app/acciones/PedidoActions.js` estaba siendo llamada con un argumento incorrecto (una cadena `userId` en lugar del objeto `pedidoData` completo) desde `src/components/common/CartComponent.jsx`. La solución implicó:
         *   Implementar `src/utils/modelLoader.js` y adaptar las Server Actions para una correcta instanciación de modelos.
-        *   Modificar `src/components/common/CartComponent.jsx` para que el botón "Realizar Pedido" (ahora "Proceder al Pago") redirija al usuario a la página `/pago`, alineando el flujo del carrito con el sistema de "pago primero" y asegurando que `procesarPagoYCrearPedido` sea el punto de entrada para la creación del pedido post-pago. (Completado)
+        *   Modificar `src/components/common/CartComponent.jsx` para que el botón "Realizar Pedido" (ahora "Proceder al Pago") redirija al usuario a la página `/pago`, alineando el flujo del carrito con el sistema de "pago primero" y asegurando que `procesarPagoYCrearPedido` sea el punto de entrada para la creación del pedido post-pago.
+        *   **Corrección de `userId` requerido en Pedido:** Se corrigió el error "userId: Path `userId` is required" en la creación de pedidos, asegurando que el campo `userId` se pase correctamente en el objeto `nuevoPedidoData` dentro de `procesarPagoYCrearPedido` en `src/app/acciones/PagoActions.js`. (Completado)
 *   **Dashboard de Administración:**
     *   Funcionalidades completas para la gestión de usuarios, diseños, pedidos, etc.
 *   **Mejoras de UI/UX:**

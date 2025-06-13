@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { obtenerPedidosPorUsuarioId } from "@/app/acciones/PedidoActions";
 import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions";
+import { obtenerPagosPorUsuarioId } from "@/app/acciones/PagoActions"; // Importar la nueva acción
 
 async function ProfilePage() {
   // 1. Obtenemos la sesión primero
@@ -20,6 +21,7 @@ async function ProfilePage() {
 
   let initialOrderedDesignIds = [];
   let initialUserDesigns = [];
+  let initialUserPayments = []; // Nueva variable para los pagos
 
   if (userId) {
     // Corregido de "orders" a "pedidos" para que coincida con lo que devuelve la función
@@ -51,6 +53,12 @@ async function ProfilePage() {
     if (designs) {
       initialUserDesigns = designs;
     }
+
+    // Obtener el historial de pagos
+    const { pagos } = await obtenerPagosPorUsuarioId(userId);
+    if (pagos) {
+      initialUserPayments = pagos;
+    }
   }
   
   console.log('--- [SERVIDOR] FIN DE DEBUGGING ---');
@@ -59,6 +67,7 @@ async function ProfilePage() {
     <ProfileContent
       initialOrderedDesignIds={initialOrderedDesignIds}
       initialUserDesigns={initialUserDesigns}
+      initialUserPayments={initialUserPayments} // Pasar los pagos como prop
     />
   );
 }

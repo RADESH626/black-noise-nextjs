@@ -11,16 +11,17 @@ import { obtenerPedidosPorUsuarioId } from "@/app/acciones/PedidoActions";
 import DesignsComponent from "../common/DesignsComponent";
 import PedidosComponent from "../common/PedidosComponent";
 import CartComponent from "../common/CartComponent";
-import PagosComponent from "../common/PagosComponent";
 import { ObtenerUsuarioPorId } from "@/app/acciones/UsuariosActions";
 import FormEditarUsuario from "@/components/perfil/FormEditarUsuario";
 import DesignUploadModal from "@/components/perfil/DesignUploadModal";
+import PaymentHistory from "@/components/perfil/PaymentHistory"; // Importar el nuevo componente
 
-function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [] }) {
+function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [], initialUserPayments = [] }) {
   // --- INICIO DE DEBUGGING EN CLIENTE ---
   console.log('--- [CLIENTE] Props iniciales recibidas del servidor ---');
   console.log('[CLIENTE] initialUserDesigns:', initialUserDesigns);
   console.log('[CLIENTE] initialOrderedDesignIds:', initialOrderedDesignIds);
+  console.log('[CLIENTE] initialUserPayments:', initialUserPayments); // Log de los pagos
   
   const { openModal } = useModal();
   const { data: session, status } = useSession();
@@ -211,7 +212,7 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [] 
         )}
         {activeTab === 'orders' && (<PedidosComponent userId={user?.id} onPaymentSuccess={fetchCartData} />)} {/* Pass fetchCartData as onPaymentSuccess */}
         {activeTab === 'cart' && (<CartComponent />)}
-        {activeTab === 'payments' && (<PagosComponent userId={user?.id} />)} {/* PagosComponent doesn't need cart refresh */}
+        {activeTab === 'payments' && (<PaymentHistory payments={initialUserPayments} />)} {/* Usar PaymentHistory y pasar los pagos */}
       </div>
     </div>
   );

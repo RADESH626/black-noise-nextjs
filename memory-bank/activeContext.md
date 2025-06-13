@@ -53,9 +53,6 @@ El problema de visualización de imágenes en la sección de pedidos ha sido res
 ### Próximos Pasos Sugeridos (a Largo Plazo):
 *   La recomendación de revertir la solución temporal de Base64 en `DesignActions.js` y resolver el problema de servicio de `Buffer`s a través de la ruta API sigue siendo válida para optimizar el rendimiento y la gestión de imágenes a largo plazo.
 
-### Logs de Depuración:
-Se añadieron y luego se eliminaron logs temporales (`console.log`) en `PedidoActions.js` y `PedidosComponent.jsx` para diagnosticar el formato de los datos de imagen en el servidor y el cliente.
-
 ---
 
 ## Tarea Actual: Retirar temporalmente la funcionalidad de likes de los diseños
@@ -109,10 +106,6 @@ El usuario ha solicitado cambiar el flujo de pedidos para que el pago se realice
     *   Realizar pruebas de extremo a extremo del nuevo flujo.
     *   Verificar creación de pedidos con pagos exitosos y ausencia de pedidos con pagos fallidos.
 
-### Estado Actual:
-La documentación `memory-bank/functionalities/GestionDePedidosYPagos.md` ha sido actualizada para reflejar el flujo de "pago primero".
-Todas las modificaciones de código en el frontend (`src/app/carrito/page.jsx`, `src/app/pago/page.jsx`, `src/components/pago/PaymentForm.jsx`, `src/app/confirmacion/page.jsx`, y ahora `src/components/common/CartComponent.jsx`) y el backend (`src/app/acciones/PagoActions.js`, `src/app/acciones/CartActions.js`, `src/models/Pedido.js`, `src/models/Pago.js`) han sido completadas para implementar el flujo de "pago primero".
-
 ### Resolución de `TypeError` en Modelos Mongoose y Ajuste del Flujo de Pago:
 **Problema Original:** Se encontró un `TypeError: First argument to Model constructor must be an object, not a string.` al intentar instanciar modelos de Mongoose en Next.js Server Actions, específicamente con el modelo `Pedido`.
 
@@ -121,6 +114,49 @@ Todas las modificaciones de código en el frontend (`src/app/carrito/page.jsx`, 
 **Solución Implementada:**
 1.  **Creación de `src/utils/modelLoader.js`:** Se implementó una utilidad centralizada para la carga de modelos. Esta utilidad asegura que la conexión a la base de datos esté establecida y que se obtenga la instancia correcta del modelo de Mongoose, ya sea que ya esté registrada o necesite ser obtenida por primera vez.
 2.  **Modificación de Server Actions (`src/app/acciones/PedidoActions.js` y `src/app/acciones/PagoActions.js`):** Se adaptaron para utilizar `modelLoader.js` para la instanciación de modelos. Se eliminaron los logs de depuración temporales y las verificaciones de tipo una vez que la causa raíz fue identificada.
-3.  **Ajuste del Flujo en `src/components/common/CartComponent.jsx`:** El botón "Realizar Pedido" fue renombrado a "Proceder al Pago" y su lógica fue modificada para redirigir al usuario a la página `/pago`, pasando los datos del carrito a través de `localStorage`. Esto asegura que el flujo de "pago primero" se inicie correctamente, donde la página `/pago` se encargará de recolectar los detalles de pago y llamar a `procesarPagoYCrearPedido`.
+3.  **Corrección de `userId` en `procesarPagoYCrearPedido`:** Se ajustó la función `procesarPagoYCrearPedido` en `src/app/acciones/PagoActions.js` para asegurar que el campo `userId` se pase correctamente al objeto `nuevoPedidoData` al crear un pedido, resolviendo el error "userId: Path `userId` is required".
+4.  **Ajuste del Flujo en `src/components/common/CartComponent.jsx`:** El botón "Realizar Pedido" fue renombrado a "Proceder al Pago" y su lógica fue modificada para redirigir al usuario a la página `/pago`, pasando los datos del carrito a través de `localStorage`. Esto asegura que el flujo de "pago primero" se inicie correctamente, donde la página `/pago` se encargará de recolectar los detalles de pago y llamar a `procesarPagoYCrearPedido`.
 
-**Estado de la Resolución:** El `TypeError` ha sido completamente resuelto al corregir la llamada a la función `guardarPedido` y al alinear el flujo del carrito con el sistema de "pago primero". La aplicación ahora debería seguir el flujo de pago deseado.
+**Estado de la Resolución:** El `TypeError` y el problema de `userId` han sido completamente resueltos al corregir la llamada a la función `guardarPedido` y al alinear el flujo del carrito con el sistema de "pago primero". La aplicación ahora debería seguir el flujo de pago deseado.
+
+---
+
+## Tarea Actual: Mostrar Historial de Pagos en el Perfil del Usuario
+
+### Resumen del Problema:
+El usuario ha solicitado que se muestre el historial de pagos realizados por el usuario en la sección de pagos de su perfil.
+
+### Plan de Implementación:
+1.  **Actualización de `src/app/perfil/page.jsx`**:
+    *   Importar la función `obtenerPagosPorUsuarioId` desde `src/app/acciones/PagoActions.js`.
+    *   Dentro de la función `ProfilePage`, después de obtener el `userId`, llamar a `obtenerPagosPorUsuarioId(userId)` para obtener el historial de pagos del usuario.
+    *   Pasar el historial de pagos obtenido como una nueva prop (`initialUserPayments`) al componente `ProfileContent`.
+2.  **Creación de un nuevo componente `PaymentHistory.jsx` en `src/components/perfil/`**:
+    *   Este componente es responsable de renderizar la lista de pagos.
+    *   Recibe `initialUserPayments` como prop.
+    *   Muestra los detalles relevantes de cada pago (fecha, valor, método, estado, etc.) en un formato legible.
+3.  **Modificación de `src/components/layout/ProfileContent.jsx`**:
+    *   Importar el nuevo componente `PaymentHistory`.
+    *   Remover la importación de `PagosComponent` (ya que no se alinea con la estructura del modelo `Pago`).
+    *   Modificar la prop `initialUserPayments` para que sea recibida por `ProfileContent`.
+    *   Reemplazar `PagosComponent` con `PaymentHistory` en la pestaña 'payments', pasándole la prop `payments={initialUserPayments}`.
+
+### Cambios Realizados:
+1.  **`src/app/perfil/page.jsx`**:
+    *   Se importó `obtenerPagosPorUsuarioId`.
+    *   Se llamó a `obtenerPagosPorUsuarioId(userId)` y se pasó `initialUserPayments` como prop a `ProfileContent`.
+2.  **`src/components/perfil/PaymentHistory.jsx`**:
+    *   Se creó el nuevo componente para mostrar el historial de pagos en formato de tabla.
+3.  **`src/components/layout/ProfileContent.jsx`**:
+    *   Se importó `PaymentHistory`.
+    *   Se eliminó la importación de `PagosComponent`.
+    *   Se modificó la prop `initialUserPayments` para que sea recibida por `ProfileContent`.
+    *   Se reemplazó `PagosComponent` con `PaymentHistory` en la pestaña 'payments', pasándole la prop `payments={initialUserPayments}`.
+
+### Estado Actual:
+El historial de pagos ahora debería mostrarse en la sección de pagos del perfil del usuario.
+
+### Próximos Pasos:
+*   Actualizar `progress.md`.
+*   Preparar los comandos `git add` y `git commit`.
+*   Verificar visualmente la funcionalidad en el navegador.
