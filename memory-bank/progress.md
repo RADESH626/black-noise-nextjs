@@ -14,7 +14,7 @@ El proyecto "Black Noise Next.js Visual Tests" se enfoca en la implementación y
 - Implemented search functionality by name and date, and updated the payment status column header in the Pedidos Dashboard.
 - Fixed a runtime error in the Pedidos Dashboard filtering logic.
 - Added user names and order dates to the Pedidos Dashboard table.
-- **Retirada temporal de la funcionalidad de likes de los diseños:** Se eliminó la visualización de likes en el frontend (`src/components/common/DesignsComponent.jsx`) y se comentó el campo `likes` en el modelo `Design` (`src/models/Design.js`).
+- **Retirada temporal de la funcionalidad de likes de los diseños:** Se eliminó la visualización de likes en el frontend (`src/components/common/DesignsComponent.jsx`, `src/app/catalogo/page.jsx`, `src/components/catalogo/DesignGrid.jsx`, `src/components/catalogo/DesignCard.jsx`) y se comentó el campo `likes` en el modelo `Design` (`src/models/Design.js`).
 
 *   **Gestión de Diseños:**
     *   Subida de diseños con imágenes (almacenamiento binario en MongoDB).

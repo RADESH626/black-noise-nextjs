@@ -2,7 +2,7 @@
 import React from 'react';
 import DesignCard from './DesignCard';
 
-function DesignGrid({ tarjetas, activo, likesState, likedDesigns, handleLike, addItem, cartItems }) {
+function DesignGrid({ tarjetas, activo, addItem, cartItems }) {
   return (
     <>
       {tarjetas.length === 0 ? (
@@ -22,9 +22,6 @@ function DesignGrid({ tarjetas, activo, likesState, likedDesigns, handleLike, ad
               <DesignCard
                 key={diseño._id}
                 diseño={diseño}
-                likesState={likesState}
-                likedDesigns={likedDesigns}
-                handleLike={handleLike}
                 addItem={addItem}
                 isInCart={isInCart} // Pass isInCart prop
               />

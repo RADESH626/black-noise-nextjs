@@ -1,7 +1,7 @@
 'use client'
 import React from 'react';
 
-function DesignCard({ diseño, likesState, likedDesigns, handleLike, addItem, isInCart }) {
+function DesignCard({ diseño, addItem, isInCart }) {
   return (
     <div
       className="flex flex-col rounded-2xl overflow-hidden shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl bg-black/80"
@@ -29,22 +29,7 @@ function DesignCard({ diseño, likesState, likedDesigns, handleLike, addItem, is
         <p>Categoría: {diseño.categoria}</p>
         <p>Precio: ${diseño.price !== undefined && diseño.price !== null ? diseño.price.toFixed(2) : '0.00'}</p>
 
-        {/* Social media interaction buttons */}
-        <div className="flex items-center justify-between mt-2">
-          <div className="flex gap-3">
-          <button
-            className={`flex items-center transition ${
-              likedDesigns[diseño.id] ? 'text-red-600' : 'text-red-400 hover:text-red-600'
-            }`}
-            onClick={() => handleLike(diseño.id)}
-          >
-            {likedDesigns[diseño.id] ? '❤️' : '♡'}{' '}
-            {likesState[diseño.id] !== undefined ? likesState[diseño.id] : diseño.likes}
-          </button>
-            {/* <button className="flex items-center text-green-400 hover:text-green-600 transition">
-              ↗️ Compartir
-            </button> */}
-          </div>
+        <div className="flex items-center justify-end mt-2">
           <button
             className={`px-3 py-1 rounded transition ${
               isInCart ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'

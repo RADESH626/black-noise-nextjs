@@ -58,47 +58,6 @@ Se añadieron y luego se eliminaron logs temporales (`console.log`) en `PedidoAc
 
 ---
 
-## Tarea Actual: Problemas en `/catalogo` (Imágenes y Botón "Añadir al Carrito")
-
-### Resumen del Problema:
-El usuario reportó que las imágenes no se estaban renderizando correctamente en la página `/catalogo` y que el botón "Añadir al carrito" no se comportaba como se esperaba (similar a un problema previo en el perfil de usuario).
-
-### Diagnóstico y Hallazgos Clave:
-1.  **Problema de Renderizado de Imágenes:**
-    *   `src/app/catalogo/page.jsx` utiliza `obtenerDesigns` para obtener los diseños.
-    *   `obtenerDesigns` en `src/app/acciones/DesignActions.js` inicialmente construía la URL de la imagen como `/api/images/design/${design._id}`.
-    *   Se descubrió que la ruta API `src/app/api/images/design/[id]/route.js` **no existía**, lo que impedía que las imágenes fueran servidas correctamente.
-    *   El modelo `src/models/Design.js` confirma que `imageData` se almacena como `Buffer` y `imageMimeType` como `String`, lo cual es correcto para el almacenamiento binario.
-    *   A pesar de la creación de la ruta API, las imágenes aún no se renderizaban, lo que sugiere un problema subyacente con el servicio de `Buffer`s en este entorno Next.js, similar a lo documentado para la sección de perfil.
-
-2.  **Problema del Botón "Añadir al Carrito":**
-    *   El botón "Añadir al carrito" en `src/components/catalogo/DesignCard.jsx` no tenía lógica para deshabilitarse si el diseño ya estaba en el carrito del usuario.
-    *   Se identificó que `src/hooks/useCartStorage.js` gestiona el estado del carrito (`cartItems`).
-
-### Solución Implementada:
-
-1.  **Creación de la Ruta API para Imágenes (Intento Inicial):**
-    *   Se creó el archivo `src/app/api/images/design/[id]/route.js`.
-    *   Esta ruta se encarga de conectar a la base de datos, encontrar el diseño por ID, extraer `imageData` y `imageMimeType`, y servir el `Buffer` binario con el `Content-Type` correcto.
-
-2.  **Workaround de Base64 para Renderizado de Imágenes en Catálogo:**
-    *   Dado que la ruta API no resolvió el problema de renderizado, se modificó `src/app/acciones/DesignActions.js` para que la función `obtenerDesigns` devuelva la propiedad `imagen` como una "Data URL" (Base64), similar a la solución temporal para el perfil de usuario. Esto permite que las imágenes se muestren correctamente en el catálogo.
-
-3.  **Implementación de Lógica para el Botón "Añadir al Carrito":**
-    *   **`src/app/catalogo/page.jsx`:** Se importó `useCartStorage` y se obtuvieron `cartItems`. Estos `cartItems` se pasaron como prop a `DesignGrid`.
-    *   **`src/components/catalogo/DesignGrid.jsx`:** Se aceptó la prop `cartItems`. Dentro del mapeo de diseños, se calculó una nueva prop `isInCart` (booleana) para cada diseño, verificando si su ID existe en `cartItems`. Esta prop `isInCart` se pasó a `DesignCard`.
-    *   **`src/components/catalogo/DesignCard.jsx`:** Se aceptó la prop `isInCart`. El botón "Añadir al carrito" ahora está deshabilitado (`disabled={isInCart}`) y su texto cambia a "En el carrito" cuando `isInCart` es `true`.
-
-### Estado Actual:
-Ambos problemas (renderizado de imágenes y lógica del botón "Añadir al Carrito") en la página `/catalogo` han sido abordados con las implementaciones descritas. El problema de renderizado de imágenes se ha resuelto mediante un workaround de Base64, mientras se investiga la causa raíz del problema con el servicio de `Buffer`s a través de la ruta API.
-
-### Próximos Pasos Sugeridos:
-*   Verificar visualmente la correcta renderización de las imágenes en `/catalogo`.
-*   Verificar la funcionalidad del botón "Añadir al carrito" (habilitado/deshabilitado y cambio de texto) en `/catalogo`.
-*   **Investigación a Profundidad (a Largo Plazo):** Se recomienda una investigación más profunda sobre por qué `NextResponse` no está sirviendo correctamente los `Buffer`s de Mongoose a través de la ruta API, con el objetivo de revertir las soluciones temporales de Base64 y optimizar el rendimiento.
-
----
-
 ## Tarea Actual: Retirar temporalmente la funcionalidad de likes de los diseños
 
 ### Resumen del Problema:
@@ -109,6 +68,14 @@ El usuario ha solicitado retirar temporalmente la funcionalidad de "likes" de lo
     *   Se eliminó la línea que mostraba el contador de likes (`<p className="font-semibold text-purple-400">likes: {design.likes}</p>`).
 2.  **Backend (`src/models/Design.js`):**
     *   Se comentó el campo `likes` en el `DesignSchema` para deshabilitar su almacenamiento y uso en el modelo de base de datos.
+3.  **Frontend (`src/app/catalogo/page.jsx`):**
+    *   Se eliminaron los estados, efectos y la lógica relacionados con los likes (`likesState`, `likedDesigns`, `handleLike`, `populares`).
+    *   Se eliminaron las props relacionadas con los likes pasadas a `DesignGrid`.
+4.  **Frontend (`src/components/catalogo/DesignGrid.jsx`):**
+    *   Se eliminaron las props relacionadas con los likes (`likesState`, `likedDesigns`, `handleLike`) de la definición del componente y de las props pasadas a `DesignCard`.
+5.  **Frontend (`src/components/catalogo/DesignCard.jsx`):**
+    *   Se eliminaron las props relacionadas con los likes (`likesState`, `likedDesigns`, `handleLike`) de la definición del componente.
+    *   Se eliminó el botón de like y su lógica asociada.
 
 ### Estado Actual:
 La funcionalidad de likes ha sido retirada temporalmente tanto del frontend como del backend.

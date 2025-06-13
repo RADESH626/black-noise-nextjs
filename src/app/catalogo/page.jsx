@@ -40,58 +40,8 @@ const ComunidadDiseños = () => {
     fetchDesigns();
   }, []); // Empty dependency array to run once on mount
 
-  // Filtramos populares, por ejemplo, más de 100 likes (assuming 'likes' property exists in design data)
-  const populares = useMemo(() => allDesigns.filter(d => d.likes > 100), [allDesigns]);
-
   // Elegimos qué mostrar según la pestaña activa
-  const tarjetas = useMemo(() => activo === 'diseños' ? allDesigns : populares, [activo, allDesigns, populares]);
-
-  const [likesState, setLikesState] = useState({});
-  const [likedDesigns, setLikedDesigns] = useState({}); // Stores { designId: true } for liked designs
-
-  // Initialize likesState and likedDesigns from localStorage on mount
-  useEffect(() => {
-    const initialLikes = {};
-    tarjetas.forEach(design => {
-      initialLikes[design.id] = design.likes || 0; // Ensure default to 0 if likes is undefined
-    });
-    setLikesState(initialLikes);
-
-    if (typeof window !== 'undefined') {
-      const storedLikedDesigns = JSON.parse(localStorage.getItem('likedDesigns') || '{}');
-      setLikedDesigns(storedLikedDesigns);
-    }
-  }, [tarjetas]);
-
-  // Update localStorage when likedDesigns changes
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('likedDesigns', JSON.stringify(likedDesigns));
-    }
-  }, [likedDesigns]);
-
-  const handleLike = (designId) => {
-    setLikesState(prev => {
-      const newLikes = { ...prev };
-      if (likedDesigns[designId]) {
-        // Unlike: decrement like count and remove from likedDesigns
-        newLikes[designId] = (newLikes[designId] || 0) - 1;
-        setLikedDesigns(prevLiked => {
-          const newLiked = { ...prevLiked };
-          delete newLiked[designId];
-          return newLiked;
-        });
-      } else {
-        // Like: increment like count and add to likedDesigns
-        newLikes[designId] = (newLikes[designId] || 0) + 1;
-        setLikedDesigns(prevLiked => ({
-          ...prevLiked,
-          [designId]: true,
-        }));
-      }
-      return newLikes;
-    });
-  };
+  const tarjetas = useMemo(() => activo === 'diseños' ? allDesigns : allDesigns, [activo, allDesigns]);
 
   const handleAddItemToCart = async (item) => {
     if (!userId) {
@@ -123,9 +73,6 @@ const ComunidadDiseños = () => {
         <DesignGrid
           tarjetas={tarjetas}
           activo={activo}
-          likesState={likesState}
-          likedDesigns={likedDesigns}
-          handleLike={handleLike}
           addItem={handleAddItemToCart} // Pass the new addItem function
           cartItems={cartItems} // Pass cart items to DesignGrid
         />
