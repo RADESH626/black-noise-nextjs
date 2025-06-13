@@ -5,7 +5,7 @@ import RedesSocialesFooter from "./footerComponents/RedesSocialesFooter";
 
 function Footer() {
   return (
-    <footer className="bg-black text-white flex flex-row gap-85">
+    <footer className="bg-black text-white flex flex-row gap-100">
         <MetodosDePagoFooter/>
         <AyudaFooter/>
         <ContactosFooter/>
