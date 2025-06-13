@@ -93,8 +93,8 @@ export async function getCartByUserId(userId) {
     }
 
     try {
-        // Populate the 'designId' field within the 'items' array
-        const cart = await Cart.findOne({ userId }).populate('items.designId').lean();
+        // Populate the 'designId' field within the 'items' array, including imageData and imageMimeType
+        const cart = await Cart.findOne({ userId }).populate('items.designId', 'nombreDesing valorDesing imageData imageMimeType').lean();
         if (!cart) {
             return { cart: null, error: null }; // No cart found, but not an error
         }
@@ -102,9 +102,11 @@ export async function getCartByUserId(userId) {
         // Map populated design details to a more usable format for the client
         const populatedCartItems = (cart.items || []).map(item => ({
             id: item.designId._id.toString(),
+            designId: item.designId._id, // Keep designId for order creation
             nombre: item.designId.nombreDesing,
             price: item.designId.valorDesing,
-            imagen: item.designId.imagenDesing,
+            imageData: item.designId.imageData, // Include imageData
+            imageMimeType: item.designId.imageMimeType, // Include imageMimeType
             quantity: item.quantity, // Use the quantity from the cart item
         }));
 

@@ -149,7 +149,7 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
 
         // 2. Crear el Pedido
         const nuevoPedidoData = {
-            usuarioId: userId,
+            userId: userId,
             items: cartItems.map(item => ({
                 designId: item.designId,
                 quantity: item.quantity,

@@ -1,5 +1,4 @@
 import { Schema, model, models } from 'mongoose'
-import { MetodoPago, EstadoPago } from './enums/pago'
 
 const PagoSchema = new Schema({
     usuarioId: {
@@ -18,13 +17,18 @@ const PagoSchema = new Schema({
     },
     metodoPago: {
         type: String,
-        enum: Object.values(MetodoPago),
+        enum: ['tarjeta', 'paypal', 'efectivo'], // Define payment methods directly
         required: true
     },
-    estadoPago: {
+    estadoTransaccion: { // Renamed from estadoPago for clarity
         type: String,
-        enum: Object.values(EstadoPago),
-        default: EstadoPago.PENDIENTE
+        enum: ['PENDIENTE', 'PAGADO', 'FALLIDO', 'REEMBOLSADO'], // Define transaction states
+        default: 'PENDIENTE'
+    },
+    detallesTarjeta: { // New field for card details
+        cardNumber: { type: String }, // Store last 4 digits
+        expiryDate: { type: String },
+        cvv: { type: String } // Masked
     },
     fechaRealizacion: {
         type: Date,

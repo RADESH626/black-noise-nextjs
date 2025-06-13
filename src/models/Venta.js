@@ -11,10 +11,6 @@ const VentaSchema = new Schema({
         ref: 'Pedido',
         required: true
     },
-    comisionAplicacion: {
-        type: Number,
-        required: true
-    },
     valorVenta: {
         type: Number,
         required: true
@@ -26,12 +22,8 @@ const VentaSchema = new Schema({
     },
     detallesVenta: [{
         type: String
-    }],
-    fechaRealizacion: {
-        type: Date,
-        default: Date.now
-    }
-},{
+    }]
+}, {
     timestamps: true
 })
 

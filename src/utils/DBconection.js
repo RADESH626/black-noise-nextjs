@@ -2,6 +2,7 @@
 
 import mongoose from 'mongoose';
 import logger from './logger';
+import '@/models'; // Import all models to ensure they are registered
 
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://Emanuel:Emanuelgalvis123@clusteremanuelgalvis.djph7.mongodb.net/BlackNoise?retryWrites=true&w=majority&appName=ClusterEmanuelGalvis";
 

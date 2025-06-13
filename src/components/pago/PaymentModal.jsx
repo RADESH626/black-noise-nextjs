@@ -2,55 +2,20 @@
 
 import React, { useState } from 'react';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
-import { procesarPagoDePedido } from '@/app/acciones/PagoActions'; // Import the new server action
+// import { procesarPagoDePedido } from '@/app/acciones/PagoActions'; // This action is for the old flow
 
-const PaymentModal = ({ pedidoId, valorPedido, onClose, onPaymentSuccess }) => { // Accept onPaymentSuccess prop
-  const [cardNumber, setCardNumber] = useState('');
-  const [expiryDate, setExpiryDate] = useState('');
-  const [cvv, setCvv] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null);
+const PaymentModal = ({ pedidoId, valorPedido, onClose, onPaymentSuccess }) => {
+  // This modal is part of the old "pay pending order" flow.
+  // With the new "payment-first" system, orders are created as PAGADO.
+  // This modal's functionality will be disabled to prevent conflicts and
+  // encourage the new payment flow.
+  // Its usage in PedidosComponent.jsx will also be removed.
 
-  const handleSubmit = async (e) => {
+  const [error, setError] = useState("Esta funcionalidad de pago ha sido deshabilitada. Los pedidos ahora se pagan antes de ser creados.");
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setSuccessMessage(null);
-
-    // Basic validation (can be expanded)
-    if (!cardNumber || !expiryDate || !cvv) {
-      setError("Por favor, completa todos los campos de pago.");
-      setLoading(false);
-      return;
-    }
-
-    const paymentData = {
-      pedidoId,
-      valorPedido,
-      cardNumber,
-      expiryDate,
-      cvv,
-      metodoPago: 'Tarjeta de Crédito/Débito', // Hardcoded for now
-    };
-
-    const { success, message, error: paymentError } = await procesarPagoDePedido(paymentData);
-
-    if (success) {
-      setSuccessMessage("¡Pago procesado exitosamente! El estado de tu pedido ha sido actualizado.");
-      // Call the success callback to refresh data in the parent component
-      if (onPaymentSuccess) {
-        onPaymentSuccess();
-      }
-
-      // Close the modal after a delay
-      setTimeout(() => {
-        onClose();
-      }, 2000);
-    } else {
-      setError(paymentError || message || "Error al procesar el pago. Inténtalo de nuevo.");
-    }
-    setLoading(false);
+    setError("Esta funcionalidad de pago ha sido deshabilitada. Por favor, utiliza el nuevo flujo de pago desde el carrito.");
   };
 
   return (

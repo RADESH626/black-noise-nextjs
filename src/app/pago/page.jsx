@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import OrderSummary from "@/components/pago/OrderSummary";
 import PaymentForm from "@/components/pago/PaymentForm";
-import { getCartByUserId, clearUserCart } from "@/app/acciones/CartActions"; // Import CartActions
+import { getCartByUserId } from "@/app/acciones/CartActions"; // Import CartActions
+import { procesarPagoYCrearPedido } from "@/app/acciones/PagoActions"; // Import procesarPagoYCrearPedido
 import { useSession } from "next-auth/react"; // Import useSession
 
 export default function Pago() {
@@ -48,34 +49,29 @@ export default function Pago() {
     return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
-  const handleClearCart = async () => {
-    if (!userId) {
-      console.warn("User not authenticated. Cannot clear server cart.");
-      setCartItems([]); // Clear local state anyway
-      return;
-    }
-    const { success, message } = await clearUserCart(userId);
-    if (success) {
-      setCartItems([]);
-    } else {
-      console.error("Failed to clear server cart:", message);
-      setError({ message: message || "Error al vaciar el carrito." });
-    }
-  };
 
-  const handlePago = async ({ nombre, correo, direccion, metodoPago }) => {
-    const pedidoCompleto = {
-      cliente: { nombre, correo, direccion },
-      productos: cartItems,
-      fecha: new Date().toLocaleString(),
-      proveedor: "Diseñador encargado",
+  const handlePago = async ({ nombre, correo, direccion, metodoPago, cardNumber, expiryDate, cvv }) => {
+    const paymentDetails = {
+      userId,
+      nombre,
+      correo,
+      direccion,
       metodoPago,
       total: getTotal(),
+      cardNumber,
+      expiryDate,
+      cvv,
     };
 
-    localStorage.setItem("pedidoCompleto", JSON.stringify(pedidoCompleto));
-    await handleClearCart(); // Use the new clear cart function
-    router.push("/confirmacion");
+    const { success, message, pedidoId } = await procesarPagoYCrearPedido(cartItems, paymentDetails);
+
+    if (success) {
+      setCartItems([]); // Clear local cart state
+      router.push(`/confirmacion?pedidoId=${pedidoId}`); // Pass pedidoId to confirmation page
+    } else {
+      setError({ message: message || "Error al procesar el pago." });
+      console.error("Error al procesar el pago:", message);
+    }
   };
 
   if (loading) {
