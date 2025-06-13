@@ -6,7 +6,7 @@ import logger from '@/utils/logger';
 
 export async function GET(request, { params }) {
     await connectDB();
-    const { modelName, id } = params;
+    const { modelName, id } = await params;
 
     logger.debug(`Attempting to retrieve image for model: ${modelName}, ID: ${id}`);
 
@@ -33,6 +33,11 @@ export async function GET(request, { params }) {
 
         const imageData = document.imageData;
         const imageMimeType = document.imageMimeType;
+
+        logger.debug(`[GET /api/images] Retrieved imageData length: ${imageData ? imageData.length : 'null'}, MimeType: ${imageMimeType}`);
+        if (imageData) {
+            logger.debug(`[GET /api/images] Retrieved imageData hex snippet: ${imageData.toString('hex').substring(0, 60)}...`);
+        }
 
         if (!imageData || !imageMimeType) {
             logger.warn(`Image data or mime type missing for model: ${modelName}, ID: ${id}`);

@@ -76,12 +76,12 @@ Para esta refactorización, la prioridad es `BinData`. GridFS se documentará co
 
 *   **`src/app/api/designs/route.js` (o ruta de API de diseños):**
     *   Ajustar el middleware o la lógica de la ruta para parsear solicitudes `multipart/form-data`.
-    *   Extraer el archivo de imagen del cuerpo de la solicitud.
+    *   Extraer el archivo binario de la solicitud.
 *   **`src/models/Design.js` (Modelo Mongoose/Schema):**
     *   Modificar el esquema para incluir un campo de tipo `Buffer` (que Mongoose mapea a `BinData` en MongoDB) para los datos de la imagen y un campo `String` para el `mimetype`.
 *   **`src/app/acciones/DesignActions.js` (Lógica de servicio/repositorio):**
-    *   Ajustar la lógica para guardar el buffer de la imagen y su `mimetype` en el documento de `Design`.
-    *   Modificar la lógica de recuperación para servir la imagen binaria con el `Content-Type` HTTP correcto.
+    *   Ajustar la lógica para guardar el buffer y el `mimetype` en el documento de `Design`.
+    *   Ajustar la lógica de recuperación para servir la imagen binaria con el `Content-Type` HTTP correcto.
 
 ### 5.3. Manejo de Errores
 

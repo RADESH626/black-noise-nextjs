@@ -50,6 +50,7 @@ export async function guardarDesigns(prevState, formData) {
             const buffer = Buffer.from(bytes);
             mimeType = imageFile.type;
             imageData = buffer;
+            logger.debug(`[guardarDesigns] Buffer length: ${buffer.length}, Hex snippet: ${buffer.toString('hex').substring(0, 60)}...`);
         } else {
             return { success: false, message: 'No se proporcionó una imagen para el diseño.' };
         }
@@ -138,9 +139,11 @@ export async function obtenerDesignsPorUsuarioId(usuarioId) {
 
             return {
                 ...design,
-                imagen: designImageUrl, // Provide the image URL
-                imageData: undefined, // Remove original imageData
-                imageMimeType: undefined, // Remove mime type
+                imagen: design.imageData && design.imageMimeType
+                    ? `data:${design.imageMimeType};base64,${design.imageData.toString('base64')}`
+                    : null, // Provide the image as a data URL
+                imageData: design.imageData, // Keep imageData for data URL
+                imageMimeType: design.imageMimeType, // Keep imageMimeType for data URL
             };
         });
 
@@ -193,7 +196,7 @@ export async function actualizarDesign(prevState, formData) {
 
         if (imageFile) {
             if (!(imageFile instanceof File)) {
-                return { success: false, message: 'El archivo de imagen proporcionado no es válido para la actualización.' };
+                return { success: false, message: 'El archivo de imagen proporcionado no es válido.' };
             }
 
             if (!ALLOWED_MIME_TYPES.includes(imageFile.type)) {
@@ -224,6 +227,9 @@ export async function actualizarDesign(prevState, formData) {
             // Do not update usuarioId or estadoDesing here unless explicitly required for updates
         };
 
+        if (updateImageData.imageData) {
+            logger.debug(`[actualizarDesign] Buffer length: ${updateImageData.imageData.length}, Hex snippet: ${updateImageData.imageData.toString('hex').substring(0, 60)}...`);
+        }
         const updatedDesign = await Design.findByIdAndUpdate(id, data, { new: true }).lean();
         logger.debug('Design updated successfully:', updatedDesign);
 
