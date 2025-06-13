@@ -7,6 +7,7 @@ import { revalidatePath } from 'next/cache';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Assuming this path for authOptions
 import logger from '@/utils/logger';
+import { Rol } from '@/models/enums/usuario/Rol';
 
 // Function to save a single design
 export async function guardarDesigns(prevState, formData) {
@@ -17,6 +18,11 @@ export async function guardarDesigns(prevState, formData) {
 
     if (!session || !session.user || !session.user.id) {
         return { success: false, message: 'Usuario no autenticado.' };
+    }
+
+    // Only allow CLIENTE role to upload designs
+    if (session.user.rol !== Rol.CLIENTE) {
+        return { success: false, message: 'Solo los usuarios con rol CLIENTE pueden subir diseños.' };
     }
 
     try {
@@ -89,19 +95,12 @@ export async function obtenerDesigns() {
 
         const formattedDesigns = designs.map(design => {
             const userAvatar = design.usuarioId && design.usuarioId.imageData && design.usuarioId.imageMimeType
-                ? `data:${design.usuarioId.imageMimeType};base64,${Buffer.from(design.usuarioId.imageData).toString('base64')}`
+                ? `/api/images/usuario/${design.usuarioId._id}`
                 : '/img/perfil/FotoPerfil.webp'; // Default avatar if no image data
 
-            logger.debug(`Processing design ID: ${design._id}`);
-            logger.debug(`Design imageData (exists): ${!!design.imageData}`);
-            logger.debug(`Design imageMimeType: ${design.imageMimeType}`);
-            logger.debug(`Design imageData length: ${design.imageData ? design.imageData.length : 'N/A'}`);
-
-            const designImageSrc = design.imageData && design.imageMimeType
-                ? `data:${design.imageMimeType};base64,${Buffer.from(design.imageData).toString('base64')}`
+            const designImageUrl = design.imageData && design.imageMimeType
+                ? `/api/images/design/${design._id}`
                 : null; // Or a default image path if no image data
-
-            logger.debug(`Constructed designImageSrc (first 50 chars): ${designImageSrc ? designImageSrc.substring(0, 50) : 'null'}`);
 
             return {
                 ...design,
@@ -109,8 +108,8 @@ export async function obtenerDesigns() {
                 prenda: design.nombreDesing, // Map nombreDesing to prenda
                 price: design.valorDesing,   // Map valorDesing to price
                 usuario: design.usuarioId ? design.usuarioId.nombreUsuario : 'Usuario Desconocido', // Map user name
-                userAvatar: userAvatar, // Add user avatar
-                imagen: designImageSrc, // Provide the pre-encoded base64 image string
+                userAvatar: userAvatar, // Add user avatar URL
+                imagen: designImageUrl, // Provide the image URL
                 // Remove original imageData and imageMimeType as they are now processed into 'imagen'
                 imageData: undefined,
                 imageMimeType: undefined,
@@ -133,14 +132,15 @@ export async function obtenerDesignsPorUsuarioId(usuarioId) {
         const designs = await Design.find({ usuarioId: usuarioId }).lean();
 
         const formattedDesigns = designs.map(design => {
-            const designImageSrc = design.imageData && design.imageMimeType
-                ? `data:${design.imageMimeType};base64,${Buffer.from(design.imageData).toString('base64')}`
+            const designImageUrl = design.imageData && design.imageMimeType
+                ? `/api/images/design/${design._id}`
                 : null; // Or a default image path if no image data
 
             return {
                 ...design,
-                imageData: designImageSrc, // Overwrite imageData with the base64 string
-                imageMimeType: undefined, // Remove mime type as it's now part of imageData
+                imagen: designImageUrl, // Provide the image URL
+                imageData: undefined, // Remove original imageData
+                imageMimeType: undefined, // Remove mime type
             };
         });
 
@@ -152,58 +152,6 @@ export async function obtenerDesignsPorUsuarioId(usuarioId) {
     }
 }
 
-
-// Function for mass registration of designs from a file
-export async function RegistroMasivoDesigns(prevState, formData) {
-    await connectDB();
-    logger.debug('Entering RegistroMasivoDesigns with formData:', formData);
-
-    const file = formData.get('file');
-    if (!file) {
-        logger.debug('No file uploaded.');
-        return { success: false, message: 'No se ha subido ningún archivo' };
-    }
-
-    const buffer = await file.arrayBuffer();
-    const text = new TextDecoder().decode(buffer);
-
-    try {
-        const resultadoParseo = Papa.parse(text, {
-            header: true,
-            skipEmptyLines: true,
-            transformHeader: header => header.trim(),
-            transform: value => typeof value === 'string' ? value.trim() : value,
-        });
-
-        if (resultadoParseo.errors.length > 0) {
-            logger.error("ERROR in RegistroMasivoDesigns (CSV parsing errors):", resultadoParseo.errors);
-            return { success: false, message: 'Errores al parsear el archivo CSV: ' + resultadoParseo.errors.map(e => e.message).join(', ') };
-        }
-
-        const designsToSave = resultadoParseo.data.map(designData => ({
-            usuarioId: session.user.id, // Assuming mass upload is also by a logged-in user
-            nombreDesing: designData.nombreDesing,
-            descripcion: designData.descripcion,
-            valorDesing: parseFloat(designData.valorDesing),
-            categoria: designData.categoria,
-            imagenDesing: designData.imagenDesing,
-            tallasDisponibles: designData.tallasDisponibles,
-            coloresDisponibles: designData.coloresDisponibles,
-            estadoDesing: 'PRIVADO'
-        }));
-
-        const savedDesigns = await Design.insertMany(designsToSave);
-        logger.debug('All designs processed for mass registration:', savedDesigns);
-
-        revalidatePath('/admin/designs');
-        revalidatePath('/catalogo');
-
-        return { success: true, message: `Se registraron ${savedDesigns.length} diseños masivamente.`, data: JSON.parse(JSON.stringify(savedDesigns)) };
-    } catch (error) {
-        logger.error("ERROR in RegistroMasivoDesigns:", error);
-        return { success: false, message: 'Error en el registro masivo de diseños: ' + error.message };
-    }
-}
 
 // Function to find a design by ID
 export async function encontrarDesignsPorId(id) {

@@ -4,15 +4,6 @@ import React from 'react'; // Keep one import
 
 function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartItems, addItem, orderedDesignIds }) { // Keep orderedDesignIds prop for now, though not used for button logic
 
-  // Helper function to safely get the image source
-  const getImageSrc = (design) => {
-    // design.imageData is now expected to be a base64 string (e.g., "data:image/jpeg;base64,...")
-    if (design.imageData) {
-      return design.imageData;
-    }
-    return design.imagenDesing || '/placeholder.png'; // fallback if imagenDesing also fails
-  };
-
   return (
     <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {loading ? (
@@ -30,7 +21,7 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartI
           <div key={design._id} className="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
             <div className="w-full h-56 bg-gray-700 relative">
               <img
-                src={getImageSrc(design)}
+                src={design.imagen || '/placeholder.png'}
                 alt={design.nombreDesing}
                 className="w-full h-full object-cover"
               />
@@ -56,7 +47,7 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartI
                     id: design._id,
                     nombre: design.nombreDesing,
                     price: design.valorDesing,
-                    imagen: design.imagenDesing,
+                    imagen: design.imagen, // Use the new image URL
                   })}
                   className="bg-purple-700 text-white font-semibold py-2 px-4 rounded-md text-sm hover:bg-purple-800 transition duration-150"
                 >

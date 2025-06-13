@@ -17,8 +17,6 @@ import Proveedor from '@/models/Proveedor'; // Import Proveedor model
 import logger from '@/utils/logger';
 import { createEmptyCartForUser } from './CartActions'; // Import the cart creation function
 
-const DEFAULT_PROFILE_PICTURE_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAKwAAACUCAMAAAA5xjIqAAAAMFBMVEXk5ueutLenrrHn6eqrsbTq7O3Lz9Hh4+S4vcDGyszT1tjP0VbTe4OKyuLvCx8nW2dvDGAcOAAAECUlEQVR4nO2c23LjIAxAbcTVBvP/f7vQZLNJ47SAsGTPcp4605czqpC4yJ2mwWAwGAwGg8FgMBgMBq+AUmDisizR5x+5dT4Dk4kuiAfSOm+mUworv25ByPkZKcK2mNPpqsmF+dX07jvbByfTdWLP9O4r9XmSAaY1fFbNiLCcxBYm+7PqV3DdKVIX4i9hvesGz28LukS124p4Gdesu/LGtsY12ypWV1HhmqoCY2xhrYnrV2wjly3EStVEMEyy5vf6+h5ay+MKW71rSlvHkQgQW1xTbDmaAzSp8iQCuLbA5mpLLutDoytHaKta1ytiIXY1zYHN0HZdWOr67LfQ0vYxZTGBlRtpaA0msKnpekLXup3hDpRHMkBlQcoDR+eKKLJ3WUu3+UpnRJxs2iDQyWJTdqY8PDbvCx6R1WQrzDTtZF9k6SqtQRaDRKCTxa6vmXB74PGukk4Wm7KpHJAtsCE7ZKeLLbBLla5rNYWGS65XpKU72FxpI3OpLSIsSFfKzTf6WDNbQln0gXGnc73WUfxSlxyTwiUtYZWd8qPShS7mLnXliWpi7O+MiFIbiFVRDyCaXHaaWmUJL+UewNL4aMfy1tz2HEp8Rf+gZY1xPTQ3JQLfWI+q3s9Ixvmu3rQVdKeZPapsJcuswQOosSU8JX7SLe5kgv7p/t22bARJcq6tf4AvuPOQ2ykGJ3Piut053yfVoM8z8AvG/jDsO4uzhPWO8jbI3TFqGTbDOYK4B4B3dv4+oC5nq08wN/tOysqvgXohZCLP/odt9eY8yfoGpAjHVWu9Rn9izRtJFtSN/CO3zgeynfFxyVF1Ce30usTov37BLfcMgInOhqd19VQYgt3WU2QE5M9pVmfzovqhJaTVNm86si42NUW9vZWrj8bSbi7y+ILyLsy/tNn3BhHsQq2bKqqTZRF9Qwgb6T68SjFd7W5rLQ2wsC7SxFeZbf9jqirf2R5/1wF584p/Zr75xkOTASBunVQzwq7HbR3BbOi//wupmh2WDLqv6g17RHAhBtwLzQek0L11cwYcRcqFricJ8EdkwMO25+0HYEbnixC219mn6oqoERn6lAXAz22U2M493psgHpmuz7r4K0Yy1w4fX+FnNipAxrb1+ajVdkPYtnykiEK0vzsd2wp2aW4PNDXrO61Xzsf3gj2aeln7szcKGRpkATmz027rGhZZh7HTRuq3CZrNtf4rIfQAH8a28sFM8VSCO6LKFTzT6rpRN0ChONrBMxVnSOgwLo+iZv/VNv3Sk4r52g7T8khk+RfatLvYXdnynS17FiTb4sgyNoS/FI/bc21hnikttfivELpQJov7wr4Xsmw3o7g9bxQmLbfmjbKjY+P/h+lNWcddxCmwRbLmJJS4Dv5D/gBmFDnwIIZzJgAAAABJRU5ErkJggg==';
-
 // Server Action para manejar el login
 export async function loginAction(prevState, formData) {
     
@@ -50,7 +48,8 @@ export async function loginAction(prevState, formData) {
             email, 
             password, 
             userRole: user.rol, 
-            readyForSignIn: true 
+            readyForSignIn: true,
+            profileImageUrl: user.profileImageUrl // Pass the new image URL
           } 
         };
       }
@@ -71,7 +70,8 @@ export async function loginAction(prevState, formData) {
             password: password, // NextAuth needs the raw password for CredentialsProvider
             isSupplier: true,
             proveedorId: proveedor._id.toString(),
-            readyForSignIn: true
+            readyForSignIn: true,
+            profileImageUrl: "/img/proveedores/IMAGEN-SOLICITUD-PROVEEDOR.jpg" // Default image for suppliers
           }
         };
       }
@@ -124,7 +124,7 @@ async function guardarUsuarios(data, enviarCorreo = false) {
     try {
         // Si no se proporciona fotoPerfil o está vacía, usa la imagen por defecto
         if (!data.fotoPerfil) {
-            data.fotoPerfil = `data:image/webp;base64,${DEFAULT_PROFILE_PICTURE_BASE64}`;
+            data.fotoPerfil = '/img/perfil/FotoPerfil.webp'; // Use static path
         } 
 
         logger.debug('datos de usuario obtenidos:', data);
@@ -213,7 +213,15 @@ async function obtenerUsuarios() {
         await connectDB();
 
         const usuarios = await Usuario.find({}).lean();
-        const plainUsers = usuarios.map(toPlainObject);
+        const plainUsers = usuarios.map(user => {
+            const plainUser = toPlainObject(user);
+            if (plainUser.imageData && plainUser.imageMimeType) {
+                plainUser.profileImageUrl = `/api/images/usuario/${plainUser._id}`;
+            } else {
+                plainUser.profileImageUrl = '/img/perfil/FotoPerfil.webp';
+            }
+            return plainUser;
+        });
         
         return { usuarios: plainUsers };
 
@@ -227,7 +235,15 @@ async function obtenerUsuariosHabilitados() {
     try {
         await connectDB();
         const usuarios = await Usuario.find({ habilitado: true }).lean();
-        const plainUsers = usuarios.map(toPlainObject);
+        const plainUsers = usuarios.map(user => {
+            const plainUser = toPlainObject(user);
+            if (plainUser.imageData && plainUser.imageMimeType) {
+                plainUser.profileImageUrl = `/api/images/usuario/${plainUser._id}`;
+            } else {
+                plainUser.profileImageUrl = '/img/perfil/FotoPerfil.webp';
+            }
+            return plainUser;
+        });
         
         return { users: plainUsers };
 
@@ -250,6 +266,11 @@ async function ObtenerUsuarioPorId(id) {
             throw new NotFoundError(`User not found with ID: ${id}`);
         }
         const plainUser = toPlainObject(response);
+        if (plainUser.imageData && plainUser.imageMimeType) {
+            plainUser.profileImageUrl = `/api/images/usuario/${plainUser._id}`;
+        } else {
+            plainUser.profileImageUrl = '/img/perfil/FotoPerfil.webp';
+        }
         logger.debug('Exiting ObtenerUsuarioPorId with plain user:', plainUser);
         return plainUser;
     } catch (error) {
@@ -271,6 +292,11 @@ async function ObtenerUsuarioPorCorreo(email) {
             return null; // Return null if user not found, handled by loginAction
         }
         const plainUser = toPlainObject(user);
+        if (plainUser.imageData && plainUser.imageMimeType) {
+            plainUser.profileImageUrl = `/api/images/usuario/${plainUser._id}`;
+        } else {
+            plainUser.profileImageUrl = '/img/perfil/FotoPerfil.webp';
+        }
         return plainUser;
         
     } catch (error) {
@@ -358,7 +384,7 @@ async function RegistroMasivoUsuario(formData) {
                     }
                     
                     if (!usuarioData.fotoPerfil) {
-                        usuarioData.fotoPerfil = `data:image/webp;base64,${DEFAULT_PROFILE_PICTURE_BASE64}`;
+                        usuarioData.fotoPerfil = '/img/perfil/FotoPerfil.webp'; // Use static path
                     }
 
                     if (!usuarioData.rol) {
@@ -645,3 +671,22 @@ export async function bulkUploadUsersAction(prevState, formData) {
         return handleError(error, 'Error durante la carga masiva.');
     }
 }
+<environment_details>
+# VSCode Visible Files
+src/app/acciones/DesignActions.js
+
+# VSCode Open Tabs
+memory-bank/activeContext.md
+memory-bank/progress.md
+src/app/api/images/[modelName]/[id]/route.js
+src/app/acciones/DesignActions.js
+
+# Current Time
+12/6/2025, 10:40:54 p. m. (America/Bogota, UTC-5:00)
+
+# Context Window Usage
+191.259 / 1048,576K tokens used (18%)
+
+# Current Mode
+ACT MODE
+</environment_details>
