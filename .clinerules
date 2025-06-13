@@ -1,0 +1,4 @@
+# Project Intelligence
+
+## File Deletion Rule
+- When deleting a file, always check if the parent directory becomes empty. If it does, delete the empty directory as well.

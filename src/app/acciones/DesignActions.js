@@ -1,0 +1,272 @@
+"use server"
+
+import connectDB from '@/utils/DBconection';
+import Design from '@/models/Design';
+import Papa from 'papaparse';
+import { revalidatePath } from 'next/cache';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Assuming this path for authOptions
+import logger from '@/utils/logger';
+
+// Function to save a single design
+export async function guardarDesigns(prevState, formData) {
+    await connectDB();
+    logger.debug('Entering guardarDesigns with formData:', formData);
+
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user || !session.user.id) {
+        return { success: false, message: 'Usuario no autenticado.' };
+    }
+
+    try {
+        const imageFile = formData.get('imagenDesing');
+        let mimeType = '';
+        let imageData = null;
+
+        const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+        const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15 MB
+
+        if (imageFile) {
+            if (!(imageFile instanceof File)) {
+                return { success: false, message: 'El archivo de imagen proporcionado no es válido.' };
+            }
+
+            if (!ALLOWED_MIME_TYPES.includes(imageFile.type)) {
+                return { success: false, message: `Tipo de archivo no soportado: ${imageFile.type}. Solo se permiten JPG, PNG y WEBP.` };
+            }
+
+            if (imageFile.size > MAX_FILE_SIZE) {
+                return { success: false, message: `El tamaño del archivo excede el límite de ${MAX_FILE_SIZE / (1024 * 1024)} MB.` };
+            }
+
+            const bytes = await imageFile.arrayBuffer();
+            const buffer = Buffer.from(bytes);
+            mimeType = imageFile.type;
+            imageData = buffer;
+        } else {
+            return { success: false, message: 'No se proporcionó una imagen para el diseño.' };
+        }
+
+        const data = {
+            usuarioId: session.user.id,
+            nombreDesing: formData.get('nombreDesing'),
+            descripcion: formData.get('descripcion'),
+            valorDesing: parseFloat(formData.get('valorDesing')),
+            categoria: formData.get('categoria'),
+            imageData: imageData,
+            imageMimeType: mimeType,
+            estadoDesing: 'PRIVADO',
+            coloresDisponibles: formData.get('coloresDisponibles') ? formData.get('coloresDisponibles').split(',') : [],
+            tallasDisponibles: formData.get('tallasDisponibles') ? formData.get('tallasDisponibles').split(',') : []
+        };
+
+        const newDesign = await Design.create(data);
+        logger.debug('Design saved successfully:', newDesign);
+
+        revalidatePath('/admin/designs');
+        revalidatePath('/catalogo');
+        revalidatePath('/perfil'); // Revalidate path for user profile page
+
+        return { success: true, message: 'Diseño registrado exitosamente', data: JSON.parse(JSON.stringify(newDesign)) };
+    } catch (error) {
+        logger.error('ERROR in guardarDesigns:', error);
+        return { success: false, message: 'Error al registrar el diseño: ' + error.message };
+    }
+}
+
+// Function to get all designs
+export async function obtenerDesigns() {
+    await connectDB();
+    logger.debug('Entering obtenerDesigns.');
+    try {
+        const designs = await Design.find({}).lean();
+        logger.debug('Designs obtained successfully:', designs);
+
+        // Manually convert Buffer to base64 string for imageData
+        const processedDesigns = designs.map(design => {
+            if (design.imageData && design.imageData instanceof Buffer) {
+                return {
+                    ...design,
+                    imageData: design.imageData.toString('base64')
+                };
+            }
+            return design;
+        });
+
+        return { data: JSON.parse(JSON.stringify(processedDesigns)) };
+    } catch (error) {
+        logger.error('ERROR in obtenerDesigns:', error);
+        return { error: 'Error al obtener los diseños: ' + error.message };
+    }
+}
+
+// Function to get designs by user ID
+export async function obtenerDesignsPorUsuarioId(usuarioId) {
+    await connectDB();
+    logger.debug('Entering obtenerDesignsPorUsuarioId with usuarioId:', usuarioId);
+    try {
+        const designs = await Design.find({ usuarioId: usuarioId }).lean(); // Corrected field name to 'usuarioId'
+        logger.debug('Designs obtained by usuarioId successfully:', designs);
+        return { designs: JSON.parse(JSON.stringify(designs)), error: null };
+    } catch (error) {
+        logger.error('ERROR in obtenerDesignsPorUsuarioId:', error);
+        return { designs: null, error: 'Error al obtener los diseños por usuario: ' + error.message };
+    }
+}
+
+
+// Function for mass registration of designs from a file
+export async function RegistroMasivoDesigns(prevState, formData) {
+    await connectDB();
+    logger.debug('Entering RegistroMasivoDesigns with formData:', formData);
+
+    const file = formData.get('file');
+    if (!file) {
+        logger.debug('No file uploaded.');
+        return { success: false, message: 'No se ha subido ningún archivo' };
+    }
+
+    const buffer = await file.arrayBuffer();
+    const text = new TextDecoder().decode(buffer);
+
+    try {
+        const resultadoParseo = Papa.parse(text, {
+            header: true,
+            skipEmptyLines: true,
+            transformHeader: header => header.trim(),
+            transform: value => typeof value === 'string' ? value.trim() : value,
+        });
+
+        if (resultadoParseo.errors.length > 0) {
+            logger.error("ERROR in RegistroMasivoDesigns (CSV parsing errors):", resultadoParseo.errors);
+            return { success: false, message: 'Errores al parsear el archivo CSV: ' + resultadoParseo.errors.map(e => e.message).join(', ') };
+        }
+
+        const designsToSave = resultadoParseo.data.map(designData => ({
+            usuarioId: session.user.id, // Assuming mass upload is also by a logged-in user
+            nombreDesing: designData.nombreDesing,
+            descripcion: designData.descripcion,
+            valorDesing: parseFloat(designData.valorDesing),
+            categoria: designData.categoria,
+            imagenDesing: designData.imagenDesing,
+            tallasDisponibles: designData.tallasDisponibles,
+            coloresDisponibles: designData.coloresDisponibles,
+            estadoDesing: 'PRIVADO'
+        }));
+
+        const savedDesigns = await Design.insertMany(designsToSave);
+        logger.debug('All designs processed for mass registration:', savedDesigns);
+
+        revalidatePath('/admin/designs');
+        revalidatePath('/catalogo');
+
+        return { success: true, message: `Se registraron ${savedDesigns.length} diseños masivamente.`, data: JSON.parse(JSON.stringify(savedDesigns)) };
+    } catch (error) {
+        logger.error("ERROR in RegistroMasivoDesigns:", error);
+        return { success: false, message: 'Error en el registro masivo de diseños: ' + error.message };
+    }
+}
+
+// Function to find a design by ID
+export async function encontrarDesignsPorId(id) {
+    await connectDB();
+    logger.debug('Entering encontrarDesignsPorId with ID:', id);
+    try {
+        const design = await Design.findById(id).lean();
+        logger.debug('Design found by ID:', design);
+        if (!design) {
+            return { error: 'Diseño no encontrado.' };
+        }
+        return { data: JSON.parse(JSON.stringify(design)) };
+    } catch (error) {
+        logger.error('ERROR in encontrarDesignsPorId:', error);
+        return { error: 'Error al encontrar el diseño por ID: ' + error.message };
+    }
+}
+
+// Function to update a design
+export async function actualizarDesign(prevState, formData) {
+    await connectDB();
+    logger.debug('Entering actualizarDesign with formData:', formData);
+
+    const id = formData.get('id');
+    if (!id) {
+        return { success: false, message: 'ID del diseño no proporcionado para la actualización.' };
+    }
+
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user || !session.user.id) {
+        return { success: false, message: 'Usuario no autenticado.' };
+    }
+
+    try {
+        const imageFile = formData.get('imagenDesing');
+        let updateImageData = {};
+        const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+        const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15 MB
+
+        if (imageFile) {
+            if (!(imageFile instanceof File)) {
+                return { success: false, message: 'El archivo de imagen proporcionado no es válido para la actualización.' };
+            }
+
+            if (!ALLOWED_MIME_TYPES.includes(imageFile.type)) {
+                return { success: false, message: `Tipo de archivo no soportado para la actualización: ${imageFile.type}. Solo se permiten JPG, PNG y WEBP.` };
+            }
+
+            if (imageFile.size > MAX_FILE_SIZE) {
+                return { success: false, message: `El tamaño del archivo excede el límite de ${MAX_FILE_SIZE / (1024 * 1024)} MB para la actualización.` };
+            }
+
+            const bytes = await imageFile.arrayBuffer();
+            const buffer = Buffer.from(bytes);
+            const mimeType = imageFile.type;
+            updateImageData = {
+                imageData: buffer,
+                imageMimeType: mimeType,
+            };
+        }
+
+        const data = {
+            nombreDesing: formData.get('nombreDesing'),
+            descripcion: formData.get('descripcion'),
+            valorDesing: parseFloat(formData.get('valorDesing')),
+            categoria: formData.get('categoria'),
+            coloresDisponibles: formData.get('coloresDisponibles') ? formData.get('coloresDisponibles').split(',') : [],
+            tallasDisponibles: formData.get('tallasDisponibles') ? formData.get('tallasDisponibles').split(',') : [],
+            ...updateImageData, // Spread the image data if available
+            // Do not update usuarioId or estadoDesing here unless explicitly required for updates
+        };
+
+        const updatedDesign = await Design.findByIdAndUpdate(id, data, { new: true }).lean();
+        logger.debug('Design updated successfully:', updatedDesign);
+
+        revalidatePath('/admin/designs');
+        revalidatePath('/catalogo');
+        revalidatePath(`/admin/designs/editar/${id}`); // Revalidate specific edit page
+
+        return { success: true, message: 'Diseño actualizado exitosamente', data: JSON.parse(JSON.stringify(updatedDesign)) };
+    } catch (error) {
+        logger.error('ERROR in actualizarDesign:', error);
+        return { success: false, message: 'Error al actualizar el diseño: ' + error.message };
+    }
+}
+
+// Function to delete a design
+export async function eliminarDesign(id) {
+    await connectDB();
+    logger.debug('Entering eliminarDesign with ID:', id);
+    try {
+        const deletedDesign = await Design.findByIdAndDelete(id).lean();
+        logger.debug('Design deleted successfully:', deletedDesign);
+
+        revalidatePath('/admin/designs');
+        revalidatePath('/catalogo');
+
+        return { success: true, message: 'Diseño eliminado exitosamente' };
+    } catch (error) {
+        logger.error('ERROR in eliminarDesign:', error);
+        return { success: false, message: 'Error al eliminar el diseño: ' + error.message };
+    }
+}
