@@ -1,0 +1,24 @@
+# Project Intelligence
+
+## Operational Directives
+
+### Authentication Required for Catalog
+- **Directive:** Access to the `/catalogo` page (y potencialmente otras páginas que muestran datos específicos del usuario o que requieren autenticación) requiere un inicio de sesión exitoso previo. Siempre asegúrate de que la autenticación se realice antes de intentar navegar a dichas rutas protegidas.
+
+### Verify Application Running Status
+- **Directive:** Before attempting any browser actions (e.g., launching, clicking, typing), always verify that the Next.js application's development server is actively running (e.g., via `npm run dev`). This is distinct from launching the browser. If the Next.js app is not running, initiate it using `npm run dev` (or the appropriate command) and wait for it to be ready before proceeding with browser interactions. This prevents "Not attached to an active page" errors and ensures a stable environment for browser automation.
+
+### Configuration File Modification Protocol
+- **Directive:** Before modifying any project configuration files (e.g., `package.json`, `next.config.mjs`, `.env.local`), I must first ask for explicit user permission and clearly indicate the specific changes I intend to make. This ensures transparency and prevents unintended alterations to the project's setup.
+
+## Git Workflow Rules
+
+### Commit Procedure
+- **Directive:** To make a commit, you must first use the `git add` command to stage your changes, and then use the `git commit` command to record them.
+
+## File Deletion Rule
+- When deleting a file, always check if the parent directory becomes empty. If it does, delete the empty directory as well.
+
+## memory back update
+
+- At the end of each task, and before proposing the next action, I MUST perform a final review. My goal is to determine if the changes made require a memory pool update. Specifically, I must review activeContext.md, Progress.md, and any relevant functionality or files. If an update is required, I will propose it as the final step in the task's execution.
