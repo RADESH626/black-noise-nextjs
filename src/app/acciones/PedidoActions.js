@@ -47,6 +47,7 @@ async function obtenerPedidos() {
             .populate('items.designId', 'nombreDesing imagenDesing') // Popula nombre e imagen de los diseños dentro de items
             .populate('proveedorId', 'nombreProveedor contactoPrincipal') // Popula algunos campos de Proveedor
             .lean();
+        console.log('Pedidos after populate in obtenerPedidos:', pedidos); // Add this line for debugging
         logger.debug('Orders retrieved from DB:', pedidos.length, 'orders found.');
         return { pedidos: JSON.parse(JSON.stringify(pedidos)) };
     } catch (error) {
