@@ -48,6 +48,7 @@ Este documento describe la funcionalidad de gestión de pedidos y el flujo de pa
     *   Se añade o modifica el campo `estadoPago` (ej: `PENDIENTE`, `PAGADO`, `CANCELADO`).
 *   **`Pago` Model (`src/models/Pago.js`):**
     *   Nuevo modelo para registrar cada transacción de pago. Incluirá campos como `pedidoId`, `monto`, `fechaPago`, `metodoPago`, `estadoTransaccion`.
+    *   **Actualización Importante:** El campo `metodoPago` ahora utiliza el enum centralizado `MetodoPago` definido en `src/models/enums/pago/MetodoPago.js` para asegurar consistencia y evitar valores hardcodeados.
 *   **`Pedido` Model (`src/models/Pedido.js`):**
     *   Se añade el campo `paymentId` de tipo `Schema.Types.ObjectId` que hace referencia al modelo `Pago`. Este campo es **requerido** ya que un pedido solo se crea después de un pago exitoso.
 
@@ -72,4 +73,5 @@ Para mejorar la experiencia del usuario en la pestaña "Diseños" del perfil, se
 *   `src/app/acciones/PagoActions.js`: Contendrá `procesarPagoDePedido` y ahora utiliza `src/utils/modelLoader.js` para la instanciación de modelos.
 *   `src/models/Pedido.js`: Definición del modelo Pedido.
 *   `src/models/Pago.js`: Definición del modelo Pago.
+*   `src/components/pago/PaymentForm.jsx`: Actualizado para usar el enum `MetodoPago` centralizado para la selección del método de pago.
 *   `src/utils/modelLoader.js`: Nueva utilidad para la carga centralizada de modelos.

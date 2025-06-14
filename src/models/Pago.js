@@ -1,4 +1,5 @@
 import { Schema, model, models } from 'mongoose'
+import { MetodoPago } from '../enums/pago/MetodoPago';
 
 const PagoSchema = new Schema({
     usuarioId: {
@@ -17,7 +18,7 @@ const PagoSchema = new Schema({
     },
     metodoPago: {
         type: String,
-        enum: ['tarjeta', 'paypal', 'efectivo'], // Define payment methods directly
+        enum: Object.values(MetodoPago), // Use the centralized MetodoPago enum
         required: true
     },
     estadoTransaccion: { // Renamed from estadoPago for clarity
