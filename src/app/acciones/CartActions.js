@@ -69,14 +69,14 @@ export async function removeDesignFromCart(userId, designId) {
                 await cart.save();
                 logger.debug('Design removed from cart:', cart);
                 revalidatePath('/perfil');
-                return { success: true, message: 'Design removed from cart successfully.' };
+                return { success: true, message: 'Design removed from cart successfully.', data: JSON.parse(JSON.stringify(cart)) };
             } else {
                 logger.debug('Design not found in cart, no action needed.');
-                return { success: true, message: 'Design not found in cart.' };
+                return { success: true, message: 'Design not found in cart.', data: JSON.parse(JSON.stringify(cart)) };
             }
         } else {
             logger.debug('Cart not found for user, no action needed.');
-            return { success: true, message: 'Cart not found for user.' };
+            return { success: true, message: 'Cart not found for user.', data: { items: [] } }; // Return empty cart if not found
         }
     } catch (error) {
         logger.error('ERROR in removeDesignFromCart:', error);
@@ -155,7 +155,28 @@ export async function updateCartItemQuantity(userId, designId, newQuantity) {
             }
             await cart.save();
             revalidatePath('/perfil');
-            return { success: true, message: 'Cart item quantity updated successfully.', data: JSON.parse(JSON.stringify(cart)) };
+
+            // Re-fetch and populate the cart after saving to ensure full item details are returned
+            const updatedPopulatedCart = await Cart.findOne({ userId }).populate('items.designId', 'nombreDesing valorDesing imageData imageMimeType descripcion categoria').lean();
+
+            const populatedCartItems = (updatedPopulatedCart.items || []).map(item => ({
+                id: item.designId._id.toString(),
+                designId: item.designId._id,
+                nombre: item.designId.nombreDesing,
+                price: item.designId.valorDesing,
+                descripcion: item.designId.descripcion,
+                categoria: item.designId.categoria,
+                imageData: item.designId.imageData ? Buffer.from(item.designId.imageData.buffer).toString('base64') : null,
+                imageMimeType: item.designId.imageMimeType,
+                quantity: item.quantity,
+            }));
+
+            const finalCartData = {
+                ...updatedPopulatedCart,
+                items: populatedCartItems,
+            };
+
+            return { success: true, message: 'Cart item quantity updated successfully.', data: JSON.parse(JSON.stringify(finalCartData)) };
         } else {
             logger.debug('Design not found in cart for quantity update, no action needed.');
             return { success: false, message: 'Design not found in cart for quantity update.' };
@@ -184,10 +205,10 @@ export async function clearUserCart(userId) {
         if (result) {
             logger.debug('Cart cleared successfully for userId:', userId);
             revalidatePath('/perfil');
-            return { success: true, message: 'Cart cleared successfully.' };
+            return { success: true, message: 'Cart cleared successfully.', data: JSON.parse(JSON.stringify(result)) };
         } else {
             logger.debug('Cart not found for user, nothing to clear.');
-            return { success: true, message: 'Cart not found for user.' };
+            return { success: true, message: 'Cart not found for user.', data: { items: [] } }; // Return empty cart if not found
         }
     } catch (error) {
         logger.error('ERROR in clearUserCart:', error);
