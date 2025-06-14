@@ -2,14 +2,14 @@
 
 ## Overview
 
-This document describes the `Cart` model and its associated functionality, which has been refactored to integrate directly into the user's profile section. The dedicated `/carrito` page has been removed.
+This document describes the `Cart` model and its associated functionality. The dedicated `/carrito` page, which was previously removed, has been reintroduced to provide a full cart view.
 
 ## Purpose
 
 The primary purpose of the `Cart` model and its functionality is to:
 - Persist the selected design IDs and quantities for a user's shopping cart.
-- Enable efficient retrieval and display of design information within the cart component in the user's profile section.
-- Facilitate the process of creating an order directly from the user's profile.
+- Enable efficient retrieval and display of design information within the cart preview modal and the dedicated `/carrito` page.
+- Facilitate the process of creating an order from the cart.
 
 ## Data Structure
 
@@ -28,7 +28,11 @@ When a user adds a design to their cart, the `designId` and quantity are managed
 
 ### Displaying Cart Information
 
-The cart information is now displayed exclusively within the user's profile, under the "Carrito" tab. The `CartComponent` fetches the cart data and renders the list of items, along with a summary of the total cost and options to clear the cart or proceed to order creation.
+The cart information is now displayed in two main locations:
+1.  **Cart Preview Modal:** A small modal accessible from the header, showing a summary of items (image, name, price, quantity).
+2.  **Dedicated `/carrito` Page:** A full-page view providing comprehensive cart management, including item details, quantity controls, removal options, and order finalization.
+
+The `CartComponent` (or a similar component) will fetch the cart data and render the list of items, along with a summary of the total cost and options to clear the cart or proceed to order creation.
 
 Additionally, the cart data (specifically `cartItems`) obtained from the database via `getCartByUserId` is passed as a prop to `DesignsComponent.jsx`. This ensures that the "En el carrito" status for individual designs in the "Diseños" tab of the user's profile is accurately reflected based on the persistent cart data.
 
@@ -67,11 +71,12 @@ The client-side cart management is synchronized with the server-side `Cart` mode
 
 ## UI/UX Changes
 
-The cart functionality has been fully integrated into the user profile.
--   The dedicated `/carrito` page has been removed.
--   The `CartComponent` (`src/components/common/CartComponent.jsx`) now provides the complete cart experience within the user's profile 'Carrito' tab, including:
+The cart functionality now includes a preview modal and a dedicated page:
+-   **Cart Preview Modal:** A new modal accessible from the header will display a summary of cart items (image, name, price, quantity) and a button to navigate to the full `/carrito` page.
+-   **Dedicated `/carrito` Page:** This page has been reintroduced to provide the complete cart experience, including:
     -   Display of all cart items with quantity controls and removal options.
     -   Calculation and display of subtotal, shipping, and total to pay.
     -   "Vaciar Carrito" (Clear Cart) button.
-    -   "Realizar Pedido" (Place Order) button, which now triggers the order creation process.
--   The `CartLeftPanel`, `CartItemsList`, and `CartSummaryAndPayment` components from `src/components/carrito/` have been removed as their functionality is now consolidated.
+    -   "Realizar Pedido" (Place Order) button, which triggers the order creation process.
+-   The `CartComponent` (`src/components/common/CartComponent.jsx`) will now primarily serve the `/carrito` page, or be adapted to be used there.
+-   The `CartLeftPanel`, `CartItemsList`, and `CartSummaryAndPayment` components from `src/components/carrito/` may need to be re-evaluated or recreated for the dedicated `/carrito` page.

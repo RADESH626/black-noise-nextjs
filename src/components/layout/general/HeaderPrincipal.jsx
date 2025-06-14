@@ -3,16 +3,21 @@
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import { useSession } from 'next-auth/react';
-import { useState, useEffect, useRef } from 'react'; // Import useState, useEffect, useRef
+import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image'; // Import Image for the cart icon
 import IconoPersona from '../../common/iconos/IconoPersona';
 import BotonGeneral from '../../common/botones/BotonGeneral';
+import CartModal from '../carrito/CartModal'; // Import CartModal
+import { getCartByUserId } from '../../app/acciones/CartActions'; // Import cart actions
 
 function HeaderPrincipal() {
     const { data: session } = useSession();
 
-    
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown visibility
-    const dropdownRef = useRef(null); // Ref for dropdown element
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    const [showCartModal, setShowCartModal] = useState(false); // State for cart modal visibility
+    const [cartItems, setCartItems] = useState([]); // State for cart items
 
     const handleUserIconClick = () => {
         setIsDropdownOpen(!isDropdownOpen);
@@ -38,15 +43,29 @@ function HeaderPrincipal() {
                     BLACK NOISE
                 </h1>
                 <div className='flex flex-row items-center gap-4'>
-                    {/* Shopping Cart Link */}
-                    <Link href="/perfil"> {/* Change href to /perfil */}
-                        <div
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-white"
-                            style={{ backgroundColor: '#6b7280' }} // gray-500
-                        >
-                            🛒
-                        </div>
-                    </Link>
+                    {/* Shopping Cart Icon */}
+                    <div
+                        className="relative cursor-pointer"
+                        onClick={async () => {
+                            if (session?.user?.id) {
+                                const cartData = await getCartByUserId(session.user.id);
+                                setCartItems(cartData?.items || []);
+                            } else {
+                                setCartItems([]); // Clear cart items if no session
+                            }
+                            setShowCartModal(!showCartModal);
+                        }}
+                    >
+                        <Image src="/icons/icono-carrito.svg" alt="Carrito" width={30} height={30} />
+                        {cartItems.length > 0 && (
+                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                {cartItems.length}
+                            </span>
+                        )}
+                    </div>
+                    {showCartModal && (
+                        <CartModal cartItems={cartItems} onClose={() => setShowCartModal(false)} />
+                    )}
 
                     {session ? (
                         <div className='relative flex flex-row items-center justify-center gap-4' ref={dropdownRef}>
