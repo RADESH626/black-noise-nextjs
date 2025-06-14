@@ -14,7 +14,8 @@
 - Reintroduced the dedicated `/carrito` page, rendering the `CartComponent` for a full cart view.
 - The cart icon in the header now toggles the `CartModal` and fetches cart data.
 - Added a directive to `.clinerules` to enforce the use of path aliases for imports.
-- Adjusted the background opacity of the `CartModal` to be more transparent.
+- Refactored the `CartModal` to be a dropdown-style modal, similar to the profile menu, addressing the user's request for a transparent background behind the modal.
+- Fixed `ReferenceError: handleCartIconClick is not defined` in `HeaderPrincipal.jsx` by ensuring the function and ref declaration were correctly included.
 
 ## Remaining Tasks:
 - No remaining tasks for this specific request.
