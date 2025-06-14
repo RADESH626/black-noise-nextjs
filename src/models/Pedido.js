@@ -29,18 +29,8 @@ const PedidoSchema = new Schema({
         required: true,
         default: EstadoPedido.PENDIENTE // This can still be PENDIENTE for fulfillment status
     },
-    estadoPago: { // New field for payment status
-        type: String,
-        enum: ['PENDIENTE', 'PAGADO', 'FALLIDO', 'REEMBOLSADO'], // Define payment states
-        required: true,
-        default: 'PENDIENTE'
-    },
     total: { // Renamed from valorPedido for consistency
         type: Number,
-        required: true
-    },
-    metodoPago: {
-        type: String,
         required: true
     },
     direccionEnvio: {
@@ -50,18 +40,16 @@ const PedidoSchema = new Schema({
     cliente: { // Client details at the time of order
         nombre: { type: String, required: true },
         correo: { type: String, required: true },
-        direccion: { type: String, required: true }
+    direccion: { type: String, required: true }
     },
-    fechaRealizacion: {
-        type: Date,
-        default: Date.now
+    paymentId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Pago',
+        required: true
     },
     fechaEstimadaEntrega: {
         type: Date
-    },
-    detallesPedido: [{
-        type: String
-    }]
+    }
 }, {
     timestamps: true
 })

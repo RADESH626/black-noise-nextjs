@@ -48,6 +48,8 @@ Este documento describe la funcionalidad de gestión de pedidos y el flujo de pa
     *   Se añade o modifica el campo `estadoPago` (ej: `PENDIENTE`, `PAGADO`, `CANCELADO`).
 *   **`Pago` Model (`src/models/Pago.js`):**
     *   Nuevo modelo para registrar cada transacción de pago. Incluirá campos como `pedidoId`, `monto`, `fechaPago`, `metodoPago`, `estadoTransaccion`.
+*   **`Pedido` Model (`src/models/Pedido.js`):**
+    *   Se añade el campo `paymentId` de tipo `Schema.Types.ObjectId` que hace referencia al modelo `Pago`. Este campo es **requerido** ya que un pedido solo se crea después de un pago exitoso.
 
 ## Utilidad de Carga de Modelos (`src/utils/modelLoader.js`)
 
