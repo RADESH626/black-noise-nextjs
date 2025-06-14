@@ -1,12 +1,11 @@
 # Active Context Log
 
-## Task: Add shipping cost field to order schema
+## Task: Resolve repeated console logs in ProfileContent.jsx
 
 ### Changes Made:
-- **File:** `src/models/Pedido.js`
-  - **Description:** Added `costoEnvio` field of type `Number` with a default value of `0` to the `PedidoSchema`.
-- **File:** `memory-bank/functionalities/GestionDePedidosYPagos.md`
-  - **Description:** Updated the documentation to reflect the addition of the `costoEnvio` field in the `Pedido` model.
+- **File:** `src/components/layout/ProfileContent.jsx`
+  - **Description:** Moved initial client-side debugging `console.log` statements into a `useEffect` hook with an empty dependency array (`[]`). This ensures the logs execute only once when the component mounts, preventing repetition on subsequent re-renders caused by state updates or tab changes.
 
 ### Next Steps:
+- Update `memory-bank/progress.md`.
 - Generate Git commit commands.

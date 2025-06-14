@@ -1,6 +1,5 @@
 "use client";
 
-import { useModal } from "@/context/ModalContext";
 import { signOut, useSession } from "next-auth/react";
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
 import Link from "next/link"; // Import Link
@@ -10,22 +9,12 @@ import { getCartByUserId, addDesignToCart } from "@/app/acciones/CartActions";
 import { obtenerPedidosPorUsuarioId } from "@/app/acciones/PedidoActions";
 import DesignsComponent from "../common/DesignsComponent";
 import PedidosComponent from "../common/PedidosComponent";
-import CartComponent from "../common/CartComponent";
 import { ObtenerUsuarioPorId } from "@/app/acciones/UsuariosActions";
 import FormEditarUsuario from "@/components/perfil/FormEditarUsuario";
 import DesignUploadModal from "@/components/perfil/DesignUploadModal";
 import PaymentHistory from "@/components/perfil/PaymentHistory"; // Importar el nuevo componente
 
 function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [], initialUserPayments = [] }) {
-  // --- INICIO DE DEBUGGING EN CLIENTE ---
-  console.log('--- [CLIENTE] Props iniciales recibidas del servidor ---');
-  console.log('[CLIENTE] initialUserDesigns:', initialUserDesigns);
-  console.log('[CLIENTE] initialOrderedDesignIds:', initialOrderedDesignIds);
-  console.log('[CLIENTE] initialUserPayments:', initialUserPayments); // Log de los pagos
-  console.log('[CLIENTE] typeof initialUserPayments:', typeof initialUserPayments);
-  console.log('[CLIENTE] Array.isArray(initialUserPayments):', Array.isArray(initialUserPayments));
-  
-  const { openModal } = useModal();
   const { data: session, status } = useSession();
   const userId = session?.user?.id;
 
@@ -43,12 +32,20 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
   // Inicializa el estado con los datos del servidor
   const [orderedDesignIds, setOrderedDesignIds] = useState(new Set(initialOrderedDesignIds));
   
-  // Log para verificar el estado inicializado
-  console.log('[CLIENTE] Estado "orderedDesignIds" inicializado como Set:', orderedDesignIds);
-  console.log('--- [CLIENTE] FIN DEBUGGING INICIAL ---');
-
   // Ensure initialUserPayments is always an array for PaymentHistory
   const paymentsForHistory = Array.isArray(initialUserPayments) ? initialUserPayments : (initialUserPayments ? [initialUserPayments] : []);
+
+  // --- INICIO DE DEBUGGING EN CLIENTE ---
+  useEffect(() => {
+    console.log('--- [CLIENTE] Props iniciales recibidas del servidor ---');
+    console.log('[CLIENTE] initialUserDesigns:', initialUserDesigns);
+    // console.log('[CLIENTE] initialOrderedDesignIds:', initialOrderedDesignIds);
+    // console.log('[CLIENTE] initialUserPayments:', initialUserPayments); // Log de los pagos
+    // console.log('[CLIENTE] typeof initialUserPayments:', typeof initialUserPayments);
+    // console.log('[CLIENTE] Array.isArray(initialUserPayments):', Array.isArray(initialUserPayments));
+    console.log('[CLIENTE] Estado "orderedDesignIds" inicializado como Set:', orderedDesignIds);
+    console.log('--- [CLIENTE] FIN DEBUGGING INICIAL ---');
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   const fetchUserData = async () => {
     if (status === 'authenticated' && userId) {
@@ -66,6 +63,21 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
 
       setLoading(false);
     } else if (status === 'unauthenticated') {
+      setLoading(false);
+    }
+  };
+
+  const fetchUserDesigns = async () => {
+    if (status === 'authenticated' && userId) {
+      setLoading(true);
+      setError(null);
+      const { designs, error: fetchError } = await obtenerDesignsPorUsuarioId(userId);
+      if (fetchError) {
+        setError(fetchError);
+        setUserDesigns([]);
+      } else {
+        setUserDesigns(designs || []);
+      }
       setLoading(false);
     }
   };
@@ -88,24 +100,25 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
   // Este useEffect se encarga de obtener los datos del lado del cliente si es necesario
   useEffect(() => {
     fetchUserData();
+    fetchUserDesigns(); // Fetch designs on initial load and when userId/status changes
     fetchCartData();
   }, [userId, status]); // Se ejecuta cuando el userId o el estado de la sesión cambian
 
 
-  const handleAddItemToCart = async (item) => {
-    if (!userId) {
-      alert("Debes iniciar sesión para agregar ítems al carrito.");
-      return;
-    }
-    setCartLoading(true);
-    const { success, message } = await addDesignToCart(userId, item.id);
-    if (success) {
-      await fetchCartData();
-    } else {
-      setCartError({ message: message || "Error al agregar el diseño al carrito." });
-    }
-    setCartLoading(false);
-  };
+  // const handleAddItemToCart = async (item) => {
+  //   if (!userId) {
+  //     alert("Debes iniciar sesión para agregar ítems al carrito.");
+  //     return;
+  //   }
+  //   setCartLoading(true);
+  //   const { success, message } = await addDesignToCart(userId, item.id);
+  //   if (success) {
+  //     await fetchCartData();
+  //   } else {
+  //     setCartError({ message: message || "Error al agregar el diseño al carrito." });
+  //   }
+  //   setCartLoading(false);
+  // };
 
   const user = currentUser;
 
@@ -144,7 +157,7 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
   const handleAddDesign = () => {
     openModal(
       "Subir Nuevo Diseño",
-      <DesignUploadModal onDesignSaved={fetchUserData} />,
+      <DesignUploadModal onDesignSaved={fetchUserDesigns} />,
       'default'
     );
   };
@@ -209,14 +222,12 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
                 userDesigns={userDesigns}
                 handleEditDesign={handleEditDesign}
                 cartItems={cartItems}
-                addItem={handleAddItemToCart}
                 orderedDesignIds={orderedDesignIds}
               />
             )}
           </>
         )}
         {activeTab === 'orders' && (<PedidosComponent userId={user?.id} onPaymentSuccess={fetchCartData} />)} {/* Pass fetchCartData as onPaymentSuccess */}
-        {activeTab === 'cart' && (<CartComponent />)}
         {activeTab === 'payments' && (<PaymentHistory payments={paymentsForHistory} />)} {/* Usar PaymentHistory y pasar los pagos */}
       </div>
     </div>
