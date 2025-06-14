@@ -46,6 +46,7 @@ Este documento describe la funcionalidad de gestión de pedidos y el flujo de pa
 
 *   **`Pedido` Model (`src/models/Pedido.js`):**
     *   Se añade o modifica el campo `estadoPago` (ej: `PENDIENTE`, `PAGADO`, `CANCELADO`).
+    *   Se añade el campo `costoEnvio` de tipo `Number` con un valor por defecto de `0`, para indicar el coste de envío del pedido.
 *   **`Pago` Model (`src/models/Pago.js`):**
     *   Nuevo modelo para registrar cada transacción de pago. Incluirá campos como `pedidoId`, `monto`, `fechaPago`, `metodoPago`, `estadoTransaccion`.
     *   **Actualización Importante:** El campo `metodoPago` ahora utiliza el enum centralizado `MetodoPago` definido en `src/models/enums/pago/MetodoPago.js` para asegurar consistencia y evitar valores hardcodeados.

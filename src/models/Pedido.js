@@ -23,6 +23,11 @@ const PedidoSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Proveedor'
     },
+    metodoEntrega: {
+        type: String,
+        enum: ['DOMICILIO', 'RECOGIDA'], // Envío a domicilio o Recogida en punto
+        required: true
+    },
     estadoPedido: {
         type: String,
         enum: Object.values(EstadoPedido),
@@ -33,14 +38,19 @@ const PedidoSchema = new Schema({
         type: Number,
         required: true
     },
+    costoEnvio: {
+        type: Number,
+        required: true,
+        default: 0
+    },
     direccionEnvio: {
         type: String,
         required: true
     },
-    cliente: { // Client details at the time of order
+    destinatario: { // cliente al que le va a llegar el pedido
         nombre: { type: String, required: true },
         correo: { type: String, required: true },
-    direccion: { type: String, required: true }
+        direccion: { type: String, required: true }
     },
     paymentId: {
         type: Schema.Types.ObjectId,

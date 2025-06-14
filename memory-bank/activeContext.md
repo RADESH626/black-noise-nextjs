@@ -1,17 +1,12 @@
 # Active Context Log
 
-## Task: Refactor payment method enum usage
+## Task: Add shipping cost field to order schema
 
 ### Changes Made:
-- **File:** `src/models/Pago.js`
-  - **Description:** Replaced hardcoded payment method enum with `MetodoPago` enum from `src/models/enums/pago/MetodoPago.js`.
-- **File:** `src/components/pago/PaymentForm.jsx`
-  - **Description:** Updated to import and use `MetodoPago` enum for payment method selection, replacing hardcoded 'tarjeta' value.
-- **File:** `memory-bank/improvement_log.md`
-  - **Description:** Added a new directive to always check for existing enums in `src/models/enums/` before creating new ones.
+- **File:** `src/models/Pedido.js`
+  - **Description:** Added `costoEnvio` field of type `Number` with a default value of `0` to the `PedidoSchema`.
 - **File:** `memory-bank/functionalities/GestionDePedidosYPagos.md`
-  - **Description:** Updated documentation to reflect the use of the centralized `MetodoPago` enum in `src/models/Pago.js` and `src/components/pago/PaymentForm.jsx`.
+  - **Description:** Updated the documentation to reflect the addition of the `costoEnvio` field in the `Pedido` model.
 
 ### Next Steps:
-- Update `memory-bank/progress.md`.
 - Generate Git commit commands.
