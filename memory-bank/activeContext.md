@@ -36,3 +36,21 @@
 
 ### Next Steps:
 -   Finalize the task by updating `progress.md` and generating git commands.
+
+## Login Credentials (Provided by User)
+
+These credentials can be used for testing different user roles in the application:
+
+*   **Cliente:** `vscodeCLiente@gmail.com`
+*   **Proveedor:** `vscodeProveedor@gmail.com`
+*   **Administrador:** `vscodeAdministrador@gmail.com`
+
+**Contraseña para todos los roles:** `Contraseña123@`
+
+### Operational Directives for Login
+
+*   **Normal User Flow:** When initiating a login, always follow the normal user flow (click email field, type email, click password field, type password, click the *text* "Iniciar Sesión") without attempting any shortcuts or direct navigations that bypass the standard login page interaction.
+
+### General Operational Directives
+
+*   **Avoid MCP Tools:** Do not use Model Context Protocol (MCP) tools unless explicitly instructed or if no other alternative exists. This includes the `browser_action` tool.

@@ -74,6 +74,14 @@ Para esta refactorización, la prioridad es `BinData`. GridFS se documentará co
 
 ### 5.2. Componentes del Backend
 
+### 5.2.1. Acciones de Diseño (`src/app/acciones/DesignActions.js`)
+
+El archivo `DesignActions.js` contiene las funciones para interactuar con los diseños en la base de datos. La función `obtenerDesigns` es crucial para el catálogo:
+*   **Obtención de Datos:** Recupera todos los documentos de diseño de la colección `Design`.
+*   **Población de Datos de Usuario:** Utiliza `populate` para incluir información del usuario asociado a cada diseño (nombre de usuario, avatar).
+*   **Formato de Imagen:** Convierte los datos binarios de la imagen (`imageData`) y su tipo MIME (`imageMimeType`) almacenados en la base de datos a una URL de datos Base64 (`data:image/jpeg;base64,...`). Esta URL es utilizada directamente por el frontend para mostrar las imágenes.
+*   **Estructura de Respuesta:** Retorna un objeto con una propiedad `data` que contiene un array de diseños formateados, listos para ser consumidos por los componentes del frontend.
+
 *   **`src/app/api/designs/route.js` (o ruta de API de diseños):**
     *   Ajustar el middleware o la lógica de la ruta para parsear solicitudes `multipart/form-data`.
     *   Extraer el archivo binario de la solicitud.
@@ -141,6 +149,18 @@ Una vez que esta documentación sea revisada y aprobada, el plan de acción para
 ### 5.1.1. Comportamiento del Botón "Agregar al Carrito"
 
 *   En el componente `DesignsComponent.jsx`, la lógica del botón "Agregar al Carrito" ha sido modificada para permitir la recompra de diseños previamente adquiridos. Anteriormente, el botón se deshabilitaba si el diseño ya formaba parte de un pedido histórico. Ahora, el botón solo se deshabilita si el diseño ya se encuentra en el carrito actual del usuario.
+
+### 5.1.2. Componente `ComunidadDiseños` (`src/app/catalogo/page.jsx`)
+
+El componente `ComunidadDiseños` es la página principal del catálogo. Es responsable de:
+*   **Obtención de Diseños:** Utiliza el hook `useEffect` para llamar a `obtenerDesigns` de `@/app/acciones/DesignActions` y cargar todos los diseños disponibles en el estado `allDesigns`.
+*   **Gestión de Estado:** Mantiene el estado de carga (`loadingDesigns`) y errores (`errorDesigns`) durante la obtención de datos.
+*   **Visualización:** Renderiza los diseños a través del componente `DesignGrid`. Actualmente, el componente `DesignGrid` está comentado, lo que impide la visualización de los diseños en el catálogo. Para que los diseños sean visibles, `DesignGrid` debe ser descomentado y sus props (`tarjetas`, `activo`, `addItem`, `cartItems`) deben ser pasadas correctamente.
+*   **Manejo de `cartItems`:** El componente `DesignGrid` requiere la prop `cartItems` para determinar si un diseño ya está en el carrito. Anteriormente, esta prop no se pasaba o `cartItems` no se inicializaba, lo que causaba un error "Cannot read properties of undefined (reading 'some')". Para resolver esto, se debe:
+    1.  Declarar un estado `cartItems` en `ComunidadDiseños` (ej. `const [cartItems, setCartItems] = useState([]);`).
+    2.  Importar `getCartByUserId` de `@/app/acciones/CartActions`.
+    3.  Utilizar un `useEffect` para llamar a `getCartByUserId(userId)` y actualizar el estado `cartItems` una vez que el `userId` esté disponible (después de la sesión).
+    4.  Pasar `cartItems={cartItems}` al componente `DesignGrid`.
 
 6.  **Implementación de Manejo de Errores:**
     *   Añadir o mejorar el manejo de errores en frontend y backend para los escenarios identificados.

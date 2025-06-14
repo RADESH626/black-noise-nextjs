@@ -16,6 +16,9 @@
 - Added a directive to `.clinerules` to enforce the use of path aliases for imports.
 - Refactored the `CartModal` to be a dropdown-style modal, similar to the profile menu, addressing the user's request for a transparent background behind the modal.
 - Fixed `ReferenceError: handleCartIconClick is not defined` in `HeaderPrincipal.jsx` by ensuring the function and ref declaration were correctly included.
+- Uncommented the `DesignGrid` component in `src/app/catalogo/page.jsx` to enable design display.
+- Implemented `cartItems` state and fetch logic in `src/app/catalogo/page.jsx` to correctly pass cart data to `DesignGrid`, resolving the "Cannot read properties of undefined (reading 'some')" error.
+- Corrected the syntax error in `src/components/catalogo/DesignGrid.jsx` related to `cartItems.some`.
 
 ## Remaining Tasks:
 - No remaining tasks for this specific request.
