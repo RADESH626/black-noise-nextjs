@@ -19,6 +19,11 @@
 - Uncommented the `DesignGrid` component in `src/app/catalogo/page.jsx` to enable design display.
 - Implemented `cartItems` state and fetch logic in `src/app/catalogo/page.jsx` to correctly pass cart data to `DesignGrid`, resolving the "Cannot read properties of undefined (reading 'some')" error.
 - Corrected the syntax error in `src/components/catalogo/DesignGrid.jsx` related to `cartItems.some`.
+- Fixed `Error: useModal is not defined` in `src/components/common/CartComponent.jsx` by importing `usePopUp` and replacing the incorrect hook usage.
+- Enhanced the `/carrito` page to display design descriptions and categories, and removed the shipping cost display, showing only the subtotal and total.
+- Fixed an issue where updating cart item quantity with an empty or invalid input caused a "Cast to Number failed" validation error by ensuring the raw string value is passed and parsed/validated in the correct component.
+- Resolved a TypeScript error (`Se esperaba '...'`) in `CartItem.jsx` by refining the JSX structure and ensuring proper `alt` attribute for images.
+- Optimized cart item quantity updates to prevent full component re-renders by updating the `cartItems` state locally instead of refetching the entire cart.
 
 ## Remaining Tasks:
 - No remaining tasks for this specific request.

@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { obtenerPedidosPagadosPorUsuarioId } from "@/app/acciones/PedidoActions"; // Use the new action
-// import { useModal } from '@/context/ModalContext'; // No longer needed
 // import PaymentModal from '@/components/pago/PaymentModal'; // No longer needed
 import DesignImageDisplay from '@/components/common/DesignImageDisplay';
 

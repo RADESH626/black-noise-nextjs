@@ -6,22 +6,9 @@ import { Rol } from './enums/usuario/Rol';
 // MongoDB already provides a unique `_id` field by default.
 
 const UsuarioSchema = new Schema({
-    tipoDocumento: {
-        type: String,
-        enum: Object.values(TipoDocumentoIdentidad),
-        required: true
-    },
-    numeroDocumento: {
-        type: String,
-        required: true
-    },
-    primerNombre: {
+    Nombre: {
         type: String,
         required: true,
-        trim: true
-    },
-    segundoNombre: {
-        type: String,
         trim: true
     },
     primerApellido: {
@@ -33,9 +20,14 @@ const UsuarioSchema = new Schema({
         type: String,
         trim: true
     },
-    nombreUsuario: {
+    tipoDocumento: {
         type: String,
-        unique: true
+        enum: Object.values(TipoDocumentoIdentidad),
+        required: true
+    },
+    numeroDocumento: {
+        type: String,
+        required: true
     },
     fechaNacimiento: {
         type: Date,
@@ -53,6 +45,10 @@ const UsuarioSchema = new Schema({
     direccion: {
         type: String,
         required: true
+    },
+    nombreUsuario: {
+        type: String,
+        unique: true
     },
     correo: {
         type: String,
@@ -79,7 +75,7 @@ const UsuarioSchema = new Schema({
         type: Boolean,
         default: true
     }
-},{
+}, {
     timestamps: true
 }
 

@@ -18,14 +18,14 @@ const CartModal = ({ cartItems, onClose }) => {
             {cartItems.map((item) => (
               <li key={item.designId} className="flex items-center mb-4 border-b pb-4">
                 <Image
-                  src={item.imageUrl || '/img/placeholder.jpg'} // Assuming item has imageUrl
-                  alt={item.name}
+                  src={item.imageData ? `data:${item.imageMimeType};base64,${item.imageData}` : '/img/placeholder.jpg'}
+                  alt={item.nombre}
                   width={60}
                   height={60}
                   className="rounded mr-4"
                 />
                 <div className="flex-1">
-                  <h3 className="font-semibold">{item.name}</h3>
+                  <h3 className="font-semibold">{item.nombre}</h3>
                   <p className="text-sm text-gray-600">Precio: ${item.price}</p>
                   <p className="text-sm text-gray-600">Cantidad: {item.quantity}</p>
                 </div>

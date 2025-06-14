@@ -4,7 +4,6 @@
 
 export const Rol = {
     CLIENTE: 'CLIENTE',
-    EMPLEADO: 'EMPLEADO',
     ADMINISTRADOR: 'ADMINISTRADOR',
     PROVEEDOR: 'PROVEEDOR'
 }

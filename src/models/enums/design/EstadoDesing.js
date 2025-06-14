@@ -4,9 +4,8 @@
 
 export const EstadoDesing = {
     PRIVADO: 'PRIVADO', // Estado inicial por defecto para diseños subidos por el usuario
-    PUBLICADO: 'PUBLICADO',
     EN_REVISION: 'EN_REVISION',
-    DESHABILITADO: 'DESHABILITADO',
+    DESCARTADO: 'DESCARTADO'
 };
 
 export default EstadoDesing;

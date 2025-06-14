@@ -8,11 +8,13 @@ function CartItem({ item, onUpdateQuantity, onRemoveItem }) {
     <div key={item.id} className="flex items-center justify-between bg-gray-800 p-4 rounded-lg">
       <div className="flex items-center">
         {item.image && (
-          <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-md mr-4" />
+          <img src={item.image} alt={item.nombre || 'Design Image'} className="w-16 h-16 object-cover rounded-md mr-4" />
         )}
-        <div>
-          <h3 className="text-lg font-semibold text-white">{item.name}</h3>
+        <div className="flex-grow"> {/* Added flex-grow to ensure content takes available space */}
+          <h3 className="text-lg font-semibold text-white">{item.nombre}</h3>
           <p className="text-gray-400">Precio: ${item.price.toFixed(2)}</p>
+          {item.descripcion && <p className="text-gray-400 text-sm">Descripción: {item.descripcion}</p>}
+          {item.categoria && <p className="text-gray-400 text-sm">Categoría: {item.categoria}</p>}
         </div>
       </div>
       <div className="flex items-center space-x-4">
@@ -20,7 +22,7 @@ function CartItem({ item, onUpdateQuantity, onRemoveItem }) {
           type="number"
           min="0"
           value={item.quantity}
-          onChange={(e) => onUpdateQuantity(item.id, parseInt(e.target.value))}
+          onChange={(e) => onUpdateQuantity(item.id, e.target.value)}
           className="w-20 p-2 bg-gray-700 border border-gray-600 rounded-md text-white"
         />
         <BotonGeneral onClick={() => onRemoveItem(item.id)}>

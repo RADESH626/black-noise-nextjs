@@ -5,7 +5,6 @@ import HeroSection from '@/components/home/HeroSection';
 import DesignRealClothesSection from '@/components/home/DesignRealClothesSection';
 import AddElementsSection from '@/components/home/AddElementsSection';
 import GarmentTypesSection from '@/components/home/GarmentTypesSection';
-import SupplierRegistrationSection from '@/components/home/SupplierRegistrationSection';
 
 
 function indexPage() {

@@ -4,3 +4,4 @@
 
 export { TipoDocumentoIdentidad } from './TipoDocumentoIdentidad'
 export { Rol } from './Rol'
+export { Genero } from './Genero'

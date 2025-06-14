@@ -5,7 +5,6 @@ import BotonGeneral from "@/components/common/botones/BotonGeneral";
 import Link from "next/link"; // Import Link
 import { useEffect, useState } from "react";
 import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions";
-import { getCartByUserId, addDesignToCart } from "@/app/acciones/CartActions";
 import { obtenerPedidosPorUsuarioId } from "@/app/acciones/PedidoActions";
 import DesignsComponent from "../common/DesignsComponent";
 import PedidosComponent from "../common/PedidosComponent";
@@ -17,14 +16,11 @@ import PaymentHistory from "@/components/perfil/PaymentHistory"; // Importar el 
 function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [], initialUserPayments = [] }) {
   const { data: session, status } = useSession();
   const userId = session?.user?.id;
-
   const [activeTab, setActiveTab] = useState('designs');
   const [currentUser, setCurrentUser] = useState(null);
   const [userDesigns, setUserDesigns] = useState(initialUserDesigns);
-  
   const [loading, setLoading] = useState(initialUserDesigns.length === 0); // Solo loading si no hay datos iniciales
   const [error, setError] = useState(null);
-
   const [cartItems, setCartItems] = useState([]);
   const [cartLoading, setCartLoading] = useState(true);
   const [cartError, setCartError] = useState(null);
@@ -81,27 +77,11 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
       setLoading(false);
     }
   };
-
-  const fetchCartData = async () => {
-    if (status === 'authenticated' && userId) {
-      setCartLoading(true);
-      setCartError(null);
-      const { cart, error: fetchError } = await getCartByUserId(userId);
-      if (fetchError) {
-        setCartError({ message: fetchError });
-        setCartItems([]);
-      } else {
-        setCartItems(cart?.items || []);
-      }
-      setCartLoading(false);
-    }
-  };
   
   // Este useEffect se encarga de obtener los datos del lado del cliente si es necesario
   useEffect(() => {
     fetchUserData();
     fetchUserDesigns(); // Fetch designs on initial load and when userId/status changes
-    fetchCartData();
   }, [userId, status]); // Se ejecuta cuando el userId o el estado de la sesión cambian
 
 
@@ -193,7 +173,6 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
       <nav className="mb-8 flex-shrink-0">
         <div className="flex border-b border-gray-700">
           <button className={`py-3 px-6 text-lg font-medium ${activeTab === 'designs' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`} onClick={() => setActiveTab('designs')}>DISEÑOS</button>
-          <button className={`py-3 px-6 text-lg font-medium ${activeTab === 'cart' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`} onClick={() => setActiveTab('cart')}>CARRITO</button>
           <button className={`py-3 px-6 text-lg font-medium ${activeTab === 'orders' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`} onClick={() => setActiveTab('orders')}>PEDIDOS</button>
           <button className={`py-3 px-6 text-lg font-medium ${activeTab === 'payments' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`} onClick={() => setActiveTab('payments')}>PAGOS</button>
         </div>

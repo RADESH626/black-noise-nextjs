@@ -1,7 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { PopUpProvider } from '../context/PopUpContext';
-import { ModalProvider } from '../context/ModalContext';
 import SessionProviderWrapper from './SessionProviderWrapper';
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,11 +22,9 @@ export default function RootLayout({ children }) {
     <html lang="es">
       <body className="bg-primary text-secondary">
           <PopUpProvider>
-            <ModalProvider>
                   <SessionProviderWrapper>
                     {children}
                   </SessionProviderWrapper>
-            </ModalProvider>
           </PopUpProvider>
       </body>
     </html>

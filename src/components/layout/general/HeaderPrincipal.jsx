@@ -27,8 +27,13 @@ function HeaderPrincipal() {
 
     const handleCartIconClick = async () => {
         if (session?.user?.id) {
-            const cartData = await getCartByUserId(session.user.id);
-            setCartItems(cartData?.items || []);
+            const { cart, error } = await getCartByUserId(session.user.id);
+            if (error) {
+                console.error("Error fetching cart:", error);
+                setCartItems([]);
+            } else {
+                setCartItems(cart?.items || []);
+            }
         } else {
             setCartItems([]); // Clear cart items if no session
         }

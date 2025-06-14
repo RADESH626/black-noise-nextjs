@@ -1,5 +1,5 @@
 import { Schema, model, models } from 'mongoose'
-import { MetodoPago } from '../enums/pago/MetodoPago';
+import { MetodoPago } from '@/models/enums/pago/MetodoPago';
 
 const PagoSchema = new Schema({
     usuarioId: {
@@ -10,6 +10,11 @@ const PagoSchema = new Schema({
     pedidoId: {
         type: Schema.Types.ObjectId,
         ref: 'Pedido',
+        required: true
+    },
+    ventaId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Venta',
         required: true
     },
     valorPago: {
@@ -29,11 +34,6 @@ const PagoSchema = new Schema({
     detallesTarjeta: { // New field for card details
         cardNumber: { type: String }, // Store last 4 digits
         expiryDate: { type: String },
-        cvv: { type: String } // Masked
-    },
-    fechaRealizacion: {
-        type: Date,
-        default: Date.now
     }
 },{
     timestamps: true

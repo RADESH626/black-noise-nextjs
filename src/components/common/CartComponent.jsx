@@ -6,13 +6,13 @@ import CartItem from './CartItem';
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation"; // Import useRouter
 import { getCartByUserId, addDesignToCart, removeDesignFromCart, updateCartItemQuantity, clearUserCart } from "@/app/acciones/CartActions";
-import { useModal } from '@/context/ModalContext'; // Import useModal
 import { procesarPagoYCrearPedido } from "@/app/acciones/PagoActions"; // Import the payment action
+import { usePopUp } from '@/context/PopUpContext'; // Import usePopUp
 
 function CartComponent() {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const { openModal, closeModal } = useModal(); // Use the modal hook
+  const { showPopUp, hidePopUp } = usePopUp(); // Use the PopUp hook
   const userId = session?.user?.id;
 
   const [cartItems, setCartItems] = useState([]);
@@ -75,17 +75,35 @@ function CartComponent() {
     setLoading(false);
   };
 
-  const handleUpdateQuantity = async (designId, quantity) => {
+  const handleUpdateQuantity = async (designId, quantityInput) => {
     if (!userId) {
       alert("Debes iniciar sesión para actualizar la cantidad del carrito.");
       return;
     }
-    if (quantity < 0) return;
+
+    const newQuantity = parseInt(quantityInput);
+
+    // If the input is empty or results in NaN, treat it as 0 or prevent update
+    if (isNaN(newQuantity) || newQuantity < 0) {
+      // Optionally, you could set the quantity to 0 or show an error
+      // For now, we'll just return if it's invalid to prevent the API call with NaN
+      return;
+    }
 
     setLoading(true);
-    const { success, message } = await updateCartItemQuantity(userId, designId, quantity);
+    const { success, message } = await updateCartItemQuantity(userId, designId, newQuantity);
     if (success) {
-      await fetchCart();
+      setCartItems(prevItems => {
+        if (newQuantity === 0) {
+          // Remove item if quantity is 0
+          return prevItems.filter(item => item.id !== designId);
+        } else {
+          // Update quantity for the specific item
+          return prevItems.map(item =>
+            item.id === designId ? { ...item, quantity: newQuantity } : item
+          );
+        }
+      });
     } else {
       setError({ message: message || "Error al actualizar la cantidad del diseño." });
     }
@@ -131,7 +149,7 @@ function CartComponent() {
     router.push("/pago"); // Redirigir a la página de pago
   };
 
-  const totalConEnvio = getTotal() + 50;
+  const totalAPagar = getTotal(); // Renamed from totalConEnvio
 
   if (loading) {
     return (
@@ -177,13 +195,10 @@ function CartComponent() {
             <span>Subtotal:</span>
             <span>${getTotal().toFixed(2)}</span>
           </div>
-          <div className="flex justify-between items-center text-white text-lg font-semibold mb-4">
-            <span>Envío:</span>
-            <span>$50.00</span>
-          </div>
+          {/* Envío section removed as per user request */}
           <div className="flex justify-between items-center text-white text-xl font-bold mb-6">
             <span>Total a Pagar:</span>
-            <span>${totalConEnvio.toFixed(2)}</span>
+            <span>${totalAPagar.toFixed(2)}</span>
           </div>
           <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
             <BotonGeneral onClick={handleClearCart} disabled={loading}>

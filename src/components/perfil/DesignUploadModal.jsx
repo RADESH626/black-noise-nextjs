@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"; // Import useState and useEffect
 import { guardarDesigns } from "@/app/acciones/DesignActions";
-import { useModal } from "@/context/ModalContext";
 import { usePopUp } from "@/context/PopUpContext";
 import { CategoriaProducto } from "@/models/enums/CategoriaProducto"; // Assuming this path for enum
 
