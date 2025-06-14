@@ -13,6 +13,8 @@
 - Created a `CartModal.jsx` component that displays a preview of cart items (image, name, price, quantity) and a message for an empty cart.
 - Reintroduced the dedicated `/carrito` page, rendering the `CartComponent` for a full cart view.
 - The cart icon in the header now toggles the `CartModal` and fetches cart data.
+- Added a directive to `.clinerules` to enforce the use of path aliases for imports.
+- Adjusted the background opacity of the `CartModal` to be more transparent.
 
 ## Remaining Tasks:
 - No remaining tasks for this specific request.

@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 const CartModal = ({ cartItems, onClose }) => {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-end z-50" onClick={onClose}>
+    <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-end z-50" onClick={onClose}>
       <div
         className="bg-white w-80 h-full shadow-lg p-4 overflow-y-auto"
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
