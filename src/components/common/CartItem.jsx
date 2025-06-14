@@ -12,7 +12,8 @@ const CartItem = memo(({ item, onUpdateQuantity, onRemoveItem }) => {
         )}
         <div className="flex-grow"> {/* Added flex-grow to ensure content takes available space */}
           <h3 className="text-lg font-semibold text-white">{item.nombre}</h3>
-          <p className="text-gray-400">Precio: ${item.price.toFixed(2)}</p>
+          <p className="text-gray-400">Precio unitario: ${item.price.toFixed(2)}</p>
+          <p className="text-gray-400 font-bold">Subtotal: ${(item.price * item.quantity).toFixed(2)}</p>
           {item.descripcion && <p className="text-gray-400 text-sm">Descripción: {item.descripcion}</p>}
           {item.categoria && <p className="text-gray-400 text-sm">Categoría: {item.categoria}</p>}
         </div>

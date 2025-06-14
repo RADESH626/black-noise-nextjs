@@ -13,6 +13,7 @@
 1.  **Modified `src/components/common/CartComponent.jsx`:** Removed shipping cost display and adjusted total calculation to only include subtotal.
 2.  **Modified `src/app/acciones/CartActions.js`:** Updated `getCartByUserId` to populate `descripcion` and `categoria` fields from the `Design` model.
 3.  **Modified `src/components/common/CartItem.jsx`:** Added display for `item.descripcion` and `item.categoria`.
+4.  **Modified `src/components/common/CartItem.jsx`:** Added display for the subtotal of each item (`item.price * item.quantity`).
 
 ### Problems Encountered:
 -   `ERROR in updateCartItemQuantity: Error: Cart validation failed: items.0.quantity: Cast to Number failed for value "NaN" (type number) at path "quantity"`: This error occurred because `parseInt(e.target.value)` was being called in `CartItem.jsx` before passing the value to `CartComponent.jsx`, leading to `NaN` being passed to the action.

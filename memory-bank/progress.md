@@ -26,6 +26,7 @@
 - Optimized cart item quantity updates to prevent full component re-renders by updating the `cartItems` state locally instead of refetching the entire cart, and by memoizing `CartItem` and stabilizing callback functions in `CartComponent`.
 - Extended local state updates to `handleAddItem`, `handleRemoveItem`, and `handleClearCart` in `CartComponent.jsx` to prevent full component re-renders on all cart modifications.
 - Prevented the "Cargando" message from appearing during quantity updates by removing global loading state triggers from `handleUpdateQuantity`.
+- Added subtotal display for each design item in `src/components/common/CartItem.jsx`.
 
 ## Remaining Tasks:
 - No remaining tasks for this specific request.
