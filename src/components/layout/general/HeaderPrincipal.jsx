@@ -5,10 +5,10 @@ import { signOut } from 'next-auth/react';
 import { useSession } from 'next-auth/react';
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image'; // Import Image for the cart icon
-import IconoPersona from '../../common/iconos/IconoPersona';
-import BotonGeneral from '../../common/botones/BotonGeneral';
-import CartModal from '../carrito/CartModal'; // Import CartModal
-import { getCartByUserId } from '../../app/acciones/CartActions'; // Import cart actions
+import IconoPersona from '@/components/common/iconos/IconoPersona';
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
+import CartModal from '@/components/carrito/CartModal'; // Import CartModal
+import { getCartByUserId } from '@/app/acciones/CartActions'; // Import cart actions
 
 function HeaderPrincipal() {
     const { data: session } = useSession();
