@@ -23,7 +23,9 @@
 - Enhanced the `/carrito` page to display design descriptions and categories, and removed the shipping cost display, showing only the subtotal and total.
 - Fixed an issue where updating cart item quantity with an empty or invalid input caused a "Cast to Number failed" validation error by ensuring the raw string value is passed and parsed/validated in the correct component.
 - Resolved a TypeScript error (`Se esperaba '...'`) in `CartItem.jsx` by refining the JSX structure and ensuring proper `alt` attribute for images.
-- Optimized cart item quantity updates to prevent full component re-renders by updating the `cartItems` state locally instead of refetching the entire cart.
+- Optimized cart item quantity updates to prevent full component re-renders by updating the `cartItems` state locally instead of refetching the entire cart, and by memoizing `CartItem` and stabilizing callback functions in `CartComponent`.
+- Extended local state updates to `handleAddItem`, `handleRemoveItem`, and `handleClearCart` in `CartComponent.jsx` to prevent full component re-renders on all cart modifications.
+- Prevented the "Cargando" message from appearing during quantity updates by removing global loading state triggers from `handleUpdateQuantity`.
 
 ## Remaining Tasks:
 - No remaining tasks for this specific request.

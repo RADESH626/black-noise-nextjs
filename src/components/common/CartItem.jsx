@@ -1,9 +1,9 @@
 "use client";
 
-import React from 'react';
+import React, { memo } from 'react';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
-function CartItem({ item, onUpdateQuantity, onRemoveItem }) {
+const CartItem = memo(({ item, onUpdateQuantity, onRemoveItem }) => {
   return (
     <div key={item.id} className="flex items-center justify-between bg-gray-800 p-4 rounded-lg">
       <div className="flex items-center">
@@ -31,6 +31,6 @@ function CartItem({ item, onUpdateQuantity, onRemoveItem }) {
       </div>
     </div>
   );
-}
+}); // Corrected closing for memo
 
 export default CartItem;

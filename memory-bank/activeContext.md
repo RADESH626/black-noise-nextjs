@@ -19,8 +19,11 @@
     -   **Correction:** Modified `src/components/common/CartItem.jsx` to pass the raw string value (`e.target.value`) directly to `onUpdateQuantity`. The parsing and validation of the quantity now occur solely within `src/components/common/CartComponent.jsx`.
 -   `[ts Error] Line 25: Se esperaba '...'.`: This TypeScript error in `src/components/common/CartItem.jsx` was likely due to a subtle JSX parsing issue or malformed structure.
     -   **Correction:** Rewrote the JSX structure within `src/components/common/CartItem.jsx` to ensure clean and correctly formed JSX, and updated `alt={item.nombre || 'Design Image'}` for the image.
--   **Unnecessary full component re-render on quantity update:** The `CartComponent` was re-rendering entirely because `fetchCart()` was called after every quantity update, causing the `cartItems` state to be replaced with a new array reference.
-    -   **Correction:** Modified `src/components/common/CartComponent.jsx` to update the `cartItems` state locally after a successful `updateCartItemQuantity` API call. This prevents a full re-fetch and should lead to more efficient re-renders.
+-   **Unnecessary full component re-render on cart modifications:** The `CartComponent` was re-rendering entirely on any cart modification (add, remove, update quantity, clear) because `fetchCart()` was called, causing the `cartItems` state to be replaced with a new array reference, and also due to unstable function references passed to memoized child components.
+    -   **Correction:** Modified `src/components/common/CartComponent.jsx` to update the `cartItems` state locally after successful `addDesignToCart`, `removeDesignFromCart`, `updateCartItemQuantity`, and `clearUserCart` API calls. This prevents full re-fetches. Additionally, wrapped `handleUpdateQuantity`, `handleRemoveItem`, `handleAddItem`, and `handleClearCart` functions with `useCallback` to ensure stable references.
+    -   **Correction:** Wrapped `CartItem` component in `src/components/common/CartItem.jsx` with `React.memo` to prevent unnecessary re-renders when its props haven't changed.
+-   **"Cargando" message appearing on quantity update:** The global `loading` state was being triggered by `setLoading(true)` and `setLoading(false)` calls within `handleUpdateQuantity`, causing the "Cargando carrito..." message to appear.
+    -   **Correction:** Removed `setLoading(true)` and `setLoading(false)` calls specifically from the `handleUpdateQuantity` function in `src/components/common/CartComponent.jsx`. This ensures that quantity updates do not trigger the global loading indicator.
 
 ### Next Steps:
 -   Update `progress.md` and generate git commands.

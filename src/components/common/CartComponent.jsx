@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import CartItem from './CartItem';
 import { useSession } from "next-auth/react";
@@ -45,22 +45,22 @@ function CartComponent() {
     return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
-  const handleAddItem = async (designId) => {
+  const handleAddItem = useCallback(async (designId) => {
     if (!userId) {
       alert("Debes iniciar sesión para agregar ítems al carrito.");
       return;
     }
     setLoading(true);
-    const { success, message } = await addDesignToCart(userId, designId);
+    const { success, message, data: updatedCart } = await addDesignToCart(userId, designId);
     if (success) {
-      await fetchCart();
+      setCartItems(updatedCart?.items || []); // Update with the new cart items from the response
     } else {
       setError({ message: message || "Error al agregar el diseño al carrito." });
     }
     setLoading(false);
-  };
+  }, [userId]); // Removed fetchCart from dependencies as it's no longer called directly
 
-  const handleRemoveItem = async (designId) => {
+  const handleRemoveItem = useCallback(async (designId) => {
     if (!userId) {
       alert("Debes iniciar sesión para eliminar ítems del carrito.");
       return;
@@ -68,14 +68,14 @@ function CartComponent() {
     setLoading(true);
     const { success, message } = await removeDesignFromCart(userId, designId);
     if (success) {
-      await fetchCart();
+      setCartItems(prevItems => prevItems.filter(item => item.id !== designId)); // Filter out the removed item
     } else {
       setError({ message: message || "Error al eliminar el diseño del carrito." });
     }
     setLoading(false);
-  };
+  }, [userId]); // Removed fetchCart from dependencies
 
-  const handleUpdateQuantity = async (designId, quantityInput) => {
+  const handleUpdateQuantity = useCallback(async (designId, quantityInput) => {
     if (!userId) {
       alert("Debes iniciar sesión para actualizar la cantidad del carrito.");
       return;
@@ -90,7 +90,7 @@ function CartComponent() {
       return;
     }
 
-    setLoading(true);
+    // Do not set global loading state for quantity updates to avoid full component re-render
     const { success, message } = await updateCartItemQuantity(userId, designId, newQuantity);
     if (success) {
       setCartItems(prevItems => {
@@ -107,10 +107,10 @@ function CartComponent() {
     } else {
       setError({ message: message || "Error al actualizar la cantidad del diseño." });
     }
-    setLoading(false);
-  };
+    // Do not set global loading state to false here either
+  }, [userId]); // setCartItems is stable, so no need to add it as dependency
 
-  const handleClearCart = async () => {
+  const handleClearCart = useCallback(async () => {
     if (!userId) {
       alert("Debes iniciar sesión para vaciar el carrito.");
       return;
@@ -118,12 +118,12 @@ function CartComponent() {
     setLoading(true);
     const { success, message } = await clearUserCart(userId);
     if (success) {
-      await fetchCart();
+      setCartItems([]); // Set cart items to an empty array
     } else {
       setError({ message: message || "Error al vaciar el carrito." });
     }
     setLoading(false);
-  };
+  }, [userId]); // Removed fetchCart from dependencies
 
   const handleProceedToPayment = async () => {
     if (!userId) {
