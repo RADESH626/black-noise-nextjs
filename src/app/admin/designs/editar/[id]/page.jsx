@@ -109,7 +109,7 @@ function EditDesignPage({ params }) {
 
       if (result?.success) {
         showPopUp("Diseño actualizado exitosamente", "success");
-        router.push("/admin/designs"); // Redirect back to designs list
+        router.push("/admin"); // Redirect back to designs list
       } else {
         setError(result?.message || "Error desconocido al actualizar el diseño.");
         showPopUp(result?.message || "Error desconocido al actualizar el diseño.", "error");

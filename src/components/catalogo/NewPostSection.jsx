@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 function NewPostSection() {
   return (
-    <div className="bg-black/80 p-4 rounded-2xl shadow-lg mb-6 flex flex-col items-center">
+    <div className="p-4 rounded-2xl shadow-lg mb-6 flex flex-col items-center" style={{ backgroundColor: '#0B0B0B' }}>
       <div className="flex items-center w-full mb-4">
         <img
           src="/img/perfil/FotoPerfil.webp"
@@ -14,14 +14,26 @@ function NewPostSection() {
         <input
           type="text"
           placeholder="¿Qué diseño estás pensando hoy?"
-          className="flex-grow p-3 rounded-full bg-[#292727] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-grow p-3 rounded-full text-white placeholder-[#AAAAAA] focus:outline-none focus:ring-2"
+          style={{
+            backgroundColor: '#1E1E1EEC',
+            border: '1px solid #0A1828',
+            boxShadow: '0 0 0 2px #FFFFFFFF' // optional glow
+          }}
         />
       </div>
-      <Link href="/perfil" className="bg-blue-600 px-6 py-2 rounded-full text-white font-semibold hover:bg-blue-700 transition-colors duration-300">
+      <Link
+        href="/perfil"
+        className="px-6 py-2 rounded-full text-white font-semibold transition-colors duration-300"
+        style={{
+          backgroundColor: '#1A3870FF',
+          hover: '#0A1828' // this won't work inline, needs Tailwind hover: setup
+        }}
+      >
         Publicar Diseño
       </Link>
     </div>
   );
 }
 
-export default NewPostSection;
+export default NewPostSection;

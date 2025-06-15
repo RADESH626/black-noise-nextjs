@@ -7,55 +7,89 @@ function DesignsTable({ designs }) {
   }
 
   return (
-    <div className="overflow-x-auto bg-white rounded-lg shadow-md">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+    <div
+      className="overflow-x-auto rounded-lg shadow-md"
+      style={{ backgroundColor: '#FFFFFF' }} // bg-white
+    >
+      <table className="min-w-full divide-y" style={{ borderColor: '#E5E7EB' /* divide-gray-200 */ }}>
+        <thead style={{ backgroundColor: '#F9FAFB' /* bg-gray-50 */ }}>
           <tr>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Imagen
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Nombre
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Categoría
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Precio
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Acciones
-            </th>
+            {['Imagen', 'Nombre', 'Categoría', 'Precio', 'Acciones'].map((title) => (
+              <th
+                key={title}
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                style={{ color: '#000000FF' /* text-gray-500 */ }}
+              >
+                {title}
+              </th>
+            ))}
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody style={{ backgroundColor: '#FFFFFF' /* bg-white */, borderColor: '#E5E7EB' }}>
           {designs.map((design) => (
-            <tr key={design._id}>
+            <tr key={design._id} style={{ borderBottom: '1px solid #000000FF' /* divide-gray-200 */ }}>
               <td className="px-6 py-4 whitespace-nowrap">
                 {design.imagen ? (
-                  <img src={design.imagen} alt={design.nombre} className="h-10 w-10 rounded-full object-cover" />
+                  <img
+                    src={design.imagen}
+                    alt={design.nombre}
+                    className="h-10 w-10 rounded-full object-cover"
+                  />
                 ) : (
-                  <div className="h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500">
+                  <div
+                    className="h-10 w-10 rounded-full flex items-center justify-center"
+                    style={{
+                      backgroundColor: '#E5E7EB', // bg-gray-200
+                      color: '#6B7280', // text-gray-500
+                    }}
+                  >
                     No Img
                   </div>
                 )}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+              <td
+                className="px-6 py-4 whitespace-nowrap text-sm font-medium"
+                style={{ color: '#000000FF' /* text-gray-900 */ }}
+              >
                 {design.nombre}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td
+                className="px-6 py-4 whitespace-nowrap text-sm"
+                style={{ color: '#000000FF' /* text-gray-500 */ }}
+              >
                 {design.categoria}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td
+                className="px-6 py-4 whitespace-nowrap text-sm"
+                style={{ color: '#000000FF' /* text-gray-500 */ }}
+              >
                 ${typeof design.precio === 'number' ? design.precio.toFixed(2) : '0.00'}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <Link href={`/admin/designs/editar/${design._id}`} className="text-blue-600 hover:text-blue-900 mr-4">
+                <Link
+                  href={`/admin/designs/editar/${design._id}`}
+                  className="mr-4"
+                  style={{
+                    color: '#2563EB', // text-blue-600
+                    textDecoration: 'none',
+                  }}
+                  onMouseOver={(e) => (e.currentTarget.style.color = '#1D4ED8')} // hover:text-blue-900
+                  onMouseOut={(e) => (e.currentTarget.style.color = '#2563EB')}
+                >
                   Editar
                 </Link>
                 <button
-                  onClick={() => console.log('Eliminar diseño:', design._id)} // Placeholder for delete action
-                  className="text-red-600 hover:text-red-900"
+                  onClick={() => console.log('Eliminar diseño:', design._id)}
+                  style={{
+                    color: '#DC2626', // text-red-600
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                  }}
+                  onMouseOver={(e) => (e.currentTarget.style.color = '#7F1D1D')} // hover:text-red-900
+                  onMouseOut={(e) => (e.currentTarget.style.color = '#DC2626')}
                 >
                   Eliminar
                 </button>
@@ -68,4 +102,4 @@ function DesignsTable({ designs }) {
   );
 }
 
-export default DesignsTable;
+export default DesignsTable;

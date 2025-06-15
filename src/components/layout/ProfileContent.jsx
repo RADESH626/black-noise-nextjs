@@ -12,8 +12,10 @@ import { ObtenerUsuarioPorId } from "@/app/acciones/UsuariosActions";
 import FormEditarUsuario from "@/components/perfil/FormEditarUsuario";
 import DesignUploadModal from "@/components/perfil/DesignUploadModal";
 import PaymentHistory from "@/components/perfil/PaymentHistory"; // Importar el nuevo componente
+import { usePopUp } from "@/context/PopUpContext"; // Import usePopUp
 
 function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [], initialUserPayments = [] }) {
+  const { showPopUp } = usePopUp();
   const { data: session, status } = useSession();
   const userId = session?.user?.id;
   const [activeTab, setActiveTab] = useState('designs');
@@ -77,6 +79,11 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
       setLoading(false);
     }
   };
+
+  const fetchCartData = () => {
+    console.log("fetchCartData called - Cart data fetching logic not yet implemented.");
+    // TODO: Implement actual cart data fetching logic here if needed
+  };
   
   // Este useEffect se encarga de obtener los datos del lado del cliente si es necesario
   useEffect(() => {
@@ -103,13 +110,14 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
   const user = currentUser;
 
   const handleEditProfile = () => {
-    openModal(
+    console.log("handleEditProfile called. currentUser:", currentUser); // Log currentUser
+    showPopUp(
       "Editar Perfil",
       <FormEditarUsuario
         userData={currentUser}
         userId={userId}
         onSuccess={() => {
-          openModal(
+          showPopUp(
             "Perfil Actualizado",
             <div className="text-white">
               <h3 className="text-lg mb-4">¡Tu perfil ha sido actualizado exitosamente!</h3>
@@ -124,7 +132,7 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
   };
 
   const handleEditDesign = (design) => {
-    openModal(
+    showPopUp(
       "Editar Diseño",
       <div className="text-white">
         <h3 className="text-lg mb-4">Editando: {design.nombreDesing}</h3>
@@ -135,7 +143,7 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
   };
 
   const handleAddDesign = () => {
-    openModal(
+    showPopUp(
       "Subir Nuevo Diseño",
       <DesignUploadModal onDesignSaved={fetchUserDesigns} />,
       'default'

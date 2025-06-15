@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from "react";
 import SeccionHeader from '../secciones/acciones/SeccionHeader';
-import { obtenerPedidos } from '@/app/acciones/PedidoActions'; // Import the action to get all orders
+import { obtenerPedidos } from '@/app/acciones/PedidoActions';
 
 export default function PedidosDashboard() {
   const [pedidos, setPedidos] = useState([]);
@@ -56,9 +56,9 @@ export default function PedidosDashboard() {
     return (
       <>
         <SeccionHeader>
-          <h4 className='font-bold text-2xl text-black'>Gestión de Pedidos</h4>
+          <h4 className='font-bold text-2xl' style={{ color: '#000000' }}>Gestión de Pedidos</h4>
         </SeccionHeader>
-        <div className="min-h-full flex justify-center items-center text-gray-400">
+        <div className="min-h-full flex justify-center items-center" style={{ color: '#9CA3AF' }}>
           Cargando pedidos...
         </div>
       </>
@@ -69,9 +69,9 @@ export default function PedidosDashboard() {
     return (
       <>
         <SeccionHeader>
-          <h4 className='font-bold text-2xl text-black'>Gestión de Pedidos</h4>
+          <h4 className='font-bold text-2xl' style={{ color: '#000000' }}>Gestión de Pedidos</h4>
         </SeccionHeader>
-        <div className="min-h-full flex justify-center items-center text-red-500">
+        <div className="min-h-full flex justify-center items-center" style={{ color: '#EF4444' }}>
           Error al cargar pedidos: {error.message}
         </div>
       </>
@@ -82,9 +82,9 @@ export default function PedidosDashboard() {
     return (
       <>
         <SeccionHeader>
-          <h4 className='font-bold text-2xl text-black'>Gestión de Pedidos</h4>
+          <h4 className='font-bold text-2xl' style={{ color: '#000000' }}>Gestión de Pedidos</h4>
         </SeccionHeader>
-        <div className="min-h-full flex justify-center items-center text-gray-400">
+        <div className="min-h-full flex justify-center items-center" style={{ color: '#9CA3AF' }}>
           No hay pedidos para mostrar.
         </div>
       </>
@@ -94,82 +94,89 @@ export default function PedidosDashboard() {
   return (
     <>
       <SeccionHeader>
-        <h4 className='font-bold text-2xl text-black'>Gestión de Pedidos</h4>
+        <h4 className='font-bold text-2xl' style={{ color: '#000000' }}>Gestión de Pedidos</h4>
       </SeccionHeader>
-      <div className="mt-4 p-4 bg-white rounded-lg shadow-md flex flex-wrap gap-4">
+
+      <div className="mt-4 p-4 rounded-lg shadow-md flex flex-wrap gap-4" style={{ backgroundColor: '#FFFFFF' }}>
         <input
           type="text"
           placeholder="Buscar por usuario o ID de pedido"
-          className="p-2 border border-gray-300 rounded-md flex-grow"
+          className="p-2 border rounded-md flex-grow"
+          style={{
+            borderColor: '#FFFFFFFF',
+            backgroundColor: '#272525FF',
+            color: '#FFFFFFFF'
+          }}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <input
           type="date"
-          className="p-2 border border-gray-300 rounded-md"
+          className="p-2 border rounded-md"
+          style={{
+            borderColor: '#000000FF',
+            backgroundColor: '#FFFFFFFF',
+            color: '#000000FF'
+          }}
           value={startDate}
           onChange={(e) => setStartDate(e.target.value)}
         />
-        <span className="self-center text-gray-500">-</span>
+        <span className="self-center" style={{ color: '#000000FF' }}>-</span>
         <input
           type="date"
-          className="p-2 border border-gray-300 rounded-md"
+          className="p-2 border rounded-md"
+          style={{
+            borderColor: '#000000FF',
+            backgroundColor: '#FFFFFF',
+            color: '#000000'
+          }}
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
         />
       </div>
-      <div className="overflow-x-auto bg-white rounded-lg shadow-md mt-4">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+
+      <div className="overflow-x-auto rounded-lg shadow-md mt-4" style={{ backgroundColor: '#FFFFFF' }}>
+        <table className="min-w-full divide-y" style={{ borderColor: '#FFFFFFFF' }}>
+          <thead style={{ backgroundColor: '#F9FAFB' }}>
             <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                ID Pedido
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Nombre Usuario
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Email Usuario
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Valor Total
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Estado Pedido
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Fecha Pedido
-              </th>
-              {/* Add more headers for other relevant fields */}
+              {['ID Pedido', 'Nombre Usuario', 'Email Usuario', 'Valor Total', 'Estado Pedido', 'Fecha Pedido'].map((title) => (
+                <th
+                  key={title}
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                  style={{ color: '#030303FF' }}
+                >
+                  {title}
+                </th>
+              ))}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody style={{ backgroundColor: '#FFFFFFFF', borderColor: '#E5E7EBFF' }}>
             {filteredPedidos.map((pedido) => (
-              <tr key={pedido._id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+              <tr key={pedido._id} style={{ borderBottom: '1px solid #000000FF' }}>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: '#111827' }}>
                   {pedido._id}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {pedido.userId ? pedido.userId.nombre : 'N/A'} {/* Display user name */}
+                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#6B7280' }}>
+                  {pedido.userId ? pedido.userId.nombre : 'N/A'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {pedido.userId ? pedido.userId.email : 'N/A'} {/* Display user email */}
+                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#6B7280' }}>
+                  {pedido.userId ? pedido.userId.email : 'N/A'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#50545CFF' }}>
                   ${typeof pedido.valorPedido === 'number' ? pedido.valorPedido.toFixed(2) : '0.00'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#50545CFF' }}>
                   {pedido.estadoPago}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {pedido.createdAt ? new Date(pedido.createdAt).toLocaleDateString() : 'N/A'} {/* Display order date */}
+                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#50545CFF' }}>
+                  {pedido.createdAt ? new Date(pedido.createdAt).toLocaleDateString() : 'N/A'}
                 </td>
-                {/* Add more cells for other relevant fields */}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-    </>
-  );
+    </>
+  );
 }
