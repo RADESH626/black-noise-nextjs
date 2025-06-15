@@ -1,35 +1,53 @@
 "use client";
 
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import CartItem from './CartItem';
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation"; // Import useRouter
+import { useRouter } from "next/navigation";
 import { addDesignToCart, removeDesignFromCart, updateCartItemQuantity, clearUserCart } from "@/app/acciones/CartActions";
-import { procesarPagoYCrearPedido } from "@/app/acciones/PagoActions"; // Import the payment action
-import { usePopUp } from '@/context/PopUpContext'; // Import usePopUp
-import { useCart } from '@/context/CartContext'; // Import useCart
-import OrderSummary from "@/components/pago/OrderSummary"; // Import OrderSummary
-import PaymentForm from "@/components/pago/PaymentForm"; // Import PaymentForm
+import { procesarPagoYCrearPedido } from "@/app/acciones/PagoActions";
+import { usePopUp } from '@/context/PopUpContext';
+import { useCart } from '@/context/CartContext';
+import OrderSummary from "@/components/pago/OrderSummary";
+import UserDataForm from "@/components/pago/UserDataForm";
+import CardDataModal from "@/components/pago/CardDataModal";
 
 function CartComponent() {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const { showPopUp } = usePopUp(); // Use the PopUp hook (keep for other popups)
-  const { cartItems, loadingCart, cartError, updateCart, fetchCart } = useCart(); // Use cart context
+  const { showPopUp } = usePopUp();
+  const { cartItems, loadingCart, cartError, updateCart, fetchCart } = useCart();
   const userId = session?.user?.id;
 
-  const [showPaymentSection, setShowPaymentSection] = useState(false); // New state for payment section visibility
-  const [paymentError, setPaymentError] = useState(null); // New state for payment errors
+  const [showPaymentSection, setShowPaymentSection] = useState(false);
+  const [paymentError, setPaymentError] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [cardData, setCardData] = useState(null);
+  const [isCardModalOpen, setIsCardModalOpen] = useState(false);
+
+  const dialogRef = useRef(null);
+
+  useEffect(() => {
+    if (showPaymentSection) {
+      dialogRef.current?.showModal();
+    } else {
+      dialogRef.current?.close();
+    }
+  }, [showPaymentSection]);
 
   const getTotal = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    let subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    // Removed: if (userData?.isDelivery) { subtotal += userData.deliveryCost; }
+    return subtotal;
   };
 
   const handleClosePayment = useCallback(() => {
     setShowPaymentSection(false);
-    setPaymentError(null); // Clear any payment errors when closing
+    setPaymentError(null);
+    setUserData(null);
+    setCardData(null);
   }, []);
 
   const addItemDebounceRef = useRef(null);
@@ -53,8 +71,8 @@ function CartComponent() {
       updatedCartItems = [...cartItems, { ...itemToAdd, id: designId, quantity: 1 }];
     }
 
-    const originalCartItems = [...cartItems]; // Store current state for rollback
-    updateCart(updatedCartItems); // Optimistic UI update
+    const originalCartItems = [...cartItems];
+    updateCart(updatedCartItems);
 
     if (addItemDebounceRef.current) {
       clearTimeout(addItemDebounceRef.current);
@@ -64,9 +82,9 @@ function CartComponent() {
       const { success, message, data: serverUpdatedCart } = await addDesignToCart(userId, designId);
       if (!success) {
         showPopUp(message || "Error al agregar el diseño al carrito en el servidor.", "error");
-        updateCart(originalCartItems); // Rollback on error
+        updateCart(originalCartItems);
       }
-    }, 1000); // Debounce for 1 second
+    }, 1000);
   }, [userId, cartItems, updateCart, showPopUp]);
 
   const handleRemoveItem = useCallback((designId) => {
@@ -75,9 +93,9 @@ function CartComponent() {
       return;
     }
 
-    const originalCartItems = [...cartItems]; // Store current state for rollback
+    const originalCartItems = [...cartItems];
     const updatedCartItems = cartItems.filter(item => item.id !== designId);
-    updateCart(updatedCartItems); // Optimistic UI update
+    updateCart(updatedCartItems);
 
     if (removeItemDebounceRef.current) {
       clearTimeout(removeItemDebounceRef.current);
@@ -87,9 +105,9 @@ function CartComponent() {
       const { success, message, data: serverUpdatedCart } = await removeDesignFromCart(userId, designId);
       if (!success) {
         showPopUp(message || "Error al eliminar el diseño del carrito en el servidor.", "error");
-        updateCart(originalCartItems); // Rollback on error
+        updateCart(originalCartItems);
       }
-    }, 1000); // Debounce for 1 second
+    }, 1000);
   }, [userId, cartItems, updateCart, showPopUp]);
 
   const handleUpdateQuantity = useCallback((designId, quantityInput) => {
@@ -104,9 +122,8 @@ function CartComponent() {
       return;
     }
 
-    const originalCartItems = [...cartItems]; // Store current state for rollback
+    const originalCartItems = [...cartItems];
 
-    // Optimistic UI update: Update the cart state immediately
     let updatedCartItems;
     if (newQuantity === 0) {
       updatedCartItems = cartItems.filter(item => item.id !== designId);
@@ -117,19 +134,17 @@ function CartComponent() {
     }
     updateCart(updatedCartItems);
 
-    // Clear any existing debounce timeout
     if (updateQuantityDebounceRef.current) {
       clearTimeout(updateQuantityDebounceRef.current);
     }
 
-    // Set a new debounce timeout to call the server action
     updateQuantityDebounceRef.current = setTimeout(async () => {
       const { success, message, data: serverUpdatedCart } = await updateCartItemQuantity(userId, designId, newQuantity);
       if (!success) {
         showPopUp(message || "Error al actualizar la cantidad del diseño en el servidor.", "error");
-        updateCart(originalCartItems); // Revert UI if server update fails
+        updateCart(originalCartItems);
       }
-    }, 1000); // Debounce for 1 second
+    }, 1000);
   }, [userId, cartItems, updateCart, showPopUp]);
 
   const handleClearCart = useCallback(() => {
@@ -138,8 +153,8 @@ function CartComponent() {
       return;
     }
 
-    const originalCartItems = [...cartItems]; // Store current state for rollback
-    updateCart([]); // Optimistic UI update: clear cart immediately
+    const originalCartItems = [...cartItems];
+    updateCart([]);
 
     if (clearCartDebounceRef.current) {
       clearTimeout(clearCartDebounceRef.current);
@@ -149,37 +164,61 @@ function CartComponent() {
       const { success, message, data: updatedCart } = await clearUserCart(userId);
       if (!success) {
         showPopUp(message || "Error al vaciar el carrito en el servidor.", "error");
-        updateCart(originalCartItems); // Rollback on error
+        updateCart(originalCartItems);
       }
-    }, 1000); // Debounce for 1 second
+    }, 1000);
   }, [userId, cartItems, updateCart, showPopUp]);
 
-  const handleProcessPayment = async ({ nombre, correo, direccion, metodoPago, cardNumber, expiryDate, cvv }) => {
+  const handleUserDataChange = useCallback((data) => {
+    setUserData(data);
+  }, []); // Empty dependency array means this function is stable
+
+  const handleCardDataSubmit = (data) => {
+    setCardData(data);
+    showPopUp("Información de la tarjeta guardada.", "success");
+  };
+
+  const handleProcessPayment = async () => {
+    if (!userData || !userData.nombre || !userData.correo || (userData.isDelivery && !userData.direccion)) {
+      setPaymentError("Por favor completa tus datos personales y de entrega.");
+      return;
+    }
+
+    if (!cardData || !cardData.tarjeta || !cardData.mes || !cardData.anio || !cardData.cvv) {
+      setPaymentError("Por favor ingresa los datos de tu tarjeta.");
+      return;
+    }
+    setPaymentError(null);
+
     const paymentDetails = {
       userId,
-      nombre,
-      correo,
-      direccion,
-      metodoPago,
+      nombre: userData.nombre,
+      correo: userData.correo,
+      direccion: userData.direccion,
+      metodoPago: "tarjeta",
       total: getTotal(),
-      cardNumber,
-      expiryDate,
-      cvv,
+      tarjeta: cardData.tarjeta,
+      mes: cardData.mes,
+      anio: cardData.anio,
+      cvv: cardData.cvv,
+      metodoEntrega: userData.isDelivery ? 'DOMICILIO' : 'RECOGIDA',
+      costoEnvio: 0, // Set to 0 as per new requirement
     };
 
     const { success, message, pedidoId } = await procesarPagoYCrearPedido(cartItems, paymentDetails);
 
     if (success) {
-      updateCart([]); // Clear local cart state via context
-      setShowPaymentSection(false); // Close the payment section on successful payment
-      router.push(`/confirmacion?pedidoId=${pedidoId}`); // Pass pedidoId to confirmation page
+      updateCart([]);
+      setShowPaymentSection(false);
+      router.push(`/confirmacion?pedidoId=${pedidoId}`);
     } else {
       setPaymentError({ message: message || "Error al procesar el pago." });
       console.error("Error al procesar el pago:", message);
     }
   };
 
-  const handleProceedToPayment = () => {
+  const handleProceedToPayment = (event) => {
+    event.preventDefault();
     if (!userId) {
       showPopUp("Debes iniciar sesión para proceder al pago.", "error");
       return;
@@ -188,7 +227,7 @@ function CartComponent() {
       showPopUp("Tu carrito está vacío. Agrega diseños antes de proceder al pago.", "error");
       return;
     }
-    setShowPaymentSection(true); // Show payment section
+    setShowPaymentSection(true);
   };
 
   const totalAPagar = getTotal();
@@ -205,30 +244,6 @@ function CartComponent() {
     return (
       <div className="h-screen flex items-center justify-center bg-gradient-to-br from-[#000000] via-[#0A1828] to-[#000000] text-red-500">
         Error al cargar el carrito: {cartError.message}
-      </div>
-    );
-  }
-
-  if (showPaymentSection) {
-    return (
-      <div
-        style={{ backgroundColor: "#FDF9F9FF", color: "#000000FF" }}
-        className="min-h-screen p-8 relative"
-      >
-        <button
-          onClick={handleClosePayment}
-          className="absolute top-4 right-4 text-black text-2xl font-bold"
-          aria-label="Cerrar"
-        >
-          &times;
-        </button>
-        <OrderSummary cartItems={cartItems} getTotal={getTotal} />
-        {paymentError && (
-          <div className="bg-red-500 text-white p-3 rounded-md mb-4 text-center">
-            {paymentError.message}
-          </div>
-        )}
-        <PaymentForm handlePago={handleProcessPayment} />
       </div>
     );
   }
@@ -291,6 +306,60 @@ function CartComponent() {
           </div>
         </div>
       )}
+
+      {/* Dialog for Payment Section */}
+      <dialog ref={dialogRef} className="relative p-8 rounded-lg shadow-lg max-w-2xl w-11/12 max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "#FDF9F1FF", color: "#000000FF", margin: "auto" }}>
+        <button
+          onClick={handleClosePayment}
+          className="absolute top-4 right-4 text-black text-2xl font-bold"
+          aria-label="Cerrar"
+        >
+          &times;
+        </button>
+        <h2 className="text-2xl font-bold mb-4" style={{ color: "#111010FF" }}>Confirmar Pedido y Pago</h2>
+        
+        <UserDataForm onUserDataChange={handleUserDataChange} />
+
+        <div className="p-6 rounded shadow-md w-full mb-6" style={{ backgroundColor: "#F7F1F1FF" }}>
+          <h3 className="text-xl font-bold mb-4" style={{ color: "#111010FF" }}>Información de Pago</h3>
+          <button
+            type="button"
+            onClick={() => setIsCardModalOpen(true)}
+            style={{ backgroundColor: "#154780FF", color: "#ffffff" }}
+            className="w-full font-semibold py-3 rounded hover:bg-blue-700 transition"
+          >
+            {cardData ? 'Editar Datos de Tarjeta' : 'Ingresar Datos de Tarjeta'}
+          </button>
+          {cardData && (
+            <p className="mt-2 text-sm" style={{ color: "#000000FF" }}>
+              Tarjeta ingresada: **** **** **** {cardData.tarjeta.slice(-4)}
+            </p>
+          )}
+        </div>
+
+        <OrderSummary cartItems={cartItems} getTotal={() => getTotal()} />
+
+        {paymentError && (
+          <p className="bg-red-500 text-white p-3 rounded-md mb-4 text-center">
+            {paymentError.message}
+          </p>
+        )}
+
+        <button
+          type="button"
+          onClick={handleProcessPayment}
+          style={{ backgroundColor: "#154780FF", color: "#ffffff" }}
+          className="w-full font-semibold py-3 rounded hover:bg-blue-700 transition"
+        >
+          Confirmar Pedido y Pagar
+        </button>
+      </dialog>
+
+      <CardDataModal
+        isOpen={isCardModalOpen}
+        onClose={() => setIsCardModalOpen(false)}
+        onCardDataSubmit={handleCardDataSubmit}
+      />
     </div>
   );
 }

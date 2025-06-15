@@ -18,7 +18,6 @@ function HeaderPrincipal() {
     const dropdownRef = useRef(null);
 
     const [showCartModal, setShowCartModal] = useState(false); // State for cart modal visibility
-    const cartModalRef = useRef(null); // Ref for cart modal element
 
     const handleUserIconClick = () => {
         setIsDropdownOpen(!isDropdownOpen);
@@ -35,9 +34,7 @@ function HeaderPrincipal() {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
             setIsDropdownOpen(false);
         }
-        if (cartModalRef.current && !cartModalRef.current.contains(event.target)) {
-            setShowCartModal(false);
-        }
+        // No need for cartModalRef check, dialog handles outside clicks natively
     };
 
     useEffect(() => {
@@ -55,16 +52,14 @@ function HeaderPrincipal() {
                 </h1>
                 <div className='flex flex-row items-center gap-4'>
                     {/* Shopping Cart Icon */}
-                    <div className="relative cursor-pointer" onClick={handleCartIconClick} ref={cartModalRef}>
+                    <div className="relative cursor-pointer" onClick={handleCartIconClick}>
                         <Image src="/icons/icono-carrito.svg" alt="Carrito" width={30} height={30} />
                         {cartItems.length > 0 && (
                             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                                 {cartItems.length}
                             </span>
                         )}
-                        {showCartModal && (
-                            <CartModal cartItems={cartItems} onClose={() => setShowCartModal(false)} />
-                        )}
+                        <CartModal cartItems={cartItems} onClose={() => setShowCartModal(false)} isOpen={showCartModal} />
                     </div>
 
                     {session ? (

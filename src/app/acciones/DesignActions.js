@@ -90,7 +90,7 @@ export async function obtenerDesigns() {
         const designs = await Design.find({})
             .populate({
                 path: 'usuarioId',
-                select: 'nombreUsuario imageData imageMimeType' // Select only necessary fields
+                select: 'Nombre primerApellido imageData imageMimeType' // Select only necessary fields
             })
             .lean();
 
@@ -108,7 +108,7 @@ export async function obtenerDesigns() {
                 id: design._id.toString(), // Ensure a string ID for frontend key
                 prenda: design.nombreDesing, // Map nombreDesing to prenda
                 price: design.valorDesing,   // Map valorDesing to price
-                usuario: design.usuarioId ? design.usuarioId.nombreUsuario : 'Usuario Desconocido', // Map user name
+                usuario: design.usuarioId ? `${design.usuarioId.Nombre} ${design.usuarioId.primerApellido}` : 'Usuario Desconocido', // Map user name
                 userAvatar: userAvatar, // Add user avatar URL
                 imagen: designImageUrl, // Provide the image as a data URL
                 // Keep imageData and imageMimeType as they are used for data URL

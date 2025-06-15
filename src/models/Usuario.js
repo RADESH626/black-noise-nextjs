@@ -46,10 +46,6 @@ const UsuarioSchema = new Schema({
         type: String,
         required: true
     },
-    nombreUsuario: {
-        type: String,
-        unique: true
-    },
     correo: {
         type: String,
         required: true,
