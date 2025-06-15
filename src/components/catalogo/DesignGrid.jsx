@@ -3,6 +3,7 @@ import React from 'react';
 import DesignCard from './DesignCard';
 
 function DesignGrid({ tarjetas, activo, addItem, cartItems }) {
+  console.log('DesignGrid re-rendered. cartItems length:', cartItems.length);
   return (
     <>
       {tarjetas.length === 0 ? (
@@ -40,4 +41,4 @@ function DesignGrid({ tarjetas, activo, addItem, cartItems }) {
   );
 }
 
-export default DesignGrid;
+export default React.memo(DesignGrid);

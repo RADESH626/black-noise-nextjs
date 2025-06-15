@@ -29,21 +29,32 @@
 - Added subtotal display for each design item in `src/components/common/CartItem.jsx`.
 - Resolved a syntax error in `src/components/common/CartComponent.jsx` by wrapping multiple JSX elements in a React Fragment.
 - Resolved a runtime error in `src/components/common/CartComponent.jsx` by importing the `Link` component from `next/link`.
-- Implemented a global cart state using `CartContext.jsx` to allow real-time updates of the cart icon in the navigation bar and other components.
+- Implemented a global cart state using `CartContext.jsx` to manage the global state of the shopping cart, including `cartItems`, loading status, and error handling.
 - Integrated `CartProvider` into `SessionProviderWrapper.jsx` to make the cart context available throughout the application.
-- Refactored `HeaderPrincipal.jsx` to consume `cartItems` from `CartContext`, ensuring the cart item count updates dynamically.
-- Refactored `CartComponent.jsx` to use `cartItems`, `loadingCart`, `cartError`, and `updateCart` from `CartContext`, centralizing its state management.
-- Modified `CartActions.js` (specifically `removeDesignFromCart` and `clearUserCart`) to consistently return the updated cart data, facilitating seamless global state synchronization.
-- Refactored `src/app/catalogo/page.jsx` to utilize the global `CartContext` for managing cart items, ensuring real-time updates of the cart icon and design status in the catalog.
-- Confirmed `src/components/catalogo/DesignGrid.jsx` correctly consumes the `cartItems` prop from its parent to display the `isInCart` status.
-- Fixed an issue in `src/components/catalogo/DesignGrid.jsx` where designs already in the cart would incorrectly show the "Add to Cart" button. This was resolved by ensuring consistent ID type comparison (`item.id === diseño._id.toString()`) when checking if a design is in the cart.
+- Refactored `HeaderPrincipal.jsx` to consume `cartItems` from `CartContext`, enabling the cart icon to dynamically display the number of items.
+- Refactored `CartComponent.jsx` to utilize `cartItems`, `loadingCart`, `cartError`, and `updateCart` from `CartContext`, centralizing its state management.
+- Enhanced Cart Actions: Modified `src/app/acciones/CartActions.js` (specifically `removeDesignFromCart` and `clearUserCart`) to ensure all cart-related server actions consistently return the updated cart data, facilitating seamless global state synchronization.
+- Refactored Catalog Page for Real-time Updates: Modified `src/app/catalogo/page.jsx` to remove local cart state and integrate with the global `CartContext`. The `handleAddItemToCart` function now updates the global cart state after a successful addition, ensuring the cart icon and design status in the catalog update in real-time.
+- Verified DesignGrid Usage: Confirmed that `src/components/catalogo/DesignGrid.jsx` correctly receives and utilizes the `cartItems` prop from its parent to display whether a design is in the cart.
+- Fixed Design Status in Catalog: Corrected the logic in `src/components/catalogo/DesignGrid.jsx` to ensure that designs already in the cart correctly display their status (e.g., "En el carrito" en lugar de "Agregar al carrito"). This was achieved by ensuring a consistent type comparison (`item.id === diseño._id.toString()`) when checking if a design is in the cart.
 - **Fixed React Warning: "Each child in a list should have a unique 'key' prop"** in `src/components/common/CartComponent.jsx` by ensuring a stable and unique key for `CartItem` components.
-- **Fixed Runtime Error: "Cannot read properties of undefined (reading 'toFixed')"** in `src/components/common/CartItem.jsx` by safely handling `item.price` and `item.quantity` before calling `toFixed()`.
-- **Fixed Missing Design Details After Quantity Update:** Ensured `src/app/acciones/CartActions.js` returns fully populated cart data after quantity updates.
-- **Implemented client-side quantity and subtotal updates with debouncing:** Quantity changes in the cart now update the UI instantly, and server synchronization is debounced to improve performance (debounce delay adjusted to 1 second).
-- **Fixed item not removing when quantity is 0:** Modified `src/components/common/CartComponent.jsx` to remove items from the client-side cart state when their quantity is set to 0.
-- **Implemented optimistic updates and debouncing for "Add to Cart" in Catalog Page:** Refactored `src/app/catalogo/page.jsx` to use optimistic UI updates and debounced server synchronization when adding designs to the cart, improving perceived performance and user experience.
-- **Implemented Optimistic Updates and Debouncing for User Design Management (Profile Page):** Applied the optimistic update and debouncing pattern to the user's design management in the profile page (`/perfil`).
+- **Fixed Runtime Error: "Cannot read properties of undefined (reading 'toFixed')"**: This error occurred in `src/components/common/CartItem.jsx` because `item.price` or `item.quantity` were `undefined` when `toFixed()` was called.
+    -   **Correction:** Modified `src/components/common/CartItem.jsx` to safely access `item.price` and `item.quantity` using the nullish coalescing operator (`?? 0`) before performing calculations or calling `toFixed()`.
+-   **Missing Design Details After Quantity Update:** When updating the quantity of designs, only price and subtotal were rendered, and full design details were missing.
+    -   **Correction:** Modified `src/app/acciones/CartActions.js` to ensure that `updateCartItemQuantity` returns the fully populated cart data, including all design details, after a quantity update.
+-   **Quantity 0 does not remove item from UI:** When a user set the quantity of an item to 0, the item remained in the UI with a quantity of 0 instead of being removed.
+    -   **Correction:** Modified `src/components/common/CartComponent.jsx` to filter out items from the `cartItems` state when their `newQuantity` is 0, ensuring immediate UI removal.
+-   **Implemented Optimistic Updates and Debouncing for Cart Actions:** Refactored `handleAddItem`, `handleRemoveItem`, and `handleClearCart` in `src/components/common/CartComponent.jsx` to:
+    *   Perform immediate optimistic UI updates on user action.
+    *   Use separate `useRef` debouncers for each action to delay server synchronization calls (`addDesignToCart`, `removeDesignFromCart`, `clearUserCart`) by 1000ms.
+    *   Implement rollback logic to revert client-side state if the server update fails.
+    *   Adjusted the debounce time for `handleUpdateQuantity` to 1000ms for consistency.
+-   **Refactored Catalog Page for Optimistic Add to Cart:** Applied the optimistic update and debounced synchronization pattern to `src/app/catalogo/page.jsx`. The `handleAddItemToCart` function now:
+    *   Optimistically adds the design to the cart state immediately.
+    *   Uses `useRef` and `setTimeout` to debounce the `addDesignToCart` server action.
+    *   Includes rollback logic to revert the UI state if the server action fails.
+    *   Removed `alert` calls, relying on console logs for now.
+-   **Implemented Optimistic Updates and Debouncing for User Design Management:** Applied the optimistic update and debouncing pattern to the user's design management in the profile page (`/perfil`).
     *   **Modified `src/components/common/DesignsComponent.jsx`**: Added "Edit" and "Delete" buttons, conditionally rendered based on a new `mode` prop ('profile' vs 'catalog').
     *   **Created `src/components/perfil/FormEditarDesign.jsx`**: A new client component for editing design details, utilizing `actualizarDesign` server action.
     *   **Modified `src/components/layout/ProfileContent.jsx`**:
@@ -52,13 +63,13 @@
         *   Updated `handleEditDesign` to open `FormEditarDesign` modal, passing design data and `handleUpdateDesign` as a callback.
         *   Passed `mode="profile"`, `handleEditDesign`, and `handleDeleteDesign` to `DesignsComponent`.
         *   Removed unnecessary `cartItems` and `orderedDesignIds` props from `DesignsComponent` when in 'profile' mode.
-        *   Removed `onPaymentSuccess={fetchCartData}` from `PedidosComponent` as `fetchCartData` was not defined in this context.
-- **Implemented Optimistic Updates and Rollback for Admin User Profile Picture Management:**
+    *   Removed `onPaymentSuccess={fetchCartData}` from `PedidosComponent` as `fetchCartData` was not defined in this context.
+-   **Implemented Optimistic Updates and Rollback for Admin User Profile Picture Management:**
     *   **Modified `src/app/admin/users/page.jsx`**: Implemented optimistic UI updates for profile picture changes, displaying the new image immediately after selection.
     *   Added a loading state to the update button to prevent multiple submissions.
     *   Implemented rollback logic to revert to the previous profile picture if the `actualizarFotoPerfilUsuarioPorAdmin` server action fails.
     *   **Created `memory-bank/functionalities/AdminUserManagement.md`**: Documented the new functionality and the application of optimistic updates and rollback.
-- **Implemented Optimistic Updates and Rollback for Admin Design Editing:**
+-   **Implemented Optimistic Updates and Rollback for Admin Design Editing:**
     *   **Modified `src/app/admin/designs/editar/[id]/page.jsx`**: Implemented optimistic UI updates for design details (name, description, price, category, and image preview) upon form submission.
     *   Utilized the existing loading state to prevent multiple submissions.
     *   Implemented rollback logic to revert to the previous design details if the `actualizarDesign` server action fails.
@@ -68,6 +79,11 @@
     *   Utilized a loading state to prevent multiple submissions.
     *   Implemented rollback logic to revert to the previous profile details if the `actualizarProveedor` server action fails.
     *   **Created `memory-bank/functionalities/SupplierProfileManagement.md`**: Documented the new functionality and the application of optimistic updates and rollback.
+-   **Fixed Catalog Page Button Reversion:** Resolved the issue where "Add to Cart" buttons for other designs would revert to their original state after adding an item. This was addressed by:
+    *   Memoizing `DesignCard.jsx` with `React.memo` to prevent unnecessary re-renders.
+    *   Memoizing `DesignGrid.jsx` with `React.memo` to prevent unnecessary re-renders.
+    *   Ensuring the `cartItems` array passed from `CartContext` is consistently updated with the complete server-side cart state.
+    *   **Modified `src/app/acciones/CartActions.js`:** Updated `addDesignToCart` to return the fully populated and formatted cart data (with `id` as string) after adding/updating an item, ensuring consistency with client-side expectations.
 
 ## Remaining Tasks:
 - The task of applying the client-side data management approach (optimistic updates, debouncing, rollback) to "other pages" has been completed for all identified suitable candidates.

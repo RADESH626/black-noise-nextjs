@@ -1,23 +1,23 @@
 'use client'
 
-import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
 import Footer from '@/components/layout/general/footer/Footer';
 import CatalogTabs from '@/components/catalogo/CatalogTabs';
 import NewPostSection from '@/components/catalogo/NewPostSection';
 import DesignGrid from '@/components/catalogo/DesignGrid';
-import { addDesignToCart } from '@/app/acciones/CartActions'; // Only addDesignToCart is needed here
-import { obtenerDesigns } from '@/app/acciones/DesignActions'; // Import obtenerDesigns
-import { useSession } from 'next-auth/react'; // Import useSession
-import { useCart } from '@/context/CartContext'; // Import useCart
+import { addDesignToCart } from '@/app/acciones/CartActions';
+import { obtenerDesigns } from '@/app/acciones/DesignActions';
+import { useSession } from 'next-auth/react';
+import { useCart } from '@/context/CartContext';
 
 const ComunidadDiseños = () => {
   const [activo, setActivo] = useState('diseños');
   const { data: session } = useSession();
   const userId = session?.user?.id;
   const { cartItems, updateCart } = useCart();
-  const debounceTimeoutRef = useRef(null);
-  const optimisticCartStateRef = useRef([]);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false); // New state for login prompt
+  const optimisticCartStateRef = React.useRef([]); // Use React.useRef for consistency
 
   const [allDesigns, setAllDesigns] = useState([]);
   const [loadingDesigns, setLoadingDesigns] = useState(true);
@@ -46,8 +46,9 @@ const ComunidadDiseños = () => {
 
   const handleAddItemToCart = useCallback(async (item) => {
     if (!userId) {
-      // Consider a more user-friendly notification than alert
-      console.warn("Debes iniciar sesión para agregar ítems al carrito.");
+      setShowLoginPrompt(true); // Show login prompt
+      // Optionally, hide it after a few seconds
+      setTimeout(() => setShowLoginPrompt(false), 3000);
       return;
     }
 
@@ -56,14 +57,12 @@ const ComunidadDiseños = () => {
     let newOptimisticCartItems;
 
     if (existingItemIndex > -1) {
-      // If item already in cart, increment quantity optimistically
       newOptimisticCartItems = cartItems.map((cartItem, index) =>
         index === existingItemIndex
           ? { ...cartItem, quantity: (cartItem.quantity || 1) + 1 }
           : cartItem
       );
     } else {
-      // If item not in cart, add it optimistically
       newOptimisticCartItems = [...cartItems, {
         id: item._id.toString(),
         name: item.prenda,
@@ -73,32 +72,24 @@ const ComunidadDiseños = () => {
       }];
     }
 
-    optimisticCartStateRef.current = cartItems; // Store current state for rollback
-    updateCart(newOptimisticCartItems); // Update UI optimistically
+    optimisticCartStateRef.current = cartItems;
+    updateCart(newOptimisticCartItems);
 
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
-    }
-
-    debounceTimeoutRef.current = setTimeout(async () => {
-      try {
-        const { success, message, data: updatedCart } = await addDesignToCart(userId, item._id.toString());
-        if (!success) {
-          // Rollback on error
-          updateCart(optimisticCartStateRef.current);
-          console.error("Error al agregar el diseño al carrito:", message);
-          // Consider a more user-friendly error notification
-        } else {
-          updateCart(updatedCart?.items || []); // Update with actual server state
-          console.log('Cart updated by server:', updatedCart?.items);
-        }
-      } catch (error) {
-        // Rollback on network/server error
+    try {
+      const { success, message, data: updatedCart } = await addDesignToCart(userId, item._id.toString());
+      if (!success) {
         updateCart(optimisticCartStateRef.current);
-        console.error("Error de red/servidor al agregar diseño al carrito:", error);
+        console.error("Error al agregar el diseño al carrito:", message);
         // Consider a more user-friendly error notification
+      } else {
+        updateCart(updatedCart?.items || []);
+        console.log('Cart updated by server:', updatedCart?.items);
       }
-    }, 500); // Debounce for 500ms
+    } catch (error) {
+      updateCart(optimisticCartStateRef.current);
+      console.error("Error de red/servidor al agregar diseño al carrito:", error);
+      // Consider a more user-friendly error notification
+    }
   }, [userId, cartItems, updateCart]);
 
   return (
@@ -117,9 +108,15 @@ const ComunidadDiseños = () => {
         <DesignGrid
           tarjetas={tarjetas}
           activo={activo}
-          addItem={handleAddItemToCart} // Pass the new addItem function
-          cartItems={cartItems} // Pass cart items to DesignGrid
+          addItem={handleAddItemToCart}
+          cartItems={cartItems}
         />
+
+        {showLoginPrompt && (
+          <div className="fixed bottom-4 right-4 bg-red-600 text-white p-3 rounded-lg shadow-lg animate-fadeInOut">
+            Debes iniciar sesión para agregar ítems al carrito.
+          </div>
+        )}
       </main>
 
       <Footer />
