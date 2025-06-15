@@ -63,6 +63,11 @@
     *   Utilized the existing loading state to prevent multiple submissions.
     *   Implemented rollback logic to revert to the previous design details if the `actualizarDesign` server action fails.
     *   **Created `memory-bank/functionalities/AdminDesignManagement.md`**: Documented the new functionality and the application of optimistic updates and rollback.
+-   **Implemented Optimistic Updates and Rollback for Supplier Profile Editing:**
+    *   **Modified `src/components/layout/proveedor/forms/FormEditarPerfilProveedor.jsx`**: Implemented optimistic UI updates for supplier profile details (name, address, payment methods, availability, credit permissions) upon form submission.
+    *   Utilized a loading state to prevent multiple submissions.
+    *   Implemented rollback logic to revert to the previous profile details if the `actualizarProveedor` server action fails.
+    *   **Created `memory-bank/functionalities/SupplierProfileManagement.md`**: Documented the new functionality and the application of optimistic updates and rollback.
 
 ## Remaining Tasks:
 - Identify and refactor other pages/components with iterative changes as per the new "Patrones de Sincronización de Datos".
