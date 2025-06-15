@@ -43,6 +43,22 @@
 - **Implemented client-side quantity and subtotal updates with debouncing:** Quantity changes in the cart now update the UI instantly, and server synchronization is debounced to improve performance (debounce delay adjusted to 1 second).
 - **Fixed item not removing when quantity is 0:** Modified `src/components/common/CartComponent.jsx` to remove items from the client-side cart state when their quantity is set to 0.
 - **Implemented optimistic updates and debouncing for "Add to Cart" in Catalog Page:** Refactored `src/app/catalogo/page.jsx` to use optimistic UI updates and debounced server synchronization when adding designs to the cart, improving perceived performance and user experience.
+- **Implemented Optimistic Updates and Debouncing for User Design Management (Profile Page):** Applied the optimistic update and debouncing pattern to the user's design management in the profile page (`/perfil`).
+    *   **Modified `src/components/common/DesignsComponent.jsx`**: Added "Edit" and "Delete" buttons, conditionally rendered based on a new `mode` prop ('profile' vs 'catalog').
+    *   **Created `src/components/perfil/FormEditarDesign.jsx`**: A new client component for editing design details, utilizing `actualizarDesign` server action.
+    *   **Modified `src/components/layout/ProfileContent.jsx`**:
+        *   Implemented `handleDeleteDesign` with optimistic UI updates (removes design immediately), debouncing (`eliminarDesign` server action after 500ms), and rollback on error.
+        *   Implemented `handleUpdateDesign` with optimistic UI updates (updates design details immediately), debouncing (`actualizarDesign` server action after 500ms), and rollback on error.
+        *   Updated `handleEditDesign` to open `FormEditarDesign` modal, passing design data and `handleUpdateDesign` as a callback.
+        *   Passed `mode="profile"`, `handleEditDesign`, and `handleDeleteDesign` to `DesignsComponent`.
+        *   Removed unnecessary `cartItems` and `orderedDesignIds` props from `DesignsComponent` when in 'profile' mode.
+        *   Removed `onPaymentSuccess={fetchCartData}` from `PedidosComponent` as `fetchCartData` was not defined in this context.
+- **Implemented Optimistic Updates and Rollback for Admin User Profile Picture Management:**
+    *   **Modified `src/app/admin/users/page.jsx`**: Implemented optimistic UI updates for profile picture changes, displaying the new image immediately after selection.
+    *   Added a loading state to the update button to prevent multiple submissions.
+    *   Implemented rollback logic to revert to the previous profile picture if the `actualizarFotoPerfilUsuarioPorAdmin` server action fails.
+    *   **Created `memory-bank/functionalities/AdminUserManagement.md`**: Documented the new functionality and the application of optimistic updates and rollback.
 
 ## Remaining Tasks:
 - Identify and refactor other pages/components with iterative changes as per the new "Patrones de Sincronización de Datos".
+- Consider if any other pages in `src/app/admin/` or other user-facing pages could benefit from this pattern.

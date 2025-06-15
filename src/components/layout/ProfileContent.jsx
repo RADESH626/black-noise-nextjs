@@ -4,7 +4,7 @@ import { signOut, useSession } from "next-auth/react";
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
 import Link from "next/link"; // Import Link
 import { useEffect, useState } from "react";
-import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions";
+import { obtenerDesignsPorUsuarioId, eliminarDesign, actualizarDesign } from "@/app/acciones/DesignActions"; // Import eliminarDesign and actualizarDesign
 import { obtenerPedidosPorUsuarioId } from "@/app/acciones/PedidoActions";
 import DesignsComponent from "../common/DesignsComponent";
 import PedidosComponent from "../common/PedidosComponent";
@@ -12,6 +12,9 @@ import { ObtenerUsuarioPorId } from "@/app/acciones/UsuariosActions";
 import FormEditarUsuario from "@/components/perfil/FormEditarUsuario";
 import DesignUploadModal from "@/components/perfil/DesignUploadModal";
 import PaymentHistory from "@/components/perfil/PaymentHistory"; // Importar el nuevo componente
+import { usePopUp } from "@/context/PopUpContext"; // Import usePopUp
+import { useRef, useCallback } from "react"; // Import useRef and useCallback
+import FormEditarDesign from "@/components/perfil/FormEditarDesign"; // Import FormEditarDesign
 
 function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [], initialUserPayments = [] }) {
   const { data: session, status } = useSession();
@@ -24,7 +27,10 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
   const [cartItems, setCartItems] = useState([]);
   const [cartLoading, setCartLoading] = useState(true);
   const [cartError, setCartError] = useState(null);
-  
+  const { showPopUp } = usePopUp(); // Initialize usePopUp
+  const deleteDesignTimeoutRef = useRef(null); // Ref for debouncing delete
+  const updateDesignTimeoutRef = useRef(null); // Ref for debouncing update
+
   // Inicializa el estado con los datos del servidor
   const [orderedDesignIds, setOrderedDesignIds] = useState(new Set(initialOrderedDesignIds));
   
@@ -123,16 +129,115 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
     );
   };
 
+  const handleUpdateDesign = useCallback(async (updatedDesignData) => {
+    const originalDesigns = userDesigns;
+    const designId = updatedDesignData._id || updatedDesignData.id;
+
+    // Optimistic update: update the design in the UI
+    setUserDesigns(prevDesigns =>
+      prevDesigns.map(design =>
+        design._id === designId ? { ...design, ...updatedDesignData } : design
+      )
+    );
+    showPopUp("Actualizando diseño...", "info");
+
+    if (updateDesignTimeoutRef.current) {
+      clearTimeout(updateDesignTimeoutRef.current);
+    }
+
+    updateDesignTimeoutRef.current = setTimeout(async () => {
+      try {
+        // Create FormData for the server action
+        const formData = new FormData();
+        for (const key in updatedDesignData) {
+          if (updatedDesignData[key] !== null && updatedDesignData[key] !== undefined) {
+            if (key === 'coloresDisponibles' || key === 'tallasDisponibles') {
+              formData.append(key, updatedDesignData[key].join(','));
+            } else {
+              formData.append(key, updatedDesignData[key]);
+            }
+          }
+        }
+        // Ensure the ID is correctly set for the server action
+        formData.set('id', designId);
+
+        const { success, message, data: returnedDesign } = await actualizarDesign(null, formData); // Pass null for prevState
+
+        if (success) {
+          showPopUp("Diseño actualizado exitosamente.", "success");
+          // Optionally update with server-returned data for full consistency
+          if (returnedDesign) {
+            setUserDesigns(prevDesigns =>
+              prevDesigns.map(design =>
+                design._id === designId ? { ...design, ...returnedDesign } : design
+              )
+            );
+          }
+        } else {
+          // Rollback: if server action fails, revert UI
+          setUserDesigns(originalDesigns);
+          showPopUp(message || "Error al actualizar el diseño. Revertido.", "error");
+          console.error("Error al actualizar el diseño:", message);
+        }
+      } catch (error) {
+        // Rollback: if network error, revert UI
+        setUserDesigns(originalDesigns);
+        showPopUp("Error de red al actualizar el diseño. Revertido.", "error");
+        console.error("Error de red al actualizar el diseño:", error);
+      }
+    }, 500); // Debounce for 500ms
+  }, [userDesigns, showPopUp]);
+
+
   const handleEditDesign = (design) => {
     openModal(
       "Editar Diseño",
-      <div className="text-white">
-        <h3 className="text-lg mb-4">Editando: {design.nombreDesing}</h3>
-        <p>Formulario de edición en desarrollo...</p>
-      </div>,
+      <FormEditarDesign
+        designData={design}
+        onSuccess={(updatedDesign) => {
+          handleUpdateDesign(updatedDesign); // Call the debounced update handler
+          openModal(
+            "Diseño Actualizado",
+            <div className="text-white">
+              <h3 className="text-lg mb-4">¡Tu diseño ha sido actualizado exitosamente!</h3>
+            </div>,
+            'default'
+          );
+        }}
+      />,
       'default'
     );
   };
+
+  const handleDeleteDesign = useCallback(async (designId) => {
+    const originalDesigns = userDesigns;
+    // Optimistic update: remove the design from the UI
+    setUserDesigns(prevDesigns => prevDesigns.filter(design => design._id !== designId));
+    showPopUp("Eliminando diseño...", "info");
+
+    if (deleteDesignTimeoutRef.current) {
+      clearTimeout(deleteDesignTimeoutRef.current);
+    }
+
+    deleteDesignTimeoutRef.current = setTimeout(async () => {
+      try {
+        const { success, message } = await eliminarDesign(designId);
+        if (success) {
+          showPopUp("Diseño eliminado exitosamente.", "success");
+        } else {
+          // Rollback: if server action fails, revert UI
+          setUserDesigns(originalDesigns);
+          showPopUp(message || "Error al eliminar el diseño. Revertido.", "error");
+          console.error("Error al eliminar el diseño:", message);
+        }
+      } catch (error) {
+        // Rollback: if network error, revert UI
+        setUserDesigns(originalDesigns);
+        showPopUp("Error de red al eliminar el diseño. Revertido.", "error");
+        console.error("Error de red al eliminar el diseño:", error);
+      }
+    }, 500); // Debounce for 500ms
+  }, [userDesigns, showPopUp]);
 
   const handleAddDesign = () => {
     openModal(
@@ -200,14 +305,14 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
                 error={error}
                 userDesigns={userDesigns}
                 handleEditDesign={handleEditDesign}
-                cartItems={cartItems}
-                orderedDesignIds={orderedDesignIds}
+                handleDeleteDesign={handleDeleteDesign}
+                mode="profile"
               />
             )}
           </>
         )}
-        {activeTab === 'orders' && (<PedidosComponent userId={user?.id} onPaymentSuccess={fetchCartData} />)} {/* Pass fetchCartData as onPaymentSuccess */}
-        {activeTab === 'payments' && (<PaymentHistory payments={paymentsForHistory} />)} {/* Usar PaymentHistory y pasar los pagos */}
+        {activeTab === 'orders' && (<PedidosComponent userId={user?.id} />)}
+        {activeTab === 'payments' && (<PaymentHistory payments={paymentsForHistory} />)}
       </div>
     </div>
   );

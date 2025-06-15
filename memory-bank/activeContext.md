@@ -59,10 +59,26 @@
     *   Uses `useRef` and `setTimeout` to debounce the `addDesignToCart` server action.
     *   Includes rollback logic to revert the UI state if the server action fails.
     *   Removed `alert` calls, relying on console logs for now.
+-   **Implemented Optimistic Updates and Debouncing for User Design Management:** Applied the optimistic update and debouncing pattern to the user's design management in the profile page (`/perfil`).
+    *   **Modified `src/components/common/DesignsComponent.jsx`**: Added "Edit" and "Delete" buttons, conditionally rendered based on a new `mode` prop ('profile' vs 'catalog').
+    *   **Created `src/components/perfil/FormEditarDesign.jsx`**: A new client component for editing design details, utilizing `actualizarDesign` server action.
+    *   **Modified `src/components/layout/ProfileContent.jsx`**:
+        *   Implemented `handleDeleteDesign` with optimistic UI updates (removes design immediately), debouncing (`eliminarDesign` server action after 500ms), and rollback on error.
+        *   Implemented `handleUpdateDesign` with optimistic UI updates (updates design details immediately), debouncing (`actualizarDesign` server action after 500ms), and rollback on error.
+        *   Updated `handleEditDesign` to open `FormEditarDesign` modal, passing design data and `handleUpdateDesign` as a callback.
+        *   Passed `mode="profile"`, `handleEditDesign`, and `handleDeleteDesign` to `DesignsComponent`.
+        *   Removed unnecessary `cartItems` and `orderedDesignIds` props from `DesignsComponent` when in 'profile' mode.
+    *   Removed `onPaymentSuccess={fetchCartData}` from `PedidosComponent` as `fetchCartData` was not defined in this context.
+-   **Implemented Optimistic Updates and Rollback for Admin User Profile Picture Management:**
+    *   **Modified `src/app/admin/users/page.jsx`**: Implemented optimistic UI updates for profile picture changes, displaying the new image immediately after selection.
+    *   Added a loading state to the update button to prevent multiple submissions.
+    *   Implemented rollback logic to revert to the previous profile picture if the `actualizarFotoPerfilUsuarioPorAdmin` server action fails.
+    *   **Created `memory-bank/functionalities/AdminUserManagement.md`**: Documented the new functionality and the application of optimistic updates and rollback.
 
 ### Next Steps:
 -   Update `progress.md` and generate git commands.
 -   Identify and refactor other pages/components with iterative changes as per the new "Patrones de Sincronización de Datos".
+-   Consider if any other pages in `src/app/admin/` or other user-facing pages could benefit from this pattern.
 
 ## Login Credentials (Provided by User)
 

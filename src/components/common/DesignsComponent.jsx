@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartItems, addItem, orderedDesignIds }) {
+function DesignsComponent({ loading, error, userDesigns, handleEditDesign, handleDeleteDesign, cartItems, addItem, orderedDesignIds, mode = 'catalog' }) {
 
   return (
     <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -38,25 +38,43 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign, cartI
                 <p className="font-semibold">precio: ${design.valorDesing}</p>
                 <p className="font-semibold">categoría: {design.categoria}</p>
               </div>
-              {(cartItems || []).some(item => item.id === design._id) ? (
-                <button
-                  disabled
-                  className="bg-gray-600 text-white font-semibold py-2 px-4 rounded-md text-sm cursor-not-allowed"
-                >
-                  En el carrito
-                </button>
-              ) : (
-                <button
-                  onClick={() => addItem({
-                    id: design._id,
-                    nombre: design.nombreDesing,
-                    price: design.valorDesing,
-                    imagen: design.imagen,
-                  })}
-                  className="bg-purple-700 text-white font-semibold py-2 px-4 rounded-md text-sm hover:bg-purple-800 transition duration-150"
-                >
-                  Agregar al carrito
-                </button>
+              {mode === 'catalog' && (
+                (cartItems || []).some(item => item.id === design._id) ? (
+                  <button
+                    disabled
+                    className="bg-gray-600 text-white font-semibold py-2 px-4 rounded-md text-sm cursor-not-allowed"
+                  >
+                    En el carrito
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => addItem({
+                      id: design._id,
+                      nombre: design.nombreDesing,
+                      price: design.valorDesing,
+                      imagen: design.imagen,
+                    })}
+                    className="bg-purple-700 text-white font-semibold py-2 px-4 rounded-md text-sm hover:bg-purple-800 transition duration-150"
+                  >
+                    Agregar al carrito
+                  </button>
+                )
+              )}
+              {mode === 'profile' && (
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => handleEditDesign(design)}
+                    className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-md text-sm hover:bg-blue-700 transition duration-150"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => handleDeleteDesign(design._id)}
+                    className="bg-red-600 text-white font-semibold py-2 px-4 rounded-md text-sm hover:bg-red-700 transition duration-150"
+                  >
+                    Eliminar
+                  </button>
+                </div>
               )}
             </div>
           </div>
