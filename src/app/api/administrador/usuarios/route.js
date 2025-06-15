@@ -27,7 +27,6 @@ export const POST = withAuthorization(async (request) => {
         // Hash password and set default values
         const hashedPassword = await bcrypt.hash(data.password, 10);
         data.password = hashedPassword;
-        data.nombreUsuario = `${data.primerNombre}${Math.floor(1000 + Math.random() * 9000)}`;
         data.rol = data.rol || 'CLIENTE'; // Allow role to be set if provided, otherwise default to CLIENTE
         data.habilitado = true;
 

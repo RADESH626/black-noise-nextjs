@@ -44,7 +44,27 @@ export async function addDesignToCart(userId, designId) {
 
         revalidatePath('/perfil'); // Revalidate profile page to reflect cart changes
 
-        return { success: true, message: 'Design added to cart successfully.', data: JSON.parse(JSON.stringify(cart)) };
+        // Re-fetch and populate the cart after saving to ensure full item details are returned
+        const updatedPopulatedCart = await Cart.findOne({ userId }).populate('items.designId', 'nombreDesing valorDesing imageData imageMimeType descripcion categoria').lean();
+
+        const populatedCartItems = (updatedPopulatedCart.items || []).map(item => ({
+            id: item.designId._id.toString(),
+            designId: item.designId._id,
+            nombre: item.designId.nombreDesing,
+            price: item.designId.valorDesing,
+            descripcion: item.designId.descripcion,
+            categoria: item.designId.categoria,
+            imageData: item.designId.imageData ? Buffer.from(item.designId.imageData.buffer).toString('base64') : null,
+            imageMimeType: item.designId.imageMimeType,
+            quantity: item.quantity,
+        }));
+
+        const finalCartData = {
+            ...updatedPopulatedCart,
+            items: populatedCartItems,
+        };
+
+        return { success: true, message: 'Design added to cart successfully.', data: JSON.parse(JSON.stringify(finalCartData)) };
     } catch (error) {
         logger.error('ERROR in addDesignToCart:', error);
         return { success: false, message: 'Error adding design to cart: ' + error.message };

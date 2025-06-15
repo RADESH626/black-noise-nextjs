@@ -2,55 +2,69 @@
 
 import { signOut, useSession } from "next-auth/react";
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
-import Link from "next/link"; // Import Link
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions";
+import { obtenerDesignsPorUsuarioId, eliminarDesign, actualizarDesign } from "@/app/acciones/DesignActions";
 import { obtenerPedidosPorUsuarioId } from "@/app/acciones/PedidoActions";
 import DesignsComponent from "../common/DesignsComponent";
 import PedidosComponent from "../common/PedidosComponent";
 import { ObtenerUsuarioPorId } from "@/app/acciones/UsuariosActions";
 import FormEditarUsuario from "@/components/perfil/FormEditarUsuario";
 import DesignUploadModal from "@/components/perfil/DesignUploadModal";
-import PaymentHistory from "@/components/perfil/PaymentHistory"; // Importar el nuevo componente
-import { usePopUp } from "@/context/PopUpContext"; // Import usePopUp
+import PaymentHistory from "@/components/perfil/PaymentHistory";
+import { usePopUp } from "@/context/PopUpContext";
+import { useRef, useCallback } from "react";
+import { signOut, useSession } from "next-auth/react";
+import BotonGeneral from "@/components/common/botones/BotonGeneral";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { obtenerDesignsPorUsuarioId, eliminarDesign, actualizarDesign } from "@/app/acciones/DesignActions";
+import { obtenerPedidosPorUsuarioId } from "@/app/acciones/PedidoActions";
+import DesignsComponent from "../common/DesignsComponent";
+import PedidosComponent from "../common/PedidosComponent";
+import { ObtenerUsuarioPorId } from "@/app/acciones/UsuariosActions";
+import FormEditarUsuario from "@/components/perfil/FormEditarUsuario";
+import DesignUploadModal from "@/components/perfil/DesignUploadModal";
+import PaymentHistory from "@/components/perfil/PaymentHistory";
+import { usePopUp } from "@/context/PopUpContext";
+import { useRef, useCallback } from "react";
+import FormEditarDesign from "@/components/perfil/FormEditarDesign";
+// Removed: import NewOrderModal from "@/components/common/modales/NewOrderModal";
 
 function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [], initialUserPayments = [] }) {
-  const { showPopUp } = usePopUp();
   const { data: session, status } = useSession();
   const userId = session?.user?.id;
   const [activeTab, setActiveTab] = useState('designs');
   const [currentUser, setCurrentUser] = useState(null);
   const [userDesigns, setUserDesigns] = useState(initialUserDesigns);
-  const [loading, setLoading] = useState(initialUserDesigns.length === 0); // Solo loading si no hay datos iniciales
+  const [loading, setLoading] = useState(initialUserDesigns.length === 0);
   const [error, setError] = useState(null);
   const [cartItems, setCartItems] = useState([]);
   const [cartLoading, setCartLoading] = useState(true);
   const [cartError, setCartError] = useState(null);
-  
-  // Inicializa el estado con los datos del servidor
+  const { showPopUp, openModal } = usePopUp();
+  const deleteDesignTimeoutRef = useRef(null);
+  const updateDesignTimeoutRef = useRef(null);
+
+  // Removed: State for NewOrderModal
+  // const [isNewOrderModalOpen, setIsNewOrderModalOpen] = useState(false);
+
   const [orderedDesignIds, setOrderedDesignIds] = useState(new Set(initialOrderedDesignIds));
   
-  // Ensure initialUserPayments is always an array for PaymentHistory
   const paymentsForHistory = Array.isArray(initialUserPayments) ? initialUserPayments : (initialUserPayments ? [initialUserPayments] : []);
 
-  // --- INICIO DE DEBUGGING EN CLIENTE ---
   useEffect(() => {
     console.log('--- [CLIENTE] Props iniciales recibidas del servidor ---');
     console.log('[CLIENTE] initialUserDesigns:', initialUserDesigns);
-    // console.log('[CLIENTE] initialOrderedDesignIds:', initialOrderedDesignIds);
-    // console.log('[CLIENTE] initialUserPayments:', initialUserPayments); // Log de los pagos
-    // console.log('[CLIENTE] typeof initialUserPayments:', typeof initialUserPayments);
-    // console.log('[CLIENTE] Array.isArray(initialUserPayments):', Array.isArray(initialUserPayments));
     console.log('[CLIENTE] Estado "orderedDesignIds" inicializado como Set:', orderedDesignIds);
     console.log('--- [CLIENTE] FIN DEBUGGING INICIAL ---');
-  }, []); // Empty dependency array ensures this runs only once on mount
+  }, []);
 
   const fetchUserData = async () => {
     if (status === 'authenticated' && userId) {
       setLoading(true);
       setError(null);
 
-      // Fetch user data
       const fetchedUser = await ObtenerUsuarioPorId(userId);
       if (fetchedUser && fetchedUser.error) {
         setError(fetchedUser.error);
@@ -79,45 +93,22 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
       setLoading(false);
     }
   };
-
-  const fetchCartData = () => {
-    console.log("fetchCartData called - Cart data fetching logic not yet implemented.");
-    // TODO: Implement actual cart data fetching logic here if needed
-  };
   
-  // Este useEffect se encarga de obtener los datos del lado del cliente si es necesario
   useEffect(() => {
     fetchUserData();
-    fetchUserDesigns(); // Fetch designs on initial load and when userId/status changes
-  }, [userId, status]); // Se ejecuta cuando el userId o el estado de la sesión cambian
-
-
-  // const handleAddItemToCart = async (item) => {
-  //   if (!userId) {
-  //     alert("Debes iniciar sesión para agregar ítems al carrito.");
-  //     return;
-  //   }
-  //   setCartLoading(true);
-  //   const { success, message } = await addDesignToCart(userId, item.id);
-  //   if (success) {
-  //     await fetchCartData();
-  //   } else {
-  //     setCartError({ message: message || "Error al agregar el diseño al carrito." });
-  //   }
-  //   setCartLoading(false);
-  // };
+    fetchUserDesigns();
+  }, [userId, status]);
 
   const user = currentUser;
 
   const handleEditProfile = () => {
-    console.log("handleEditProfile called. currentUser:", currentUser); // Log currentUser
-    showPopUp(
+    openModal(
       "Editar Perfil",
       <FormEditarUsuario
         userData={currentUser}
         userId={userId}
         onSuccess={() => {
-          showPopUp(
+          openModal(
             "Perfil Actualizado",
             <div className="text-white">
               <h3 className="text-lg mb-4">¡Tu perfil ha sido actualizado exitosamente!</h3>
@@ -131,24 +122,116 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
     );
   };
 
+  const handleUpdateDesign = useCallback(async (updatedDesignData) => {
+    const originalDesigns = userDesigns;
+    const designId = updatedDesignData._id || updatedDesignData.id;
+
+    setUserDesigns(prevDesigns =>
+      prevDesigns.map(design =>
+        design._id === designId ? { ...design, ...updatedDesignData } : design
+      )
+    );
+    showPopUp("Actualizando diseño...", "info");
+
+    if (updateDesignTimeoutRef.current) {
+      clearTimeout(updateDesignTimeoutRef.current);
+    }
+
+    updateDesignTimeoutRef.current = setTimeout(async () => {
+      try {
+        const formData = new FormData();
+        for (const key in updatedDesignData) {
+          if (updatedDesignData[key] !== null && updatedDesignData[key] !== undefined) {
+            if (key === 'coloresDisponibles' || key === 'tallasDisponibles') {
+              formData.append(key, updatedDesignData[key].join(','));
+            } else {
+              formData.append(key, updatedDesignData[key]);
+            }
+          }
+        }
+        formData.set('id', designId);
+
+        const { success, message, data: returnedDesign } = await actualizarDesign(null, formData);
+
+        if (success) {
+          showPopUp("Diseño actualizado exitosamente.", "success");
+          if (returnedDesign) {
+            setUserDesigns(prevDesigns =>
+              prevDesigns.map(design =>
+                design._id === designId ? { ...design, ...returnedDesign } : design
+              )
+            );
+          }
+        } else {
+          setUserDesigns(originalDesigns);
+          showPopUp(message || "Error al actualizar el diseño. Revertido.", "error");
+          console.error("Error al actualizar el diseño:", message);
+        }
+      } catch (error) {
+        setUserDesigns(originalDesigns);
+        showPopUp("Error de red al actualizar el diseño. Revertido.", "error");
+        console.error("Error de red al actualizar el diseño:", error);
+      }
+    }, 500);
+  }, [userDesigns, showPopUp]);
+
+
   const handleEditDesign = (design) => {
-    showPopUp(
+    openModal(
       "Editar Diseño",
-      <div className="text-white">
-        <h3 className="text-lg mb-4">Editando: {design.nombreDesing}</h3>
-        <p>Formulario de edición en desarrollo...</p>
-      </div>,
+      <FormEditarDesign
+        designData={design}
+        onSuccess={(updatedDesign) => {
+          handleUpdateDesign(updatedDesign);
+          openModal(
+            "Diseño Actualizado",
+            <div className="text-white">
+              <h3 className="text-lg mb-4">¡Tu diseño ha sido actualizado exitosamente!</h3>
+            </div>,
+            'default'
+          );
+        }}
+      />,
       'default'
     );
   };
 
+  const handleDeleteDesign = useCallback(async (designId) => {
+    const originalDesigns = userDesigns;
+    setUserDesigns(prevDesigns => prevDesigns.filter(design => design._id !== designId));
+    showPopUp("Eliminando diseño...", "info");
+
+    if (deleteDesignTimeoutRef.current) {
+      clearTimeout(deleteDesignTimeoutRef.current);
+    }
+
+    deleteDesignTimeoutRef.current = setTimeout(async () => {
+      try {
+        const { success, message } = await eliminarDesign(designId);
+        if (success) {
+          showPopUp("Diseño eliminado exitosamente.", "success");
+        } else {
+          setUserDesigns(originalDesigns);
+          showPopUp(message || "Error al eliminar el diseño. Revertido.", "error");
+          console.error("Error al eliminar el diseño:", message);
+        }
+      } catch (error) {
+        setUserDesigns(originalDesigns);
+        showPopUp("Error de red al eliminar el diseño. Revertido.", "error");
+        console.error("Error de red al eliminar el diseño:", error);
+      }
+    }, 500);
+  }, [userDesigns, showPopUp]);
+
   const handleAddDesign = () => {
-    showPopUp(
+    openModal(
       "Subir Nuevo Diseño",
       <DesignUploadModal onDesignSaved={fetchUserDesigns} />,
       'default'
     );
   };
+
+  // Removed: const handleCreateNewOrder = () => { setIsNewOrderModalOpen(true); };
 
   return (
     <div className="mx-auto p-4 md:p-8 bg-black text-white w-screen flex flex-col min-h-screen">
@@ -168,9 +251,10 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
             </div>
             <div className="flex flex-col sm:flex-row justify-center md:justify-start space-y-2 sm:space-y-0 sm:space-x-3">
               <BotonGeneral onClick={handleEditProfile}>EDITAR PERFIL</BotonGeneral>
-              <Link href="/catalogo"> {/* Add Link */}
-                <BotonGeneral>VER DISEÑOS DE LA COMUNIDAD</BotonGeneral> {/* Add new button */}
+              <Link href="/catalogo">
+                <BotonGeneral>VER DISEÑOS DE LA COMUNIDAD</BotonGeneral>
               </Link>
+              {/* Removed: <BotonGeneral onClick={handleCreateNewOrder}>CREAR NUEVO PEDIDO</BotonGeneral> */}
               <BotonGeneral onClick={() => signOut({ callbackUrl: '/login' })}>CERRAR SESIÓN</BotonGeneral>
             </div>
           </div>
@@ -208,15 +292,17 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
                 error={error}
                 userDesigns={userDesigns}
                 handleEditDesign={handleEditDesign}
-                cartItems={cartItems}
-                orderedDesignIds={orderedDesignIds}
+                handleDeleteDesign={handleDeleteDesign}
+                mode="profile"
               />
             )}
           </>
         )}
-        {activeTab === 'orders' && (<PedidosComponent userId={user?.id} onPaymentSuccess={fetchCartData} />)} {/* Pass fetchCartData as onPaymentSuccess */}
-        {activeTab === 'payments' && (<PaymentHistory payments={paymentsForHistory} />)} {/* Usar PaymentHistory y pasar los pagos */}
+        {activeTab === 'orders' && (<PedidosComponent userId={user?.id} />)}
+        {activeTab === 'payments' && (<PaymentHistory payments={paymentsForHistory} />)}
       </div>
+
+      {/* Removed: {isNewOrderModalOpen && ( <NewOrderModal onClose={() => setIsNewOrderModalOpen(false)} /> )} */}
     </div>
   );
 }

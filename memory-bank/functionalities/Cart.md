@@ -36,6 +36,10 @@ The `CartComponent` (or a similar component) will fetch the cart data and render
 
 Additionally, the cart data (specifically `cartItems`) obtained from the database via `getCartByUserId` is passed as a prop to `DesignsComponent.jsx`. This ensures that the "En el carrito" status for individual designs in the "Diseños" tab of the user's profile is accurately reflected based on the persistent cart data.
 
+### Global Cart State Management
+
+To ensure the cart icon in the navigation bar (`HeaderPrincipal`) and other components can react dynamically to changes in the cart, a global cart context will be implemented. This context will manage the `cartItems` state and provide methods to update it from any part of the application.
+
 ### Order Creation
 
 The "Realizar Pedido" button in the cart now triggers the creation of a new order. This process involves:
@@ -54,8 +58,8 @@ The client-side cart management is synchronized with the server-side `Cart` mode
     *   The server action connects to the database.
     *   It performs the necessary CRUD operations on the `Cart` document (create, read, update, delete items) or creates a `Pedido` document.
     *   `revalidatePath('/perfil')` is used to ensure the user's profile page (where the cart is displayed) reflects the latest cart state.
-    *   The server returns a success or error response.
-4.  **Client-side Update**: Based on the server's response, the `CartComponent` updates its local state to reflect the changes, ensuring consistency in the UI.
+    *   The server returns a success or error response, including the updated cart data.
+4.  **Client-side Update**: Based on the server's response, the `CartContext` will be updated, which in turn will re-render any components consuming the context (e.g., `HeaderPrincipal`, `CartComponent`).
 
 ## Related Components/Files
 

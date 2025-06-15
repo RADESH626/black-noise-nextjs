@@ -1,6 +1,9 @@
 # Project Progress
 
 ## Current Status:
+- The `UsuarioSchema` has been refactored to remove the `nombreUsuario` field, simplifying the login process to use `correo` as the sole unique identifier.
+- All references to `nombreUsuario` in `src/components/layout/admin/dashboards/UsuariosClientPage.jsx`, `src/app/acciones/UsuariosActions.js`, `src/app/acciones/PagoActions.js`, `src/app/acciones/DesignActions.js`, and `src/app/api/administrador/usuarios/route.js` have been updated or removed.
+- The `memory-bank/functionalities/UserManagement.md` documentation has been updated to reflect this change.
 - The `Pedido` model has been updated to include a `paymentId` field, ensuring a direct link to the payment transaction.
 - The `GestionDePedidosYPagos.md` documentation has been updated to reflect this change and the "payment first" flow.
 - The `Pago` model now correctly uses the centralized `MetodoPago` enum, replacing hardcoded values.
@@ -9,7 +12,7 @@
 - The `Genero` enum has been correctly exported in `src/models/enums/usuario/index.js`.
 - The profile page data fetching has been optimized on the client-side by ensuring `userDesigns` are re-fetched after a new design upload, improving UI consistency.
 - Resolved repeated client-side console logs in `src/components/layout/ProfileContent.jsx` by moving them into a `useEffect` hook, ensuring they run only once on component mount.
-- Implemented a shopping cart icon in the `HeaderPrincipal.jsx` component.
+- Implemented a shopping cart icon in `HeaderPrincipal.jsx` component.
 - Created a `CartModal.jsx` component that displays a preview of cart items (image, name, price, quantity) and a message for an empty cart.
 - Reintroduced the dedicated `/carrito` page, rendering the `CartComponent` for a full cart view.
 - The cart icon in the header now toggles the `CartModal` and fetches cart data.
@@ -24,28 +27,92 @@
 - Fixed an issue where updating cart item quantity with an empty or invalid input caused a "Cast to Number failed" validation error by ensuring the raw string value is passed and parsed/validated in the correct component.
 - Resolved a TypeScript error (`Se esperaba '...'`) in `CartItem.jsx` by refining the JSX structure and ensuring proper `alt` attribute for images.
 - Optimized cart item quantity updates to prevent full component re-renders by updating the `cartItems` state locally instead of refetching the entire cart, and by memoizing `CartItem` and stabilizing callback functions in `CartComponent`.
-- Extended local state updates to `handleAddItem`, `handleRemoveItem`, and `handleClearCart` in `CartComponent.jsx` to prevent full component re-renders on all cart modifications.
+- Extended local state updates to `handleAddItem`, `handleRemoveItem`, and `handleClearCart` in `src/components/common/CartComponent.jsx` to prevent full component re-renders on all cart modifications.
 - Prevented the "Cargando" message from appearing during quantity updates by removing global loading state triggers from `handleUpdateQuantity`.
 - Added subtotal display for each design item in `src/components/common/CartItem.jsx`.
 - Resolved a syntax error in `src/components/common/CartComponent.jsx` by wrapping multiple JSX elements in a React Fragment.
 - Resolved a runtime error in `src/components/common/CartComponent.jsx` by importing the `Link` component from `next/link`.
-- Implemented a global cart state using `CartContext.jsx` to allow real-time updates of the cart icon in the navigation bar and other components.
+- Implemented a global cart state using `CartContext.jsx` to manage the global state of the shopping cart, including `cartItems`, loading status, and error handling.
 - Integrated `CartProvider` into `SessionProviderWrapper.jsx` to make the cart context available throughout the application.
-- Refactored `HeaderPrincipal.jsx` to consume `cartItems` from `CartContext`, ensuring the cart item count updates dynamically.
-- Refactored `CartComponent.jsx` to use `cartItems`, `loadingCart`, `cartError`, and `updateCart` from `CartContext`, centralizing its state management.
-- Modified `CartActions.js` (specifically `removeDesignFromCart` and `clearUserCart`) to consistently return the updated cart data, facilitating seamless global state synchronization.
-- Refactored `src/app/catalogo/page.jsx` to utilize the global `CartContext` for managing cart items, ensuring real-time updates of the cart icon and design status in the catalog.
-- Confirmed `src/components/catalogo/DesignGrid.jsx` correctly consumes the `cartItems` prop from its parent to display the `isInCart` status.
-- Fixed an issue in `src/components/catalogo/DesignGrid.jsx` where designs already in the cart would incorrectly show the "Add to Cart" button. This was resolved by ensuring consistent ID type comparison (`item.id === diseño._id.toString()`) when checking if a design is in the cart.
+- Refactored `HeaderPrincipal.jsx` to consume `cartItems` from `CartContext`, enabling the cart icon to dynamically display the number of items.
+- Refactored `CartComponent.jsx` to utilize `cartItems`, `loadingCart`, `cartError`, and `updateCart` from `CartContext`, centralizing its state management.
+- Enhanced Cart Actions: Modified `src/app/acciones/CartActions.js` (specifically `removeDesignFromCart` and `clearUserCart`) to ensure all cart-related server actions consistently return the updated cart data, facilitating seamless global state synchronization.
+- Refactored Catalog Page for Real-time Updates: Modified `src/app/catalogo/page.jsx` to remove local cart state and integrate with the global `CartContext`. The `handleAddItemToCart` function now updates the global cart state after a successful addition, ensuring the cart icon and design status in the catalog update in real-time.
+- Verified DesignGrid Usage: Confirmed that `src/components/catalogo/DesignGrid.jsx` correctly receives and utilizes the `cartItems` prop from its parent to display whether a design is in the cart.
+- Fixed Design Status in Catalog: Corrected the logic in `src/components/catalogo/DesignGrid.jsx` to ensure that designs already in the cart correctly display their status (e.g., "En el carrito" en lugar de "Agregar al carrito"). This was achieved by ensuring a consistent type comparison (`item.id === diseño._id.toString()`) when checking if a design is in the cart.
 - **Fixed React Warning: "Each child in a list should have a unique 'key' prop"** in `src/components/common/CartComponent.jsx` by ensuring a stable and unique key for `CartItem` components.
-- **Fixed Runtime Error: "Cannot read properties of undefined (reading 'toFixed')"** in `src/components/common/CartItem.jsx` by safely handling `item.price` and `item.quantity` before calling `toFixed()`.
-- **Fixed Missing Design Details After Quantity Update:** Ensured `src/app/acciones/CartActions.js` returns fully populated cart data after quantity updates.
+- **Fixed Runtime Error: "Cannot read properties of undefined (reading 'toFixed')"**: This error occurred in `src/components/common/CartItem.jsx` because `item.price` or `item.quantity` were `undefined` when `toFixed()` was called.
+    -   **Correction:** Modified `src/components/common/CartItem.jsx` to safely access `item.price` and `item.quantity` using the nullish coalescing operator (`?? 0`) before performing calculations or calling `toFixed()`.
+-   **Missing Design Details After Quantity Update:** When updating the quantity of designs, only price and subtotal were rendered, and full design details were missing.
+    -   **Correction:** Modified `src/app/acciones/CartActions.js` to ensure that `updateCartItemQuantity` returns the fully populated cart data, including all design details, after a quantity update.
+-   **Quantity 0 does not remove item from UI:** When a user set the quantity of an item to 0, the item remained in the UI with a quantity of 0 instead of being removed.
+    -   **Correction:** Modified `src/components/common/CartComponent.jsx` to filter out items from the `cartItems` state when their `newQuantity` is 0, ensuring immediate UI removal.
+    -   **Correction:** Modified `src/components/common/CartComponent.jsx` to filter out items from the `cartItems` state when their `newQuantity` is 0, ensuring immediate UI removal.
+-   **Implemented Optimistic Updates and Debouncing for Cart Actions:** Refactored `handleAddItem`, `handleRemoveItem`, and `handleClearCart` in `src/components/common/CartComponent.jsx` to:
+    *   Perform immediate optimistic UI updates on user action.
+    *   Use separate `useRef` debouncers for each action to delay server synchronization calls (`addDesignToCart`, `removeDesignFromCart`, `clearUserCart`) by 1000ms.
+    *   Implement rollback logic to revert client-side state if the server update fails.
+    *   Adjusted the debounce time for `handleUpdateQuantity` to 000ms for consistency.
+-   **Refactored Catalog Page for Optimistic Add to Cart:** Applied the optimistic update and debounced synchronization pattern to `src/app/catalogo/page.jsx`. The `handleAddItemToCart` function now:
+    *   Optimistically adds the design to the cart state immediately.
+    *   Uses `useRef` and `setTimeout` to debounce the `addDesignToCart` server action.
+    *   Includes rollback logic to revert the UI state if the server action fails.
+    *   Removed `alert` calls, relying on console logs for now.
+-   **Implemented Optimistic Updates and Debouncing for User Design Management:** Applied the optimistic update and debouncing pattern to the user's design management in the profile page (`/perfil`).
+    *   **Modified `src/components/common/DesignsComponent.jsx`**: Added "Edit" and "Delete" buttons, conditionally rendered based on a new `mode` prop ('profile' vs 'catalog').
+    *   **Created `src/components/perfil/FormEditarDesign.jsx`**: A new client component for editing design details, utilizing `actualizarDesign` server action.
+    *   **Modified `src/components/layout/ProfileContent.jsx`**:
+        *   Implemented `handleDeleteDesign` with optimistic UI updates (removes design immediately), debouncing (`eliminarDesign` server action after 500ms), and rollback on error.
+        *   Implemented `handleUpdateDesign` with optimistic UI updates (updates design details immediately), debouncing (`actualizarDesign` server action after 500ms), and rollback on error.
+        *   Updated `handleEditDesign` to open `FormEditarDesign` modal, passing design data and `handleUpdateDesign` as a callback.
+        *   Passed `mode="profile"`, `handleEditDesign`, and `handleDeleteDesign` to `DesignsComponent`.
+        *   Removed unnecessary `cartItems` and `orderedDesignIds` props from `DesignsComponent` when in 'profile' mode.
+    *   Removed `onPaymentSuccess={fetchCartData}` from `PedidosComponent` as `fetchCartData` was not defined in this context.
+-   **Implemented Optimistic Updates and Rollback for Admin User Profile Picture Management:**
+    *   **Modified `src/app/admin/users/page.jsx`**: Implemented optimistic UI updates for profile picture changes, displaying the new image immediately after selection.
+    *   Added a loading state to the update button to prevent multiple submissions.
+    *   Implemented rollback logic to revert to the previous profile picture if the `actualizarFotoPerfilUsuarioPorAdmin` server action fails.
+    *   **Created `memory-bank/functionalities/AdminUserManagement.md`**: Documented the new functionality and the application of optimistic updates and rollback.
+-   **Implemented Optimistic Updates and Rollback for Admin Design Editing:**
+    *   **Modified `src/app/admin/designs/editar/[id]/page.jsx`**: Implemented optimistic UI updates for design details (name, description, price, category, and image preview) upon form submission.
+    *   Utilized the existing loading state to prevent multiple submissions.
+    *   Implemented rollback logic to revert to the previous design details if the `actualizarDesign` server action fails.
+    *   **Created `memory-bank/functionalities/AdminDesignManagement.md`**: Documented the new functionality and the application of optimistic updates and rollback.
+-   **Implemented Optimistic Updates and Rollback for Supplier Profile Editing:**
+    *   **Modified `src/components/layout/proveedor/forms/FormEditarPerfilProveedor.jsx`**: Implemented optimistic UI updates for supplier profile details (name, address, payment methods, availability, credit permissions) upon form submission.
+    *   Utilized a loading state to prevent multiple submissions.
+    *   Implemented rollback logic to revert to the previous profile details if the `actualizarProveedor` server action fails.
+    *   **Created `memory-bank/functionalities/SupplierProfileManagement.md`**: Documented the new functionality and the application of optimistic updates and rollback.
+-   **Fixed Catalog Page Button Reversion:** Resolved the issue where "Add to Cart" buttons for other designs would revert to their original state after adding an item. This was addressed by:
+    *   Memoizing `DesignCard.jsx` with `React.memo` to prevent unnecessary re-renders.
+    *   Memoizing `DesignGrid.jsx` with `React.memo` to prevent unnecessary re-renders.
+    *   Ensuring the `cartItems` array passed from `CartContext` is consistently updated with the complete server-side cart state.
+    *   **Modified `src/app/acciones/CartActions.js`:** Updated `addDesignToCart` to return the fully populated and formatted cart data (with `id` as string) after adding/updating an item, ensuring consistency with client-side expectations.
+- Fixed runtime error "totalConEnvio is not defined" in `src/components/common/CartComponent.jsx` by replacing the undefined variable with `totalAPagar`.
+- Created `src/components/pago/PaymentModal.jsx` to encapsulate payment form logic.
+- Modified `src/components/common/CartComponent.jsx` to display `PaymentModal` as a modal using `usePopUp` when "Proceder al Pago" is clicked, instead of redirecting to `/pago`.
+- `src/app/pago/page.jsx` remains a standalone page and was not modified to become a modal.
+- Fixed runtime error "PaymentModal is not defined" in `src/components/common/CartComponent.jsx` by adding the import statement for `PaymentModal`.
+- Created new documentation files: `log/2025-06-14.md`, `docs/features/CartManagement.md`, `docs/features/UserProfileManagement.md`, `docs/features/AdminAndSupplierModules.md`, and `docs/patterns/OptimisticUpdates.md`. These files have been linked in `memory-bank/manifest.md`.
+- **Fixed Hydration Error: "<div> cannot be a descendant of <p>"**: This error occurred because the `PopUpMessage` component was rendering its `message` prop (which could be a block-level element like a `div` from `PaymentModal`) inside a `<p>` tag.
+    -   **Correction:** Modified `src/components/common/modales/PopUpMessage.jsx` to replace the problematic `<p>` tag with a `<span>` tag, ensuring correct HTML nesting and resolving the hydration error.
+- **Fixed Runtime Error: "useState is not defined"**: This error occurred in `src/components/common/CartComponent.jsx` because `useState` was used without being imported from the 'react' library.
+    -   **Correction:** Modified `src/components/common/CartComponent.jsx` to import `useState` from 'react'.
+- **Payment Page Enhancements:**
+    - Implemented `src/components/pago/UserDataForm.jsx` for user data input, auto-fill, and delivery method selection (home delivery with cost / pick-up).
+    - Implemented `src/components/pago/CardDataModal.jsx` as a modal for credit card input.
+    - Integrated both components into `src/app/proceso-pago/page.jsx`, replacing the old payment form.
+    - Updated `src/models/Pedido.js` to make `direccionEnvio` and `destinatario.direccion` optional, accommodating the "pick-up" delivery option.
+- **New Order Modal Enhancements:**
+    - Implemented user data input fields (name, email, address) in `src/components/common/modales/NewOrderModal.jsx`.
+    - Added an "Auto-fill with my data" button to populate these fields with authenticated user information.
+    - Integrated delivery method selection (home delivery with cost / pick-up) with conditional address display.
+    - Updated the order saving logic to include the new user and delivery information.
+- **New Order Modal Integration:**
+    - Integrated `src/components/common/modales/NewOrderModal.jsx` into `src/components/layout/ProfileContent.jsx` with a "CREAR NUEVO PEDIDO" button to open the modal.
 
 ## Remaining Tasks:
-- No remaining tasks for this specific request.
-
-## Project Progress
-
-- Fixed runtime error related to invalid Link usage in `DesignsTable.jsx`.
-- Fixed 404 error after updating a design by correcting the redirection target in `src/app/admin/designs/editar/[id]/page.jsx`.
-- Fixed "Each child in a list should have a unique 'key' prop" console error in `FormFiltrarPagos.jsx`.
+- The task of applying the client-side data management approach (optimistic updates, debouncing, rollback) to "other pages" has been completed for all identified suitable candidates.
+- `src/app/pedido/page.jsx`: Reviewed and determined that no direct interactive elements for order status changes exist on this page that would benefit from optimistic updates, as the "payment first" flow is already implemented.
+- `src/components/layout/admin/pedidos/forms/FormEditarPedido.jsx`: Reviewed and found to be a placeholder component with no current functionality for editing orders, thus no optimistic updates could be applied at this time.
+- The current task is considered complete.

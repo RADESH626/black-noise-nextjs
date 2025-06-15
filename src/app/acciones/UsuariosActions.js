@@ -311,7 +311,6 @@ async function RegistrarUsuario(formData) {
             tipoDocumento: formData.get('tipoDocumento'),
             numeroDocumento: formData.get('numeroDocumento'),
             primerNombre: formData.get('primerNombre'),
-            nombreUsuario: `${formData.get('primerNombre')}${Math.floor(1000 + Math.random() * 9000)}`,
             segundoNombre: formData.get('segundoNombre'),
             primerApellido: formData.get('primerApellido'),
             segundoApellido: formData.get('segundoApellido'),

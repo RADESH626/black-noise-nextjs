@@ -148,3 +148,25 @@ Para el almacenamiento de archivos binarios como imágenes, se prioriza el uso d
     *   **Consideraciones:** Mayor complejidad en la implementación y gestión. Requiere una API de GridFS para interactuar con los archivos.
 
 **Decisión de Implementación:** La estrategia inicial para las imágenes de diseño es utilizar `BinData`. GridFS se considerará si el análisis de los tamaños de imagen reales revela que exceden consistentemente el límite de 16MB, o si se requiere una solución más escalable para archivos muy grandes en el futuro.
+
+## Patrones de Sincronización de Datos
+
+### Gestión de Datos en el Cliente con Actualizaciones Optimistas y Sincronización Debounced
+
+*   **Racional:** Mejorar la experiencia de usuario (UX) y el rendimiento de las páginas con cambios iterativos, minimizando la latencia percibida y reduciendo la carga del servidor.
+*   **Flujo de Actualizaciones Optimistas:**
+    1.  **Acción del Usuario:** El usuario realiza una acción que modifica datos (ej. cambiar cantidad de un ítem en el carrito, añadir un nuevo diseño).
+    2.  **Actualización Inmediata de UI y Estado Local:** La interfaz de usuario se actualiza instantáneamente para reflejar el cambio, y el estado de los datos en el cliente (ej. un arreglo local) se modifica de inmediato.
+    3.  **Sincronización Debounced con el Servidor:** Se programa una llamada a la API para sincronizar el cambio con el servidor. Esta llamada se "debouncea", lo que significa que solo se ejecutará después de un período de inactividad del usuario (ej. 500ms-1000ms) sin más cambios en los datos relevantes. Esto evita enviar múltiples solicitudes al servidor por cambios rápidos y consecutivos.
+*   **Manejo de Errores y Rollback:**
+    *   Si la sincronización con el servidor falla (ej. error de red, validación fallida), el estado local del cliente se revertirá a su estado anterior válido, y se mostrará un mensaje de error al usuario.
+    *   Si la sincronización es exitosa, el estado local ya está actualizado, por lo que no se requiere acción adicional.
+*   **Inicialización y Caché de Datos (Optimización para Grandes Volúmenes):**
+    *   **Carga Inicial:** Para páginas que muestran grandes volúmenes de datos (ej. catálogos), se implementará **paginación** o **infinite scrolling** para cargar solo un subconjunto inicial de datos.
+    *   **Pre-renderizado:** Se considerará el uso de **Server-Side Rendering (SSR)** o **Static Site Generation (SSG)** de Next.js para la carga inicial de páginas con datos críticos, mejorando el rendimiento percibido.
+    *   **Caché Robusto:** Se utilizarán librerías de gestión de estado del servidor como **React Query (TanStack Query)** para manejar el caché de datos en el cliente, la revalidación en segundo plano y la sincronización, reduciendo significativamente las solicitudes repetidas al servidor y acelerando las cargas posteriores de la página.
+    *   **Indicadores de Carga:** Se mostrarán "loading skeletons" o spinners mientras los datos iniciales se están cargando.
+*   **Beneficios:**
+    *   **Mejora de UX:** La interfaz de usuario se siente más rápida y reactiva.
+    *   **Reducción de Carga del Servidor:** Menos solicitudes al servidor por cambios iterativos.
+    *   **Carga de Página Más Rápida:** Aprovechamiento de la caché del cliente y estrategias de carga eficiente.

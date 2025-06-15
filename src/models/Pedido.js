@@ -45,12 +45,12 @@ const PedidoSchema = new Schema({
     },
     direccionEnvio: {
         type: String,
-        required: true
+        required: false // Made optional as it depends on delivery method
     },
     destinatario: { // cliente al que le va a llegar el pedido
         nombre: { type: String, required: true },
         correo: { type: String, required: true },
-        direccion: { type: String, required: true }
+        direccion: { type: String, required: false } // Made optional as it depends on delivery method
     },
     paymentId: {
         type: Schema.Types.ObjectId,

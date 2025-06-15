@@ -43,9 +43,10 @@ function PaymentForm({ handlePago }) {
   };
 
   return (
+    
     <form
       onSubmit={handleSubmit}
-      style={{ backgroundColor: "#FFFFFFFF", padding: "1.5rem", borderRadius: "0.5rem", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", maxWidth: "28rem", margin: "0 auto" }}
+      style={{ backgroundColor: "#FFFFFFFF", padding: "1.5rem", borderRadius: "0.5rem", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", margin: "0 auto" }}
     >
       <h1 style={{ fontWeight: "600", fontSize: "1.25rem", marginBottom: "1rem" }}>
         Metodo de pago

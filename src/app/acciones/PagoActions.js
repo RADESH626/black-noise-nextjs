@@ -37,7 +37,7 @@ async function obtenerPagos() {
         logger.debug('Database connected for obtenerPagos.');
         const Pago = await getModel('Pago');
         const pagos = await Pago.find({})
-            .populate('usuarioId', 'nombreUsuario correo') // Popula algunos campos de Usuario
+            .populate('usuarioId', 'Nombre primerApellido correo') // Popula algunos campos de Usuario
             .populate('ventaId', '_id') // Popula el ID de Venta
             .lean();
         logger.debug('Payments retrieved from DB:', pagos.length, 'payments found.');
@@ -56,7 +56,7 @@ async function ObtenerPagoPorId(id) {
         logger.debug('Database connected for ObtenerPagoPorId.');
         const Pago = await getModel('Pago');
         const pago = await Pago.findById(id)
-            .populate('usuarioId', 'nombreUsuario correo')
+            .populate('usuarioId', 'Nombre primerApellido correo')
             .populate('ventaId', '_id')
             .lean();
         logger.debug('Payment retrieved from DB:', pago);
@@ -114,7 +114,7 @@ async function obtenerPagosPorUsuarioId(usuarioId) {
         logger.debug('Database connected for obtenerPagosPorUsuarioId.');
         const Pago = await getModel('Pago');
         const pagos = await Pago.find({ usuarioId })
-            .populate('usuarioId', 'nombreUsuario correo') // Popula algunos campos de Usuario
+            .populate('usuarioId', 'Nombre primerApellido correo') // Popula algunos campos de Usuario
             .populate('ventaId', '_id') // Popula el ID de Venta
             .lean();
         logger.debug('Payments retrieved for user ID:', usuarioId, 'count:', pagos.length);

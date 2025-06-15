@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import InputGeneral from '@/components/common/inputs/InputGeneral';
@@ -19,7 +19,7 @@ function FormEditarPerfilProveedor({ perfilInicial }) {
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(false);
+    const previousFormDataRef = useRef(null); // Ref to store previous form data for rollback
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -50,25 +50,32 @@ function FormEditarPerfilProveedor({ perfilInicial }) {
         e.preventDefault();
         setLoading(true);
         setError(null);
-        setSuccess(false);
+
+        // Store current formData for potential rollback
+        previousFormDataRef.current = formData;
+
+        // Optimistically update UI (formData is already updated by handleChange)
+        // No explicit optimistic update needed here as formData is already the new state
 
         try {
-            const result = await actualizarPerfilProveedor(formData);
+            const result = await actualizarProveedor(formData);
             
             if (result.error) {
                 throw new Error(result.error);
             }
 
-            setSuccess(true);
-            router.refresh(); // Actualizar los datos en la página
-            
-            // Opcional: redirigir después de un tiempo
-            setTimeout(() => {
-                router.push('/proveedor');
-            }, 2000);
+            // If successful, the UI is already updated. No need for router.refresh() or redirect.
+            // showPopUp("Perfil actualizado con éxito", "success"); // Use PopUpContext if available
+            console.log("Perfil actualizado con éxito"); // For now, log success
 
         } catch (err) {
             setError(err.message);
+            // Rollback to previous state
+            if (previousFormDataRef.current) {
+                setFormData(previousFormDataRef.current);
+            }
+            // showPopUp(`Error: ${err.message}`, "error"); // Use PopUpContext if available
+            console.error(`Error: ${err.message}`); // For now, log error
         } finally {
             setLoading(false);
         }
@@ -158,11 +165,7 @@ function FormEditarPerfilProveedor({ perfilInicial }) {
                 </div>
 
                 {error && <p className="text-red-500 text-center">{error}</p>}
-                {success && (
-                    <p className="text-green-500 text-center">
-                        ¡Perfil actualizado con éxito! Redirigiendo...
-                    </p>
-                )}
+                {/* Removed success message as optimistic update handles immediate feedback */}
 
                 <div className="flex justify-end space-x-4 mt-6">
                     <BotonGeneral

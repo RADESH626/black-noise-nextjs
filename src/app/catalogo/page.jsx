@@ -1,23 +1,27 @@
 'use client'
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
 import Footer from '@/components/layout/general/footer/Footer';
 import CatalogTabs from '@/components/catalogo/CatalogTabs';
 import NewPostSection from '@/components/catalogo/NewPostSection';
 import DesignGrid from '@/components/catalogo/DesignGrid';
-import { addDesignToCart, getCartByUserId } from '@/app/acciones/CartActions'; // Import addDesignToCart and getCartByUserId
-import { obtenerDesigns } from '@/app/acciones/DesignActions'; // Import obtenerDesigns
-import { useSession } from 'next-auth/react'; // Import useSession
+import { addDesignToCart } from '@/app/acciones/CartActions';
+import { obtenerDesigns } from '@/app/acciones/DesignActions';
+import { useSession } from 'next-auth/react';
+import { useCart } from '@/context/CartContext';
 
 const ComunidadDiseños = () => {
   const [activo, setActivo] = useState('diseños');
   const { data: session } = useSession();
   const userId = session?.user?.id;
-  const [allDesigns, setAllDesigns] = useState([]); // State to store all designs
+  const { cartItems, updateCart } = useCart();
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false); // New state for login prompt
+  const optimisticCartStateRef = React.useRef([]); // Use React.useRef for consistency
+
+  const [allDesigns, setAllDesigns] = useState([]);
   const [loadingDesigns, setLoadingDesigns] = useState(true);
   const [errorDesigns, setErrorDesigns] = useState(null);
-  const [cartItems, setCartItems] = useState([]); // State to store cart items
 
   useEffect(() => {
     async function fetchDesigns() {
@@ -36,44 +40,57 @@ const ComunidadDiseños = () => {
       }
     }
     fetchDesigns();
-  }, []); // Empty dependency array to run once on mount
+  }, []);
 
-  useEffect(() => {
-    async function fetchCartItems() {
-      if (userId) { // Only fetch if userId is available
-        try {
-          const result = await getCartByUserId(userId);
-          if (result?.cart?.items) {
-            setCartItems(result.cart.items);
-          } else {
-            console.error("Error al cargar ítems del carrito:", result?.error);
-            setCartItems([]); // Ensure cartItems is an array even on error
-          }
-        } catch (err) {
-          console.error("Error de red o del servidor al cargar ítems del carrito:", err.message);
-          setCartItems([]); // Ensure cartItems is an array even on error
-        }
-      }
-    }
-    fetchCartItems();
-  }, [userId]); // Re-run when userId changes
-
-  // Elegimos qué mostrar según la pestaña activa
   const tarjetas = useMemo(() => activo === 'diseños' ? allDesigns : allDesigns, [activo, allDesigns]);
 
-  const handleAddItemToCart = async (item) => {
+  const handleAddItemToCart = useCallback(async (item) => {
     if (!userId) {
-      alert("Debes iniciar sesión para agregar ítems al carrito.");
+      setShowLoginPrompt(true); // Show login prompt
+      // Optionally, hide it after a few seconds
+      setTimeout(() => setShowLoginPrompt(false), 3000);
       return;
     }
-    const { success, message } = await addDesignToCart(userId, item.id);
-    if (!success) {
-      alert(message || "Error al agregar el diseño al carrito.");
+
+    // Optimistic update
+    const existingItemIndex = cartItems.findIndex(cartItem => cartItem.id === item._id.toString());
+    let newOptimisticCartItems;
+
+    if (existingItemIndex > -1) {
+      newOptimisticCartItems = cartItems.map((cartItem, index) =>
+        index === existingItemIndex
+          ? { ...cartItem, quantity: (cartItem.quantity || 1) + 1 }
+          : cartItem
+      );
     } else {
-      alert("Diseño agregado al carrito!");
-      // Optionally, revalidate cart path here if needed, but CartComponent will fetch its own data
+      newOptimisticCartItems = [...cartItems, {
+        id: item._id.toString(),
+        name: item.prenda,
+        price: item.price,
+        quantity: 1,
+        image: item.imagen,
+      }];
     }
-  };
+
+    optimisticCartStateRef.current = cartItems;
+    updateCart(newOptimisticCartItems);
+
+    try {
+      const { success, message, data: updatedCart } = await addDesignToCart(userId, item._id.toString());
+      if (!success) {
+        updateCart(optimisticCartStateRef.current);
+        console.error("Error al agregar el diseño al carrito:", message);
+        // Consider a more user-friendly error notification
+      } else {
+        updateCart(updatedCart?.items || []);
+        console.log('Cart updated by server:', updatedCart?.items);
+      }
+    } catch (error) {
+      updateCart(optimisticCartStateRef.current);
+      console.error("Error de red/servidor al agregar diseño al carrito:", error);
+      // Consider a more user-friendly error notification
+    }
+  }, [userId, cartItems, updateCart]);
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(to bottom, #000000, #0A1828, #000000)' }}>
@@ -91,9 +108,15 @@ const ComunidadDiseños = () => {
         <DesignGrid
           tarjetas={tarjetas}
           activo={activo}
-          addItem={handleAddItemToCart} // Pass the new addItem function
-          cartItems={cartItems} // Pass cart items to DesignGrid
+          addItem={handleAddItemToCart}
+          cartItems={cartItems}
         />
+
+        {showLoginPrompt && (
+          <div className="fixed bottom-4 right-4 bg-red-600 text-white p-3 rounded-lg shadow-lg animate-fadeInOut">
+            Debes iniciar sesión para agregar ítems al carrito.
+          </div>
+        )}
       </main>
 
       <Footer />

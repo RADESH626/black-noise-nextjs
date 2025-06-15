@@ -76,7 +76,11 @@ export default function Confirmacion() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-green-100 text-black p-4">
+    <div className="flex flex-col items-center justify-center }
+    
+    
+    
+    bg-green-100 text-black p-4">
       <h1 className="text-3xl font-bold mb-4 text-center">¡Pago exitoso!</h1>
       <p className="text-lg mb-6 text-center">Tu pedido ha sido confirmado.</p>
 
