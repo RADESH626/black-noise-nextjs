@@ -1,19 +1,19 @@
 # Active Context
 
-## Current Session: User Schema Refactoring and Codebase Cleanup (2025-06-14)
+## Current Session: Remove Email API Route, Centralize Email Sending, and Self-Correction on Git Commands (2025-06-15)
 
-This session focused on refactoring the `UsuarioSchema` to simplify the login method by removing the `nombreUsuario` field and subsequently cleaning up all references to this field in the codebase.
+This session focused on removing the dedicated API route for email sending, ensuring all email operations are handled directly through the centralized Nodemailer utility, and a critical self-correction regarding Git command execution on Windows.
 
 **Changes Made:**
-- Removed the `nombreUsuario` field from `src/models/Usuario.js` to streamline the login process, making `correo` the sole unique identifier for authentication.
-- Updated `memory-bank/functionalities/UserManagement.md` to reflect the change in user identifiers and login process.
-- Modified `src/components/layout/admin/dashboards/UsuariosClientPage.jsx` to replace `user.nombreUsuario` with `user.Nombre` and `user.primerApellido` for display purposes.
-- Removed the `nombreUsuario` creation line from `src/app/acciones/UsuariosActions.js` during user registration.
-- Updated `src/app/acciones/PagoActions.js` to change `populate('usuarioId', 'nombreUsuario correo')` to `populate('usuarioId', 'Nombre primerApellido correo')`.
-- Updated `src/app/acciones/DesignActions.js` to change `select: 'nombreUsuario imageData imageMimeType'` to `select: 'Nombre primerApellido imageData imageMimeType'` and to use `design.usuarioId.Nombre` and `design.usuarioId.primerApellido` for displaying the user's name.
-- Removed the `nombreUsuario` creation line from `src/app/api/administrador/usuarios/route.js`.
+- Modified `src/app/api/email/route.js` to import and use the `transporter` instance exported from `src/utils/nodemailer.js`, centralizing the email configuration.
+- Deleted `src/app/api/email/route.js` as it is no longer needed, and no other files were found to be calling this API endpoint.
+- Deleted the `src/app/api/email/` directory as it became empty after the `route.js` file was removed.
+- **Self-Correction**: Updated `memory-bank/improvement_log.md` to critically reinforce the directive against chaining `git add` and `git commit` commands with `&&` on Windows, following a previous error. This emphasizes the need to execute them as separate commands.
 
 ## Previous Sessions:
+- Update Memory Bank with Functionality Management Directive (2025-06-15)
+- Pedido and Pago Validation Fixes (2025-06-15)
+- User Schema Refactoring and Codebase Cleanup (2025-06-14)
 - Payment Flow Consolidation and Refinement (2025-06-14)
 - Payment Page Enhancements (2025-06-14)
 - Payment Modal Refactoring, useState Fix, and Modal Standardization (2025-06-14)

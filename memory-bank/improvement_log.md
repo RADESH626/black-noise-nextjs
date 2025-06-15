@@ -16,9 +16,9 @@ This document serves as a critical source of wisdom, detailing lessons learned f
   - **Correction**: Prioritize documentation updates in `functionalities/` before implementing any major scope code changes. Always consult `manifest.md` and `improvement_log.md` at the start of every task.
   - **Date**: 2025-10-06
 
-- **Error 4: Incorrect CLI Command Chaining on Windows**: Attempted to chain `git add` and `git commit` using `&&` which is not directly supported in the default Windows command prompt without quoting.
-  - **Correction**: When executing multiple CLI commands, especially `git add` and `git commit`, execute them as separate commands. Avoid using `&&` for chaining in a single `execute_command` call on Windows unless explicitly confirmed to be supported by the shell.
-  - **Date**: 2025-10-06
+- **Error 4: Incorrect CLI Command Chaining on Windows (CRITICAL REINFORCEMENT)**: I *repeatedly* attempted to chain `git add` and `git commit` using `&&`, which is NOT supported in the default Windows command prompt. This is a recurring error that I MUST eliminate.
+  - **Correction**: **ALWAYS** execute `git add` and `git commit` as **SEPARATE, INDIVIDUAL COMMANDS**. Under no circumstances should `&&` or any other chaining operator be used for these commands on Windows. This rule takes precedence.
+  - **Date**: 2025-06-15 (Reinforced)
 
 - **Error 5: Hardcoded Enum Usage**: Used hardcoded enum values instead of existing centralized enums.
   - **Correction**: Always check for existing enums in `src/models/enums/` before creating new ones or using hardcoded values. If an existing enum is suitable, use it to ensure consistency and avoid duplication.
