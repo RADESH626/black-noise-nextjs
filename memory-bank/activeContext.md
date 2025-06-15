@@ -54,6 +54,11 @@
     *   Use separate `useRef` debouncers for each action to delay server synchronization calls (`addDesignToCart`, `removeDesignFromCart`, `clearUserCart`) by 1000ms.
     *   Implement rollback logic to revert client-side state if the server update fails.
     *   Adjusted the debounce time for `handleUpdateQuantity` to 1000ms for consistency.
+-   **Refactored Catalog Page for Optimistic Add to Cart:** Applied the optimistic update and debounced synchronization pattern to `src/app/catalogo/page.jsx`. The `handleAddItemToCart` function now:
+    *   Optimistically adds the design to the cart state immediately.
+    *   Uses `useRef` and `setTimeout` to debounce the `addDesignToCart` server action.
+    *   Includes rollback logic to revert the UI state if the server action fails.
+    *   Removed `alert` calls, relying on console logs for now.
 
 ### Next Steps:
 -   Update `progress.md` and generate git commands.

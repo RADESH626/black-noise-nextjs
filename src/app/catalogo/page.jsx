@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
 import Footer from '@/components/layout/general/footer/Footer';
 import CatalogTabs from '@/components/catalogo/CatalogTabs';
@@ -15,9 +15,11 @@ const ComunidadDiseños = () => {
   const [activo, setActivo] = useState('diseños');
   const { data: session } = useSession();
   const userId = session?.user?.id;
-  const { cartItems, updateCart } = useCart(); // Use cartItems and updateCart from CartContext
+  const { cartItems, updateCart } = useCart();
+  const debounceTimeoutRef = useRef(null);
+  const optimisticCartStateRef = useRef([]);
 
-  const [allDesigns, setAllDesigns] = useState([]); // State to store all designs
+  const [allDesigns, setAllDesigns] = useState([]);
   const [loadingDesigns, setLoadingDesigns] = useState(true);
   const [errorDesigns, setErrorDesigns] = useState(null);
 
@@ -38,25 +40,66 @@ const ComunidadDiseños = () => {
       }
     }
     fetchDesigns();
-  }, []); // Empty dependency array to run once on mount
+  }, []);
 
-  // Elegimos qué mostrar según la pestaña activa
   const tarjetas = useMemo(() => activo === 'diseños' ? allDesigns : allDesigns, [activo, allDesigns]);
 
-  const handleAddItemToCart = async (item) => {
+  const handleAddItemToCart = useCallback(async (item) => {
     if (!userId) {
-      alert("Debes iniciar sesión para agregar ítems al carrito.");
+      // Consider a more user-friendly notification than alert
+      console.warn("Debes iniciar sesión para agregar ítems al carrito.");
       return;
     }
-    const { success, message, data: updatedCart } = await addDesignToCart(userId, item.id);
-    if (!success) {
-      alert(message || "Error al agregar el diseño al carrito.");
+
+    // Optimistic update
+    const existingItemIndex = cartItems.findIndex(cartItem => cartItem.id === item._id.toString());
+    let newOptimisticCartItems;
+
+    if (existingItemIndex > -1) {
+      // If item already in cart, increment quantity optimistically
+      newOptimisticCartItems = cartItems.map((cartItem, index) =>
+        index === existingItemIndex
+          ? { ...cartItem, quantity: (cartItem.quantity || 1) + 1 }
+          : cartItem
+      );
     } else {
-      alert("Diseño agregado al carrito!");
-      updateCart(updatedCart?.items || []); // Update global cart state
-      console.log('Updated Cart Items after add:', updatedCart?.items); // Debug log
+      // If item not in cart, add it optimistically
+      newOptimisticCartItems = [...cartItems, {
+        id: item._id.toString(),
+        name: item.prenda,
+        price: item.price,
+        quantity: 1,
+        image: item.imagen,
+      }];
     }
-  };
+
+    optimisticCartStateRef.current = cartItems; // Store current state for rollback
+    updateCart(newOptimisticCartItems); // Update UI optimistically
+
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
+    debounceTimeoutRef.current = setTimeout(async () => {
+      try {
+        const { success, message, data: updatedCart } = await addDesignToCart(userId, item._id.toString());
+        if (!success) {
+          // Rollback on error
+          updateCart(optimisticCartStateRef.current);
+          console.error("Error al agregar el diseño al carrito:", message);
+          // Consider a more user-friendly error notification
+        } else {
+          updateCart(updatedCart?.items || []); // Update with actual server state
+          console.log('Cart updated by server:', updatedCart?.items);
+        }
+      } catch (error) {
+        // Rollback on network/server error
+        updateCart(optimisticCartStateRef.current);
+        console.error("Error de red/servidor al agregar diseño al carrito:", error);
+        // Consider a more user-friendly error notification
+      }
+    }, 500); // Debounce for 500ms
+  }, [userId, cartItems, updateCart]);
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(to bottom, #000000, #0A1828, #000000)' }}>
