@@ -9,6 +9,7 @@ This document serves as the master index for the entire Memory Bank, providing a
 
 ## Feature Documentation:
 - [functionalities/](functionalities/): Directory containing detailed documentation for each feature.
+  - [functionalities/EmailSending.md](functionalities/EmailSending.md): Documentation for the global email sending functionality.
 
 ## Knowledge Base:
 - [techniques/](techniques/): A collection of reusable problem-solving techniques and best practices.
