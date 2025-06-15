@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 import { Rol } from "@/models/enums/usuario/Rol";
 import bcrypt from "bcryptjs";
 import logger from '@/utils/logger';
+import { transporter } from '@/utils/nodemailer'; // Import the centralized transporter
 
 export async function crearProveedor(prevState, formData) {
   const session = await getServerSession(authOptions);
@@ -58,24 +59,13 @@ export async function crearProveedor(prevState, formData) {
       const emailBody = `Hola ${nombreDueño},\n\nTu empresa ${nombreEmpresa} ha sido registrada como proveedor en Black Noise.\n\nTu clave de acceso para iniciar sesión en el portal de proveedores es: ${generatedAccessKey}\n\nPor favor, guarda esta clave en un lugar seguro. Puedes acceder al portal de proveedores en [URL del portal de proveedores].\n\nSaludos,\nEl equipo de Black Noise`;
 
       try {
-        const emailApiUrl = `${process.env.NEXTAUTH_URL}/api/email`;
-        const emailResponse = await fetch(emailApiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            to: emailContacto,
-            subject: emailSubject,
-            body: emailBody,
-          }),
-        });
-
-        const emailResult = await emailResponse.json();
-        if (!emailResult.success) {
-          logger.warn("Advertencia: No se pudo enviar el correo electrónico al proveedor. Detalles:", emailResult.message);
-          // Decide if you want to return an error here or just log a warning
-        }
+        const mailOptions = {
+          from: process.env.EMAIL_USER,
+          to: emailContacto,
+          subject: emailSubject,
+          html: emailBody,
+        };
+        await transporter.sendMail(mailOptions);
       } catch (emailError) {
         logger.error("Error al intentar enviar el correo electrónico de la clave de acceso:", emailError);
         // Decide if you want to return an error here or just log a warning

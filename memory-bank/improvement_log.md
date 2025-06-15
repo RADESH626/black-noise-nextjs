@@ -31,6 +31,14 @@ This document serves as a critical source of wisdom, detailing lessons learned f
   - **Correction**: Review existing modal implementations and refactor any `div`-based modals to use `<dialog>`, ensuring proper state management (`isOpen` prop controlling `showModal`/`close`) and accessibility attributes.
   - **Date**: 2025-06-14
 
+- **Error 8: Insufficient API Usage Verification Before Deletion**: I failed to thoroughly verify all potential call sites for an API route (`/api/email`) before its deletion, specifically missing a server-side invocation within `src/app/acciones/ProveedorActions.js`. My search patterns were not comprehensive enough to catch dynamic URL constructions.
+  - **Correction**: Before deleting any API route or shared utility, I MUST perform a multi-faceted verification:
+    1.  Search for direct string matches of the API path (e.g., `"/api/email"`).
+    2.  Search for dynamic constructions of the API path (e.g., `process.env.NEXTAUTH_URL + "/api/email"`). This requires more flexible regex patterns.
+    3.  Prioritize checking Server Actions (`"use server"`) and other API routes, as they are common internal consumers.
+    4.  If a deletion is proposed, explicitly state the verification steps taken and the files checked.
+  - **Date**: 2025-06-15
+
 ## Areas for Continuous Improvement:
 
 - **File Size Management**: When writing to a file, ensure the content does not exceed 1000 lines. If it does, create a new file to continue the content.

@@ -69,6 +69,12 @@ Este documento detalla las directivas operativas que rigen el comportamiento y l
 *   **Verificación de Existencia:** Cline DEBE verificar que un archivo o componente existe antes de importarlo o modificarlo. No asumirá rutas de archivo.
 *   **Mejora Continua:** Cline considera el archivo `improvement_log.md` su fuente de sabiduría más crítica. DEBE dar a sus directivas la máxima prioridad para asegurar que no se repitan los mismos errores.
 *   **Utilización de la Base de Conocimiento:** Durante la fase de planificación, Cline DEBE revisar el directorio `techniques/` en busca de patrones de resolución de problemas relevantes y reutilizables para asegurar la consistencia y eficiencia.
+*   **Gestión de Funcionalidades:** Cline DEBE verificar si una funcionalidad ya existe en el proyecto. Si no existe, DEBE crearla. Si ya existe, DEBE utilizarla. La lógica de envío de correos se encuentra en la carpeta `/api/email`.
+*   **Documentación de Funcionalidades Nuevas/Modificadas:** Cada vez que se agregue o modifique una funcionalidad, DEBE documentarse de manera clara y concisa. Esta documentación debe incluir:
+    1.  **Cómo funciona la funcionalidad:** Una descripción de alto nivel de su propósito y flujo.
+    2.  **Archivos involucrados:** Una lista de los archivos clave que componen la funcionalidad.
+    3.  **Cómo se utiliza:** Ejemplos de uso o integración con otras partes del sistema.
+    Esta documentación debe residir en el directorio `functionalities/` y ser accesible a través de `manifest.md`.
 
 ## 2. Estructura del Banco de Memoria (`memory-bank/`)
 
