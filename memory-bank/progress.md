@@ -40,6 +40,12 @@
 - **Fixed React Warning: "Each child in a list should have a unique 'key' prop"** in `src/components/common/CartComponent.jsx` by ensuring a stable and unique key for `CartItem` components.
 - **Fixed Runtime Error: "Cannot read properties of undefined (reading 'toFixed')"** in `src/components/common/CartItem.jsx` by safely handling `item.price` and `item.quantity` before calling `toFixed()`.
 - **Fixed Missing Design Details After Quantity Update:** Ensured `src/app/acciones/CartActions.js` returns fully populated cart data after quantity updates.
+- **Implemented client-side quantity and subtotal updates with debouncing:** Quantity changes in the cart now update the UI instantly, and server synchronization is debounced to improve performance (debounce delay adjusted to 1 second).
+- **Fixed item not removing when quantity is 0:** Modified `src/components/common/CartComponent.jsx` to remove items from the client-side cart state when their quantity is set to 0.
 
 ## Remaining Tasks:
-- No remaining tasks for this specific request.
+- Documented the new "Patrones de Sincronización de Datos" in `memory-bank/systemPatterns.md`, outlining the strategy for client-side data management with optimistic updates and debounced server synchronization.
+- Comprehensively refactored `src/components/common/CartComponent.jsx` to implement optimistic UI updates and debounced server synchronization for `handleAddItem`, `handleRemoveItem`, `handleClearCart`, and `handleUpdateQuantity` (with a consistent 1000ms debounce delay). Rollback logic is included for server errors.
+
+## Remaining Tasks:
+- Identify and refactor other pages/components with iterative changes as per the new "Patrones de Sincronización de Datos".

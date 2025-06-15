@@ -8,17 +8,17 @@ import Image from 'next/image'; // Import Image for the cart icon
 import IconoPersona from '@/components/common/iconos/IconoPersona';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import CartModal from '@/components/carrito/CartModal'; // Import CartModal
-import { getCartByUserId } from '@/app/acciones/CartActions'; // Import cart actions
+import { useCart } from '@/context/CartContext'; // Import useCart
 
 function HeaderPrincipal() {
     const { data: session } = useSession();
+    const { cartItems, fetchCart } = useCart(); // Use cartItems and fetchCart from CartContext
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
 
     const [showCartModal, setShowCartModal] = useState(false); // State for cart modal visibility
     const cartModalRef = useRef(null); // Ref for cart modal element
-    const [cartItems, setCartItems] = useState([]); // State for cart items
 
     const handleUserIconClick = () => {
         setIsDropdownOpen(!isDropdownOpen);
@@ -26,17 +26,7 @@ function HeaderPrincipal() {
     };
 
     const handleCartIconClick = async () => {
-        if (session?.user?.id) {
-            const { cart, error } = await getCartByUserId(session.user.id);
-            if (error) {
-                console.error("Error fetching cart:", error);
-                setCartItems([]);
-            } else {
-                setCartItems(cart?.items || []);
-            }
-        } else {
-            setCartItems([]); // Clear cart items if no session
-        }
+        await fetchCart(); // Fetch latest cart data when modal is opened
         setShowCartModal(!showCartModal);
         setIsDropdownOpen(false); // Close user dropdown if cart modal opens
     };

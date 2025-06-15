@@ -7,7 +7,7 @@
 ### Task: Enhance cart page information and display, and fix React warnings.
 
 ### Details:
-- **Objective:** Display more design information (description, category), show subtotal, hide shipping cost on the `/carrito` page, and resolve the "unique key prop" warning in `CartComponent.jsx` and "Cannot read properties of undefined (reading 'toFixed')" in `CartItem.jsx`, and ensure full design details are rendered after quantity updates.
+- **Objective:** Display more design information (description, category), show subtotal, hide shipping cost on the `/carrito` page, and resolve the "unique key prop" warning in `CartComponent.jsx` and "Cannot read properties of undefined (reading 'toFixed')" in `CartItem.jsx`, and ensure full design details are rendered after quantity updates. Implement client-side quantity and subtotal updates with debouncing for server synchronization.
 
 ### Actions Taken:
 1.  **Modified `src/components/common/CartComponent.jsx`:** Removed shipping cost display and adjusted total calculation to only include subtotal.
@@ -17,6 +17,8 @@
 5.  **Modified `src/components/common/CartComponent.jsx`:** Updated the `key` prop in the `cartItems.map` function to ensure a unique and stable key for each `CartItem`. The `map` callback now includes `index`, and the key is `item.id ? String(item.id) : `${item.name || 'unknown'}-${index}``.
 6.  **Modified `src/components/common/CartItem.jsx`:** Implemented safe access to `item.price` and `item.quantity` using the nullish coalescing operator (`?? 0`) before calling `toFixed(2)` to prevent "Cannot read properties of undefined" errors.
 7.  **Modified `src/app/acciones/CartActions.js`:** Ensured that `updateCartItemQuantity` returns the fully populated cart data, including all design details, after a quantity update. This prevents the loss of design information when the cart state is updated in the frontend.
+8.  **Modified `src/components/common/CartComponent.jsx`:** Implemented client-side quantity updates with debouncing. Quantity changes now update the UI instantly, and a debounced server call (`updateCartItemQuantity`) is made after a 1000ms (1 second) delay to synchronize with the backend.
+9.  **Modified `src/components/common/CartComponent.jsx`:** Adjusted `handleUpdateQuantity` to correctly remove an item from the client-side cart state when its quantity is set to 0.
 
 ### Problems Encountered:
 -   `ERROR in updateCartItemQuantity: Error: Cart validation failed: items.0.quantity: Cast to Number failed for value "NaN" (type number) at path "quantity"`: This error occurred because `parseInt(e.target.value)` was being called in `CartItem.jsx` before passing the value to `CartComponent.jsx`, leading to `NaN` being passed to the action.
@@ -45,9 +47,17 @@
     -   **Correction:** Modified `src/components/common/CartItem.jsx` to safely access `item.price` and `item.quantity` using the nullish coalescing operator (`?? 0`) before performing calculations or calling `toFixed()`.
 -   **Missing Design Details After Quantity Update:** When updating the quantity of designs, only price and subtotal were rendered, and full design details were missing.
     -   **Correction:** Modified `src/app/acciones/CartActions.js` to ensure that `updateCartItemQuantity` returns the fully populated cart data, including all design details, after a quantity update.
+-   **Quantity 0 does not remove item from UI:** When a user set the quantity of an item to 0, the item remained in the UI with a quantity of 0 instead of being removed.
+    -   **Correction:** Modified `src/components/common/CartComponent.jsx` to filter out items from the `cartItems` state when their `newQuantity` is 0, ensuring immediate UI removal.
+-   **Implemented Optimistic Updates and Debouncing for Cart Actions:** Refactored `handleAddItem`, `handleRemoveItem`, and `handleClearCart` in `src/components/common/CartComponent.jsx` to:
+    *   Perform immediate optimistic UI updates on user action.
+    *   Use separate `useRef` debouncers for each action to delay server synchronization calls (`addDesignToCart`, `removeDesignFromCart`, `clearUserCart`) by 1000ms.
+    *   Implement rollback logic to revert client-side state if the server update fails.
+    *   Adjusted the debounce time for `handleUpdateQuantity` to 1000ms for consistency.
 
 ### Next Steps:
 -   Update `progress.md` and generate git commands.
+-   Identify and refactor other pages/components with iterative changes as per the new "Patrones de Sincronización de Datos".
 
 ## Login Credentials (Provided by User)
 

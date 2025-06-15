@@ -1,129 +1,150 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
+import Link from 'next/link';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import CartItem from './CartItem';
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation"; // Import useRouter
-import { getCartByUserId, addDesignToCart, removeDesignFromCart, updateCartItemQuantity, clearUserCart } from "@/app/acciones/CartActions";
+import { addDesignToCart, removeDesignFromCart, updateCartItemQuantity, clearUserCart } from "@/app/acciones/CartActions";
 import { procesarPagoYCrearPedido } from "@/app/acciones/PagoActions"; // Import the payment action
 import { usePopUp } from '@/context/PopUpContext'; // Import usePopUp
+import { useCart } from '@/context/CartContext'; // Import useCart
 
 function CartComponent() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const { showPopUp, hidePopUp } = usePopUp(); // Use the PopUp hook
+  const { cartItems, loadingCart, cartError, updateCart, fetchCart } = useCart(); // Use cart context
   const userId = session?.user?.id;
 
-  const [cartItems, setCartItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const fetchCart = async () => {
-    if (status === 'authenticated' && userId) {
-      setLoading(true);
-      setError(null);
-      const { cart, error: fetchError } = await getCartByUserId(userId);
-      if (fetchError) {
-        setError({ message: fetchError });
-        setCartItems([]);
-      } else {
-        setCartItems(cart?.items || []);
-      }
-      setLoading(false);
-    } else if (status === 'unauthenticated') {
-      setLoading(false);
-      setCartItems([]);
-    }
-  };
-
-  useEffect(() => {
-    fetchCart();
-  }, [status, userId]);
+  // No need for local cartItems, loading, error states, or fetchCart useEffect
 
   const getTotal = () => {
     return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
-  const handleAddItem = useCallback(async (designId) => {
+  const addItemDebounceRef = useRef(null);
+  const removeItemDebounceRef = useRef(null);
+  const updateQuantityDebounceRef = useRef(null);
+  const clearCartDebounceRef = useRef(null);
+
+  const handleAddItem = useCallback((designId, itemToAdd) => {
     if (!userId) {
-      alert("Debes iniciar sesión para agregar ítems al carrito.");
+      showPopUp("Debes iniciar sesión para agregar ítems al carrito.", "error");
       return;
     }
-    setLoading(true);
-    const { success, message, data: updatedCart } = await addDesignToCart(userId, designId);
-    if (success) {
-      setCartItems(updatedCart?.items || []); // Update with the new cart items from the response
-    } else {
-      setError({ message: message || "Error al agregar el diseño al carrito." });
-    }
-    setLoading(false);
-  }, [userId]); // Removed fetchCart from dependencies as it's no longer called directly
 
-  const handleRemoveItem = useCallback(async (designId) => {
+    const existingItem = cartItems.find(item => item.id === designId);
+    let updatedCartItems;
+    if (existingItem) {
+      updatedCartItems = cartItems.map(item =>
+        item.id === designId ? { ...item, quantity: item.quantity + 1 } : item
+      );
+    } else {
+      updatedCartItems = [...cartItems, { ...itemToAdd, id: designId, quantity: 1 }];
+    }
+
+    const originalCartItems = [...cartItems]; // Store current state for rollback
+    updateCart(updatedCartItems); // Optimistic UI update
+
+    if (addItemDebounceRef.current) {
+      clearTimeout(addItemDebounceRef.current);
+    }
+
+    addItemDebounceRef.current = setTimeout(async () => {
+      const { success, message, data: serverUpdatedCart } = await addDesignToCart(userId, designId);
+      if (!success) {
+        showPopUp(message || "Error al agregar el diseño al carrito en el servidor.", "error");
+        updateCart(originalCartItems); // Rollback on error
+      }
+    }, 1000); // Debounce for 1 second
+  }, [userId, cartItems, updateCart, showPopUp]);
+
+  const handleRemoveItem = useCallback((designId) => {
     if (!userId) {
-      alert("Debes iniciar sesión para eliminar ítems del carrito.");
+      showPopUp("Debes iniciar sesión para eliminar ítems del carrito.", "error");
       return;
     }
-    setLoading(true);
-    const { success, message } = await removeDesignFromCart(userId, designId);
-    if (success) {
-      setCartItems(prevItems => prevItems.filter(item => item.id !== designId)); // Filter out the removed item
-    } else {
-      setError({ message: message || "Error al eliminar el diseño del carrito." });
-    }
-    setLoading(false);
-  }, [userId]); // Removed fetchCart from dependencies
 
-  const handleUpdateQuantity = useCallback(async (designId, quantityInput) => {
+    const originalCartItems = [...cartItems]; // Store current state for rollback
+    const updatedCartItems = cartItems.filter(item => item.id !== designId);
+    updateCart(updatedCartItems); // Optimistic UI update
+
+    if (removeItemDebounceRef.current) {
+      clearTimeout(removeItemDebounceRef.current);
+    }
+
+    removeItemDebounceRef.current = setTimeout(async () => {
+      const { success, message, data: serverUpdatedCart } = await removeDesignFromCart(userId, designId);
+      if (!success) {
+        showPopUp(message || "Error al eliminar el diseño del carrito en el servidor.", "error");
+        updateCart(originalCartItems); // Rollback on error
+      }
+    }, 1000); // Debounce for 1 second
+  }, [userId, cartItems, updateCart, showPopUp]);
+
+  const handleUpdateQuantity = useCallback((designId, quantityInput) => {
     if (!userId) {
-      alert("Debes iniciar sesión para actualizar la cantidad del carrito.");
+      showPopUp("Debes iniciar sesión para actualizar la cantidad del carrito.", "error");
       return;
     }
 
     const newQuantity = parseInt(quantityInput);
 
-    // If the input is empty or results in NaN, treat it as 0 or prevent update
     if (isNaN(newQuantity) || newQuantity < 0) {
-      // Optionally, you could set the quantity to 0 or show an error
-      // For now, we'll just return if it's invalid to prevent the API call with NaN
       return;
     }
 
-    // Do not set global loading state for quantity updates to avoid full component re-render
-    const { success, message } = await updateCartItemQuantity(userId, designId, newQuantity);
-    if (success) {
-      setCartItems(prevItems => {
-        if (newQuantity === 0) {
-          // Remove item if quantity is 0
-          return prevItems.filter(item => item.id !== designId);
-        } else {
-          // Update quantity for the specific item
-          return prevItems.map(item =>
-            item.id === designId ? { ...item, quantity: newQuantity } : item
-          );
-        }
-      });
-    } else {
-      setError({ message: message || "Error al actualizar la cantidad del diseño." });
-    }
-    // Do not set global loading state to false here either
-  }, [userId]); // setCartItems is stable, so no need to add it as dependency
+    const originalCartItems = [...cartItems]; // Store current state for rollback
 
-  const handleClearCart = useCallback(async () => {
+    // Optimistic UI update: Update the cart state immediately
+    let updatedCartItems;
+    if (newQuantity === 0) {
+      updatedCartItems = cartItems.filter(item => item.id !== designId);
+    } else {
+      updatedCartItems = cartItems.map(item =>
+        item.id === designId ? { ...item, quantity: newQuantity } : item
+      );
+    }
+    updateCart(updatedCartItems);
+
+    // Clear any existing debounce timeout
+    if (updateQuantityDebounceRef.current) {
+      clearTimeout(updateQuantityDebounceRef.current);
+    }
+
+    // Set a new debounce timeout to call the server action
+    updateQuantityDebounceRef.current = setTimeout(async () => {
+      const { success, message, data: serverUpdatedCart } = await updateCartItemQuantity(userId, designId, newQuantity);
+      if (!success) {
+        showPopUp(message || "Error al actualizar la cantidad del diseño en el servidor.", "error");
+        updateCart(originalCartItems); // Revert UI if server update fails
+      }
+    }, 1000); // Debounce for 1 second
+  }, [userId, cartItems, updateCart, showPopUp]);
+
+  const handleClearCart = useCallback(() => {
     if (!userId) {
-      alert("Debes iniciar sesión para vaciar el carrito.");
+      showPopUp("Debes iniciar sesión para vaciar el carrito.", "error");
       return;
     }
-    setLoading(true);
-    const { success, message } = await clearUserCart(userId);
-    if (success) {
-      setCartItems([]); // Set cart items to an empty array
-    } else {
-      setError({ message: message || "Error al vaciar el carrito." });
+
+    const originalCartItems = [...cartItems]; // Store current state for rollback
+    updateCart([]); // Optimistic UI update: clear cart immediately
+
+    if (clearCartDebounceRef.current) {
+      clearTimeout(clearCartDebounceRef.current);
     }
-    setLoading(false);
-  }, [userId]); // Removed fetchCart from dependencies
+
+    clearCartDebounceRef.current = setTimeout(async () => {
+      const { success, message, data: updatedCart } = await clearUserCart(userId);
+      if (!success) {
+        showPopUp(message || "Error al vaciar el carrito en el servidor.", "error");
+        updateCart(originalCartItems); // Rollback on error
+      }
+    }, 1000); // Debounce for 1 second
+  }, [userId, cartItems, updateCart, showPopUp]);
 
   const handleProceedToPayment = async () => {
     if (!userId) {
@@ -135,13 +156,6 @@ function CartComponent() {
       return;
     }
 
-    // Redirigir a la página de pago, pasando los ítems del carrito y el total
-    // Se recomienda usar localStorage o un contexto para pasar datos complejos
-    // o una ruta dinámica si los datos son pequeños y seguros para la URL.
-    // Para este caso, simularemos una redirección simple a la página de pago.
-    // La página de pago (`src/app/pago/page.jsx`) se encargará de recolectar
-    // los detalles de pago y llamar a `procesarPagoYCrearPedido`.
-
     // Guardar los datos del carrito en localStorage para que la página de pago los recupere
     localStorage.setItem('currentCartItems', JSON.stringify(cartItems));
     localStorage.setItem('currentCartTotal', JSON.stringify(totalConEnvio));
@@ -151,63 +165,93 @@ function CartComponent() {
 
   const totalAPagar = getTotal(); // Renamed from totalConEnvio
 
-  if (loading) {
+  if (loadingCart) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#000000] via-[#0A1828] to-[#000000] text-white">
+      <div className="h-screen flex items-center justify-center bg-gradient-to-br from-[#000000] via-[#0A1828] to-[#000000] text-white">
         Cargando carrito...
       </div>
     );
   }
 
-  if (error) {
+  if (cartError) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#000000] via-[#0A1828] to-[#000000] text-red-500">
-        Error al cargar el carrito: {error.message}
+      <div className="h-screen flex items-center justify-center bg-gradient-to-br from-[#000000] via-[#0A1828] to-[#000000] text-red-500">
+        Error al cargar el carrito: {cartError.message}
       </div>
     );
   }
 
   return (
-    <div className="bg-black p-6 md:p-8 rounded-lg shadow-lg">
+    <div className="bg-black p-6 md:p-8 shadow-lg h-screen justify-between flex flex-col overflow-hidden">
+
       <h2 className="text-2xl font-bold mb-6 text-white">Tu Carrito de Compras</h2>
-      {error && ( // Display error message if present
+
+      {cartError && ( // Display error message if present
         <div className="bg-red-500 text-white p-3 rounded-md mb-4 text-center">
-          {error.message}
+          {cartError.message}
         </div>
       )}
-      <div className="space-y-4">
-        {cartItems.length === 0 ? (
-          <p className="text-gray-400 text-center">Tu carrito está vacío.</p>
-        ) : (
-          cartItems.map((item) => (
-            <CartItem
-              key={item.id}
-              item={item}
-              onUpdateQuantity={handleUpdateQuantity}
-              onRemoveItem={handleRemoveItem}
-            />
-          ))
-        )}
+      {/* div que contiene los ítems del carrito */}
+      <div className="space-y-4 justify-center items-center flex overflow-y-auto flex-col h-full ">
+
+        <div className="w-full max-w-3xl mx-auto space-y-4">
+
+
+          {/* items del carrito */}
+          {cartItems.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full ">
+
+              <div className="flex flex-col items-center justify-center h-full ">
+
+                <p className="text-gray-400 text-center ">Tu carrito está vacío.</p>
+
+                <Link href="/catalogo" className="text-blue-500 hover:underline">
+                  Volver a la tienda
+                </Link>
+              </div>
+
+            </div>
+          ) : (
+            cartItems.map((item, index) => {
+              const imageUrl = item.imageData && item.imageMimeType
+                ? `data:${item.imageMimeType};base64,${item.imageData}`
+                : null;
+              return (
+                <CartItem
+                  key={item.id ? String(item.id) : `${item.name || 'unknown'}-${index}`}
+                  item={{ ...item, image: imageUrl }}
+                  onUpdateQuantity={handleUpdateQuantity}
+                  onRemoveItem={handleRemoveItem}
+                />
+              );
+            })
+          )}
+        </div>
+
       </div>
+
       {cartItems.length > 0 && (
-        <div className="mt-8 pt-4 border-t border-gray-700">
+        <div className="mt-8 pt-4 border-t border-gray-700 ">
+
           <div className="flex justify-between items-center text-white text-lg font-semibold mb-2">
             <span>Subtotal:</span>
             <span>${getTotal().toFixed(2)}</span>
           </div>
+
           {/* Envío section removed as per user request */}
           <div className="flex justify-between items-center text-white text-xl font-bold mb-6">
             <span>Total a Pagar:</span>
             <span>${totalAPagar.toFixed(2)}</span>
           </div>
           <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
-            <BotonGeneral onClick={handleClearCart} disabled={loading}>
+            <BotonGeneral onClick={handleClearCart} disabled={loadingCart}>
               Vaciar Carrito
             </BotonGeneral>
-            <BotonGeneral onClick={handleProceedToPayment} disabled={loading}>
+            <BotonGeneral onClick={handleProceedToPayment} disabled={loadingCart}>
               Proceder al Pago
             </BotonGeneral>
           </div>
+
         </div>
       )}
     </div>

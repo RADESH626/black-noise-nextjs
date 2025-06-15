@@ -6,18 +6,20 @@ import Footer from '@/components/layout/general/footer/Footer';
 import CatalogTabs from '@/components/catalogo/CatalogTabs';
 import NewPostSection from '@/components/catalogo/NewPostSection';
 import DesignGrid from '@/components/catalogo/DesignGrid';
-import { addDesignToCart, getCartByUserId } from '@/app/acciones/CartActions'; // Import addDesignToCart and getCartByUserId
+import { addDesignToCart } from '@/app/acciones/CartActions'; // Only addDesignToCart is needed here
 import { obtenerDesigns } from '@/app/acciones/DesignActions'; // Import obtenerDesigns
 import { useSession } from 'next-auth/react'; // Import useSession
+import { useCart } from '@/context/CartContext'; // Import useCart
 
 const ComunidadDiseños = () => {
   const [activo, setActivo] = useState('diseños');
   const { data: session } = useSession();
   const userId = session?.user?.id;
+  const { cartItems, updateCart } = useCart(); // Use cartItems and updateCart from CartContext
+
   const [allDesigns, setAllDesigns] = useState([]); // State to store all designs
   const [loadingDesigns, setLoadingDesigns] = useState(true);
   const [errorDesigns, setErrorDesigns] = useState(null);
-  const [cartItems, setCartItems] = useState([]); // State to store cart items
 
   useEffect(() => {
     async function fetchDesigns() {
@@ -38,26 +40,6 @@ const ComunidadDiseños = () => {
     fetchDesigns();
   }, []); // Empty dependency array to run once on mount
 
-  useEffect(() => {
-    async function fetchCartItems() {
-      if (userId) { // Only fetch if userId is available
-        try {
-          const result = await getCartByUserId(userId);
-          if (result?.cart?.items) {
-            setCartItems(result.cart.items);
-          } else {
-            console.error("Error al cargar ítems del carrito:", result?.error);
-            setCartItems([]); // Ensure cartItems is an array even on error
-          }
-        } catch (err) {
-          console.error("Error de red o del servidor al cargar ítems del carrito:", err.message);
-          setCartItems([]); // Ensure cartItems is an array even on error
-        }
-      }
-    }
-    fetchCartItems();
-  }, [userId]); // Re-run when userId changes
-
   // Elegimos qué mostrar según la pestaña activa
   const tarjetas = useMemo(() => activo === 'diseños' ? allDesigns : allDesigns, [activo, allDesigns]);
 
@@ -66,12 +48,13 @@ const ComunidadDiseños = () => {
       alert("Debes iniciar sesión para agregar ítems al carrito.");
       return;
     }
-    const { success, message } = await addDesignToCart(userId, item.id);
+    const { success, message, data: updatedCart } = await addDesignToCart(userId, item.id);
     if (!success) {
       alert(message || "Error al agregar el diseño al carrito.");
     } else {
       alert("Diseño agregado al carrito!");
-      // Optionally, revalidate cart path here if needed, but CartComponent will fetch its own data
+      updateCart(updatedCart?.items || []); // Update global cart state
+      console.log('Updated Cart Items after add:', updatedCart?.items); // Debug log
     }
   };
 
