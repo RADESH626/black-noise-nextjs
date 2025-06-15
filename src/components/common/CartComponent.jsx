@@ -10,19 +10,27 @@ import { addDesignToCart, removeDesignFromCart, updateCartItemQuantity, clearUse
 import { procesarPagoYCrearPedido } from "@/app/acciones/PagoActions"; // Import the payment action
 import { usePopUp } from '@/context/PopUpContext'; // Import usePopUp
 import { useCart } from '@/context/CartContext'; // Import useCart
+import OrderSummary from "@/components/pago/OrderSummary"; // Import OrderSummary
+import PaymentForm from "@/components/pago/PaymentForm"; // Import PaymentForm
 
 function CartComponent() {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const { showPopUp, hidePopUp } = usePopUp(); // Use the PopUp hook
+  const { showPopUp } = usePopUp(); // Use the PopUp hook (keep for other popups)
   const { cartItems, loadingCart, cartError, updateCart, fetchCart } = useCart(); // Use cart context
   const userId = session?.user?.id;
 
-  // No need for local cartItems, loading, error states, or fetchCart useEffect
+  const [showPaymentSection, setShowPaymentSection] = useState(false); // New state for payment section visibility
+  const [paymentError, setPaymentError] = useState(null); // New state for payment errors
 
   const getTotal = () => {
     return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
+
+  const handleClosePayment = useCallback(() => {
+    setShowPaymentSection(false);
+    setPaymentError(null); // Clear any payment errors when closing
+  }, []);
 
   const addItemDebounceRef = useRef(null);
   const removeItemDebounceRef = useRef(null);
@@ -146,24 +154,44 @@ function CartComponent() {
     }, 1000); // Debounce for 1 second
   }, [userId, cartItems, updateCart, showPopUp]);
 
-  const handleProceedToPayment = async () => {
+  const handleProcessPayment = async ({ nombre, correo, direccion, metodoPago, cardNumber, expiryDate, cvv }) => {
+    const paymentDetails = {
+      userId,
+      nombre,
+      correo,
+      direccion,
+      metodoPago,
+      total: getTotal(),
+      cardNumber,
+      expiryDate,
+      cvv,
+    };
+
+    const { success, message, pedidoId } = await procesarPagoYCrearPedido(cartItems, paymentDetails);
+
+    if (success) {
+      updateCart([]); // Clear local cart state via context
+      setShowPaymentSection(false); // Close the payment section on successful payment
+      router.push(`/confirmacion?pedidoId=${pedidoId}`); // Pass pedidoId to confirmation page
+    } else {
+      setPaymentError({ message: message || "Error al procesar el pago." });
+      console.error("Error al procesar el pago:", message);
+    }
+  };
+
+  const handleProceedToPayment = () => {
     if (!userId) {
-      alert("Debes iniciar sesión para proceder al pago.");
+      showPopUp("Debes iniciar sesión para proceder al pago.", "error");
       return;
     }
     if (cartItems.length === 0) {
-      alert("Tu carrito está vacío. Agrega diseños antes de proceder al pago.");
+      showPopUp("Tu carrito está vacío. Agrega diseños antes de proceder al pago.", "error");
       return;
     }
-
-    // Guardar los datos del carrito en localStorage para que la página de pago los recupere
-    localStorage.setItem('currentCartItems', JSON.stringify(cartItems));
-    localStorage.setItem('currentCartTotal', JSON.stringify(totalConEnvio));
-
-    router.push("/pago"); // Redirigir a la página de pago
+    setShowPaymentSection(true); // Show payment section
   };
 
-  const totalAPagar = getTotal(); // Renamed from totalConEnvio
+  const totalAPagar = getTotal();
 
   if (loadingCart) {
     return (
@@ -181,35 +209,49 @@ function CartComponent() {
     );
   }
 
+  if (showPaymentSection) {
+    return (
+      <div
+        style={{ backgroundColor: "#FDF9F9FF", color: "#000000FF" }}
+        className="min-h-screen p-8 relative"
+      >
+        <button
+          onClick={handleClosePayment}
+          className="absolute top-4 right-4 text-black text-2xl font-bold"
+          aria-label="Cerrar"
+        >
+          &times;
+        </button>
+        <OrderSummary cartItems={cartItems} getTotal={getTotal} />
+        {paymentError && (
+          <div className="bg-red-500 text-white p-3 rounded-md mb-4 text-center">
+            {paymentError.message}
+          </div>
+        )}
+        <PaymentForm handlePago={handleProcessPayment} />
+      </div>
+    );
+  }
+
   return (
     <div className="bg-black p-6 md:p-8 shadow-lg h-screen justify-between flex flex-col overflow-hidden">
-
       <h2 className="text-2xl font-bold mb-6 text-white">Tu Carrito de Compras</h2>
 
-      {cartError && ( // Display error message if present
+      {cartError && (
         <div className="bg-red-500 text-white p-3 rounded-md mb-4 text-center">
           {cartError.message}
         </div>
       )}
-      {/* div que contiene los ítems del carrito */}
       <div className="space-y-4 justify-center items-center flex overflow-y-auto flex-col h-full ">
-
         <div className="w-full max-w-3xl mx-auto space-y-4">
-
-
-          {/* items del carrito */}
           {cartItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full ">
-
               <div className="flex flex-col items-center justify-center h-full ">
-
                 <p className="text-gray-400 text-center ">Tu carrito está vacío.</p>
-
                 <Link href="/catalogo" className="text-blue-500 hover:underline">
                   Volver a la tienda
                 </Link>
               </div>
-
             </div>
           ) : (
             cartItems.map((item, index) => {
@@ -227,18 +269,14 @@ function CartComponent() {
             })
           )}
         </div>
-
       </div>
 
       {cartItems.length > 0 && (
         <div className="mt-8 pt-4 border-t border-gray-700 ">
-
           <div className="flex justify-between items-center text-white text-lg font-semibold mb-2">
             <span>Subtotal:</span>
             <span>${getTotal().toFixed(2)}</span>
           </div>
-
-          {/* Envío section removed as per user request */}
           <div className="flex justify-between items-center text-white text-xl font-bold mb-6">
             <span>Total a Pagar:</span>
             <span>${totalAPagar.toFixed(2)}</span>
@@ -251,7 +289,6 @@ function CartComponent() {
               Proceder al Pago
             </BotonGeneral>
           </div>
-
         </div>
       )}
     </div>
