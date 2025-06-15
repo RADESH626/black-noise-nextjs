@@ -1,0 +1,11 @@
+/* .popup-shadow {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+} */
+
+.popup-success {
+    background-color: #28a745 !important; /* Solid green for success */
+}
+
+.popup-error {
+    background-color: #dc3545 !important; /* Solid red for error */
+}
