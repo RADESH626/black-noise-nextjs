@@ -58,6 +58,11 @@
     *   Added a loading state to the update button to prevent multiple submissions.
     *   Implemented rollback logic to revert to the previous profile picture if the `actualizarFotoPerfilUsuarioPorAdmin` server action fails.
     *   **Created `memory-bank/functionalities/AdminUserManagement.md`**: Documented the new functionality and the application of optimistic updates and rollback.
+- **Implemented Optimistic Updates and Rollback for Admin Design Editing:**
+    *   **Modified `src/app/admin/designs/editar/[id]/page.jsx`**: Implemented optimistic UI updates for design details (name, description, price, category, and image preview) upon form submission.
+    *   Utilized the existing loading state to prevent multiple submissions.
+    *   Implemented rollback logic to revert to the previous design details if the `actualizarDesign` server action fails.
+    *   **Created `memory-bank/functionalities/AdminDesignManagement.md`**: Documented the new functionality and the application of optimistic updates and rollback.
 
 ## Remaining Tasks:
 - Identify and refactor other pages/components with iterative changes as per the new "Patrones de Sincronización de Datos".
