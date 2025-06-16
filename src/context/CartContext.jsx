@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
-import { getCartByUserId } from '@/app/acciones/CartActions';
+import { getCartByUserId, addDesignToCart } from '@/app/acciones/CartActions';
 
 const CartContext = createContext();
 
@@ -40,12 +40,37 @@ export function CartProvider({ children }) {
     setCartItems(newCartItems);
   }, []);
 
+  const addItem = useCallback(async (item) => {
+    if (!userId) {
+      console.warn("No user ID available. Cannot add item to cart.");
+      return;
+    }
+
+    setLoadingCart(true);
+    setCartError(null);
+
+    try {
+      const { success, message, data: cart } = await addDesignToCart(userId, item);
+      if (success) {
+        setCartItems(cart?.items || []);
+      } else {
+        setCartError({ message: message || "Error al agregar el item al carrito." });
+      }
+    } catch (error) {
+      setCartError({ message: "Error de red al agregar el item al carrito." });
+      console.error("Error adding item to cart:", error);
+    } finally {
+      setLoadingCart(false);
+    }
+  }, [userId]);
+
   const value = {
     cartItems,
     loadingCart,
     cartError,
     fetchCart,
     updateCart,
+    addItem,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

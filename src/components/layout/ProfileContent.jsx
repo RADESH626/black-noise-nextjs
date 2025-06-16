@@ -15,6 +15,7 @@ import PaymentHistory from "@/components/perfil/PaymentHistory";
 import { useDialog } from "@/context/DialogContext";
 import { useRef, useCallback } from "react";
 import FormEditarDesign from "@/components/perfil/FormEditarDesign";
+import { useCart } from "@/context/CartContext";
 // Removed: import NewOrderModal from "@/components/common/modales/NewOrderModal";
 
 function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [], initialUserPayments = [] }) {
@@ -25,12 +26,10 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
   const [userDesigns, setUserDesigns] = useState(initialUserDesigns);
   const [loading, setLoading] = useState(initialUserDesigns.length === 0);
   const [error, setError] = useState(null);
-  const [cartItems, setCartItems] = useState([]);
-  const [cartLoading, setCartLoading] = useState(true);
-  const [cartError, setCartError] = useState(null);
   const { showPopUp, openModal } = useDialog();
   const deleteDesignTimeoutRef = useRef(null);
   const updateDesignTimeoutRef = useRef(null);
+  const { cartItems, addItem } = useCart();
 
   // Removed: State for NewOrderModal
   // const [isNewOrderModalOpen, setIsNewOrderModalOpen] = useState(false);
@@ -211,9 +210,9 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
 
   const handleAddDesign = () => {
     openModal(
-      // "Subir Nuevo Diseño",
+      "Subir Nuevo Diseño",
       <DesignUploadModal onDesignSaved={fetchUserDesigns} />,
-      // 'default'
+      'default'
     );
   };
 
@@ -228,7 +227,7 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
             <img src="/img/perfil/FotoPerfil.webp" alt="User Image" className="w-full h-full object-cover rounded-lg" />
           </div>
           <div className="flex-grow text-center md:text-left">
-            <h1 className="text-3xl md:text-4xl font-bold mb-1">{user?.primerNombre} {user?.primerApellido}</h1>
+            <h1 className="text-3xl md:text-4xl font-bold mb-1">{user?.Nombre} {user?.primerApellido}</h1>
             <div className="text-gray-400 mb-3">
               <p>CORREO: {user?.correo}</p>
               <p>NÚMERO DE DOCUMENTO: {user?.numeroDocumento}</p>
@@ -278,6 +277,8 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
                 userDesigns={userDesigns}
                 handleEditDesign={handleEditDesign}
                 handleDeleteDesign={handleDeleteDesign}
+                cartItems={cartItems}
+                addItem={addItem}
                 mode="profile"
               />
             )}
@@ -287,7 +288,6 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
         {activeTab === 'payments' && (<PaymentHistory payments={paymentsForHistory} />)}
       </div>
 
-      {/* Removed: {isNewOrderModalOpen && ( <NewOrderModal onClose={() => setIsNewOrderModalOpen(false)} /> )} */}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import BotonGeneral from './botones/BotonGeneral';
 
 function DesignsComponent({ loading, error, userDesigns, handleEditDesign, handleDeleteDesign, cartItems, addItem, orderedDesignIds, mode = 'catalog' }) {
 
@@ -40,40 +41,60 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign, handl
               </div>
               {mode === 'catalog' && (
                 (cartItems || []).some(item => item.id === design._id) ? (
-                  <button
+                  <BotonGeneral
                     disabled
-                    className="bg-gray-600 text-white font-semibold py-2 px-4 rounded-md text-sm cursor-not-allowed"
+                    className="bg-gray-600 text-black font-semibold py-2 px-4 rounded-md text-sm cursor-not-allowed"
                   >
                     En el carrito
-                  </button>
+                  </BotonGeneral>
                 ) : (
-                  <button
+                  <BotonGeneral
                     onClick={() => addItem({
                       id: design._id,
                       nombre: design.nombreDesing,
                       price: design.valorDesing,
                       imagen: design.imagen,
                     })}
-                    className="bg-purple-700 text-white font-semibold py-2 px-4 rounded-md text-sm hover:bg-purple-800 transition duration-150"
+                    className="bg-purple-700 text-black font-semibold py-2 px-4 rounded-md text-sm hover:bg-purple-800 transition duration-150"
                   >
                     Agregar al carrito
-                  </button>
+                  </BotonGeneral>
                 )
               )}
               {mode === 'profile' && (
                 <div className="flex space-x-2">
-                  <button
+                  {(cartItems || []).some(item => item.id === design._id) ? (
+                    <BotonGeneral
+                      disabled
+                      className="bg-gray-600 text-black font-semibold py-2 px-4 rounded-md text-sm cursor-not-allowed"
+                    >
+                      En el carrito
+                    </BotonGeneral>
+                  ) : (
+                    <BotonGeneral
+                      onClick={() => addItem({
+                        id: design._id,
+                        nombre: design.nombreDesing,
+                        price: design.valorDesing,
+                        imagen: design.imagen,
+                      })}
+                      className="bg-purple-700 text-black font-semibold py-2 px-4 rounded-md text-sm hover:bg-purple-800 transition duration-150"
+                    >
+                      Agregar al carrito
+                    </BotonGeneral>
+                  )}
+                  <BotonGeneral
                     onClick={() => handleEditDesign(design)}
-                    className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-md text-sm hover:bg-blue-700 transition duration-150"
+                    className="bg-blue-600 text-black font-semibold py-2 px-4 rounded-md text-sm hover:bg-blue-700 transition duration-150"
                   >
                     Editar
-                  </button>
-                  <button
+                  </BotonGeneral>
+                  <BotonGeneral
                     onClick={() => handleDeleteDesign(design._id)}
-                    className="bg-red-600 text-white font-semibold py-2 px-4 rounded-md text-sm hover:bg-red-700 transition duration-150"
+                    className="bg-red-600 text-black font-semibold py-2 px-4 rounded-md text-sm hover:bg-red-700 transition duration-150"
                   >
                     Eliminar
-                  </button>
+                  </BotonGeneral>
                 </div>
               )}
             </div>

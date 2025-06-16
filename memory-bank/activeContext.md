@@ -1,6 +1,38 @@
 # Active Session Context
 
-## Date: 2025-06-15
+## Date: 2025-06-16
+
+## Task: Add "add to cart" button to designs in user profile
+
+### Problem:
+The user requested to add an "add to cart" button to the designs displayed on their profile page, similar to the functionality available on the catalog page. An initial attempt resulted in an "addItem is not a function" error.
+
+### Analysis:
+- The `DesignsComponent` (src/components/common/DesignsComponent.jsx) already contains the logic for an "Agregar al carrito" button, which is conditionally rendered based on the `mode` prop (`catalog` or `profile`).
+- The `ProfileContent` component (src/components/layout/ProfileContent.jsx) is responsible for rendering `DesignsComponent` on the user's profile page and passes the `mode="profile"` prop.
+- The `CartContext` (src/context/CartContext.jsx) provides the `cartItems` and `addItem` function necessary for cart operations.
+- **Correction Analysis:** The `addItem` function was not correctly implemented in `src/context/CartContext.jsx` to call the existing server action. It was attempting to call `addToCart` (aliased as `addToCartAction`) which did not exist, instead of the correctly named `addDesignToCart` function in `src/app/acciones/CartActions.js`.
+
+### Solution Implemented:
+1.  **Modified `src/components/common/DesignsComponent.jsx`**:
+    *   Extended the conditional rendering for the "Agregar al carrito" button to include `mode === 'profile'`. This ensures the button appears on profile designs.
+    *   The button's logic (checking if the item is already in the cart and calling `addItem`) remains consistent with the catalog mode.
+2.  **Modified `src/components/layout/ProfileContent.jsx`**:
+    *   Imported `useCart` from `@/context/CartContext`.
+    *   Used the `useCart` hook to destructure `cartItems` and `addItem`.
+    *   Passed `cartItems` and `addItem` as props to the `DesignsComponent` when it is rendered in the profile tab.
+3.  **Modified `src/context/CartContext.jsx` (Correction)**:
+    *   Corrected the import of the cart action from `src/app/acciones/CartActions.js` to use `addDesignToCart` directly, instead of an incorrect alias.
+    *   Updated the `addItem` function to correctly call the `addDesignToCart` server action, passing the `userId` and the `item` (design) data.
+
+### Files Modified:
+- `src/components/common/DesignsComponent.jsx`
+- `src/components/layout/ProfileContent.jsx`
+- `src/context/CartContext.jsx`
+
+### Next Steps:
+- Update `progress.md`.
+- Propose Git commands.
 
 ## Task: Fix supplier dashboard redirection
 
