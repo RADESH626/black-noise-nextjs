@@ -12,8 +12,8 @@ import { useCart } from '@/context/CartContext'; // Import useCart
 
 function HeaderPrincipal() {
     const { data: session } = useSession();
-    console.log("Session object in HeaderPrincipal:", session);
-    const { cartItems, fetchCart } = useCart(); // Use cartItems and fetchCart from CartContext
+    // console.log("Session object in HeaderPrincipal:", session);
+    const { cartItems, fetchCart, removeItem } = useCart(); // Use cartItems, fetchCart, and removeItem from CartContext
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
@@ -48,19 +48,27 @@ function HeaderPrincipal() {
     return (
         <div>
             <header className='flex flex-row justify-between items-center p-10 top-0 fixed w-full h-16 z-50' style={{ backgroundColor: '#000000' }}>
+
                 <h1 className='font-bold text-3xl hover:text-white transition-colors duration-500' style={{ color: '#FFFFFFFF' }}>
                     BLACK NOISE
                 </h1>
+
                 <div className='flex flex-row items-center gap-4'>
                     {/* Shopping Cart Icon */}
+
                     <div className="relative cursor-pointer" onClick={handleCartIconClick}>
                         <Image src="/icons/icono-carrito.svg" alt="Carrito" width={30} height={30} />
                         {cartItems.length > 0 && (
-                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                            <span className="absolute -top-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                                 {cartItems.length}
                             </span>
                         )}
-                        <CartModal cartItems={cartItems} onClose={() => setShowCartModal(false)} isOpen={showCartModal} />
+
+                        <div className="absolute mt-2 top-full right-0  z-50 w-auto ">
+
+                            <CartModal cartItems={cartItems} onClose={() => setShowCartModal(false)} isOpen={showCartModal} onRemoveItem={removeItem} />
+
+                        </div>
                     </div>
 
                     {session ? (

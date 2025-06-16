@@ -91,7 +91,7 @@ function FormEditarDesign({ designData, onSuccess }) {
           label="Descripción"
           id="descripcion"
           name="descripcion"
-          type="textarea"
+          type="text"
           value={formData.descripcion}
           onChange={handleChange}
           required
@@ -114,16 +114,6 @@ function FormEditarDesign({ designData, onSuccess }) {
           name="categoria"
           type="text"
           value={formData.categoria}
-          onChange={handleChange}
-          required
-        />
-
-        <InputGeneral
-          label="Tallas Disponibles (separadas por comas)"
-          id="tallasDisponibles"
-          name="tallasDisponibles"
-          type="text"
-          value={formData.tallasDisponibles}
           onChange={handleChange}
           required
         />

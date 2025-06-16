@@ -31,9 +31,10 @@ const ComunidadDiseños = () => {
         throw new Error(result?.error || "Error al cargar los diseños.");
       }
     },
-    staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
+    staleTime: Infinity, // Data is considered fresh indefinitely for diagnostic
     cacheTime: 10 * 60 * 1000, // Data stays in cache for 10 minutes
     retry: 1, // Retry once on failure
+    refetchOnWindowFocus: false, // Disable refetching on window focus for diagnostic
   });
 
   const tarjetas = useMemo(() => activo === 'diseños' ? allDesigns : allDesigns, [activo, allDesigns]);

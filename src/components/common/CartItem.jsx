@@ -6,7 +6,7 @@ import BotonGeneral from '@/components/common/botones/BotonGeneral';
 const CartItem = memo(({ item, onUpdateQuantity, onRemoveItem }) => {
   return (
     <div key={item.id} className="flex items-center justify-between bg-gray-800 p-4 rounded-lg">
-      <div className="flex items-center">
+      <div className="flex items-center"> 
         {item.image && (
           <img src={item.image} alt={item.nombre || 'Design Image'} className="w-16 h-16 object-cover rounded-md mr-4" />
         )}
@@ -21,7 +21,8 @@ const CartItem = memo(({ item, onUpdateQuantity, onRemoveItem }) => {
       <div className="flex items-center space-x-4">
         <input
           type="number"
-          min="0"
+          min="1"
+          maxLength={4}
           value={item.quantity}
           onChange={(e) => onUpdateQuantity(item.id, e.target.value)}
           className="w-20 p-2 bg-gray-700 border border-gray-600 rounded-md text-white"

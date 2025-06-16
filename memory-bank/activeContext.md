@@ -121,3 +121,34 @@
 
 *   Verificar que el pop-up `CartModal` se muestre correctamente como un dropdown cerca del icono del carrito.
 *   Verificar que el `PopUpMessage` (el de `src/components/common/pop-up/`) se muestre correctamente como un modal.
+
+### 16/06/2025 - 02:54 PM
+
+**Tarea:** Eliminar borde blanco de pop-ups.
+
+**Cambios Realizados:**
+
+*   **`src/components/common/modales/PopUpMessage.jsx`**:
+    *   Se añadieron las clases de Tailwind CSS `border-none` y `outline-none` al elemento `<dialog>` para eliminar el borde y el contorno predeterminados del navegador.
+*   **`src/components/common/modales/Modal.jsx`**:
+    *   Se añadieron las clases de Tailwind CSS `border-none` y `outline-none` al elemento `<dialog>` para asegurar que todos los modales tengan un estilo consistente sin bordes.
+
+**Próximos Pasos:**
+
+*   Verificar que los pop-ups ya no muestren el borde blanco.
+
+### 16/06/2025 - 03:32 PM
+
+**Tarea:** Corregir el fondo blanco y el borde del mensaje de pop-up de inicio de sesión.
+
+**Cambios Realizados:**
+
+*   **`src/components/common/modales/PopUpMessage.jsx`**:
+    *   Se eliminó la importación de `PopUpMessage.module.css` ya que las clases de CSS Modules no se estaban aplicando correctamente.
+    *   Se reemplazó la lógica de aplicación de clases de CSS Modules por clases directas de Tailwind CSS para el color de fondo (`bg-green-700` para éxito, `bg-red-700` para error).
+    *   Se añadieron las clases `border-0` y `outline-0` directamente al elemento `<dialog>` para asegurar la eliminación de cualquier borde o contorno predeterminado del navegador.
+    *   Se eliminaron los `console.log` de depuración.
+
+**Próximos Pasos:**
+
+*   Verificar que el pop-up de inicio de sesión ahora muestre el color de fondo correcto y no tenga un borde blanco.

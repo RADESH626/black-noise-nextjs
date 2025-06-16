@@ -101,7 +101,7 @@ function DesignUploadModal({ onDesignSaved }) {
   };
 
   return (
-    <div className="p-6 bg-black text-white rounded-lg shadow-lg max-h-[80vh] overflow-y-auto">
+    <div className="p-6 bg-gray-900 text-white rounded-lg shadow-lg max-h-[80vh] overflow-y-auto">
       {/* <h2 className="text-2xl font-bold mb-6 text-center">Subir Nuevo Diseño</h2> */}
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (

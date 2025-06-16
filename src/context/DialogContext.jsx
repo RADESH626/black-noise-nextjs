@@ -9,20 +9,23 @@ const DialogContext = createContext();
 export const DialogProvider = ({ children }) => {
   const [message, setMessage] = useState(null);
   const [type, setType] = useState('success'); // 'success' or 'error'
+  const [isPopUpPersistent, setIsPopUpPersistent] = useState(false); // New state for persistence
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState(null);
   const [modalTitle, setModalTitle] = useState('');
   const [modalType, setModalType] = useState('default');
 
-  const showPopUp = useCallback((msg, msgType = 'success') => {
-    console.log('DialogContext: showPopUp called with message:', msg, 'and type:', msgType);
+  const showPopUp = useCallback((msg, msgType = 'success', persistent = false) => {
+    console.log('DialogContext: showPopUp called with message:', msg, 'type:', msgType, 'persistent:', persistent);
     setMessage(msg);
     setType(msgType);
+    setIsPopUpPersistent(persistent); // Set persistence
   }, []);
 
   const hidePopUp = useCallback(() => {
     setMessage(null);
+    setIsPopUpPersistent(false); // Reset persistence when hiding
   }, []);
 
   const openModal = useCallback((title, content, type = 'default') => {
@@ -47,6 +50,7 @@ export const DialogProvider = ({ children }) => {
           message={message}
           type={type}
           onClose={hidePopUp}
+          persistent={isPopUpPersistent} // Pass persistence to PopUpMessage
         />
       )}
       {isModalOpen && (

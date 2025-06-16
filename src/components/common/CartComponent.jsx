@@ -13,6 +13,7 @@ import { useCart } from '@/context/CartContext';
 import OrderSummary from "@/components/pago/OrderSummary";
 import UserDataForm from "@/components/pago/UserDataForm";
 import CardDataModal from "@/components/pago/CardDataModal";
+import OrderConfirmationDialogContent from "@/components/pago/OrderConfirmationDialogContent";
 
 function CartComponent() {
   const router = useRouter();
@@ -210,7 +211,17 @@ function CartComponent() {
     if (success) {
       updateCart([]);
       setShowPaymentSection(false);
-      router.push(`/confirmacion?pedidoId=${pedidoId}`);
+      showPopUp(
+        <OrderConfirmationDialogContent
+          pedidoId={pedidoId}
+          onClose={() => {
+            // This onClose will be called when the dialog is closed
+            // You might want to do something here, e.g., navigate to home or clear state
+          }}
+        />,
+        "success", // You can choose the type of popup, 'success' seems appropriate
+        true // Make it persistent until closed by user
+      );
     } else {
       setPaymentError({ message: message || "Error al procesar el pago." });
       console.error("Error al procesar el pago:", message);
@@ -250,6 +261,7 @@ function CartComponent() {
 
   return (
     <div className="bg-black p-6 md:p-8 shadow-lg h-screen justify-between flex flex-col overflow-hidden">
+      
       <h2 className="text-2xl font-bold mb-6 text-white">Tu Carrito de Compras</h2>
 
       {cartError && (
@@ -257,8 +269,8 @@ function CartComponent() {
           {cartError.message}
         </div>
       )}
-      <div className="space-y-4 justify-center items-center flex overflow-y-auto flex-col h-full ">
-        <div className="w-full max-w-3xl mx-auto space-y-4">
+      <div className="space-y-4 flex overflow-y-auto flex-col h-full w-full">
+        <div className="w-full space-y-4">
           {cartItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full ">
               <div className="flex flex-col items-center justify-center h-full ">

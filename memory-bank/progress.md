@@ -15,6 +15,10 @@ El proyecto está en desarrollo activo. Se han implementado varias funcionalidad
     *   `src/components/carrito/CartModal.jsx`: Refactorizado para usar el elemento nativo HTML `<dialog>` inicialmente, pero luego **revertido** a una implementación basada en `div` con posicionamiento `absolute right-0 mt-2` para funcionar como un dropdown, según la solicitud del usuario.
     *   `src/components/common/pop-up/PopUpMessage.jsx`: Refactorizado para usar el elemento nativo HTML `<dialog>` y ajustado para manejar la persistencia y el cierre.
     *   Se añadió una nueva lección aprendida en `memory-bank/improvement_log.md` para distinguir entre modales (usando `<dialog>`) y dropdowns/popovers (usando `div`).
+*   **Corrección de Fondo y Borde de Pop-ups de Mensaje:** Se solucionó el problema donde los pop-ups de mensaje (éxito/error) aparecían con un fondo blanco y un borde. La solución implicó:
+    *   Eliminar la dependencia de `PopUpMessage.module.css` para los colores de fondo.
+    *   Aplicar directamente clases de Tailwind CSS (`bg-green-700` para éxito, `bg-red-700` para error) al elemento `<dialog>`.
+    *   Asegurar la eliminación de bordes y contornos predeterminados con las clases `border-0` y `outline-0` en el `<dialog>`.
 
 **Funcionalidades Pendientes / En Curso:**
 *   (No hay funcionalidades pendientes explícitas en este momento, aparte de la verificación de la última implementación).
@@ -26,3 +30,4 @@ El proyecto está en desarrollo activo. Se han implementado varias funcionalidad
 *   Verificar que el pop-up de confirmación de pedido ya no se cierre automáticamente y requiera interacción manual.
 *   Verificar que el pop-up `CartModal` se muestre correctamente como un dropdown cerca del icono del carrito.
 *   Verificar que el `PopUpMessage` (el de `src/components/common/pop-up/`) se muestre correctamente como un modal.
+*   Verificar que el pop-up de inicio de sesión ahora muestre el color de fondo correcto y no tenga un borde blanco.

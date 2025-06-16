@@ -34,10 +34,11 @@ function ProveedorPage() {
                 throw new Error(result.message || "Error al cargar el perfil del proveedor.");
             }
         },
-        enabled: session.user.isSupplier, // Only run query if user is a supplier
-        staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
+        enabled: !!session?.user?.isSupplier && !!session?.user?.id, // Only run query if user is a supplier and ID is available
+        staleTime: Infinity, // Data is considered fresh indefinitely for diagnostic
         cacheTime: 10 * 60 * 1000, // Data stays in cache for 10 minutes
         retry: 1, // Retry once on failure
+        refetchOnWindowFocus: false, // Disable refetching on window focus for diagnostic
     });
 
     // Render logic for authenticated suppliers

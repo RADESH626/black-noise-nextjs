@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
-import { getCartByUserId, addDesignToCart } from '@/app/acciones/CartActions';
+import { getCartByUserId, addDesignToCart, removeDesignFromCart } from '@/app/acciones/CartActions';
 
 const CartContext = createContext();
 
@@ -64,6 +64,30 @@ export function CartProvider({ children }) {
     }
   }, [userId]);
 
+  const removeItem = useCallback(async (designId) => {
+    if (!userId) {
+      console.warn("No user ID available. Cannot remove item from cart.");
+      return;
+    }
+
+    setLoadingCart(true);
+    setCartError(null);
+
+    try {
+      const { success, message, data: cart } = await removeDesignFromCart(userId, designId);
+      if (success) {
+        setCartItems(cart?.items || []);
+      } else {
+        setCartError({ message: message || "Error al eliminar el item del carrito." });
+      }
+    } catch (error) {
+      setCartError({ message: "Error de red al eliminar el item del carrito." });
+      console.error("Error removing item from cart:", error);
+    } finally {
+      setLoadingCart(false);
+    }
+  }, [userId]);
+
   const value = {
     cartItems,
     loadingCart,
@@ -71,6 +95,7 @@ export function CartProvider({ children }) {
     fetchCart,
     updateCart,
     addItem,
+    removeItem,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

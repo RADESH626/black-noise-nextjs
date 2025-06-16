@@ -26,9 +26,9 @@ const Modal = ({ title, children, onClose, isOpen, type = 'default' }) => {
   return (
     <dialog
       ref={dialogRef}
-      className={`fixed inset-0 flex items-center justify-center z-[9999] bg-transparent h-screen w-screen`}
+      className={`fixed inset-0 flex items-center justify-center z-[9999] bg-transparent h-screen w-screen border-none outline-none`}
     >
-      <div className={`relative p-6 rounded-lg shadow-xl max-w-2xl w-11/12 md:w-2/3 lg:w-1/2 bg-white text-gray-800 max-h-[90vh] overflow-y-auto`}>
+      <div className={`relative p-6 rounded-lg shadow-xl max-w-2xl w-11/12 md:w-2/3 lg:w-1/2 bg-black text-white max-h-[90vh] overflow-y-auto`}>
         <h2 className="text-2xl font-bold mb-4 border-b border-gray-200 pb-2">{title}</h2>
         <div className="modal-content">
           {children}

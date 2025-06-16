@@ -84,8 +84,8 @@ export const authOptions = {
   },
     callbacks: {
       async jwt({ token, user }) {
-        console.log("[NextAuth Callback] JWT - Initial Token:", token);
-        console.log("[NextAuth Callback] JWT - User:", user);
+        // console.log("[NextAuth Callback] JWT - Initial Token:", token);
+        // console.log("[NextAuth Callback] JWT - User:", user);
         if (user) {
           token.id = user.id;
           token.name = user.name;
@@ -96,12 +96,12 @@ export const authOptions = {
           token.image = user.image;
           token.numeroTelefono = user.numeroTelefono; // Pass numeroTelefono to token
         }
-        console.log("[NextAuth Callback] JWT - Final Token:", token);
+        // console.log("[NextAuth Callback] JWT - Final Token:", token);
         return token;
       },
       async session({ session, token }) {
-        console.log("[NextAuth Callback] Session - Initial Session:", session);
-        console.log("[NextAuth Callback] Session - Token:", token);
+        // console.log("[NextAuth Callback] Session - Initial Session:", session);
+        // console.log("[NextAuth Callback] Session - Token:", token);
         session.user.id = token.id;
         session.user.name = token.name;
         session.user.email = token.email;
@@ -110,7 +110,7 @@ export const authOptions = {
         session.user.proveedorId = token.proveedorId;
         session.user.image = token.image;
         session.user.numeroTelefono = token.numeroTelefono; // Pass numeroTelefono to session
-        console.log("[NextAuth Callback] Session - Final Session:", session);
+        // console.log("[NextAuth Callback] Session - Final Session:", session);
         return session;
       },
     },

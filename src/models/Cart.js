@@ -19,6 +19,11 @@ const CartSchema = new mongoose.Schema({
         default: 1,
         min: 1,
       },
+      proveedorId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Proveedor',
+        required: false, // Make it optional, as a design might not always have a direct supplier in all contexts
+      },
     },
   ],
 });

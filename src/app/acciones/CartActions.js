@@ -20,11 +20,18 @@ export async function addDesignToCart(userId, designId) {
     }
 
     try {
+        // Fetch the design to get its proveedorId
+        const design = await Design.findById(actualDesignId).lean();
+        if (!design) {
+            return { success: false, message: 'Design not found.' };
+        }
+        const proveedorId = design.proveedorId; // Get proveedorId from the Design
+
         let cart = await Cart.findOne({ userId });
 
         if (!cart) {
             // If no cart exists for the user, create a new one with the design
-            cart = await Cart.create({ userId, items: [{ designId: actualDesignId, quantity: 1 }] });
+            cart = await Cart.create({ userId, items: [{ designId: actualDesignId, quantity: 1, proveedorId: proveedorId }] });
             logger.debug('New cart created with design:', cart);
         } else {
             // If cart exists, check if design is already present
@@ -36,7 +43,7 @@ export async function addDesignToCart(userId, designId) {
                 logger.debug('Design quantity incremented in cart:', cart);
             } else {
                 // If design not present, add new item
-                cart.items.push({ designId: actualDesignId, quantity: 1 });
+                cart.items.push({ designId: actualDesignId, quantity: 1, proveedorId: proveedorId });
                 logger.debug('New design added to existing cart:', cart);
             }
             await cart.save();
@@ -45,7 +52,7 @@ export async function addDesignToCart(userId, designId) {
         revalidatePath('/perfil'); // Revalidate profile page to reflect cart changes
 
         // Re-fetch and populate the cart after saving to ensure full item details are returned
-        const updatedPopulatedCart = await Cart.findOne({ userId }).populate('items.designId', 'nombreDesing valorDesing imageData imageMimeType descripcion categoria').lean();
+        const updatedPopulatedCart = await Cart.findOne({ userId }).populate('items.designId', 'nombreDesing valorDesing imageData imageMimeType descripcion categoria proveedorId').lean();
 
         const populatedCartItems = (updatedPopulatedCart.items || []).map(item => ({
             id: item.designId._id.toString(),
@@ -57,6 +64,7 @@ export async function addDesignToCart(userId, designId) {
             imageData: item.designId.imageData ? Buffer.from(item.designId.imageData.buffer).toString('base64') : null,
             imageMimeType: item.designId.imageMimeType,
             quantity: item.quantity,
+            proveedorId: item.designId.proveedorId, // Include proveedorId here
         }));
 
         const finalCartData = {
@@ -68,7 +76,7 @@ export async function addDesignToCart(userId, designId) {
     } catch (error) {
         logger.error('ERROR in addDesignToCart:', error);
         return { success: false, message: 'Error adding design to cart: ' + error.message };
-    }
+}
 }
 
 export async function removeDesignFromCart(userId, designId) {
@@ -113,8 +121,8 @@ export async function getCartByUserId(userId) {
     }
 
     try {
-        // Populate the 'designId' field within the 'items' array, including imageData, imageMimeType, description, and category
-        const cart = await Cart.findOne({ userId }).populate('items.designId', 'nombreDesing valorDesing imageData imageMimeType descripcion categoria').lean();
+        // Populate the 'designId' field within the 'items' array, including imageData, imageMimeType, description, category, and proveedorId
+        const cart = await Cart.findOne({ userId }).populate('items.designId', 'nombreDesing valorDesing imageData imageMimeType descripcion categoria proveedorId').lean();
         if (!cart) {
             return { cart: null, error: null }; // No cart found, but not an error
         }
@@ -130,6 +138,7 @@ export async function getCartByUserId(userId) {
             imageData: item.designId.imageData ? Buffer.from(item.designId.imageData.buffer).toString('base64') : null, // Convert Buffer to base64 string
             imageMimeType: item.designId.imageMimeType, // Include imageMimeType
             quantity: item.quantity, // Use the quantity from the cart item
+            proveedorId: item.designId.proveedorId, // Include proveedorId here
         }));
 
         // Reconstruct the cart object with populated items
@@ -177,7 +186,7 @@ export async function updateCartItemQuantity(userId, designId, newQuantity) {
             revalidatePath('/perfil');
 
             // Re-fetch and populate the cart after saving to ensure full item details are returned
-            const updatedPopulatedCart = await Cart.findOne({ userId }).populate('items.designId', 'nombreDesing valorDesing imageData imageMimeType descripcion categoria').lean();
+            const updatedPopulatedCart = await Cart.findOne({ userId }).populate('items.designId', 'nombreDesing valorDesing imageData imageMimeType descripcion categoria proveedorId').lean();
 
             const populatedCartItems = (updatedPopulatedCart.items || []).map(item => ({
                 id: item.designId._id.toString(),
@@ -189,6 +198,7 @@ export async function updateCartItemQuantity(userId, designId, newQuantity) {
                 imageData: item.designId.imageData ? Buffer.from(item.designId.imageData.buffer).toString('base64') : null,
                 imageMimeType: item.designId.imageMimeType,
                 quantity: item.quantity,
+                proveedorId: item.designId.proveedorId, // Include proveedorId here
             }));
 
             const finalCartData = {

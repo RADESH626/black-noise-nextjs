@@ -32,7 +32,7 @@ Este documento describe la funcionalidad de gestión de pedidos y el flujo de pa
 ### 3. Confirmación y Creación del Pedido
 
 *   **Validación:** Antes de confirmar, se valida que todos los datos requeridos (personales, de entrega y de tarjeta) estén completos.
-*   **Pago Exitoso:** Si el pago es exitoso, se crea un nuevo documento `Pedido` en la base de datos con un estado de pago `PAGADO` (o `COMPLETADO`). El modal de pago se cierra y el usuario es redirigido a una página de confirmación del pedido.
+*   **Pago Exitoso:** Si el pago es exitoso, se crea un nuevo documento `Pedido` en la base de datos con un estado de pago `PAGADO` (o `COMPLETADO`). El modal de pago se cierra y se muestra un diálogo de confirmación del pedido con los detalles relevantes.
 *   **Pago Fallido:** Si el pago falla, se informa al usuario del error directamente en el modal de pago. No se crea ningún `Pedido`.
 
 ### 4. Visualización del Historial de Pedidos
@@ -56,9 +56,18 @@ Este documento describe la funcionalidad de gestión de pedidos y el flujo de pa
     2.  Crea un nuevo documento `Pago` en la base de datos, registrando la transacción.
     3.  Actualiza el campo `estadoPago` del `Pedido` correspondiente a `PAGADO`.
     4.  Devuelve un objeto de resultado (`{ success: true }` o `{ success: false, error: '...' }`) para el feedback al cliente.
+*   **Asignación Automática de Proveedor:**
+    *   Después de la creación exitosa del `Pedido`, se invoca la Server Action `assignOrderToProvider` (ubicada en `src/app/acciones/assignOrderToProvider.js`).
+    *   Esta función selecciona automáticamente el proveedor más adecuado basándose en la especialidad del diseño del pedido, la disponibilidad del proveedor (`habilitado`), la carga de trabajo actual (`activeOrders < 5`) y un sistema de turnos (`lastAssignedAt`).
+    *   Si se encuentra un proveedor, el `Pedido` se actualiza con el `proveedorId` y su `estadoPedido` cambia a `ASIGNADO`. El proveedor también se actualiza (`activeOrders` se incrementa, `lastAssignedAt` se actualiza).
+    *   Si no se encuentra un proveedor adecuado, el `estadoPedido` se establece en `ASIGNACION_PENDIENTE` para revisión manual.
+    *   Se envía un correo de notificación al proveedor asignado.
 *   **Modelos Involucrados:**
     *   `src/models/Pago.js`: Esquema para registrar las transacciones de pago.
-    *   `src/models/Pedido.js`: Esquema del pedido, que incluye el campo `estadoPago`.
+    *   `src/models/Pedido.js`: Esquema del pedido, que incluye el campo `estadoPago` y `proveedorId`.
+    *   `src/models/Proveedor.js`: Esquema del proveedor, utilizado para la lógica de asignación.
+    *   `src/models/Usuario.js`: Utilizado para obtener el correo del proveedor para la notificación.
+    *   `src/models/Design.js`: Utilizado para obtener la `categoria` del diseño del pedido.
 
 ## Modelos de Base de Datos
 

@@ -10,6 +10,7 @@ import { clearUserCart } from '@/app/acciones/CartActions'; // Import clearUserC
 import { guardarVenta } from '@/app/acciones/VentaActions'; // Import guardarVenta
 import { getModel } from '@/utils/modelLoader';
 import { MetodoPago } from '@/models/enums/pago/MetodoPago'; // Import MetodoPago enum
+import { assignOrderToProvider } from '@/app/acciones/assignOrderToProvider'; // Import the new server action
 
 // Crear un nuevo pago
 async function guardarPago(data) {
@@ -188,6 +189,26 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
         }
         logger.debug('Pedido created successfully:', nuevoPedido);
 
+        // Fetch the newly created order and populate design details for supplier assignment
+        const PedidoModel = await getModel('Pedido');
+        const populatedPedido = await PedidoModel.findById(nuevoPedido._id)
+            .populate('items.designId') // Populate the designId to get category
+            .lean();
+
+        if (populatedPedido) {
+            logger.debug('Attempting to assign order to provider:', populatedPedido._id);
+            const { success: assignSuccess, message: assignMessage } = await assignOrderToProvider(populatedPedido);
+            if (!assignSuccess) {
+                logger.warn(`Failed to assign provider for order ${populatedPedido._id}: ${assignMessage}`);
+                // Optionally, update order status to indicate assignment failure or pending manual review
+                // This is already handled within assignOrderToProvider, but can be logged here.
+            } else {
+                logger.debug(`Order ${populatedPedido._id} successfully assigned to provider.`);
+            }
+        } else {
+            logger.error(`Could not find newly created order ${nuevoPedido._id} for provider assignment.`);
+        }
+
         // 3. Crear un nuevo registro de Venta
         const nuevaVentaData = {
             usuarioId: userId,
@@ -237,7 +258,7 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
         revalidatePath('/admin/pagos'); // Revalidate admin payments page
         logger.debug('Revalidated paths /perfil, /admin/pedidos, and /admin/pagos.');
 
-        return { success: true, message: 'Pago procesado y pedido creado exitosamente.', pedidoId: nuevoPedido._id };
+        return { success: true, message: 'Pago procesado y pedido creado exitosamente.', pedidoId: nuevoPedido._id.toString() };
 
     } catch (error) {
         logger.error('ERROR in procesarPagoYCrearPedido:', error);

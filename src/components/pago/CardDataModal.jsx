@@ -31,6 +31,13 @@ export default function CardDataModal({ isOpen, onClose, onCardDataSubmit }) {
       setError("Por favor completa todos los campos de la tarjeta.");
       return;
     }
+
+    const monthInt = parseInt(mes, 10);
+    if (isNaN(monthInt) || monthInt < 1 || monthInt > 12) {
+      setError("El mes debe ser un número entre 01 y 12.");
+      return;
+    }
+
     setError('');
     onCardDataSubmit({ tarjeta, mes, anio, cvv });
     // onClose(); // onClose will be called by useEffect when isOpen becomes false
@@ -48,6 +55,7 @@ export default function CardDataModal({ isOpen, onClose, onCardDataSubmit }) {
         &times;
       </button>
       <h2 className="text-2xl font-bold mb-4" style={{ color: "#111010FF" }}>Datos de la Tarjeta</h2>
+
       <form onSubmit={handleSubmit}>
         <label className="block mb-4">
           <span style={{ color: "#000000FF" }}>Número de Tarjeta:</span>
@@ -65,10 +73,26 @@ export default function CardDataModal({ isOpen, onClose, onCardDataSubmit }) {
           <label className="flex-1">
             <span style={{ color: "#000000FF" }}>Mes:</span>
             <input
-              type="text"
+              type="number"
               value={mes}
-              onChange={(e) => setMes(e.target.value.replace(/\D/g, ""))}
+              onChange={(e) => {
+                let value = e.target.value;
+                // Remove non-digit characters
+                value = value.replace(/\D/g, "");
+                // Ensure value is within 1-12 range
+                if (value !== "") {
+                  let numValue = parseInt(value, 10);
+                  if (numValue > 12) {
+                    value = "12";
+                  } else if (numValue < 1 && value !== "") {
+                    value = "1";
+                  }
+                }
+                setMes(value);
+              }}
               maxLength={2}
+              min={1}
+              max={12}
               placeholder="MM"
               style={{ borderColor: "#000000FF", color: "#000000FF" }}
               className="w-full border rounded px-3 py-2 mt-1"

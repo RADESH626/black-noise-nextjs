@@ -18,7 +18,7 @@ export default function UserDataForm({ onUserDataChange }) {
       if (status === 'authenticated' && session?.user?.email) {
         const fetchedUser = await ObtenerUsuarioPorCorreo(session.user.email);
         if (fetchedUser) {
-          sessionStorage.setItem('cachedUserName', fetchedUser.primerNombre || '');
+          sessionStorage.setItem('cachedUserName', fetchedUser.Nombre || '');
           sessionStorage.setItem('cachedUserEmail', fetchedUser.correo || '');
           sessionStorage.setItem('cachedUserAddress', fetchedUser.direccion || '');
         }

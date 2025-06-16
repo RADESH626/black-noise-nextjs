@@ -3,7 +3,7 @@ import React from 'react';
 import DesignCard from './DesignCard';
 
 function DesignGrid({ tarjetas, activo, addItem, cartItems }) {
-  console.log('DesignGrid re-rendered. cartItems length:', cartItems.length);
+  // console.log('DesignGrid re-rendered. cartItems length:', cartItems.length);
   return (
     <>
       {tarjetas.length === 0 ? (
@@ -18,14 +18,14 @@ function DesignGrid({ tarjetas, activo, addItem, cartItems }) {
         >
           {tarjetas.map((diseño) => {
             const isInCart = cartItems.some(item => {
-              console.log('Comparing:');
-              console.log('  Cart Item ID:', item.id, 'Type:', typeof item.id);
-              console.log('  Design ID:', diseño._id.toString(), 'Type:', typeof diseño._id.toString());
+              // console.log('Comparing:');
+              // console.log('  Cart Item ID:', item.id, 'Type:', typeof item.id);
+              // console.log('  Design ID:', diseño._id.toString(), 'Type:', typeof diseño._id.toString());
               const result = item.id === diseño._id.toString();
-              console.log('  Result (isInCart for this item):', result);
+              // console.log('  Result (isInCart for this item):', result);
               return result;
             });
-            console.log('Final isInCart for Design ID', diseño._id, ':', isInCart); // Debug log
+            // console.log('Final isInCart for Design ID', diseño._id, ':', isInCart); // Debug log
             return (
               <DesignCard
                 key={diseño._id}

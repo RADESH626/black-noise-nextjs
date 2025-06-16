@@ -9,7 +9,7 @@ export default function HeaderProveedor() {
   const appTitle = "Black Noise"; // Or get from a config if available
 
   return (
-    <header className="bg-gray-800 text-white p-4 flex justify-between items-center">
+    <header className="bg-black text-white p-4 flex justify-between items-center">
       <div className="flex items-center">
         <Link href="/" className="text-2xl font-bold">
           {appTitle}
