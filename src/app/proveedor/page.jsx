@@ -13,42 +13,51 @@ function ProveedorPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
     const [miPerfil, setMiPerfil] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(status === "loading"); // Initialize loading based on session status
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        if (status === "loading") return;
+        // If session is still loading, or user is not authenticated/supplier, handle redirects
+        if (status === "loading") {
+            setLoading(true); // Ensure loading is true while session is loading
+            return;
+        }
 
-        // If not authenticated or not a supplier, redirect to login
         if (!session || !session.user || !session.user.isSupplier) {
             router.push("/login");
             return;
         }
 
-        const fetchMiPerfil = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                const result = await obtenerMiPerfilProveedor(); 
-                if (result.success) {
-                    setMiPerfil(result.proveedor);
-                } else {
-                    setError(result.message || "Error al cargar el perfil del proveedor.");
+        // If session is authenticated and user is supplier, but profile not loaded, fetch it
+        if (session.user.isSupplier && !miPerfil) {
+            const fetchMiPerfil = async () => {
+                setLoading(true); // Set loading true before fetching
+                setError(null);
+                try {
+                    const result = await obtenerMiPerfilProveedor();
+                    if (result.success) {
+                        setMiPerfil(result.proveedor);
+                    } else {
+                        setError(result.message || "Error al cargar el perfil del proveedor.");
+                    }
+                } catch (err) {
+                    console.error("Error fetching supplier profile:", err);
+                    setError("Error al cargar el perfil del proveedor. Inténtalo de nuevo.");
+                } finally {
+                    setLoading(false); // Set loading false after fetch
                 }
-            } catch (err) {
-                console.error("Error fetching supplier profile:", err);
-                setError("Error al cargar el perfil del proveedor. Inténtalo de nuevo.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (session.user.isSupplier && !miPerfil) { // Removed session.user.proveedorId from dependency array
+            };
             fetchMiPerfil();
+        } else if (session.user.isSupplier && miPerfil) {
+            // If session is authenticated, user is supplier, and profile is already loaded,
+            // ensure loading is false. This handles cases where status might briefly change
+            // but miPerfil is still present.
+            setLoading(false);
         }
-    }, [session, status, router]); // Removed session.user.proveedorId from dependency array
+    }, [session, status, router, miPerfil]); // Added miPerfil to dependencies
 
-    if (loading) {
+    // Render logic
+    if (status === "loading" || (loading && !miPerfil)) {
         return <LoadingSpinner />;
     }
 

@@ -7,7 +7,7 @@
 - **Supplier Dashboard Redirection Fix:** Implemented a comprehensive fix for the supplier dashboard redirection issue. The root cause was identified as the `authorize` callback in NextAuth incorrectly setting `isSupplier: false` for users with `rol: PROVEEDOR` due to an authentication flow logic error. This has been corrected by refactoring the `authorize` callback to correctly fetch and combine `Usuario` and `Proveedor` data for supplier logins, ensuring `isSupplier: true` and `proveedorId` are correctly propagated to the session. All temporary debugging changes have been reverted.
 - **"Only plain objects" Error Fix:** Resolved the error by applying `JSON.parse(JSON.stringify())` to data returned from `guardarPedido` and `toPlainObject` to data returned from `obtenerPedidosPorProveedorId` in `src/app/acciones/PedidoActions.js`, ensuring all data passed to client components is properly serialized.
 - **Custom Header in Supplier View:** Implemented a new, exclusive header component (`HeaderProveedor.jsx`) for the supplier view (`src/app/proveedor/pedidos/page.jsx`). This header displays the app title ("Black Noise") on the left, the logged-in supplier's name on the right, and now includes a "Cerrar Sesión" (Logout) button, which utilizes the `BotonGeneral` component with `text-black` styling, fulfilling the user's specific request.
-- **Supplier Page Refresh Fix:** Addressed the issue where the supplier page (`/proveedor`) was unnecessarily re-fetching data and showing a loading spinner upon re-entry. The `useEffect` hook in `src/app/proveedor/page.jsx` has been modified to conditionally fetch data only if the `miPerfil` state is `null` or `undefined`, preventing redundant data loading.
+- **Supplier Page Refresh & Flicker Fix (Refined Loading State):** Addressed the issue where the supplier page (`/proveedor`) was unnecessarily re-fetching data and showing a loading spinner upon re-entry, and also the flickering when switching tabs. The `useEffect` hook in `src/app/proveedor/page.jsx` has been modified to conditionally fetch data only if the `miPerfil` state is `null` or `undefined`. Additionally, the loading state management has been refined by initializing `loading` based on `useSession`'s initial `status` and explicitly setting `loading` to `false` when `miPerfil` is loaded. The conditional rendering of the `LoadingSpinner` now combines `status === "loading"` with `(loading && !miPerfil)`, preventing the spinner from showing during background session revalidation if the profile data is already loaded.
 
 ## Completed Tasks:
 - Initial project setup and configuration.
@@ -18,7 +18,7 @@
 - Fixing supplier dashboard redirection.
 - Fixing "Only plain objects" error.
 - Implemented custom header for supplier view.
-- Fixed unnecessary page refresh on supplier page re-entry.
+- Fixed unnecessary page refresh and flickering on supplier page re-entry (refined loading state).
 - Committed changes to git.
 
 ## Pending Tasks:

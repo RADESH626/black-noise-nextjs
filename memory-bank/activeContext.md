@@ -17,7 +17,7 @@ When a supplier logs in, they are not redirected to their specific dashboard (`/
 2.  **Modified `src/app/api/auth/[...nextauth]/route.js`**:
     *   In the `authorize` callback, changed `rol: null` to `rol: Rol.PROVEEDOR` for authenticated suppliers.
     *   Refactored the `authorize` callback to correctly handle users with `rol: PROVEEDOR`: If a `Usuario` with `rol: PROVEEDOR` is authenticated, it now explicitly fetches the associated `Proveedor` document and sets `isSupplier: true` and `proveedorId` in the session object returned by `authorize`. This ensures `isSupplier` is correctly `true` for suppliers.
-3.  **Modified `src/app/acciones/PedidoActions.js`**: Applied `JSON.parse(JSON.stringify())` to the data returned by `guardarPedido` and `toPlainObject` to the data returned by `obtenerPedidosPorProveedorId` to ensure all Mongoose documents and `ObjectId`s are converted to plain JavaScript objects with string IDs before being passed to client components.
+3.  **Modified `src/app/acciones/PedidoActions.js`**: Applied `JSON.parse(JSON.stringify())` to the data returned by `guardarPedido` and `toPlainObject` to the data returned from `obtenerPedidosPorProveedorId` to ensure all Mongoose documents and `ObjectId`s are converted to plain JavaScript objects with string IDs before being passed to client components.
 4.  **Reverted temporary debugging changes**: All temporary changes in `src/app/proveedor/pedidos/page.jsx` and `src/middleware.js` have been reverted.
 
 ### Files Modified:
@@ -72,15 +72,22 @@ The user requested a custom header for the supplier view (`/proveedor/pedidos`) 
 ## Task: Prevent unnecessary page refresh on supplier page re-entry
 
 ### Problem:
-The supplier page (`/proveedor`) was fully refreshing (re-fetching data and showing a loading spinner) every time the user navigated away and then returned to it.
+The supplier page (`/proveedor`) was fully refreshing (re-fetching data and showing a loading spinner) every time the user navigated away and then returned to it, and also "flickered" when switching tabs.
 
 ### Analysis:
 - The `src/app/proveedor/page.jsx` component is a Client Component.
 - It uses a `useEffect` hook to fetch supplier profile data (`obtenerMiPerfilProveedor`).
 - The `useEffect` was configured to re-run the data fetch whenever its dependencies (`session`, `status`, `router`) changed, which happens on component remount or session state updates, leading to unnecessary re-fetching and display of the loading spinner.
+- The "flickering" was caused by the `LoadingSpinner` being displayed even when `miPerfil` data was already present, due to `useSession` revalidating the session and briefly setting `loading` to true.
 
 ### Solution Implemented:
-1.  **Modified `src/app/proveedor/page.jsx`**: Adjusted the `useEffect` hook to include a condition (`!miPerfil`) before calling `fetchMiPerfil`. This ensures that the data is only fetched if `miPerfil` is `null` or `undefined`, preventing redundant data loading when the user returns to the page and the profile data is already present.
+1.  **Modified `src/app/proveedor/page.jsx` (Initial Fetch Optimization)**: Adjusted the `useEffect` hook to include a condition (`!miPerfil`) before calling `fetchMiPerfil`. This ensures that the data is only fetched if `miPerfil` is `null` or `undefined`, preventing redundant data loading when the user returns to the page and the profile data is already present.
+2.  **Modified `src/app/proveedor/page.jsx` (Loading State Refinement & Flicker Fix)**:
+    *   Initialized the `loading` state based on `useSession`'s initial `status` (`useState(status === "loading")`).
+    *   Ensured `setLoading(true)` when `status` is "loading" inside `useEffect`.
+    *   Added `miPerfil` to `useEffect` dependencies to react to its changes.
+    *   Explicitly set `setLoading(false)` if `miPerfil` is already loaded and session is authenticated.
+    *   Combined `status === "loading"` with `(loading && !miPerfil)` in the main render condition for the spinner (`if (status === "loading" || (loading && !miPerfil))`). This means the spinner will show if the *session* is loading, or if the *profile data* is loading and not yet available, preventing the spinner from showing during background session revalidation if the profile data is already loaded.
 
 ### Files Modified:
 - `src/app/proveedor/page.jsx`
