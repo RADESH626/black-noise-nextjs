@@ -34,6 +34,27 @@ The user requested to add an "add to cart" button to the designs displayed on th
 - Update `progress.md`.
 - Propose Git commands.
 
+## Task: Add main header to user profile page
+
+### Problem:
+The user requested to add the main header to the user profile page (`/perfil`).
+
+### Analysis:
+- The `src/app/perfil/page.jsx` component was identified as the target.
+- The `PageLayout` component (`src/components/layout/PageLayout.jsx`) was found to contain the `HeaderPrincipal` component, which is the main header.
+
+### Solution Implemented:
+1.  **Modified `src/app/perfil/page.jsx`**:
+    *   Imported `PageLayout` from `@/components/layout/PageLayout`.
+    *   Wrapped the `ProfileContent` component with `PageLayout` to include the main header and footer.
+
+### Files Modified:
+- `src/app/perfil/page.jsx`
+
+### Next Steps:
+- Update `progress.md`.
+- Propose Git commands.
+
 ## Task: Fix supplier dashboard redirection
 
 ### Problem:

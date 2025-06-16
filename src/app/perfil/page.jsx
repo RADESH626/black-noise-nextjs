@@ -4,6 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { obtenerPedidosPorUsuarioId } from "@/app/acciones/PedidoActions";
 import { obtenerDesignsPorUsuarioId } from "@/app/acciones/DesignActions";
 import { obtenerPagosPorUsuarioId } from "@/app/acciones/PagoActions"; // Importar la nueva acción
+import PageLayout from "@/components/layout/PageLayout";
 
 async function ProfilePage() {
   // 1. Obtenemos la sesión primero
@@ -64,11 +65,13 @@ async function ProfilePage() {
   console.log('--- [SERVIDOR] FIN DE DEBUGGING ---');
 
   return (
-    <ProfileContent
-      initialOrderedDesignIds={initialOrderedDesignIds}
-      initialUserDesigns={initialUserDesigns}
-      initialUserPayments={initialUserPayments} // Pasar los pagos como prop
-    />
+    <PageLayout>
+      <ProfileContent
+        initialOrderedDesignIds={initialOrderedDesignIds}
+        initialUserDesigns={initialUserDesigns}
+        initialUserPayments={initialUserPayments} // Pasar los pagos como prop
+      />
+    </PageLayout>
   );
 }
 

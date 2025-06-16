@@ -30,6 +30,7 @@
 - Fixed React Hooks Order in ListaPedidosProveedorPage.
 - Refactored design editing form to use common components.
 - Added 'add to cart' button to designs in user profile (corrected `addItem` function call).
+- Added main header to user profile page.
 - Committed changes to git.
 
 ## Pending Tasks:
