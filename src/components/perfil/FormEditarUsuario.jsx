@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { usePopUp } from "@/context/PopUpContext";
+import { useDialog } from "@/context/DialogContext";
 import BotonGeneral from "@/components/common/botones/BotonGeneral"; // Assuming this component exists
 import { updateUserAction } from "@/app/acciones/UsuariosActions"; // Import the server action
 
@@ -23,7 +23,7 @@ const initialState = {
 };
 
 function FormEditarUsuario({ userData, userId, onSuccess }) {
-  const { showPopUp } = usePopUp();
+  const { showPopUp } = useDialog();
   const [state, formAction] = useActionState(updateUserAction.bind(null, userId), initialState);
 
   // State for form fields, initialized with userData

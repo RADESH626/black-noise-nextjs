@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
-import { usePopUp } from '@/context/PopUpContext';
+import { useDialog } from '@/context/DialogContext';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import InputTipoDocumentoIdentidad from '@/components/common/inputs/InputTipoDocumentoIdentidad';
 import InputDocumentoIdentidad from '@/components/common/inputs/InputDocumentoIdentidad';
@@ -31,7 +31,7 @@ const initialState = {
 };
 
 function FormEditarUsuario({ initialData, onSuccess }) {
-    const { showPopUp } = usePopUp();
+    const { showPopUp } = useDialog();
     const [state, formAction] = useActionState(EditarUsuario.bind(null, initialData._id), initialState);
 
     useEffect(() => {

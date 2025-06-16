@@ -111,7 +111,7 @@ export default function Confirmacion() {
                 />
               )}
               <div>
-                {item.designId?.nombreDesing} (x{item.quantity}) - ${item.price.toFixed(2)}
+                {item.designId?.nombreDesing} (x{item.quantity}) - ${(item.price || 0).toFixed(2)}
               </div>
             </li>
           ))}

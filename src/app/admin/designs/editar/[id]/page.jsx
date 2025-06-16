@@ -3,12 +3,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { encontrarDesignsPorId, actualizarDesign } from "@/app/acciones/DesignActions";
-import { usePopUp } from "@/context/PopUpContext";
+import { useDialog } from "@/context/DialogContext";
 import { CategoriaProducto } from "@/models/enums/CategoriaProducto";
 
 function EditDesignPage({ params }) {
   const router = useRouter();
-  const { showPopUp } = usePopUp();
+  const { showPopUp } = useDialog();
   const designId = params.id;
 
   const [nombreDesing, setNombreDesing] = useState("");

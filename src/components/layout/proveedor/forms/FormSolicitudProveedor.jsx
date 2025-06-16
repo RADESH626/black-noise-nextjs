@@ -3,7 +3,7 @@
 import React, { useEffect, useActionState } from 'react'; // Import useEffect and useActionState
 import { useSession } from 'next-auth/react';
 import { useFormStatus } from 'react-dom'; // Import hooks
-import { usePopUp } from '@/context/PopUpContext';
+import { useDialog } from '@/context/DialogContext';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import InputGeneral from '@/components/common/inputs/InputGeneral';
 import { CategoriaProducto } from '@/models/enums/CategoriaProducto';
@@ -29,7 +29,7 @@ const initialState = {
 
 function FormSolicitudProveedor() {
     const { data: session } = useSession(); // Keep useSession for client-side checks if needed
-    const { showPopUp } = usePopUp(); // Add usePopUp hook
+    const { showPopUp } = useDialog(); // Add useDialog hook
 
     // Usar useActionState para manejar el estado de la acción
     const [state, formAction] = useActionState(submitSupplierApplicationAction, initialState);
@@ -145,7 +145,7 @@ function FormSolicitudProveedor() {
                     className="mb-6"
                 />
 
-                {/* Error and Success messages will be handled by PopUpContext */}
+                {/* Error and Success messages will be handled by DialogContext */}
                 {/* {error && <p className="text-red-500 text-center">{error}</p>}
                 {success && <p className="text-green-500 text-center">¡Solicitud enviada con éxito! Te notificaremos pronto.</p>} */}
 

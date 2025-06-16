@@ -23,19 +23,16 @@ const UsuarioSchema = new Schema({
     tipoDocumento: {
         type: String,
         enum: Object.values(TipoDocumentoIdentidad),
-        required: true
     },
     numeroDocumento: {
         type: String,
         required: true
     },
     fechaNacimiento: {
-        type: Date,
-        required: true
+        type: Date
     },
     genero: {
         type: String,
-        required: true,
         default: "OTRO"
     },
     numeroTelefono: {
@@ -43,8 +40,7 @@ const UsuarioSchema = new Schema({
         required: true
     },
     direccion: {
-        type: String,
-        required: true
+        type: String
     },
     correo: {
         type: String,

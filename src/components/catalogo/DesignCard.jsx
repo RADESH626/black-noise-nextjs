@@ -3,6 +3,7 @@ import React from 'react';
 
 function DesignCard({ diseño, addItem, isInCart }) {
   console.log(`DesignCard re-rendered for ${diseño.prenda}, isInCart: ${isInCart}`);
+  console.log('Design data in DesignCard:', JSON.stringify(diseño, null, 2)); // Stringify to see full content
   return (
     <div
       className="flex flex-col rounded-2xl overflow-hidden shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl bg-black/80"

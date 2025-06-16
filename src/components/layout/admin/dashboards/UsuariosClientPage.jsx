@@ -12,7 +12,7 @@ import FormBuscarUsuario from '@/components/layout/admin/usuarios/forms/FormBusc
 import ModalAgregarUsuario from '@/components/common/modales/ModalAgregarUsuario';
 import ModalEditarUsuario from '@/components/layout/admin/usuarios/modals/ModalEditarUsuario'; // Import ModalEditarUsuario
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
-import { usePopUp } from '@/context/PopUpContext';
+import { useDialog } from '@/context/DialogContext';
 import { useActionState } from 'react'; // For React 19
 import { useFormStatus } from 'react-dom'; // For React 19
 
@@ -25,7 +25,7 @@ const formatDate = (dateString) => {
 
 // Component for the toggle user status button, using Server Actions pattern
 function ToggleUserStatusForm({ userId, currentStatus, onStatusChanged }) {
-    const { showPopUp } = usePopUp();
+    const { showPopUp } = useDialog();
     const [state, formAction] = useActionState(toggleUsuarioHabilitado, { message: null, success: false });
     const { pending } = useFormStatus();
 
@@ -63,7 +63,7 @@ export default function UsuariosClientPage({ initialUsers }) {
   const [showAddUserModal, setShowAddUserModal] = useState(false);
   const [showEditUserModal, setShowEditUserModal] = useState(false); // State for edit user modal
   const [userToEdit, setUserToEdit] = useState(null); // State to hold user data for editing
-  const { showPopUp } = usePopUp();
+  const { showPopUp } = useDialog();
 
   const fetchAndSetUsers = useCallback(async () => {
     setLoading(true);
@@ -146,6 +146,7 @@ export default function UsuariosClientPage({ initialUsers }) {
                 ) : (
                     users.map((user) => (
                         <tr key={user._id} className="hover:bg-gray-200">
+                          
                             {/* Estado */}
                             <TdGeneral>
                                 <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
@@ -173,9 +174,9 @@ export default function UsuariosClientPage({ initialUsers }) {
                             </TdGeneral>
 
                             {/* Nombre */}
-                            <TdGeneral>
+                            {/* <TdGeneral>
                                 {`${user.primerNombre} ${user.primerApellido}`}
-                            </TdGeneral>
+                            </TdGeneral> */}
 
                             {/* Información de Usuario */}
                             <TdGeneral>

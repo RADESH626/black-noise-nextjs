@@ -12,21 +12,7 @@ import { ObtenerUsuarioPorId } from "@/app/acciones/UsuariosActions";
 import FormEditarUsuario from "@/components/perfil/FormEditarUsuario";
 import DesignUploadModal from "@/components/perfil/DesignUploadModal";
 import PaymentHistory from "@/components/perfil/PaymentHistory";
-import { usePopUp } from "@/context/PopUpContext";
-import { useRef, useCallback } from "react";
-import { signOut, useSession } from "next-auth/react";
-import BotonGeneral from "@/components/common/botones/BotonGeneral";
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import { obtenerDesignsPorUsuarioId, eliminarDesign, actualizarDesign } from "@/app/acciones/DesignActions";
-import { obtenerPedidosPorUsuarioId } from "@/app/acciones/PedidoActions";
-import DesignsComponent from "../common/DesignsComponent";
-import PedidosComponent from "../common/PedidosComponent";
-import { ObtenerUsuarioPorId } from "@/app/acciones/UsuariosActions";
-import FormEditarUsuario from "@/components/perfil/FormEditarUsuario";
-import DesignUploadModal from "@/components/perfil/DesignUploadModal";
-import PaymentHistory from "@/components/perfil/PaymentHistory";
-import { usePopUp } from "@/context/PopUpContext";
+import { useDialog } from "@/context/DialogContext";
 import { useRef, useCallback } from "react";
 import FormEditarDesign from "@/components/perfil/FormEditarDesign";
 // Removed: import NewOrderModal from "@/components/common/modales/NewOrderModal";
@@ -42,7 +28,7 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
   const [cartItems, setCartItems] = useState([]);
   const [cartLoading, setCartLoading] = useState(true);
   const [cartError, setCartError] = useState(null);
-  const { showPopUp, openModal } = usePopUp();
+  const { showPopUp, openModal } = useDialog();
   const deleteDesignTimeoutRef = useRef(null);
   const updateDesignTimeoutRef = useRef(null);
 
@@ -225,9 +211,9 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
 
   const handleAddDesign = () => {
     openModal(
-      "Subir Nuevo Diseño",
+      // "Subir Nuevo Diseño",
       <DesignUploadModal onDesignSaved={fetchUserDesigns} />,
-      'default'
+      // 'default'
     );
   };
 
@@ -250,7 +236,6 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
               <p>DIRECCIÓN: {user?.direccion}</p>
             </div>
             <div className="flex flex-col sm:flex-row justify-center md:justify-start space-y-2 sm:space-y-0 sm:space-x-3">
-              <BotonGeneral onClick={handleEditProfile}>EDITAR PERFIL</BotonGeneral>
               <Link href="/catalogo">
                 <BotonGeneral>VER DISEÑOS DE LA COMUNIDAD</BotonGeneral>
               </Link>

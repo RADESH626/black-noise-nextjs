@@ -34,7 +34,7 @@ const PopUpMessage = ({ message, type, onClose }) => {
   const popupClass = type === 'success' ? styles.popupSuccess : styles.popupError;
 
   return (
-    <dialog ref={dialogRef} className={`${popupClass} text-secondary px-6 py-4 rounded-b-lg popup-shadow min-w-[300px] max-w-[500px] mx-4 mt-0`} style={{ margin: 'auto' }}>
+    <dialog ref={dialogRef} className={`${popupClass} text-secondary px-6 py-4 rounded-b-lg popup-shadow min-w-[300px] max-w-[500px] absolute top-4 left-1/2 -translate-x-1/2 z-50`}>
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-3 bg-green-700 p-2 rounded">
           <span className={`text-2xl ${type === 'success' ? 'text-neutral-100' : 'text-neutral-100'}`}>
@@ -48,7 +48,7 @@ const PopUpMessage = ({ message, type, onClose }) => {
         >
           ✕
         </button>
-      </div>
+      </div >
     </dialog>
   );
 };

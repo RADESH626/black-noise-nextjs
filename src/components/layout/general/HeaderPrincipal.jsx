@@ -12,6 +12,7 @@ import { useCart } from '@/context/CartContext'; // Import useCart
 
 function HeaderPrincipal() {
     const { data: session } = useSession();
+    console.log("Session object in HeaderPrincipal:", session);
     const { cartItems, fetchCart } = useCart(); // Use cartItems and fetchCart from CartContext
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -65,7 +66,7 @@ function HeaderPrincipal() {
                     {session ? (
                         <div className='relative flex flex-row items-center justify-center gap-4' ref={dropdownRef}>
                             <span className='text-white'>
-                                ¡Bienvenido {session.user?.name}!
+                                ¡Bienvenido {session?.user?.name || session?.user?.email || 'Usuario'}!
                             </span>
                             {/* User Icon to trigger dropdown */}
                             <div

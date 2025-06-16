@@ -64,3 +64,7 @@ html, body {
 .animate-fadeIn {
     animation: fadeIn 0.2s ease-out forwards;
 }
+
+dialog::backdrop {
+    background-color: transparent; /* No backdrop unless explicitly requested */
+}

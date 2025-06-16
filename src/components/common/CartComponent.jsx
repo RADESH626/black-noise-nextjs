@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { addDesignToCart, removeDesignFromCart, updateCartItemQuantity, clearUserCart } from "@/app/acciones/CartActions";
 import { procesarPagoYCrearPedido } from "@/app/acciones/PagoActions";
-import { usePopUp } from '@/context/PopUpContext';
+import { useDialog } from '@/context/DialogContext';
 import { useCart } from '@/context/CartContext';
 import OrderSummary from "@/components/pago/OrderSummary";
 import UserDataForm from "@/components/pago/UserDataForm";
@@ -17,7 +17,7 @@ import CardDataModal from "@/components/pago/CardDataModal";
 function CartComponent() {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const { showPopUp } = usePopUp();
+  const { showPopUp } = useDialog();
   const { cartItems, loadingCart, cartError, updateCart, fetchCart } = useCart();
   const userId = session?.user?.id;
 

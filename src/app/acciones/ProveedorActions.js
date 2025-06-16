@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import connectDB from "@/utils/DBconection";
 import Proveedor from "@/models/Proveedor";
+import Usuario from "@/models/Usuario"; // Import the Usuario model
 import { revalidatePath } from "next/cache";
 import { Rol } from "@/models/enums/usuario/Rol";
 import bcrypt from "bcryptjs";
@@ -17,71 +18,100 @@ export async function crearProveedor(prevState, formData) {
     return { message: "Acceso denegado. Solo los administradores pueden crear proveedores.", success: false };
   }
 
-    await connectDB();
+  await connectDB();
+
+  try {
+    // Extract user-related fields
+    const nombre = formData.get("nombre");
+    const primerApellido = formData.get("primerApellido");
+    const numeroDocumento = formData.get("numeroDocumento");
+    const numeroTelefonoUsuario = formData.get("numeroTelefono"); // Renamed to avoid conflict
+    const emailContacto = formData.get("emailContacto"); // This will be used for both User and Proveedor
+
+    // Extract supplier-related fields
+    const nombreEmpresa = formData.get("nombreEmpresa");
+    const nit = formData.get("nit");
+    const direccionEmpresa = formData.get("direccionEmpresa");
+    const especialidad = formData.get("especialidad").split(',').map(s => s.trim()); // Split by comma and trim whitespace
+    const comision = formData.get("comision");
+    const telefonoContactoProveedor = formData.get("telefonoContacto"); // Renamed to avoid conflict
+    const metodosPagoAceptados = formData.getAll("metodosPagoAceptados").flatMap(item => item.split(',').map(s => s.trim())); // Split each item by comma and flatten
+
+    // Basic validation for required fields for both User and Proveedor
+    if (!nombre || !primerApellido || !numeroDocumento || !numeroTelefonoUsuario || !emailContacto ||
+        !nombreEmpresa || !nit || !direccionEmpresa || !especialidad || !comision || !telefonoContactoProveedor || metodosPagoAceptados.length === 0) {
+      return { message: "Todos los campos obligatorios deben ser completados.", success: false };
+    }
+
+    // Check if a user with this email already exists
+    const existingUser = await Usuario.findOne({ correo: emailContacto });
+    if (existingUser) {
+      return { message: "Ya existe un usuario registrado con este correo electrónico.", success: false };
+    }
+
+    // Generate a random access key for the new supplier (and user password)
+    const generatedAccessKey = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const hashedAccessKey = await bcrypt.hash(generatedAccessKey, 10);
+
+    // Create a new Usuario entry
+    const nuevoUsuario = new Usuario({
+      Nombre: nombre,
+      primerApellido: primerApellido,
+      numeroDocumento: numeroDocumento,
+      numeroTelefono: numeroTelefonoUsuario,
+      correo: emailContacto,
+      password: hashedAccessKey,
+      rol: Rol.PROVEEDOR,
+      habilitado: true,
+    });
+    await nuevoUsuario.save();
+
+    // Create the new Proveedor entry, linking it to the newly created Usuario
+    const nuevoProveedor = new Proveedor({
+      userId: nuevoUsuario._id, // Link to the new user
+      nombreEmpresa,
+      nit,
+      direccionEmpresa,
+      especialidad,
+      comision: parseFloat(comision),
+      telefonoContacto: telefonoContactoProveedor,
+      emailContacto,
+      metodosPagoAceptados,
+      habilitado: true,
+    });
+
+    logger.info("Attempting to save new Proveedor with data:", nuevoProveedor.toObject());
+    await nuevoProveedor.save();
+    logger.info("Proveedor saved successfully with ID:", nuevoProveedor._id);
+
+    // Send the access key to the provider's email
+    const emailSubject = "Tu clave de acceso para el Portal de Proveedores Black Noise";
+    const emailBody = `Hola ${nombre},\n\nTu empresa ${nombreEmpresa} ha sido registrada como proveedor en Black Noise.\n\nTu clave de acceso para iniciar sesión en el portal de proveedores es: ${generatedAccessKey}\n\nPor favor, guarda esta clave en un lugar seguro. Puedes acceder al portal de proveedores en [URL del portal de proveedores].\n\nSaludos,\nEl equipo de Black Noise`;
 
     try {
-      const nombreEmpresa = formData.get("nombreEmpresa");
-      const nit = formData.get("nit");
-      const direccionEmpresa = formData.get("direccionEmpresa");
-      const especialidad = formData.get("especialidad");
-      const comision = formData.get("comision");
-      const nombreDueño = formData.get("nombreDueño");
-      const telefonoContacto = formData.get("telefonoContacto");
-      const emailContacto = formData.get("emailContacto");
-      const metodosPagoAceptados = formData.getAll("metodosPagoAceptados"); // Get all selected payment methods
-
-      if (!nombreEmpresa || !nit || !direccionEmpresa || !especialidad || !comision || !nombreDueño || !telefonoContacto || !emailContacto || metodosPagoAceptados.length === 0) {
-        return { message: "Todos los campos son obligatorios, incluyendo al menos un método de pago.", success: false };
-      }
-
-      // Generate a random access key for the new supplier
-      const generatedAccessKey = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-      const hashedAccessKey = await bcrypt.hash(generatedAccessKey, 10);
-
-      const nuevoProveedor = new Proveedor({
-        nombreEmpresa,
-        nit,
-        direccionEmpresa,
-        especialidad,
-        comision: parseFloat(comision), // Ensure commission is a number
-        nombreDueño,
-        telefonoContacto,
-        emailContacto,
-        metodosPagoAceptados, // Include the new field
-        habilitado: true, // New providers are enabled by default
-        accessKey: hashedAccessKey, // Store the hashed access key
-      });
-
-      await nuevoProveedor.save();
-
-      // Send the access key to the provider's email
-      const emailSubject = "Tu clave de acceso para el Portal de Proveedores Black Noise";
-      const emailBody = `Hola ${nombreDueño},\n\nTu empresa ${nombreEmpresa} ha sido registrada como proveedor en Black Noise.\n\nTu clave de acceso para iniciar sesión en el portal de proveedores es: ${generatedAccessKey}\n\nPor favor, guarda esta clave en un lugar seguro. Puedes acceder al portal de proveedores en [URL del portal de proveedores].\n\nSaludos,\nEl equipo de Black Noise`;
-
-      try {
-        const mailOptions = {
-          from: process.env.EMAIL_USER,
-          to: emailContacto,
-          subject: emailSubject,
-          html: emailBody,
-        };
-        await transporter.sendMail(mailOptions);
-      } catch (emailError) {
-        logger.error("Error al intentar enviar el correo electrónico de la clave de acceso:", emailError);
-        // Decide if you want to return an error here or just log a warning
-      }
-
-      revalidatePath("/admin/proveedores");
-      return {
-        message: "Proveedor creado exitosamente. La clave de acceso ha sido enviada al correo electrónico del proveedor.",
-        success: true,
-        accessKey: generatedAccessKey // Add the generated access key here
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: emailContacto,
+        subject: emailSubject,
+        html: emailBody,
       };
-    } catch (error) {
-      logger.error("Error al crear proveedor:", error);
-      return { message: `Error al crear proveedor: ${error.message}`, success: false };
+      await transporter.sendMail(mailOptions);
+    } catch (emailError) {
+      logger.error("Error al intentar enviar el correo electrónico de la clave de acceso:", emailError);
+      // Decide if you want to return an error here or just log a warning
     }
+
+    revalidatePath("/admin/proveedores");
+    return {
+      message: "Proveedor creado exitosamente. La clave de acceso ha sido enviada al correo electrónico del proveedor.",
+      success: true,
+      // Do NOT return accessKey here as per user's request
+    };
+  } catch (error) {
+    logger.error("Error al crear proveedor:", error);
+    return { message: `Error al crear proveedor: ${error.message}`, success: false };
   }
+}
 
 export async function generarYGuardarAccessKey(proveedorId, newAccessKey) {
   await connectDB();
@@ -171,6 +201,7 @@ export async function obtenerProveedoresHabilitados() {
       proveedores: proveedores.map(p => ({
         ...p,
         _id: p._id.toString(),
+        userId: p.userId ? p.userId.toString() : null, // Convert userId to string
         createdAt: p.createdAt ? new Date(p.createdAt).toISOString() : null,
         updatedAt: p.updatedAt ? new Date(p.updatedAt).toISOString() : null,
       })),
@@ -190,6 +221,7 @@ export async function obtenerProveedores() {
       proveedores: proveedores.map(p => ({
         ...p,
         _id: p._id.toString(),
+        userId: p.userId ? p.userId.toString() : null, // Convert userId to string
         createdAt: p.createdAt ? new Date(p.createdAt).toISOString() : null,
         updatedAt: p.updatedAt ? new Date(p.updatedAt).toISOString() : null,
       })),

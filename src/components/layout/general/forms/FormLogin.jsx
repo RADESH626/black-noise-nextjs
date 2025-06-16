@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useActionState } from 'react'; // Import hooks
 import { useFormStatus } from 'react-dom'; // Import useFormStatus
 import { signIn } from "next-auth/react"; // Import signIn
-import { usePopUp } from '@/context/PopUpContext';
+import { useDialog } from '@/context/DialogContext';
 import { InputEmail, InputPassword } from "@/components/common/inputs";
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import { loginAction } from '@/app/acciones/UsuariosActions'; // Import Server Action
@@ -34,7 +34,7 @@ const initialState = {
 };
 
 function FormLogin() {
-  const { showPopUp } = usePopUp();
+  const { showPopUp } = useDialog();
   const router = useRouter();
 
   // Usar useActionState para manejar el estado de la acción

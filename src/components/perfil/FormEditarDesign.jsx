@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { usePopUp } from "@/context/PopUpContext";
+import { useDialog } from "@/context/DialogContext";
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
 import { actualizarDesign } from "@/app/acciones/DesignActions"; // Import the server action
 
@@ -23,7 +23,7 @@ const initialState = {
 };
 
 function FormEditarDesign({ designData, onSuccess }) {
-  const { showPopUp } = usePopUp();
+  const { showPopUp } = useDialog();
   const [state, formAction] = useActionState(actualizarDesign, initialState);
 
   const [formData, setFormData] = useState({

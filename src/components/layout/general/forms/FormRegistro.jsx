@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useActionState } from 'react'; // Import hooks
 import { useFormStatus } from 'react-dom'; // Import useFormStatus
-import { usePopUp } from '@/context/PopUpContext';
+import { useDialog } from '@/context/DialogContext';
 import {
   InputPassword,
   InputTipoDocumentoIdentidad,
@@ -37,12 +37,13 @@ function SubmitButton() {
 const initialState = {
   message: null,
   success: false,
+  formData: {},
 };
 
 
 function FormRegistro() {
   const router = useRouter();
-  const { showPopUp } = usePopUp();
+  const { showPopUp } = useDialog();
 
   // Usar useActionState para manejar el estado de la acción
   const [state, formAction] = useActionState(registerAction, initialState);
@@ -50,7 +51,8 @@ function FormRegistro() {
   // Efecto para mostrar pop-up y redirigir basado en el estado
   useEffect(() => {
     if (state.message) {
-      showPopUp(state.message, state.success ? 'success' : 'error');
+      const messageToShow = state.success ? `${state.message} Ahora puedes iniciar sesión.` : state.message;
+      showPopUp(messageToShow, state.success ? 'success' : 'error');
       // Clear the message after showing to prevent it from reappearing on re-renders
       // This assumes the server action doesn't reset the state itself.
       // If the action always returns a new state object, this might not be strictly necessary,
@@ -81,7 +83,7 @@ function FormRegistro() {
 
           <label htmlFor="tipoDocumento" className="block mb-1 text-sm font-medium text-accent1">Tipo de Documento</label>
           <div className="relative">
-            <InputTipoDocumentoIdentidad id="tipoDocumento" name="tipoDocumento" required />
+            <InputTipoDocumentoIdentidad id="tipoDocumento" name="tipoDocumento" required defaultValue={state.formData?.tipoDocumento || ''} />
           </div>
 
         </div>
@@ -92,7 +94,7 @@ function FormRegistro() {
           <label htmlFor="numeroDocumento" className="block mb-1 text-sm font-medium text-accent1">Número de Documento</label>
           <div className="relative">
             
-            <InputDocumentoIdentidad id="numeroDocumento" name="numeroDocumento" required />
+            <InputDocumentoIdentidad id="numeroDocumento" name="numeroDocumento" required defaultValue={state.formData?.numeroDocumento || ''} />
 
           </div>
 
@@ -105,7 +107,7 @@ function FormRegistro() {
       {/* ==================================================================================================== */}
 
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="h-full">
 
 
         <div className="relative">
@@ -113,7 +115,7 @@ function FormRegistro() {
           <label htmlFor="primerNombre" className="block mb-1 text-sm font-medium text-accent1">Primer nombre</label>
           <div className="relative">
 
-            <InputTextoGeneral id="primerNombre" name="primerNombre" required placeholder="Primer nombre" />
+            <InputTextoGeneral id="primerNombre" name="primerNombre" required placeholder="Primer nombre" defaultValue={state.formData?.primerNombre || ''} />
             <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
           </div>
@@ -121,18 +123,18 @@ function FormRegistro() {
         </div>
 
 
-        <div className="relative">
+        {/* <div className="relative">
 
 
           <label htmlFor="segundoNombre" className="block mb-1 text-sm font-medium text-accent1">Segundo nombre</label>
-          <div className="relative">
+           <div className="relative">
 
             <InputTextoGeneral id="segundoNombre" name="segundoNombre" placeholder="Segundo nombre (opcional)" />
             <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
-          </div>
+          </div> 
 
-        </div>
+        </div> */}
 
 
       </div>
@@ -147,7 +149,7 @@ function FormRegistro() {
           <label htmlFor="primerApellido" className="block mb-1 text-sm font-medium text-accent1">Primer apellido</label>
           <div className="relative">
 
-            <InputTextoGeneral id="primerApellido" name="primerApellido" required placeholder="Primer apellido" />
+            <InputTextoGeneral id="primerApellido" name="primerApellido" required placeholder="Primer apellido" defaultValue={state.formData?.primerApellido || ''} />
             <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
           </div>
@@ -160,7 +162,7 @@ function FormRegistro() {
           <label htmlFor="segundoApellido" className="block mb-1 text-sm font-medium text-accent1">Segundo apellido</label>
           <div className="relative">
 
-            <InputTextoGeneral id="segundoApellido" name="segundoApellido" required placeholder="Segundo apellido" />
+            <InputTextoGeneral id="segundoApellido" name="segundoApellido" required placeholder="Segundo apellido" defaultValue={state.formData?.segundoApellido || ''} />
             <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
           </div>
@@ -178,7 +180,7 @@ function FormRegistro() {
           <label htmlFor="fechaNacimiento" className="block mb-1 text-sm font-medium text-accent1">Fecha de nacimiento</label>
           <div className="relative">
 
-            <InputFecha id="fechaNacimiento" name="fechaNacimiento" required />
+            <InputFecha id="fechaNacimiento" name="fechaNacimiento" required defaultValue={state.formData?.fechaNacimiento || ''} />
 
           </div>
 
@@ -190,7 +192,7 @@ function FormRegistro() {
           <label htmlFor="genero" className="block mb-1 text-sm font-medium text-accent1">Género</label>
           <div className="relative">
 
-            <InputGenero required name="genero" />
+            <InputGenero required name="genero" defaultValue={state.formData?.genero || ''} />
             <i className='bx bxs-user absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
           </div>
@@ -206,7 +208,7 @@ function FormRegistro() {
         <label htmlFor="telefono" className="block mb-1 text-sm font-medium text-accent1">Número de teléfono</label>
         <div className="relative">
 
-          <InputTelefono id="numeroTelefono" name="numeroTelefono" required />
+          <InputTelefono id="numeroTelefono" name="numeroTelefono" required defaultValue={state.formData?.numeroTelefono || ''} />
           <i className='bx bxs-phone absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
         </div>
@@ -218,7 +220,7 @@ function FormRegistro() {
         <label htmlFor="direccion" className="block mb-1 text-sm font-medium text-accent1">Dirección</label>
         <div className="relative">
 
-          <InputTextoGeneral id="direccion" name="direccion" required placeholder="Dirección" />
+          <InputTextoGeneral id="direccion" name="direccion" required placeholder="Dirección" defaultValue={state.formData?.direccion || ''} />
           <i className='bx bxs-home absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
         </div>
@@ -231,7 +233,7 @@ function FormRegistro() {
 
         <label htmlFor="correo-registro" className="block mb-1 text-sm font-medium text-accent1">Correo electrónico</label>
         <div className="relative">
-          <InputEmail id="correo-registro" name="correo" required placeholder="Correo electrónico" />
+          <InputEmail id="correo-registro" name="correo" required placeholder="Correo electrónico" defaultValue={state.formData?.correo || ''} />
           <i className='bx bxs-envelope absolute right-3 top-1/2 transform -translate-y-1/2 text-accent1 input-icon'></i>
 
         </div>

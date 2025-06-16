@@ -2,16 +2,16 @@
 
 import { SessionProvider } from "next-auth/react";
 import { CartProvider } from '@/context/CartContext'; // Import CartProvider
-import { PopUpProvider } from '@/context/PopUpContext'; // Import PopUpProvider
+import { DialogProvider } from '@/context/DialogContext'; // Import DialogProvider
 
 export default function SessionProviderWrapper({ children }) {
   return (
     <SessionProvider>
-      <PopUpProvider> {/* Wrap with PopUpProvider */}
+      <DialogProvider> {/* Wrap with DialogProvider */}
         <CartProvider> {/* Wrap with CartProvider */}
           {children}
         </CartProvider>
-      </PopUpProvider>
+      </DialogProvider>
     </SessionProvider>
   );
 }

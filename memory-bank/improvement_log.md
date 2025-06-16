@@ -39,6 +39,10 @@ This document serves as a critical source of wisdom, detailing lessons learned f
     4.  If a deletion is proposed, explicitly state the verification steps taken and the files checked.
   - **Date**: 2025-06-15
 
+- **Lesson Learned 9: Modal Backgrounds**: Modals should not have a background overlay unless explicitly requested by the user.
+  - **Correction**: When implementing modals, ensure the outer container for the modal overlay uses `bg-transparent` by default. Only add a semi-transparent or colored background if specifically instructed.
+  - **Date**: 2025-06-15
+
 ## Areas for Continuous Improvement:
 
 - **File Size Management**: When writing to a file, ensure the content does not exceed 1000 lines. If it does, create a new file to continue the content.

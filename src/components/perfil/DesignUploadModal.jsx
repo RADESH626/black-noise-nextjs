@@ -2,12 +2,11 @@
 
 import { useState, useEffect } from "react"; // Import useState and useEffect
 import { guardarDesigns } from "@/app/acciones/DesignActions";
-import { usePopUp } from "@/context/PopUpContext";
+import { useDialog } from "@/context/DialogContext";
 import { CategoriaProducto } from "@/models/enums/CategoriaProducto"; // Assuming this path for enum
 
 function DesignUploadModal({ onDesignSaved }) {
-  const { closeModal } = useModal();
-  const { showPopUp } = usePopUp();
+  const { closeModal, showPopUp } = useDialog();
 
   // State for form fields
   const [nombreDesing, setNombreDesing] = useState("");
@@ -103,7 +102,7 @@ function DesignUploadModal({ onDesignSaved }) {
 
   return (
     <div className="p-6 bg-black text-white rounded-lg shadow-lg max-h-[80vh] overflow-y-auto">
-      <h2 className="text-2xl font-bold mb-6 text-center">Subir Nuevo Diseño</h2>
+      {/* <h2 className="text-2xl font-bold mb-6 text-center">Subir Nuevo Diseño</h2> */}
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
           <div className="bg-red-800 text-white p-3 rounded-md text-sm mb-4">

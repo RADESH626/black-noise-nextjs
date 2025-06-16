@@ -2,16 +2,20 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Assuming authOptions are exported from here
 import { UnauthorizedError, ForbiddenError, handleError } from './errorHandler';
 import { NextResponse } from 'next/server';
+// import logger from './logger'; // Removed logger import
 
 export const authorize = (requiredRole) => async (request, context) => {
     try {
         const session = await getServerSession(authOptions);
 
         if (!session || !session.user) {
+            // logger.warn('Authorization failed: No session or user found.'); // Removed logging
             throw new UnauthorizedError('Authentication required');
         }
 
-        if (requiredRole && session.user.role !== requiredRole) {
+        // logger.info(`Authorization check: User role is '${session.user.rol}', Required role is '${requiredRole}'.`); // Removed logging
+
+        if (requiredRole && session.user.rol !== requiredRole) { // Use session.user.rol
             throw new ForbiddenError(`Access denied. Requires ${requiredRole} role.`);
         }
 

@@ -24,7 +24,7 @@ async function guardarPedido(pedidoData) {
         revalidatePath('/admin/pedidos'); // Revalidate admin orders page
         revalidatePath('/perfil'); // Revalidate user profile page
         logger.debug('Revalidated paths /admin/pedidos and /perfil.');
-        return { success: true, data: pedidoGuardado }; // Return the Mongoose document directly
+        return { success: true, data: JSON.parse(JSON.stringify(pedidoGuardado)) }; // Convert to plain object
     } catch (error) {
         logger.error('ERROR in guardarPedido:', error);
         return { error: 'Error al guardar el pedido: ' + error.message };

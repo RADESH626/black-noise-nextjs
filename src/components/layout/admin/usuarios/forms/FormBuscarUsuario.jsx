@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
-import { usePopUp } from '@/context/PopUpContext';
+import { useDialog } from '@/context/DialogContext';
 import { FiltrarUsuarios } from '@/app/acciones/UsuariosActions';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import InputGeneral from '@/components/common/inputs/InputGeneral';
@@ -23,7 +23,7 @@ const initialState = {
 };
 
 function FormBuscarUsuario({ onSearchSuccess }) {
-  const { showPopUp } = usePopUp();
+  const { showPopUp } = useDialog();
   const [state, formAction] = useActionState(FiltrarUsuarios, initialState);
 
   useEffect(() => {

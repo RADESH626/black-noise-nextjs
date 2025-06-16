@@ -55,7 +55,7 @@ const PedidoSchema = new Schema({
     paymentId: {
         type: Schema.Types.ObjectId,
         ref: 'Pago',
-        required: true
+        required: false // Made permanently optional to resolve circular dependency
     },
     fechaEstimadaEntrega: {
         type: Date

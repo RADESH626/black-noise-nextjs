@@ -7,7 +7,9 @@ import { revalidatePath } from 'next/cache';
 import logger from '@/utils/logger';
 import { guardarPedido } from '@/app/acciones/PedidoActions'; // Import guardarPedido
 import { clearUserCart } from '@/app/acciones/CartActions'; // Import clearUserCart
+import { guardarVenta } from '@/app/acciones/VentaActions'; // Import guardarVenta
 import { getModel } from '@/utils/modelLoader';
+import { MetodoPago } from '@/models/enums/pago/MetodoPago'; // Import MetodoPago enum
 
 // Crear un nuevo pago
 async function guardarPago(data) {
@@ -136,7 +138,16 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
 
         const Pedido = await getModel('Pedido');
         const Pago = await getModel('Pago');
-        const { userId, nombre, correo, direccion, metodoPago, total, cardNumber, expiryDate, cvv } = paymentDetails;
+        const { userId, nombre, correo, direccion, metodoPago: rawMetodoPago, metodoEntrega, total, cardNumber, expiryDate, cvv } = paymentDetails;
+
+        // Map rawMetodoPago to a valid enum value
+        let metodoPago = rawMetodoPago;
+        if (rawMetodoPago === 'tarjeta') {
+            metodoPago = MetodoPago.TARJETA_CREDITO; // Default to credit card if 'tarjeta' is passed
+        } else if (!Object.values(MetodoPago).includes(rawMetodoPago)) {
+            logger.warn(`Invalid metodoPago received: ${rawMetodoPago}. Defaulting to EFECTIVO.`);
+            metodoPago = MetodoPago.EFECTIVO; // Fallback for unexpected values
+        }
 
         // 1. Simular procesamiento de pago (aquí iría la integración real con pasarela de pago)
         // Por ahora, asumimos que el pago siempre es exitoso.
@@ -156,14 +167,15 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
                 price: item.price,
                 // Otros campos relevantes del producto si es necesario
             })),
-            fechaPedido: new Date(),
-            estadoPedido: 'PENDIENTE', // Initial state, will be updated to PAGADO
-            estadoPago: 'PAGADO', // Set directly to PAGADO as payment is successful
+            proveedorId: cartItems[0]?.proveedorId, // Assuming all items in cart are from the same supplier for simplicity
+            metodoEntrega: metodoEntrega,
+            estadoPedido: 'PENDIENTE',
             total: total,
-            metodoPago: metodoPago,
+            costoEnvio: 0, // Assuming 0 for now, or calculate based on metodoEntrega/direccion
             direccionEnvio: direccion,
-            // Otros campos del pedido como información del cliente
-            cliente: { nombre, correo, direccion },
+            destinatario: { nombre, correo, direccion },
+            // paymentId will be added after Pago is created
+            fechaEstimadaEntrega: new Date(new Date().setDate(new Date().getDate() + 7)), // Example: 7 days from now
         };
         logger.debug('Value of nuevoPedidoData:', nuevoPedidoData);
         logger.debug('Type of nuevoPedidoData:', typeof nuevoPedidoData);
@@ -176,19 +188,43 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
         }
         logger.debug('Pedido created successfully:', nuevoPedido);
 
-        // 3. Crear un nuevo registro de Pago
-        const nuevoPago = new Pago({
-            pedidoId: nuevoPedido._id, // Link to the newly created Pedido
+        // 3. Crear un nuevo registro de Venta
+        const nuevaVentaData = {
             usuarioId: userId,
+            pedidoId: nuevoPedido._id,
+            valorVenta: total,
+            comisionAplicacion: total * 0.1, // Example: 10% commission
+            fechaVenta: new Date(),
+            estadoVenta: 'COMPLETADA', // Assuming sale is completed upon successful order and payment
+        };
+        const { success: ventaCreationSuccess, data: nuevaVenta, error: ventaCreationError } = await guardarVenta(nuevaVentaData);
+
+        if (!ventaCreationSuccess) {
+            logger.error('Error creating venta:', ventaCreationError);
+            // Consider how to handle this error: log for manual review, etc.
+            // For now, we'll just log it and proceed, as the order and payment are technically created.
+        }
+        logger.debug('Venta created successfully:', nuevaVenta);
+
+        // 4. Crear un nuevo registro de Pago
+        const nuevoPago = new Pago({
+            usuarioId: userId,
+            pedidoId: nuevoPedido._id, // Link to the newly created Pedido
+            ventaId: nuevaVenta ? nuevaVenta._id : null, // Link to the newly created Venta
             valorPago: total,
             metodoPago,
-            estadoTransaccion: 'PAGADO',
+            estadoTransaccion: 'PAGADO', // Set to PAGADO as payment is successful
             detallesTarjeta: { cardNumber: cardNumber ? cardNumber.slice(-4) : 'N/A', expiryDate: expiryDate || 'N/A', cvv: '***' } // Store last 4 digits, mask CVV
         });
         const pagoGuardado = await nuevoPago.save();
-        logger.debug('Pago record created and linked to Pedido:', pagoGuardado);
+        logger.debug('Pago record created and linked to Pedido and Venta:', pagoGuardado);
 
-        // 4. Vaciar el carrito del usuario
+        // 5. Actualizar el Pedido con el paymentId
+        nuevoPedido.paymentId = pagoGuardado._id;
+        await nuevoPedido.save();
+        logger.debug('Pedido updated with paymentId successfully.');
+
+        // 6. Vaciar el carrito del usuario
         const { success: clearCartSuccess, message: clearCartMessage } = await clearUserCart(userId);
         if (!clearCartSuccess) {
              logger.warn('Failed to clear cart after successful payment and order creation:', clearCartMessage);

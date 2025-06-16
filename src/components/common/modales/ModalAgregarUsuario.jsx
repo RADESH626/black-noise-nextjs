@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from 'react';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import { useActionState } from 'react'; // For React 19
 import { useFormStatus } from 'react-dom'; // For React 19
-import { usePopUp } from '@/context/PopUpContext';
+import { useDialog } from '@/context/DialogContext';
 import { bulkUploadUsersAction } from '@/app/acciones/UsuariosActions'; // Import the Server Action
 
 // Submit button component for bulk upload with pending state
@@ -33,7 +33,7 @@ const initialState = {
 function ModalAgregarUsuario({ isOpen, onClose, onUserAdded }) {
     const dialogRef = useRef(null);
     const fileInputRef = useRef(null);
-    const { showPopUp } = usePopUp();
+    const { showPopUp } = useDialog();
 
     const [state, formAction] = useActionState(bulkUploadUsersAction, initialState);
 

@@ -39,12 +39,12 @@ function GestionProveedoresDashboard() {
 
     const handleOpenAddProveedorModal = () => {
         openModal(
-            "Agregar Nuevo Proveedor",
+            // "Agregar Nuevo Proveedor",
             <FormularioAgregarProveedor onSuccess={() => {
                 closeModal();
                 fetchProveedores(); // Refresh the list after successful addition
             }} />,
-            "large" // You can adjust the size as needed: 'small', 'default', 'large', or 'full'
+            // "large" // You can adjust the size as needed: 'small', 'default', 'large', or 'full'
         );
     };
 

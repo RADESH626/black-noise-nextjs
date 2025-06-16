@@ -8,7 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import BotonEditar from '@/components/common/botones/BotonEditar';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
-import { usePopUp } from '@/context/PopUpContext';
+import { useDialog } from '@/context/DialogContext';
 import { useActionState } from 'react'; // For React 19
 import { useFormStatus } from 'react-dom'; // For React 19
 import { MetodoPago } from '@/models/enums/pago/MetodoPago';
@@ -26,7 +26,7 @@ const PAYMENT_METHOD_DISPLAY_NAMES = {
 
 // Component for the delete provider button, using Server Actions pattern
 function DeleteProviderForm({ providerId, onProviderDeleted }) {
-    const { showPopUp } = usePopUp();
+    const { showPopUp } = useDialog();
     const [state, formAction] = useActionState(eliminarProveedor, { message: null, success: false });
     const { pending } = useFormStatus();
 
@@ -59,7 +59,7 @@ export default function ListaProveedores({ initialProviders }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('ALL'); // 'ALL' for no filter
-  const { showPopUp } = usePopUp();
+  const { showPopUp } = useDialog();
 
   const fetchAndSetProviders = useCallback(async () => {
     setLoading(true);

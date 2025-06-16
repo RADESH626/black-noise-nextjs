@@ -26,3 +26,10 @@ Los cambios en el perfil del proveedor se aplican en la UI al instante.
 Rollback en caso de error.
 
 Archivo: src/components/layout/proveedor/forms/FormEditarPerfilProveedor.jsx
+
+Admin - Agregar Proveedor:
+
+Permite a los administradores añadir nuevos proveedores a través de un formulario modal. Durante este proceso, se crea automáticamente un usuario asociado (`Usuario`) con rol de `PROVEEDOR` y se vincula al nuevo proveedor. La clave de acceso inicial para el proveedor se genera y se envía directamente a su correo electrónico, sin ser mostrada al administrador.
+
+Componente: src/components/admin/proveedores/AddSupplierModal.jsx
+Server Action: src/app/acciones/ProveedorActions.js (crearProveedor)

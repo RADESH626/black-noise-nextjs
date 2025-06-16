@@ -26,6 +26,20 @@ graph TD
 *   **Server Actions:** Utilización extensiva de Server Actions para manejar envíos de formularios y lógica de negocio del lado del servidor, reduciendo la necesidad de rutas API REST tradicionales para operaciones internas.
     *   **Estructura de Formularios:** Componentes de formulario (`"use client"`) que utilizan `useActionState` y `useFormStatus` para manejar estados de envío y retroalimentación.
     *   **Estructura de Server Actions:** Funciones asíncronas (`"use server"`) que validan datos, ejecutan lógica de negocio, manejan errores y revalidan rutas (`revalidatePath`).
+
+### Obtención de Datos Iniciales con Server Components
+
+*   **Racional:** Para la carga inicial de datos en páginas que muestran listas o colecciones de información (especialmente en dashboards administrativos), se prioriza el uso de Server Components. Esto permite que los datos se obtengan directamente en el servidor, reduciendo el JavaScript enviado al cliente y mejorando el rendimiento de la carga inicial.
+*   **Flujo:**
+    1.  **Página como Server Component:** La página principal del dashboard (ej. `src/app/admin/proveedores/page.jsx`) se define como un Server Component (sin `'use client'`).
+    2.  **Fetch Directo en el Servidor:** Dentro de este Server Component, se llama directamente a la Server Action de obtención de datos (ej. `obtenerProveedores()`).
+    3.  **Paso de Props a Cliente:** Los datos obtenidos se pasan como `props` a un componente de cliente anidado (ej. `src/components/admin/proveedores/ProveedoresClientPage.jsx`) que maneja la interactividad, el estado local y las mutaciones.
+    4.  **Revalidación para Frescura:** Para asegurar que los datos se actualicen después de mutaciones (ej. agregar, editar, eliminar), las Server Actions de mutación utilizan `revalidatePath()` para invalidar la caché de la ruta del dashboard, forzando una nueva obtención de datos en la siguiente solicitud o re-renderización del Server Component.
+*   **Beneficios:**
+    *   **Mejor Rendimiento:** Menos JavaScript en el cliente, carga inicial más rápida.
+    *   **SEO Mejorado:** Contenido renderizado en el servidor es más fácilmente indexable.
+    *   **Simplificación del Código:** Elimina la necesidad de `useEffect` para la carga inicial de datos en el cliente.
+
 *   **Autenticación y Autorización:**
     *   **NextAuth.js:** Implementación de autenticación basada en sesiones con NextAuth.js.
     *   **Roles:** Gestión de roles de usuario (cliente, administrador, proveedor) para control de acceso.

@@ -5,7 +5,6 @@ function THUsuarios() {
         <TablaHeader>
             <Thgeneral>Estado</Thgeneral>
             <Thgeneral>Usuario</Thgeneral>
-            <Thgeneral>Nombre</Thgeneral>
             <Thgeneral>Información de Usuario</Thgeneral>
             <Thgeneral>Contacto</Thgeneral>
             <Thgeneral>Acciones</Thgeneral>

@@ -1,11 +1,11 @@
 "use client";
 import React, { useEffect, useRef } from 'react';
-import { usePopUp } from '@/context/PopUpContext';
+import { useDialog } from '@/context/DialogContext';
 import FormEditarUsuario from '@/components/layout/admin/usuarios/forms/FormEditarUsuario'; // Will create this next
 
 function ModalEditarUsuario({ isOpen, onClose, onUserUpdated, userData }) {
     const dialogRef = useRef(null);
-    const { showPopUp } = usePopUp();
+    const { showPopUp } = useDialog();
 
     useEffect(() => {
         if (isOpen) {

@@ -2,7 +2,7 @@
 
 import { useEffect, useActionState } from "react";
 import { useFormStatus } from 'react-dom';
-import { usePopUp } from '@/context/PopUpContext';
+import { useDialog } from '@/context/DialogContext';
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
 import {
   InputTipoDocumentoIdentidad,
@@ -35,7 +35,7 @@ const initialState = {
 };
 
 function FormAgregarUsuarios({ onSuccess }) {
-  const { showPopUp } = usePopUp();
+  const { showPopUp } = useDialog();
 
   // Use useActionState to manage the state of the action
   const [state, formAction] = useActionState(addSingleUserAction, initialState);

@@ -7,14 +7,14 @@ function Registro() {
   return (
     <main className="min-h-screen flex items-center justify-center p-5 bg-gradient-to-br from-black via-[#0A1828] to-black">
       <motion.div
-        className="rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.2)] overflow-hidden text-[#000000] max-w-6xl w-full"
+        className="rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.2)] overflow-hidden text-[#ffffff] max-w-6xl w-full"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <div className="flex flex-row">
           <motion.div
-            className="p-10 bg-[#f0eded] flex-1"
+            className="p-10 bg-[#000000] flex-1 bg-gradient-to-l from-[#000000] to-[#1a1a1a]"
             initial={{ x: -50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.7 }}

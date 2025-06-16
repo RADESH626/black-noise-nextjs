@@ -2,7 +2,7 @@
 
 import React, { useEffect, useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
-import { usePopUp } from "@/context/PopUpContext";
+import { useDialog } from "@/context/DialogContext";
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
 import InputGeneral from "@/components/common/inputs/InputGeneral";
 import { crearProveedor } from "@/app/acciones/ProveedorActions";
@@ -26,7 +26,7 @@ const initialState = {
 };
 
 function FormularioAgregarProveedor({ onSuccess }) {
-  const { showPopUp } = usePopUp();
+  const { showPopUp } = useDialog();
   const [state, formAction] = useActionState(crearProveedor, initialState);
   const [selectedPaymentMethods, setSelectedPaymentMethods] = useState([]);
   const [displayedAccessKey, setDisplayedAccessKey] = useState(null); // New state for access key
