@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import Papa from 'papaparse';
-import nodemailer from 'nodemailer';
+import { transporter } from '@/utils/nodemailer';
 import connectDB from '@/utils/DBconection';
 import Usuario from '@/models/Usuario';
 import { signIn } from "next-auth/react";
@@ -28,7 +28,7 @@ export async function loginAction(prevState, formData) {
 
   // Perform basic server-side validation if needed
   if (!email || !password) {
-    return handleError(new ValidationError('Por favor, ingresa correo y contraseña.'), 'Validation Error', 400);
+    return handleError('Por favor, ingresa correo y contraseña.', 'Validation Error', 400);
   }
 
   try {
@@ -39,21 +39,21 @@ export async function loginAction(prevState, formData) {
       // Verify password for regular user
       const isValid = await comparePassword(password, user.password);
       
-      if (isValid) {
-        logger.info('Server Action Login: Usuario autenticado, rol:', user.rol);
-        return { 
-          message: 'Inicio de sesión exitoso.', 
-          success: true, 
-          data: { 
-            email, 
-            password, 
-            userRole: user.rol, 
-            readyForSignIn: true,
-            profileImageUrl: user.profileImageUrl // Pass the new image URL
-          } 
-        };
-      }
-    }
+            if (isValid) {
+              logger.info('Server Action Login: Usuario autenticado, rol:', user.rol);
+              return { 
+                message: 'Inicio de sesión exitoso.', 
+                success: true, 
+                data: { 
+                  email, 
+                  password, 
+                  userRole: user.rol, 
+                  readyForSignIn: true,
+                  profileImageUrl: user.profileImageUrl // Pass the new image URL
+                } 
+              };
+            }
+          }
 
     // If not a regular user or password invalid, attempt to authenticate as a supplier
     const proveedor = await Proveedor.findOne({ emailContacto: { $regex: new RegExp(`^${email.trim()}$`, 'i') } }).lean();
@@ -69,6 +69,7 @@ export async function loginAction(prevState, formData) {
             email: proveedor.emailContacto,
             password: password, // NextAuth needs the raw password for CredentialsProvider
             isSupplier: true,
+            userRole: 'PROVEEDOR', // Explicitly set userRole for supplier
             proveedorId: proveedor._id.toString(),
             readyForSignIn: true,
             profileImageUrl: "/img/proveedores/IMAGEN-SOLICITUD-PROVEEDOR.jpg" // Default image for suppliers
@@ -78,7 +79,7 @@ export async function loginAction(prevState, formData) {
     }
 
     // If neither user nor supplier found/authenticated
-    return handleError(new ValidationError('Credenciales incorrectas.'), 'Invalid credentials', 401);
+    return handleError('Credenciales incorrectas.', 'Invalid credentials', 401);
 
   } catch (error) {
     return handleError(error, 'Error del servidor durante el login.');
@@ -97,7 +98,8 @@ export async function addSingleUserAction(prevState, formData) {
             formData.set('password', password); // Set the correct name for RegistrarUsuario
             formData.delete('contrasena'); // Remove the old name
         } else {
-            throw new ValidationError('La contraseña es requerida.');
+            // Throw a plain error message instead of ValidationError instance
+            return handleError('La contraseña es requerida.', 'Validation Error', 400);
         }
 
         // Call the existing RegistrarUsuario function
@@ -107,13 +109,12 @@ export async function addSingleUserAction(prevState, formData) {
             revalidatePath('/admin/usuarios');
             return { message: result.message || 'Usuario agregado exitosamente.', success: true, data: result.data };
         } else {
-            // RegistrarUsuario already returns an error object, so we can use its message
-            throw new ValidationError(result.error); // Re-throw as ValidationError
+            // RegistrarUsuario already returns an error object with a message.
+            // Pass the error message directly to handleError.
+            return handleError(result.error, 'Validation Error', 400, formData);
         }
     } catch (error) {
-        if (error instanceof ValidationError) {
-            return handleError(error, error.message, error.statusCode);
-        }
+        // This catch block now primarily handles unexpected errors.
         return handleError(error, 'Error al agregar el usuario.');
     }
 }
@@ -154,7 +155,7 @@ async function guardarUsuarios(data, enviarCorreo = false) {
         if (enviarCorreo && UsuarioGuardado && UsuarioGuardado.correo) {
             const asunto = 'Bienvenido/a a Black Noise';
             const contenidoHtml = `
-                <h1>¡Hola ${UsuarioGuardado.primerNombre}!</h1>
+                <h1>¡Hola ${UsuarioGuardado.Nombre}!</h1>
                 <p>Gracias por registrarte en Black Noise.</p>
                 <p>Tu cuenta ha sido creada exitosamente.</p>
                 <p>Usuario: ${UsuarioGuardado.correo}</p>
@@ -182,16 +183,6 @@ async function guardarUsuarios(data, enviarCorreo = false) {
 // Función para enviar correos electrónicos
 async function enviarCorreoElectronico(to, subject, html) {
     try {
-        const transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST || 'smtp.example.com',
-            port: parseInt(process.env.SMTP_PORT) || 587,
-            secure: (parseInt(process.env.SMTP_PORT) || 587) === 465,
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
-        });
-
         const mailOptions = {
             from: `"Black Noise" <${process.env.EMAIL_USER}>`,
             to: to,
@@ -297,6 +288,7 @@ async function ObtenerUsuarioPorCorreo(email) {
         } else {
             plainUser.profileImageUrl = '/img/perfil/FotoPerfil.webp';
         }
+        // logger.info('Rol del usuario obtenido en ObtenerUsuarioPorCorreo:', plainUser.rol); // Removed logging
         return plainUser;
         
     } catch (error) {
@@ -310,8 +302,6 @@ async function RegistrarUsuario(formData) {
         const data = {
             tipoDocumento: formData.get('tipoDocumento'),
             numeroDocumento: formData.get('numeroDocumento'),
-            primerNombre: formData.get('primerNombre'),
-            segundoNombre: formData.get('segundoNombre'),
             primerApellido: formData.get('primerApellido'),
             segundoApellido: formData.get('segundoApellido'),
             fechaNacimiento: formData.get('fechaNacimiento'),
@@ -324,9 +314,26 @@ async function RegistrarUsuario(formData) {
             habilitado: true
         };
 
-        validateRequiredFields(data, ['tipoDocumento', 'numeroDocumento', 'primerNombre', 'primerApellido', 'fechaNacimiento', 'genero', 'numeroTelefono', 'direccion', 'correo', 'password']);
+        // Concatenate names to form the 'Nombre' field for the Usuario model
+        const primerNombre = formData.get('primerNombre');
+        const segundoNombre = formData.get('segundoNombre');
+        const primerApellido = formData.get('primerApellido');
+        const segundoApellido = formData.get('segundoApellido');
+
+        data.Nombre = primerNombre; // Add only the first name to data
+
+        validateRequiredFields(data, ['tipoDocumento', 'numeroDocumento', 'Nombre', 'primerApellido', 'fechaNacimiento', 'genero', 'numeroTelefono', 'direccion', 'correo', 'password']);
         validateEmail(data.correo);
         validatePassword(data.password);
+
+        // Validate fechaNacimiento: year must be less than 2007
+        const birthDate = new Date(data.fechaNacimiento);
+        if (isNaN(birthDate.getTime())) {
+            throw new ValidationError('Fecha de nacimiento inválida.');
+        }
+        if (birthDate.getFullYear() >= 2007) {
+            throw new ValidationError('La fecha de nacimiento debe ser anterior al año 2007.');
+        }
 
         const hashedPassword = await hashPassword(data.password);
         data.password = hashedPassword;
@@ -531,8 +538,6 @@ async function EditarUsuario(id, formData) {
         const updateData = {
             tipoDocumento: formData.get('tipoDocumento'),
             numeroDocumento: formData.get('numeroDocumento'),
-            primerNombre: formData.get('primerNombre'),
-            segundoNombre: formData.get('segundoNombre'),
             primerApellido: formData.get('primerApellido'),
             segundoApellido: formData.get('segundoApellido'),
             fechaNacimiento: formData.get('fechaNacimiento'),
@@ -543,7 +548,15 @@ async function EditarUsuario(id, formData) {
             rol: formData.get('rol'),
         };
 
-        validateRequiredFields(updateData, ['tipoDocumento', 'numeroDocumento', 'primerNombre', 'primerApellido', 'fechaNacimiento', 'genero', 'numeroTelefono', 'direccion', 'correo', 'rol']);
+        // Concatenate names to form the 'Nombre' field for the Usuario model
+        const primerNombre = formData.get('primerNombre');
+        const segundoNombre = formData.get('segundoNombre');
+        const primerApellido = formData.get('primerApellido');
+        const segundoApellido = formData.get('segundoApellido');
+
+        updateData.Nombre = primerNombre; // Add only the first name to updateData
+
+        validateRequiredFields(updateData, ['tipoDocumento', 'numeroDocumento', 'Nombre', 'primerApellido', 'fechaNacimiento', 'genero', 'numeroTelefono', 'direccion', 'correo', 'rol']);
         validateEmail(updateData.correo);
 
         const usuarioActualizado = await Usuario.findByIdAndUpdate(
@@ -610,13 +623,17 @@ export async function registerAction(prevState, formData) {
       revalidatePath('/'); // Add revalidatePath for general consistency
       return { message: result.message || '¡Registro exitoso!', success: true, data: result.data };
     } else {
-      throw new ValidationError(result.error);
+      // RegistrarUsuario already returns an error object with a message.
+      // Pass the error message directly to handleError.
+      return handleError(result.error, 'Validation Error', 400);
     }
   } catch (error) {
+    // This catch block now primarily handles errors thrown directly within registerAction
+    // (e.g., password mismatch) or unexpected errors.
     if (error instanceof ValidationError) {
-        return handleError(error, error.message, error.statusCode);
+        return handleError(error.message, 'Validation Error', error.statusCode, formData);
     }
-    return handleError(error, 'Error en el registro. Inténtalo de nuevo.');
+    return handleError(error, 'Error en el registro. Inténtalo de nuevo.', 500, formData);
   }
 }
 
@@ -624,7 +641,7 @@ export async function registerAction(prevState, formData) {
 export async function updateUserAction(userId, prevState, formData) {
     try {
         if (!userId) {
-            throw new ValidationError('ID de usuario no proporcionado para actualizar.');
+            return handleError('ID de usuario no proporcionado para actualizar.', 'Validation Error', 400);
         }
 
         const result = await EditarUsuario(userId, formData);
@@ -636,11 +653,12 @@ export async function updateUserAction(userId, prevState, formData) {
 
             return { message: result.message || 'Usuario actualizado exitosamente.', success: true, data: result.data };
         } else {
-            throw new ValidationError(result.error);
+            // EditarUsuario returns an error object with a message.
+            return handleError(result.error, 'Validation Error', 400);
         }
     } catch (error) {
         if (error instanceof ValidationError) {
-            return handleError(error, error.message, error.statusCode);
+            return handleError(error.message, 'Validation Error', error.statusCode);
         }
         return handleError(error, 'Error al actualizar el usuario.');
     }
@@ -652,7 +670,7 @@ export async function bulkUploadUsersAction(prevState, formData) {
         const session = await getServerSession(authOptions);
 
         if (!session?.user?.id) {
-            throw new UnauthorizedError('Usuario no autenticado. Por favor, inicia sesión.');
+            return handleError('Usuario no autenticado. Por favor, inicia sesión.', 'Unauthorized', 401);
         }
 
         const result = await RegistroMasivoUsuario(formData);
@@ -661,11 +679,12 @@ export async function bulkUploadUsersAction(prevState, formData) {
             revalidatePath('/admin/usuarios');
             return { message: result.message || 'Carga masiva completada exitosamente.', success: true };
         } else {
-            throw new ValidationError(result.error);
+            // RegistroMasivoUsuario returns an error object with a message.
+            return handleError(result.error, 'Validation Error', 400);
         }
     } catch (error) {
         if (error instanceof ValidationError || error instanceof UnauthorizedError) {
-            return handleError(error, error.message, error.statusCode);
+            return handleError(error.message, error.message, error.statusCode);
         }
         return handleError(error, 'Error durante la carga masiva.');
     }

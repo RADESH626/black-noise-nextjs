@@ -6,6 +6,7 @@ import Proveedor from '@/models/Proveedor'; // Necesario para popular
 import { revalidatePath } from 'next/cache';
 import logger from '@/utils/logger';
 import { getModel } from '@/utils/modelLoader';
+import { toPlainObject } from '@/utils/dbUtils'; // Import toPlainObject
 
 // Crear un nuevo pedido
 async function guardarPedido(pedidoData) {
@@ -23,7 +24,7 @@ async function guardarPedido(pedidoData) {
         revalidatePath('/admin/pedidos'); // Revalidate admin orders page
         revalidatePath('/perfil'); // Revalidate user profile page
         logger.debug('Revalidated paths /admin/pedidos and /perfil.');
-        return { success: true, data: JSON.parse(JSON.stringify(pedidoGuardado)) };
+        return { success: true, data: pedidoGuardado }; // Return the Mongoose document directly
     } catch (error) {
         logger.error('ERROR in guardarPedido:', error);
         return { error: 'Error al guardar el pedido: ' + error.message };
@@ -117,12 +118,15 @@ export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId)
 
         logger.debug('Orders retrieved for supplier ID:', proveedorId, 'count:', pedidos.length);
         
+        // Convert to plain JavaScript objects, ensuring ObjectIds are strings
+        const plainPedidos = pedidos.map(p => toPlainObject(p));
+
         // If a specific pedidoId was requested, return the single pedido object
         if (pedidoId) {
-            return { success: true, pedido: JSON.parse(JSON.stringify(pedidos[0])) };
+            return { success: true, pedido: plainPedidos[0] };
         } else {
             // Otherwise, return the array of all orders for the supplier
-            return { success: true, pedidos: JSON.parse(JSON.stringify(pedidos)) };
+            return { success: true, pedidos: plainPedidos };
         }
     } catch (error) {
         logger.error('ERROR in obtenerPedidosPorProveedorId:', error);
