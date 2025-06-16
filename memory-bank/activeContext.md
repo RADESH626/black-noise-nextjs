@@ -34,6 +34,39 @@ The user requested to add an "add to cart" button to the designs displayed on th
 - Update `progress.md`.
 - Propose Git commands.
 
+## Task: Add remove button to cart modal
+
+### Problem:
+The user requested a button on each design in the cart modal to allow them to remove that design from their cart.
+
+### Analysis:
+- The `CartModal.jsx` component displays the cart items.
+- The `CartContext.jsx` manages the cart state and provides functions to interact with the cart.
+- The `CartActions.js` server actions handle backend cart operations.
+- A `removeDesignFromCart` action already existed in `CartActions.js`.
+
+### Solution Implemented:
+1.  **Modified `src/components/carrito/CartModal.jsx`**:
+    *   Added an `onRemoveItem` prop to the component.
+    *   Included a button with a trash can icon (using `icono-basurero.svg`) within each cart item's `<li>` element.
+    *   The button's `onClick` handler calls `onRemoveItem(item.designId)`.
+2.  **Modified `src/context/CartContext.jsx`**:
+    *   Imported `removeDesignFromCart` from `src/app/acciones/CartActions.js`.
+    *   Implemented a `removeItem` function that calls `removeDesignFromCart` with the `userId` and `designId`, then updates the cart state.
+    *   Added `removeItem` to the `value` object provided by the `CartContext.Provider`.
+3.  **Modified `src/components/layout/general/HeaderPrincipal.jsx`**:
+    *   Destructured `removeItem` from the `useCart()` hook.
+    *   Passed the `removeItem` function as the `onRemoveItem` prop to the `CartModal` component.
+
+### Files Modified:
+- `src/components/carrito/CartModal.jsx`
+- `src/context/CartContext.jsx`
+- `src/components/layout/general/HeaderPrincipal.jsx`
+
+### Next Steps:
+- Update `progress.md`.
+- Propose Git commands.
+
 ## Task: Add main header to user profile page
 
 ### Problem:

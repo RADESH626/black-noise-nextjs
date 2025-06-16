@@ -29,7 +29,7 @@ When a user adds a design to their cart, the `designId` and quantity are managed
 ### Displaying Cart Information
 
 The cart information is now displayed in two main locations:
-1.  **Cart Preview Modal:** A small modal accessible from the header, showing a summary of items (image, name, price, quantity).
+1.  **Cart Preview Modal:** A small modal accessible from the header, showing a summary of items (image, name, price, quantity) and a trash can icon button (using `icono-basurero.svg`) for each item to remove it directly from the cart.
 2.  **Dedicated `/carrito` Page:** A full-page view providing comprehensive cart management, including item details, quantity controls, removal options, and order finalization.
 
 The `CartComponent` (or a similar component) will fetch the cart data and render the list of items, along with a summary of the total cost and options to clear the cart or proceed to order creation.
