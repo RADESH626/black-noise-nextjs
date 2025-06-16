@@ -4,6 +4,8 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { useDialog } from "@/context/DialogContext";
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
+import InputGeneral from "@/components/common/inputs/InputGeneral";
+import InputFiles from "@/components/common/inputs/InputFiles";
 import { actualizarDesign } from "@/app/acciones/DesignActions"; // Import the server action
 
 // Submit button component with pending state
@@ -32,7 +34,6 @@ function FormEditarDesign({ designData, onSuccess }) {
     descripcion: designData?.descripcion || "",
     valorDesing: designData?.valorDesing || "",
     categoria: designData?.categoria || "",
-    coloresDisponibles: designData?.coloresDisponibles?.join(',') || "",
     tallasDisponibles: designData?.tallasDisponibles?.join(',') || "",
     imagenDesing: null, // For file input
   });
@@ -76,105 +77,65 @@ function FormEditarDesign({ designData, onSuccess }) {
     <form onSubmit={handleSubmit} className="space-y-5 text-white">
       <input type="hidden" name="id" value={formData.id} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="relative">
-          <label htmlFor="nombreDesing" className="block mb-1 text-sm font-medium text-purple-400">
-            Nombre del Diseño
-          </label>
-          <input
-            type="text"
-            id="nombreDesing"
-            name="nombreDesing"
-            value={formData.nombreDesing}
-            onChange={handleChange}
-            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-purple-500 focus:border-purple-500"
-            required
-          />
-        </div>
+        <InputGeneral
+          label="Nombre del Diseño"
+          id="nombreDesing"
+          name="nombreDesing"
+          type="text"
+          value={formData.nombreDesing}
+          onChange={handleChange}
+          required
+        />
 
-        <div className="relative">
-          <label htmlFor="descripcion" className="block mb-1 text-sm font-medium text-purple-400">
-            Descripción
-          </label>
-          <textarea
-            id="descripcion"
-            name="descripcion"
-            value={formData.descripcion}
-            onChange={handleChange}
-            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-purple-500 focus:border-purple-500"
-            rows="3"
-            required
-          ></textarea>
-        </div>
+        <InputGeneral
+          label="Descripción"
+          id="descripcion"
+          name="descripcion"
+          type="textarea"
+          value={formData.descripcion}
+          onChange={handleChange}
+          required
+        />
 
-        <div className="relative">
-          <label htmlFor="valorDesing" className="block mb-1 text-sm font-medium text-purple-400">
-            Valor del Diseño
-          </label>
-          <input
-            type="number"
-            id="valorDesing"
-            name="valorDesing"
-            value={formData.valorDesing}
-            onChange={handleChange}
-            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-purple-500 focus:border-purple-500"
-            step="0.01"
-            required
-          />
-        </div>
+        <InputGeneral
+          label="Valor del Diseño"
+          id="valorDesing"
+          name="valorDesing"
+          type="number"
+          value={formData.valorDesing}
+          onChange={handleChange}
+          step="0.01"
+          required
+        />
 
-        <div className="relative">
-          <label htmlFor="categoria" className="block mb-1 text-sm font-medium text-purple-400">
-            Categoría
-          </label>
-          <input
-            type="text"
-            id="categoria"
-            name="categoria"
-            value={formData.categoria}
-            onChange={handleChange}
-            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-purple-500 focus:border-purple-500"
-            required
-          />
-        </div>
+        <InputGeneral
+          label="Categoría"
+          id="categoria"
+          name="categoria"
+          type="text"
+          value={formData.categoria}
+          onChange={handleChange}
+          required
+        />
 
-        <div className="relative">
-          <label htmlFor="coloresDisponibles" className="block mb-1 text-sm font-medium text-purple-400">
-            Colores Disponibles (separados por coma)
-          </label>
-          <input
-            type="text"
-            id="coloresDisponibles"
-            name="coloresDisponibles"
-            value={formData.coloresDisponibles}
-            onChange={handleChange}
-            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-purple-500 focus:border-purple-500"
-          />
-        </div>
-
-        <div className="relative">
-          <label htmlFor="tallasDisponibles" className="block mb-1 text-sm font-medium text-purple-400">
-            Tallas Disponibles (separadas por coma)
-          </label>
-          <input
-            type="text"
-            id="tallasDisponibles"
-            name="tallasDisponibles"
-            value={formData.tallasDisponibles}
-            onChange={handleChange}
-            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-purple-500 focus:border-purple-500"
-          />
-        </div>
+        <InputGeneral
+          label="Tallas Disponibles (separadas por comas)"
+          id="tallasDisponibles"
+          name="tallasDisponibles"
+          type="text"
+          value={formData.tallasDisponibles}
+          onChange={handleChange}
+          required
+        />
 
         <div className="relative md:col-span-2">
           <label htmlFor="imagenDesing" className="block mb-1 text-sm font-medium text-purple-400">
             Imagen del Diseño (opcional, para reemplazar)
           </label>
-          <input
-            type="file"
+          <InputFiles
             id="imagenDesing"
             name="imagenDesing"
             onChange={handleChange}
-            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-purple-500 focus:border-purple-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
             accept="image/jpeg,image/png,image/webp"
           />
         </div>

@@ -13,7 +13,7 @@ When a supplier logs in, they are not redirected to their specific dashboard (`/
 - **"Only plain objects" Error:** The `obtenerPedidosPorProveedorId` server action in `src/app/acciones/PedidoActions.js` was returning Mongoose documents (or objects with `ObjectId` buffers) that were not fully converted to plain JavaScript objects, causing an error when passed to the client-side `ListaPedidosProveedorPage`.
 
 ### Solution Implemented:
-1.  **Modified `src/app/acciones/UsuariosActions.js`**: In the `loginAction` function, added `userRole: 'PROVEEDOR'` to the `data` object returned upon successful supplier authentication.
+1.  **Modified `src/app/acciones/UsuariosActions.js`**: In the `loginAction` function, added `userRole: 'PROVEVEEDOR'` to the `data` object returned upon successful supplier authentication.
 2.  **Modified `src/app/api/auth/[...nextauth]/route.js`**:
     *   In the `authorize` callback, changed `rol: null` to `rol: Rol.PROVEEDOR` for authenticated suppliers.
     *   Refactored the `authorize` callback to correctly handle users with `rol: PROVEEDOR`: If a `Usuario` with `rol: PROVEEDOR` is authenticated, it now explicitly fetches the associated `Proveedor` document and sets `isSupplier: true` and `proveedorId` in the session object returned by `authorize`. This ensures `isSupplier` is correctly `true` for suppliers.
@@ -160,6 +160,31 @@ The supplier page (`/proveedor`) and the catalog page (`/catalogo`) were re-fetc
 - `src/app/catalogo/page.jsx`
 - `package.json` (due to npm install)
 - `package-lock.json` (due to npm install)
+
+### Next Steps:
+- Update `progress.md`.
+- Propose Git commands.
+
+## Task: Refactor design editing form to use common components
+
+### Problem:
+The `FormEditarDesign.jsx` component was using native HTML input elements with custom styling, leading to duplicated code and inconsistent UI compared to existing common input components.
+
+### Analysis:
+- Identified `FormEditarDesign.jsx` as the target for refactoring.
+- Scanned `src/components/common/inputs/` for reusable input components.
+- Found `InputGeneral.jsx` suitable for text, textarea, and number inputs.
+- Found `InputFiles.jsx` suitable for file inputs, requiring an `accept` prop modification.
+- The `handleChange` and `handleSubmit` functions were compatible with the common components.
+
+### Solution Implemented:
+1.  Imported `InputGeneral` and `InputFiles` into `src/components/perfil/FormEditarDesign.jsx`.
+2.  Replaced `input` elements for `nombreDesing`, `valorDesing`, `categoria`, and `tallasDisponibles` with `InputGeneral` components.
+3.  Replaced `textarea` element for `descripcion` with `InputGeneral` component with `type="textarea"`.
+4.  Replaced `input type="file"` for `imagenDesing` with `InputFiles` component, passing `accept="image/jpeg,image/png,image/webp"`.
+
+### Files Modified:
+- `src/components/perfil/FormEditarDesign.jsx`
 
 ### Next Steps:
 - Update `progress.md`.

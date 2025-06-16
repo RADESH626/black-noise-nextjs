@@ -12,6 +12,7 @@
 - **React Query Integration for Data Caching (Refined `enabled` option, `refetchOnWindowFocus` disabled, `staleTime: Infinity` for diagnostic):** Integrated `@tanstack/react-query` into the application. Configured `QueryClientProvider` in `src/app/layout.jsx` and refactored data fetching in `src/app/proveedor/page.jsx` (for supplier profile), `src/app/catalogo/page.jsx` (for designs), and **`src/app/proveedor/pedidos/page.jsx` (for supplier orders)** to use `useQuery`. This provides robust client-side caching, reducing unnecessary network requests and improving UI responsiveness. The `enabled` option in `useQuery` for `ProveedorPage` was refined to `!!session?.user?.isSupplier && !!session?.user?.id` to ensure the query only runs when `session.user.id` is fully available, preventing premature queries or `queryKey` changes. Additionally, `refetchOnWindowFocus` has been set to `false` for all relevant queries as a diagnostic step to prevent re-fetches when the browser tab regains focus, and `staleTime` has been set to `Infinity` for diagnostic purposes, to ensure data is always considered fresh from cache.
 - **Fixed "Only plain objects" Error with QueryClientProvider:** Resolved the serialization error by creating a dedicated client component (`src/app/providers.jsx`) to encapsulate the `QueryClient` instance creation and the `QueryClientProvider`, ensuring the `QueryClient` is instantiated in a client environment.
 - **Fixed React Hooks Order in ListaPedidosProveedorPage:** Corrected the order of Hooks in `src/app/proveedor/pedidos/page.jsx` by moving the `useQuery` hook call and all other React Hooks to the top level of the component, ensuring they are called unconditionally and consistently across all renders. Additionally, refined the `useQuery` implementation by adding a conditional check within the `queryFn` to safely access `session.user.proveedorId`, preventing errors when `session` data might not be fully available during initial renders. This fully resolves the "change in the order of Hooks" error and related runtime issues by ensuring all conditional returns occur *after* all Hooks have been called.
+- **Refactored Design Editing Form:** The `FormEditarDesign.jsx` component has been refactored to utilize existing common input components (`InputGeneral.jsx` and `InputFiles.jsx`) instead of native HTML inputs. This improves code consistency, reusability, and maintains a uniform UI across the application.
 
 ## Completed Tasks:
 - Initial project setup and configuration.
@@ -26,6 +27,8 @@
 - Removed supplier profile editing.
 - Integrated React Query for data caching (refined `enabled` option, `refetchOnWindowFocus` disabled, `staleTime: Infinity` for diagnostic).
 - Fixed "Only plain objects" Error with QueryClientProvider.
+- Fixed React Hooks Order in ListaPedidosProveedorPage.
+- Refactored design editing form to use common components.
 - Committed changes to git.
 
 ## Pending Tasks:
