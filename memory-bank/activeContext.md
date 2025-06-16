@@ -35,21 +35,23 @@ When a supplier logs in, they are not redirected to their specific dashboard (`/
 ## Task: Implement custom header for supplier view
 
 ### Problem:
-The user requested a custom header for the supplier view (`/proveedor/pedidos`) instead of the general `HeaderPrincipal`. This new header should display the app title on the left and the logged-in supplier's name.
+The user requested a custom header for the supplier view (`/proveedor/pedidos`) instead of the general `HeaderPrincipal`. This new header should display the app title on the left and the logged-in supplier's name, and now also include a logout button, using the general button component, with black text.
 
 ### Analysis:
 - The previous `HeaderPrincipal` component was removed from `src/app/proveedor/pedidos/page.jsx`.
-- A new component, `HeaderProveedor.jsx`, needs to be created in `src/components/layout/proveedor/`.
-- This new component will use `next-auth/react` to access the session and display the supplier's name.
+- A new component, `HeaderProveedor.jsx`, was created in `src/components/layout/proveedor/`.
+- This new component will use `next-auth/react` to access the session and display the supplier's name and a logout button.
 - `src/app/proveedor/pedidos/page.jsx` will then import and render `HeaderProveedor`.
+- The logout button needs to use the `BotonGeneral` component from `src/components/common/botones/`, and its text color should be black.
 
 ### Solution Implemented:
 1.  **Reverted `src/app/proveedor/pedidos/page.jsx`**: Removed the `HeaderPrincipal` import and component rendering.
 2.  **Created `src/components/layout/proveedor/HeaderProveedor.jsx`**:
-    *   Implemented a new React component that imports `useSession` and `Link`.
+    *   Implemented a new React component that imports `useSession`, `signOut`, `Link`, and `BotonGeneral`.
     *   Displays "Black Noise" as the app title on the left.
     *   Conditionally displays "Bienvenido, {session.user.name}" if the session and user name are available.
-    *   Styled with Tailwind CSS for basic layout.
+    *   Added a "Cerrar Sesión" button using the `BotonGeneral` component that calls `signOut({ callbackUrl: '/login' })` on click.
+    *   Styled with Tailwind CSS for basic layout, ensuring the logout button has `text-black`.
 3.  **Modified `src/app/proveedor/pedidos/page.jsx`**:
     *   Imported `HeaderProveedor` from `@/components/layout/proveedor/HeaderProveedor`.
     *   Rendered the `<HeaderProveedor />` component at the top of both `return` statements to ensure it's always present.
