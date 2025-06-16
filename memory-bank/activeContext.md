@@ -69,7 +69,7 @@ The user requested a custom header for the supplier view (`/proveedor/pedidos`) 
 - Update `progress.md`.
 - Propose Git commands.
 
-## Task: Prevent unnecessary page refresh on supplier page re-entry
+## Task: Prevent unnecessary page refresh on supplier page re-entry and flickering
 
 ### Problem:
 The supplier page (`/proveedor`) was fully refreshing (re-fetching data and showing a loading spinner) every time the user navigated away and then returned to it, and also "flickered" when switching tabs.
@@ -78,7 +78,7 @@ The supplier page (`/proveedor`) was fully refreshing (re-fetching data and show
 - The `src/app/proveedor/page.jsx` component is a Client Component.
 - It uses a `useEffect` hook to fetch supplier profile data (`obtenerMiPerfilProveedor`).
 - The `useEffect` was configured to re-run the data fetch whenever its dependencies (`session`, `status`, `router`) changed, which happens on component remount or session state updates, leading to unnecessary re-fetching and display of the loading spinner.
-- The "flickering" was caused by the `LoadingSpinner` being displayed even when `miPerfil` data was already present, due to `useSession` revalidating the session and briefly setting `loading` to true.
+- The "flickering" was caused by the `LoadingSpinner` being displayed even when `miPerfil` data was already present, due to `useSession` revalidating the session and briefly setting `loading` to true, and potentially by delayed authentication checks.
 
 ### Solution Implemented:
 1.  **Modified `src/app/proveedor/page.jsx` (Initial Fetch Optimization)**: Adjusted the `useEffect` hook to include a condition (`!miPerfil`) before calling `fetchMiPerfil`. This ensures that the data is only fetched if `miPerfil` is `null` or `undefined`, preventing redundant data loading when the user returns to the page and the profile data is already present.
@@ -88,9 +88,55 @@ The supplier page (`/proveedor`) was fully refreshing (re-fetching data and show
     *   Added `miPerfil` to `useEffect` dependencies to react to its changes.
     *   Explicitly set `setLoading(false)` if `miPerfil` is already loaded and session is authenticated.
     *   Combined `status === "loading"` with `(loading && !miPerfil)` in the main render condition for the spinner (`if (status === "loading" || (loading && !miPerfil))`). This means the spinner will show if the *session* is loading, or if the *profile data* is loading and not yet available, preventing the spinner from showing during background session revalidation if the profile data is already loaded.
+3.  **Modified `src/app/proveedor/page.jsx` (Authentication Check Relocation)**: Moved the `session` and `isSupplier` authentication check from inside `useEffect` to the main render function of `ProveedorPage`. This ensures that unauthorized users are redirected immediately and synchronously (`router.push("/login"); return null;`), preventing any potential flickering related to session revalidation attempting to render content before redirecting.
 
 ### Files Modified:
 - `src/app/proveedor/page.jsx`
+
+### Next Steps:
+- Update `progress.md`.
+- Propose Git commands.
+
+## Task: Remove supplier's ability to edit profile
+
+### Problem:
+The user requested to remove the ability for suppliers to edit their own profiles, as this functionality should be exclusive to administrators.
+
+### Analysis:
+- The "Editar Perfil" section, including a link to `/proveedor/editar-perfil`, was present on the `src/app/proveedor/page.jsx`.
+
+### Solution Implemented:
+1.  **Modified `src/app/proveedor/page.jsx`**: Removed the `div` containing the "Gestión de Perfil" section and the `Link` to `/proveedor/editar-perfil`. This removes the UI element that allowed suppliers to access their profile editing page.
+
+### Files Modified:
+- `src/app/proveedor/page.jsx`
+
+### Next Steps:
+- Update `progress.md`.
+- Propose Git commands.
+
+## Task: Integrate React Query for client-side data caching
+
+### Problem:
+The supplier page (`/proveedor`) and the catalog page (`/catalogo`) were re-fetching data every time the user navigated away and then returned, causing unnecessary network requests and visual flickering. The user requested a caching solution.
+
+### Analysis:
+- Both `src/app/proveedor/page.jsx` and `src/app/catalogo/page.jsx` were using `useState` and `useEffect` for data fetching, leading to re-fetches on component remount.
+- No client-side caching mechanism was in place to persist data across navigation.
+- React Query is a suitable library for this purpose.
+
+### Solution Implemented:
+1.  **Installed Dependencies**: Installed `@tanstack/react-query` and `@tanstack/react-query-devtools`.
+2.  **Configured `QueryClientProvider`**: Wrapped the application with `QueryClientProvider` in `src/app/layout.jsx` to make React Query available globally.
+3.  **Refactored Data Fetching in `ProveedorPage`**: Modified `src/app/proveedor/page.jsx` to use `useQuery` for fetching `miPerfil`, replacing the manual `useState`/`useEffect` logic. Adjusted loading and error handling to use `useQuery`'s states.
+4.  **Refactored Data Fetching in `ComunidadDiseños` (Catalog Page)**: Modified `src/app/catalogo/page.jsx` to use `useQuery` for fetching `allDesigns`, replacing the manual `useState`/`useEffect` logic. Adjusted loading and error handling to use `useQuery`'s states.
+
+### Files Modified:
+- `src/app/layout.jsx`
+- `src/app/proveedor/page.jsx`
+- `src/app/catalogo/page.jsx`
+- `package.json` (due to npm install)
+- `package-lock.json` (due to npm install)
 
 ### Next Steps:
 - Update `progress.md`.

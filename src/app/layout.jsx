@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { DialogProvider } from '../context/DialogContext';
 import SessionProviderWrapper from './SessionProviderWrapper';
+import { Providers } from './providers'; // Import the new Providers component
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -21,11 +22,13 @@ export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <body className="bg-primary text-secondary">
+        <Providers> {/* Use the new Providers component */}
           <DialogProvider>
                   <SessionProviderWrapper>
                     {children}
                   </SessionProviderWrapper>
           </DialogProvider>
+        </Providers>
       </body>
     </html>
   )

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
 import Footer from '@/components/layout/general/footer/Footer';
 import CatalogTabs from '@/components/catalogo/CatalogTabs';
@@ -10,6 +10,7 @@ import { addDesignToCart } from '@/app/acciones/CartActions';
 import { obtenerDesigns } from '@/app/acciones/DesignActions';
 import { useSession } from 'next-auth/react';
 import { useCart } from '@/context/CartContext';
+import { useQuery } from '@tanstack/react-query';
 
 const ComunidadDiseños = () => {
   const [activo, setActivo] = useState('diseños');
@@ -19,28 +20,21 @@ const ComunidadDiseños = () => {
   const [showLoginPrompt, setShowLoginPrompt] = useState(false); // New state for login prompt
   const optimisticCartStateRef = React.useRef([]); // Use React.useRef for consistency
 
-  const [allDesigns, setAllDesigns] = useState([]);
-  const [loadingDesigns, setLoadingDesigns] = useState(true);
-  const [errorDesigns, setErrorDesigns] = useState(null);
-
-  useEffect(() => {
-    async function fetchDesigns() {
-      try {
-        setLoadingDesigns(true);
-        const result = await obtenerDesigns();
-        if (result?.data) {
-          setAllDesigns(result.data);
-        } else {
-          setErrorDesigns(result?.error || "Error al cargar los diseños.");
-        }
-      } catch (err) {
-        setErrorDesigns("Error de red o del servidor al cargar diseños: " + err.message);
-      } finally {
-        setLoadingDesigns(false);
+  // Use useQuery to fetch designs
+  const { data: allDesigns, isLoading: loadingDesigns, isError: errorDesigns, error } = useQuery({
+    queryKey: ['allDesigns'], // Unique key for this query
+    queryFn: async () => {
+      const result = await obtenerDesigns();
+      if (result?.data) {
+        return result.data;
+      } else {
+        throw new Error(result?.error || "Error al cargar los diseños.");
       }
-    }
-    fetchDesigns();
-  }, []);
+    },
+    staleTime: 5 * 60 * 1000, // Data is considered fresh for 5 minutes
+    cacheTime: 10 * 60 * 1000, // Data stays in cache for 10 minutes
+    retry: 1, // Retry once on failure
+  });
 
   const tarjetas = useMemo(() => activo === 'diseños' ? allDesigns : allDesigns, [activo, allDesigns]);
 
@@ -105,12 +99,17 @@ const ComunidadDiseños = () => {
 
         <NewPostSection />
 
-        <DesignGrid
-          tarjetas={tarjetas}
-          activo={activo}
-          addItem={handleAddItemToCart}
-          cartItems={cartItems}
-        />
+        {loadingDesigns && <p className="text-white text-center">Cargando diseños...</p>}
+        {errorDesigns && <p className="text-red-500 text-center">Error: {error?.message || "No se pudieron cargar los diseños."}</p>}
+
+        {!loadingDesigns && !errorDesigns && allDesigns && (
+          <DesignGrid
+            tarjetas={tarjetas}
+            activo={activo}
+            addItem={handleAddItemToCart}
+            cartItems={cartItems}
+          />
+        )}
 
         {showLoginPrompt && (
           <div className="fixed bottom-4 right-4 bg-red-600 text-white p-3 rounded-lg shadow-lg animate-fadeInOut">
