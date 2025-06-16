@@ -22,11 +22,23 @@ export default function ListaPedidosProveedorPage() {
       }
       // Pass null for pedidoId to get all orders for supplier
       const result = await obtenerPedidosPorProveedorId(null, session.user.proveedorId);
-      if (result && result.success) {
-        return result.pedidos;
-      } else {
-        throw new Error(result ? result.message : "Error al cargar los pedidos: Respuesta indefinida.");
+      // Si la acción del servidor devuelve un objeto con 'success: false' o 'error',
+      // significa que hubo un problema en el servidor.
+      if (result && result.success === false) {
+        throw new Error(result.message || "Error al cargar los pedidos: Error del servidor.");
       }
+      if (result && result.error) { // Si la acción devuelve una propiedad 'error'
+        throw new Error(result.error);
+      }
+
+      // Si no hay un error explícito y 'pedidos' es un array, consideramos que la operación fue exitosa,
+      // incluso si el array de pedidos está vacío.
+      if (result && 'pedidos' in result) {
+        return result.pedidos;
+      }
+
+      // Si llegamos aquí, la respuesta del servidor no tiene el formato esperado.
+      throw new Error("Error al cargar los pedidos: Formato de respuesta inesperado del servidor.");
     },
     enabled: !!session?.user?.isSupplier && !!session?.user?.proveedorId, // Only run query if user is a supplier and has a supplierId
     staleTime: Infinity, // Data is considered fresh indefinitely for diagnostic
@@ -51,7 +63,7 @@ export default function ListaPedidosProveedorPage() {
   }
 
   if (isError) {
-    return <ErrorMessage message={error.message || "Error al cargar los pedidos."} />;
+    return <ErrorMessage message={error.message} />;
   }
 
   if (!pedidos || pedidos.length === 0) { // Check if pedidos is null/undefined or empty

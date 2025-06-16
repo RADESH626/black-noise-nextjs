@@ -4,6 +4,7 @@
 
 **Problemas Resueltos:**
 - Se añadió y exportó la función `obtenerPedidosPorProveedorId` en `src/app/acciones/PedidoActions.js` para resolver el error de importación en `/proveedor/pedidos`.
+- Se mejoró y corrigió el manejo de errores en `src/app/proveedor/pedidos/page.jsx` para mostrar mensajes de error más precisos y evitar duplicaciones.
 
 **Tareas Pendientes:**
 - Continuar con el desarrollo y depuración de la aplicación Next.js.
