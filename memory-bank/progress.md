@@ -33,6 +33,7 @@ El proyecto está en desarrollo activo. Se han implementado varias funcionalidad
 *   **Corrección de "Module not found: Can't resolve '../../acciones/PedidoActions'" y rutas de importación de componentes:** Se corrigieron las rutas de importación en `src/app/proveedor/pedidos/ver/[id]/page.jsx`. La importación de `obtenerPedidoPorProveedorId` se cambió a un alias (`@/app/acciones/PedidoActions`), y las importaciones de `LoadingSpinner` y `ErrorMessage` se corrigieron para usar alias y eliminar comentarios.
 *   **Resolución de Advertencia de Acceso a `params`:** Se ha resuelto la advertencia de Next.js sobre el acceso directo a `params` en `src/app/proveedor/pedidos/ver/[id]/page.jsx` importando `React` y utilizando `React.use(params)` para desestructurar el `id`.
 *   **Aislamiento de `obtenerPedidosPorProveedorId`:** Se movió la función `obtenerPedidosPorProveedorId` a un nuevo archivo `src/app/acciones/ProveedorPedidoActions.js` para resolver problemas de exportación/importación.
+*   **Corrección de error del servidor durante el login:** Se añadió una verificación para `user.password` en `loginAction` en `src/app/acciones/UsuariosActions.js` para evitar pasar `undefined` a `bcrypt.compare`.
 
 **Funcionalidades Pendientes / En Curso:**
 *   Ninguna.

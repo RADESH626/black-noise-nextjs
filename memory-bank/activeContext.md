@@ -409,3 +409,16 @@
 **Próximos Pasos:**
 
 *   Verificar la corrección intentando un proceso de pago y creación de pedido.
+
+### 16/06/2025 - 06:29 PM
+
+**Tarea:** Corregir error del servidor durante el login: "Illegal arguments: string, undefined" en `comparePassword`.
+
+**Cambios Realizados:**
+
+*   **`src/app/acciones/UsuariosActions.js`**:
+    *   Se añadió una verificación `if (!user.password)` antes de llamar a `comparePassword` en la función `loginAction`. Si `user.password` es `undefined` o `null`, se devuelve un error de credenciales incorrectas, evitando que `bcrypt.compare` reciba un argumento inválido.
+
+**Próximos Pasos:**
+
+*   Verificar que el login funcione correctamente y que el error "Illegal arguments: string, undefined" ya no ocurra.

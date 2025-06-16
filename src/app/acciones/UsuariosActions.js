@@ -37,6 +37,10 @@ export async function loginAction(prevState, formData) {
     
     if (user) {
       // Verify password for regular user
+      if (!user.password) {
+        logger.warn('Server Action Login: Usuario encontrado pero sin contraseña almacenada:', user.correo);
+        return handleError('Credenciales incorrectas.', 'Invalid credentials', 401);
+      }
       const isValid = await comparePassword(password, user.password);
       
             if (isValid) {
