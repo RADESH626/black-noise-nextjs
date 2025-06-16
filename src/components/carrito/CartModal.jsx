@@ -6,14 +6,12 @@ import Image from 'next/image';
 
 // Add an isOpen prop to control the dialog visibility
 const CartModal = ({ cartItems, onClose, isOpen, onRemoveItem }) => {
-  const dialogRef = useRef(null); // Ref for the dialog element
+  const dialogRef = useRef(null); // Ref for the div element, though not strictly needed for visibility control
 
   if (!isOpen) return null; // Render nothing if not open
 
   return (
-    // Use <div> element instead of <dialog>
-    <div ref={dialogRef} className="p-4 rounded-lg shadow-lg max-w-xs w-80 max-h-96 overflow-y-auto z-50" style={{ backgroundColor: "#FFFFFF" }}>
-
+    <div ref={dialogRef} className="absolute right-0 mt-2 p-4 rounded-lg shadow-lg max-w-xs w-80 max-h-96 overflow-y-auto z-50" style={{ backgroundColor: "#FFFFFF" }}>
       <div className="flex justify-between items-center mb-4 px-4 pt-2">
         <h2 className="text-xl font-bold">Tu Carrito</h2>
         <button onClick={onClose} className="text-gray-500 hover:text-gray-700">

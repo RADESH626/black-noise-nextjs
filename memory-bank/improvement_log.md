@@ -43,6 +43,10 @@ This document serves as a critical source of wisdom, detailing lessons learned f
   - **Correction**: When implementing modals, ensure the outer container for the modal overlay uses `bg-transparent` by default. Only add a semi-transparent or colored background if specifically instructed.
   - **Date**: 2025-06-15
 
+- **Lesson Learned 10: Distinguishing Modals from Dropdowns**: The native HTML `<dialog>` element is ideal for true modals (blocking, centered, requiring explicit closure). For non-blocking UI elements that appear as overlays relative to a trigger (like a dropdown menu or a popover), a `div`-based implementation with appropriate positioning (e.g., `absolute` or `fixed` relative to a parent) is more suitable.
+  - **Correction**: When implementing "pop-ups," first determine if the desired behavior is that of a modal or a dropdown/popover. Use `<dialog>` for modals and `div` for dropdowns/popovers, ensuring consistent styling and accessibility for each type.
+  - **Date**: 2025-06-16
+
 ## Areas for Continuous Improvement:
 
 - **File Size Management**: When writing to a file, ensure the content does not exceed 1000 lines. If it does, create a new file to continue the content.
