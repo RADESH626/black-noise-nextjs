@@ -32,6 +32,7 @@ El proyecto está en desarrollo activo. Se han implementado varias funcionalidad
 *   **Diagnóstico de error "obtenerPedidoPorProveedorId is not a function" (re-ocurrencia):** Se cambió la importación de `obtenerPedidoPorProveedorId` en `src/app/proveedor/pedidos/ver/[id]/page.jsx` de un alias (`@/app/acciones/PedidoActions`) a una ruta relativa (`../../acciones/PedidoActions`) como paso de diagnóstico.
 *   **Corrección de "Module not found: Can't resolve '../../acciones/PedidoActions'" y rutas de importación de componentes:** Se corrigieron las rutas de importación en `src/app/proveedor/pedidos/ver/[id]/page.jsx`. La importación de `obtenerPedidoPorProveedorId` se cambió a un alias (`@/app/acciones/PedidoActions`), y las importaciones de `LoadingSpinner` y `ErrorMessage` se corrigieron para usar alias y eliminar comentarios.
 *   **Resolución de Advertencia de Acceso a `params`:** Se ha resuelto la advertencia de Next.js sobre el acceso directo a `params` en `src/app/proveedor/pedidos/ver/[id]/page.jsx` importando `React` y utilizando `React.use(params)` para desestructurar el `id`.
+*   **Aislamiento de `obtenerPedidosPorProveedorId`:** Se movió la función `obtenerPedidosPorProveedorId` a un nuevo archivo `src/app/acciones/ProveedorPedidoActions.js` para resolver problemas de exportación/importación.
 
 **Funcionalidades Pendientes / En Curso:**
 *   Ninguna.

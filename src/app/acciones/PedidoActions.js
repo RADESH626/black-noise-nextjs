@@ -24,7 +24,7 @@ async function guardarPedido(pedidoData) {
         revalidatePath('/admin/pedidos'); // Revalidate admin orders page
         revalidatePath('/perfil'); // Revalidate user profile page
         logger.debug('Revalidated paths /admin/pedidos and /perfil.');
-        return { success: true, data: toPlainObject(pedidoGuardado) }; // Convert to plain object
+        return { success: true, data: pedidoGuardado };
     } catch (error) {
         logger.error('ERROR in guardarPedido:', error);
         return { error: 'Error al guardar el pedido: ' + error.message };
@@ -87,50 +87,6 @@ async function obtenerPedidosPagadosPorUsuarioId(usuarioId) {
     } catch (error) {
         logger.error('ERROR in obtenerPedidosPagadosPorUsuarioId:', error);
         return { success: false, message: 'Error al obtener los pedidos pagados del usuario: ' + error.message };
-    }
-}
-
-// Obtener pedidos por ID de Proveedor (puede ser un pedido específico o todos los de un proveedor)
-export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId) {
-    logger.debug('Entering obtenerPedidosPorProveedorId with pedidoId:', pedidoId, 'proveedorId:', proveedorId);
-    try {
-        await connectDB();
-        logger.debug('Database connected for obtenerPedidosPorProveedorId.');
-
-        if (!proveedorId) {
-            return { success: false, message: "ID de proveedor es requerido." };
-        }
-        const Pedido = await getModel('Pedido');
-        let query = { proveedorId: proveedorId };
-        if (pedidoId) {
-            query._id = pedidoId;
-        }
-
-        const pedidos = await Pedido.find(query)
-            .populate('items.designId', 'nombreDesing imageData imageMimeType') // Popula nombre, datos binarios y tipo MIME de los diseños dentro de items
-            .populate('proveedorId', 'nombreEmpresa emailContacto') // Popula algunos campos de Proveedor
-            .lean();
-
-        if (pedidoId && pedidos.length === 0) {
-            logger.debug('Specific order not found for supplier or does not belong to supplier.');
-            return { success: false, message: 'Pedido no encontrado o no pertenece a este proveedor.' };
-        }
-
-        logger.debug('Orders retrieved for supplier ID:', proveedorId, 'count:', pedidos.length);
-        
-        // Convert to plain JavaScript objects, ensuring ObjectIds are strings
-        const plainPedidos = pedidos.map(p => toPlainObject(p));
-
-        // If a specific pedidoId was requested, return the single pedido object
-        if (pedidoId) {
-            return { success: true, pedido: plainPedidos[0] };
-        } else {
-            // Otherwise, return the array of all orders for the supplier
-            return { success: true, pedidos: plainPedidos };
-        }
-    } catch (error) {
-        logger.error('ERROR in obtenerPedidosPorProveedorId:', error);
-        return { success: false, message: 'Error al obtener los pedidos del proveedor: ' + error.message };
     }
 }
 

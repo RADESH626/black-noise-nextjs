@@ -272,7 +272,7 @@
 
 ### 16/06/2025 - 04:46 PM
 
-**Tarea:** Diagnosticar error "(0 , _app_acciones_PedidoActions__WEBPACK_IMPORTED_MODULE_4__.obtenerPedidoPorProveedorId) is not a function" (re-occurrence).
+**Tarea:** Diagnosticar error "(0 , _app_acciones_PedidoActions__WEBPACK_IMPORTED_MODULE_4__.obtenerPedidoPorProveedorId) is not a function" (re-ocurrencia).
 
 **Cambios Realizados:**
 
@@ -323,3 +323,89 @@
 **Próximos Pasos:**
 
 *   Verificar que la aplicación compile y funcione correctamente sin errores de exportación duplicada.
+
+### 16/06/2025 - 04:54 PM
+
+**Tarea:** Corregir el error "(0 , _app_acciones_PedidoActions__WEBPACK_IMPORTED_MODULE_4__.obtenerPedidoPorProveedorId) is not a function" y "Duplicate export 'obtenerPedidosPorProveedorId'".
+
+**Cambios Realizados:**
+
+*   **`src/app/acciones/PedidoActions.js`**:
+    *   Se eliminó el `export` de la declaración de la función `obtenerPedidosPorProveedorId`.
+    *   Se aseguró que `obtenerPedidosPorProveedorId` esté *solo* en la lista de exportaciones nombradas al final del archivo.
+
+**Próximos Pasos:**
+
+*   Verificar que la aplicación compile y funcione correctamente sin errores de exportación.
+
+### 16/06/2025 - 04:56 PM
+
+**Tarea:** Forzar la re-evaluación del módulo de Next.js para resolver el error de importación.
+
+**Cambios Realizados:**
+
+*   **`src/app/proveedor/pedidos/ver/[id]/page.jsx`**:
+    *   Se añadió y luego se eliminó un comentario trivial para forzar a Next.js a re-evaluar el módulo y sus importaciones.
+
+**Próximos Pasos:**
+
+*   Verificar que la aplicación compile y funcione correctamente sin errores de importación.
+
+### 16/06/2025 - 04:58 PM
+
+**Tarea:** Aislar la función `obtenerPedidosPorProveedorId` en un archivo dedicado para resolver problemas de exportación/importación.
+
+**Cambios Realizados:**
+
+*   **`src/app/acciones/ProveedorPedidoActions.js` (Nuevo Archivo)**:
+    *   Se creó este nuevo archivo.
+    *   Se movió la función `obtenerPedidosPorProveedorId` a este archivo, asegurando que se exporte correctamente (`export async function obtenerPedidosPorProveedorId(...)`).
+*   **`src/app/acciones/PedidoActions.js`**:
+    *   Se eliminó completamente la función `obtenerPedidosPorProveedorId` de este archivo.
+*   **`src/app/proveedor/pedidos/ver/[id]/page.jsx`**:
+    *   Se actualizó la importación de `obtenerPedidoPorProveedorId` para que apunte al nuevo archivo: `import { obtenerPedidoPorProveedorId } from "@/app/acciones/ProveedorPedidoActions";`.
+
+**Próximos Pasos:**
+
+*   Verificar que la aplicación compile y funcione correctamente, y que la función `obtenerPedidosPorProveedorId` sea accesible sin errores.
+
+### 16/06/2025 - 04:59 PM
+
+**Tarea:** Implementar importación dinámica para `obtenerPedidoPorProveedorId` en `page.jsx` como último recurso para resolver el error de exportación/importación.
+
+**Cambios Realizados:**
+
+*   **`src/app/proveedor/pedidos/ver/[id]/page.jsx`**:
+    *   Se cambió la importación estática de `obtenerPedidoPorProveedorId` a una importación dinámica utilizando `next/dynamic`.
+    *   Se modificó la llamada a la función dentro de `fetchPedido` para manejar la importación dinámica (`await import(...).then(mod => mod.obtenerPedidoPorProveedorId)`).
+
+**Próximos Pasos:**
+
+*   Verificar que la aplicación compile y funcione correctamente sin errores de importación.
+
+### 16/06/2025 - 05:01 PM
+
+**Tarea:** Revertir la importación dinámica de `obtenerPedidoPorProveedorId` en `page.jsx` y reiterar la necesidad de un reinicio del servidor de desarrollo.
+
+**Cambios Realizados:**
+
+*   **`src/app/proveedor/pedidos/ver/[id]/page.jsx`**:
+    *   Se revirtió la importación de `obtenerPedidoPorProveedorId` a una importación estática: `import { obtenerPedidoPorProveedorId } from "@/app/acciones/ProveedorPedidoActions";`.
+    *   Se revirtió la lógica de llamada a la función dentro de `fetchPedido` a su estado original.
+
+**Próximos Pasos:**
+
+*   Informar al usuario que el problema es probablemente ambiental y requiere un reinicio manual del servidor de desarrollo de Next.js.
+
+### 16/06/2025 - 06:15 PM
+
+**Tarea:** Corregir TypeError: nuevoPedido.save is not a function.
+
+**Cambios Realizados:**
+
+*   **`src/app/acciones/PedidoActions.js`**:
+    *   Se modificó la función `guardarPedido` para que retorne directamente la instancia del documento Mongoose (`pedidoGuardado`) en lugar de un objeto JavaScript plano. Esto asegura que el objeto `nuevoPedido` en `src/app/acciones/PagoActions.js` conserve el método `.save()`.
+
+**Próximos Pasos:**
+
+*   Verificar la corrección intentando un proceso de pago y creación de pedido.
