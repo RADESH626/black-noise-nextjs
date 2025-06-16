@@ -24,7 +24,7 @@ async function guardarPedido(pedidoData) {
         revalidatePath('/admin/pedidos'); // Revalidate admin orders page
         revalidatePath('/perfil'); // Revalidate user profile page
         logger.debug('Revalidated paths /admin/pedidos and /perfil.');
-        return { success: true, data: pedidoGuardado }; // Return the Mongoose document directly
+        return { success: true, data: toPlainObject(pedidoGuardado) }; // Convert to plain object
     } catch (error) {
         logger.error('ERROR in guardarPedido:', error);
         return { error: 'Error al guardar el pedido: ' + error.message };
@@ -45,7 +45,7 @@ async function obtenerPedidos() {
             .lean();
         console.log('Pedidos after populate in obtenerPedidos:', pedidos); // Add this line for debugging
         logger.debug('Orders retrieved from DB:', pedidos.length, 'orders found.');
-        return { pedidos: JSON.parse(JSON.stringify(pedidos)) };
+        return { pedidos: pedidos.map(p => toPlainObject(p)) };
     } catch (error) {
         logger.error('ERROR in obtenerPedidos:', error);
         return { error: 'Error al obtener los pedidos: ' + error.message };
@@ -64,7 +64,7 @@ async function obtenerPedidosPorUsuarioId(usuarioId) {
             .populate('proveedorId', 'nombreProveedor contactoPrincipal')
             .lean();
         logger.debug('Orders retrieved for user ID:', usuarioId, 'count:', pedidos.length);
-        return { pedidos: JSON.parse(JSON.stringify(pedidos)) };
+        return { pedidos: pedidos.map(p => toPlainObject(p)) };
     } catch (error) {
         logger.error('ERROR in obtenerPedidosPorUsuarioId:', error);
         return { success: false, message: 'Error al obtener los pedidos del usuario: ' + error.message };
@@ -83,7 +83,7 @@ async function obtenerPedidosPagadosPorUsuarioId(usuarioId) {
             .populate('proveedorId', 'nombreProveedor contactoPrincipal')
             .lean();
         logger.debug('Paid orders retrieved for user ID:', usuarioId, 'count:', pedidos.length);
-        return { pedidos: JSON.parse(JSON.stringify(pedidos)) };
+        return { pedidos: pedidos.map(p => toPlainObject(p)) };
     } catch (error) {
         logger.error('ERROR in obtenerPedidosPagadosPorUsuarioId:', error);
         return { success: false, message: 'Error al obtener los pedidos pagados del usuario: ' + error.message };
@@ -151,8 +151,8 @@ async function ObtenerPedidoPorId(id) {
             logger.debug('Order not found for ID:', id);
             return { success: false, message: 'Pedido no encontrado' };
         }
-        logger.debug('Exiting ObtenerPedidoPorId with order:', JSON.parse(JSON.stringify(pedido)));
-        return { success: true, pedido: JSON.parse(JSON.stringify(pedido)) };
+        logger.debug('Exiting ObtenerPedidoPorId with order:', toPlainObject(pedido));
+        return { success: true, pedido: toPlainObject(pedido) };
     } catch (error) {
         logger.error('ERROR in ObtenerPedidoPorId:', error);
         return { success: false, message: 'Error al obtener el pedido: ' + error.message };
@@ -185,7 +185,7 @@ async function EditarPedido(id, data) {
         revalidatePath('/admin/pedidos');
         revalidatePath(`/admin/pedidos/editar/${id}`);
         logger.debug('Revalidated paths /admin/pedidos and /admin/pedidos/editar/${id}.');
-        return { success: true, data: JSON.parse(JSON.stringify(pedidoActualizado)) };
+        return { success: true, data: toPlainObject(pedidoActualizado) };
     } catch (error) {
         logger.error('ERROR in EditarPedido:', error);
         return { error: 'Error al editar el pedido: ' + error.message };

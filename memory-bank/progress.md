@@ -24,9 +24,17 @@ El proyecto está en desarrollo activo. Se han implementado varias funcionalidad
 *   **Simplificación del Contenido del Pop-up "¡Pedido Confirmado!":** Se ha modificado el componente `OrderConfirmationDialogContent.jsx` para presentar un mensaje de confirmación de pedido más conciso y directo, enfocándose en la confirmación del registro y el número de pedido, eliminando información redundante.
 *   **Pop-up de Confirmación de Pedido Transitorio:** Se ha modificado la llamada a `showPopUp` en `src/components/common/CartComponent.jsx` para que el mensaje de confirmación de pedido sea una cadena de texto simple y se cierre automáticamente después de un tiempo, similar al mensaje de inicio de sesión exitoso.
 *   **Envío de Correo de Confirmación al Usuario (TypeError Resuelto):** Se ha corregido el `TypeError: sendEmail is not a function` definiendo y exportando correctamente la función `sendEmail` en `src/utils/nodemailer.js`. Ahora los correos de confirmación deberían enviarse sin problemas.
+*   **Corrección de Errores de Serialización de Objetos:** Se abordaron múltiples errores de serialización de objetos (`ObjectId` y `Buffer`) al pasar datos de Server Components a Client Components. Esto se logró mediante:
+    *   La modificación de la función `toPlainObject` en `src/utils/dbUtils.js` para que realice una conversión recursiva de `ObjectIds` anidados y objetos `Buffer` a cadenas de texto (Base64 para Buffers).
+    *   La aplicación consistente de `toPlainObject` en las funciones de las Server Actions en `src/app/acciones/DesignActions.js`, `src/app/acciones/PagoActions.js`, `src/app/acciones/PedidoActions.js` y `src/app/acciones/ProveedorActions.js` para asegurar que los datos retornados sean objetos planos y serializables.
+    *   La conversión explícita de `_id` a cadena de texto en los componentes cliente `src/app/proveedor/pedidos/ver/[id]/page.jsx` y `src/app/proveedor/pedidos/page.jsx`, y `src/app/confirmacion/page.jsx`.
+*   **Corrección de error "Duplicate export 'obtenerPedidosPorProveedorId'":** Se eliminó `obtenerPedidosPorProveedorId` de la lista de exportaciones en el bloque `export { ... }` al final de `src/app/acciones/PedidoActions.js`, ya que la función ya se exporta directamente en su declaración.
+*   **Diagnóstico de error "obtenerPedidoPorProveedorId is not a function" (re-ocurrencia):** Se cambió la importación de `obtenerPedidoPorProveedorId` en `src/app/proveedor/pedidos/ver/[id]/page.jsx` de un alias (`@/app/acciones/PedidoActions`) a una ruta relativa (`../../acciones/PedidoActions`) como paso de diagnóstico.
+*   **Corrección de "Module not found: Can't resolve '../../acciones/PedidoActions'" y rutas de importación de componentes:** Se corrigieron las rutas de importación en `src/app/proveedor/pedidos/ver/[id]/page.jsx`. La importación de `obtenerPedidoPorProveedorId` se cambió a un alias (`@/app/acciones/PedidoActions`), y las importaciones de `LoadingSpinner` y `ErrorMessage` se corrigieron para usar alias y eliminar comentarios.
+*   **Resolución de Advertencia de Acceso a `params`:** Se ha resuelto la advertencia de Next.js sobre el acceso directo a `params` en `src/app/proveedor/pedidos/ver/[id]/page.jsx` importando `React` y utilizando `React.use(params)` para desestructurar el `id`.
 
 **Funcionalidades Pendientes / En Curso:**
 *   Ninguna.
 
 **Próximos Pasos:**
-*   Ninguno.
+*   Verificar que la aplicación funcione correctamente sin errores.

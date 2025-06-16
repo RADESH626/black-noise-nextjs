@@ -85,12 +85,12 @@ export default function ListaPedidosProveedorPage() {
             <tbody className="text-gray-600">
               {pedidos.map((pedido) => (
                 <tr key={pedido._id} className="border-b border-gray-200 hover:bg-gray-100">
-                  <td className="py-3 px-4">{pedido._id}</td>
+                  <td className="py-3 px-4">{pedido._id.toString()}</td>
                   <td className="py-3 px-4">{new Date(pedido.fechaPedido).toLocaleDateString()}</td>
                   <td className="py-3 px-4">{pedido.estado}</td>
                   <td className="py-3 px-4">${pedido.total.toFixed(2)}</td>
                   <td className="py-3 px-4">
-                    <Link href={`/proveedor/pedidos/ver/${pedido._id}`} className="text-blue-600 hover:underline">
+                    <Link href={`/proveedor/pedidos/ver/${pedido._id.toString()}`} className="text-blue-600 hover:underline">
                       Ver Detalles
                     </Link>
                   </td>

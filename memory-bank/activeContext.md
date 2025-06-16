@@ -219,3 +219,107 @@
 **Próximos Pasos:**
 
 *   Verificar que los correos de confirmación se envíen correctamente después de un pedido.
+
+### 16/06/2025 - 04:42 PM
+
+**Tarea:** Corregir el error "Only plain objects can be passed to Client Components from Server Components. Objects with toJSON methods are not supported."
+
+**Cambios Realizados:**
+
+*   **`src/app/proveedor/pedidos/ver/[id]/page.jsx`**: Se convirtió `pedido._id` a cadena de texto para su visualización.
+*   **`src/app/proveedor/pedidos/page.jsx`**: Se convirtió `pedido._id` a cadena de texto para su visualización y en el atributo `href` del `Link`.
+*   **`src/utils/dbUtils.js`**: Se modificó la función `toPlainObject` para que convierta recursivamente los `ObjectIds` anidados y los objetos `Buffer` a cadenas de texto (Base64 para Buffers).
+*   **`src/app/acciones/DesignActions.js`**:
+    *   En `obtenerDesignsPorUsuarioId` y `obtenerDesigns`, se aseguró que `_id` se convierta a cadena de texto y se eliminaron los campos `imageData` y `imageMimeType` del objeto retornado.
+    *   En `guardarDesigns` y `actualizarDesign`, se aseguró que `_id` sea una cadena de texto y se eliminaron `imageData` y `imageMimeType` del objeto `data` retornado.
+*   **`src/app/acciones/PagoActions.js`**:
+    *   En `obtenerPagos`, `obtenerPagosPorUsuarioId`, `guardarPago`, `ObtenerPagoPorId` y `EditarPago`, se aseguró que `_id`, `ventaId` y `usuarioId._id` (si están populados) se conviertan a cadenas de texto en los objetos retornados.
+*   **`src/app/acciones/PedidoActions.js`**:
+    *   En `guardarPedido`, `obtenerPedidos`, `obtenerPedidosPorUsuarioId`, `obtenerPedidosPagadosPorUsuarioId`, `ObtenerPedidoPorId` y `EditarPedido`, se actualizó el código para utilizar la función `toPlainObject` mejorada para toda la serialización de datos retornados.
+*   **`src/app/acciones/ProveedorActions.js`**:
+    *   En `crearProveedor` y `actualizarProveedor`, se actualizó el código para utilizar `toPlainObject` para los datos retornados.
+*   **`src/app/confirmacion/page.jsx`**: Se convirtió `pedido._id` a cadena de texto para su visualización.
+
+**Próximos Pasos:**
+
+*   Verificar que la aplicación funcione correctamente sin errores de serialización de objetos.
+
+### 16/06/2025 - 04:44 PM
+
+**Tarea:** Corregir el error "(0 , _app_acciones_PedidoActions__WEBPACK_IMPORTED_MODULE_4__.obtenerPedidoPorProveedorId) is not a function".
+
+**Cambios Realizados:**
+
+*   **`src/app/acciones/PedidoActions.js`**:
+    *   Se añadió `obtenerPedidosPorProveedorId` a la lista de exportaciones en el bloque `export { ... }` al final del archivo, asegurando que la función sea accesible como un módulo.
+
+**Próximos Pasos:**
+
+*   Verificar que la función `obtenerPedidoPorProveedorId` se pueda llamar correctamente desde `src/app/proveedor/pedidos/ver/[id]/page.jsx`.
+
+### 16/06/2025 - 04:45 PM
+
+**Tarea:** Corregir el error "Duplicate export 'obtenerPedidosPorProveedorId'".
+
+**Cambios Realizados:**
+
+*   **`src/app/acciones/PedidoActions.js`**:
+    *   Se eliminó `obtenerPedidosPorProveedorId` de la lista de exportaciones en el bloque `export { ... }` al final del archivo, ya que la función ya se exporta directamente en su declaración.
+
+**Próximos Pasos:**
+
+*   Verificar que la aplicación compile y funcione correctamente sin errores de exportación duplicada.
+
+### 16/06/2025 - 04:46 PM
+
+**Tarea:** Diagnosticar error "(0 , _app_acciones_PedidoActions__WEBPACK_IMPORTED_MODULE_4__.obtenerPedidoPorProveedorId) is not a function" (re-occurrence).
+
+**Cambios Realizados:**
+
+*   **`src/app/proveedor/pedidos/ver/[id]/page.jsx`**:
+    *   Se cambió la importación de `obtenerPedidoPorProveedorId` de un alias (`@/app/acciones/PedidoActions`) a una ruta relativa (`../../acciones/PedidoActions`) como paso de diagnóstico.
+
+**Próximos Pasos:**
+
+*   Verificar si el cambio a la ruta relativa resuelve el error. Si lo hace, investigar la configuración de alias de Next.js.
+
+### 16/06/2025 - 04:49 PM
+
+**Tarea:** Corregir "Module not found: Can't resolve '../../acciones/PedidoActions'" y rutas de importación de componentes.
+
+**Cambios Realizados:**
+
+*   **`src/app/proveedor/pedidos/ver/[id]/page.jsx`**:
+    *   Se cambió la importación de `obtenerPedidoPorProveedorId` de una ruta relativa (`../../acciones/PedidoActions`) a un alias (`@/app/acciones/PedidoActions`).
+    *   Se corrigieron las importaciones de `LoadingSpinner` y `ErrorMessage` para eliminar comentarios y asegurar el uso de alias (`@/components/common/LoadingSpinner` y `@/components/common/ErrorMessage`).
+
+**Próximos Pasos:**
+
+*   Verificar que la aplicación compile y funcione correctamente sin errores de resolución de módulos.
+
+### 16/06/2025 - 04:50 PM
+
+**Tarea:** Resolver advertencia de Next.js sobre el acceso directo a `params`.
+
+**Cambios Realizados:**
+
+*   **`src/app/proveedor/pedidos/ver/[id]/page.jsx`**:
+    *   Se importó `React`.
+    *   Se modificó la desestructuración de `params` para usar `React.use(params)`: `const { id: pedidoId } = React.use(params);`.
+
+**Próximos Pasos:**
+
+*   Verificar que la advertencia de Next.js sobre el acceso directo a `params` ya no aparezca.
+
+### 16/06/2025 - 04:51 PM
+
+**Tarea:** Corregir el error "(0 , _app_acciones_PedidoActions__WEBPACK_IMPORTED_MODULE_4__.obtenerPedidoPorProveedorId) is not a function" (re-occurrence).
+
+**Cambios Realizados:**
+
+*   **`src/app/acciones/PedidoActions.js`**:
+    *   Se eliminó `obtenerPedidosPorProveedorId` de la lista de exportaciones en el bloque `export { ... }` al final del archivo, ya que la función ya se exporta directamente en su declaración.
+
+**Próximos Pasos:**
+
+*   Verificar que la aplicación compile y funcione correctamente sin errores de exportación duplicada.

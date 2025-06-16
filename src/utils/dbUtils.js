@@ -1,22 +1,46 @@
-// Helper function to convert Mongoose document to plain object
+// Helper function to convert Mongoose document (or plain object) to a serializable plain object
 export function toPlainObject(doc) {
-    if (!doc) return null;
-    const obj = doc.toObject ? doc.toObject() : { ...doc }; // Handle both Mongoose docs and lean objects
+    if (doc === null || typeof doc !== 'object') {
+        return doc;
+    }
 
-    if (obj._id) {
-        obj._id = obj._id.toString();
+    // Handle Mongoose documents by converting to a plain object first
+    const obj = doc.toObject ? doc.toObject({ getters: true, virtuals: true }) : { ...doc };
+
+    // Recursive function to process properties
+    const processValue = (value) => {
+        if (value && typeof value === 'object') {
+            if (value instanceof Date) {
+                return value.toISOString();
+            }
+            if (value instanceof Buffer) {
+                return value.toString('base64');
+            }
+            // Check if it's a Mongoose ObjectId
+            if (value._bsontype === 'ObjectId' || (value.constructor && value.constructor.name === 'ObjectId')) {
+                return value.toString();
+            }
+            if (Array.isArray(value)) {
+                return value.map(item => processValue(item));
+            }
+            // Recursively process nested objects
+            const newObj = {};
+            for (const key in value) {
+                if (Object.prototype.hasOwnProperty.call(value, key)) {
+                    newObj[key] = processValue(value[key]);
+                }
+            }
+            return newObj;
+        }
+        return value;
+    };
+
+    const result = processValue(obj);
+
+    // Remove __v if present at the top level
+    if (result.__v !== undefined) {
+        delete result.__v;
     }
-    // Convert dates to YYYY-MM-DD for form compatibility or ISO string for full timestamp
-    if (obj.fechaNacimiento) {
-        obj.fechaNacimiento = new Date(obj.fechaNacimiento).toISOString().split('T')[0];
-    }
-    if (obj.createdAt) {
-        obj.createdAt = new Date(obj.createdAt).toISOString();
-    }
-    if (obj.updatedAt) {
-        obj.updatedAt = new Date(obj.updatedAt).toISOString();
-    }
-    // Remove __v if present
-    delete obj.__v;
-    return obj;
+
+    return result;
 }

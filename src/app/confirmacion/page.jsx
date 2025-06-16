@@ -85,7 +85,7 @@ export default function Confirmacion() {
       <p className="text-lg mb-6 text-center">Tu pedido ha sido confirmado.</p>
 
       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-xl font-semibold mb-4">Resumen del Pedido #{pedido._id}</h2>
+        <h2 className="text-xl font-semibold mb-4">Resumen del Pedido #{pedido._id.toString()}</h2>
         {pedido.cliente && (
           <div className="mb-4">
             <p><strong>Cliente:</strong> {pedido.cliente.nombre}</p>

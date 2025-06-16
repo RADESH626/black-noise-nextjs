@@ -75,7 +75,16 @@ export async function guardarDesigns(prevState, formData) {
         revalidatePath('/catalogo');
         revalidatePath('/perfil'); // Revalidate path for user profile page
 
-        return { success: true, message: 'Diseño registrado exitosamente', data: JSON.parse(JSON.stringify(newDesign)) };
+        return {
+            success: true,
+            message: 'Diseño registrado exitosamente',
+            data: {
+                ...JSON.parse(JSON.stringify(newDesign)),
+                _id: newDesign._id.toString(),
+                imageData: undefined, // Remove imageData
+                imageMimeType: undefined, // Remove imageMimeType
+            }
+        };
     } catch (error) {
         logger.error('ERROR in guardarDesigns:', error);
         return { success: false, message: 'Error al registrar el diseño: ' + error.message };
@@ -105,13 +114,14 @@ export async function obtenerDesigns() {
 
             return {
                 ...design,
+                _id: design._id.toString(), // Convert _id to string
                 id: design._id.toString(), // Ensure a string ID for frontend key
                 prenda: design.nombreDesing, // Map nombreDesing to prenda
                 price: design.valorDesing,   // Map valorDesing to price
                 usuario: design.usuarioId ? `${design.usuarioId.Nombre} ${design.usuarioId.primerApellido}` : 'Usuario Desconocido', // Map user name
                 userAvatar: userAvatar, // Add user avatar URL
                 imagen: designImageUrl, // Provide the image as a data URL
-                // Keep imageData and imageMimeType as they are used for data URL
+                // imageData and imageMimeType are removed as they are not plain objects for client components
             };
         });
 
@@ -137,11 +147,11 @@ export async function obtenerDesignsPorUsuarioId(usuarioId) {
 
             return {
                 ...design,
+                _id: design._id.toString(), // Convert _id to string
                 imagen: design.imageData && design.imageMimeType
                     ? `data:${design.imageMimeType};base64,${design.imageData.toString('base64')}`
                     : null, // Provide the image as a data URL
-                imageData: design.imageData, // Keep imageData for data URL
-                imageMimeType: design.imageMimeType, // Keep imageMimeType for data URL
+                // imageData and imageMimeType are removed as they are not plain objects for client components
             };
         });
 
@@ -235,7 +245,16 @@ export async function actualizarDesign(prevState, formData) {
         revalidatePath('/catalogo');
         revalidatePath(`/admin/designs/editar/${id}`); // Revalidate specific edit page
 
-        return { success: true, message: 'Diseño actualizado exitosamente', data: JSON.parse(JSON.stringify(updatedDesign)) };
+        return {
+            success: true,
+            message: 'Diseño actualizado exitosamente',
+            data: {
+                ...JSON.parse(JSON.stringify(updatedDesign)),
+                _id: updatedDesign._id.toString(),
+                imageData: undefined, // Remove imageData
+                imageMimeType: undefined, // Remove imageMimeType
+            }
+        };
     } catch (error) {
         logger.error('ERROR in actualizarDesign:', error);
         return { success: false, message: 'Error al actualizar el diseño: ' + error.message };

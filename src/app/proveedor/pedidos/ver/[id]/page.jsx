@@ -1,16 +1,17 @@
 "use client";
 
+import React from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { obtenerPedidoPorProveedorId } from "@/app/acciones/PedidoActions";
-import LoadingSpinner from "@/components/common/LoadingSpinner"; // Assuming you have a LoadingSpinner component
-import ErrorMessage from "@/components/common/ErrorMessage"; // Assuming you have an ErrorMessage component
+import LoadingSpinner from "@/components/common/LoadingSpinner";
+import ErrorMessage from "@/components/common/ErrorMessage";
 
 export default function VerPedidoProveedorPage({ params }) {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { id: pedidoId } = params;
+  const { id: pedidoId } = React.use(params);
   const [pedido, setPedido] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -60,7 +61,7 @@ export default function VerPedidoProveedorPage({ params }) {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Detalles del Pedido #{pedido._id}</h1>
+      <h1 className="text-2xl font-bold mb-4">Detalles del Pedido #{pedido._id.toString()}</h1>
       <div className="bg-white shadow-md rounded-lg p-6">
         <p className="mb-2"><strong>Fecha del Pedido:</strong> {new Date(pedido.fechaPedido).toLocaleDateString()}</p>
         <p className="mb-2"><strong>Estado:</strong> {pedido.estado}</p>

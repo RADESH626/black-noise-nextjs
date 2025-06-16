@@ -177,6 +177,7 @@ function CartComponent() {
   const handleCardDataSubmit = (data) => {
     setCardData(data);
     showPopUp("Información de la tarjeta guardada.", "success");
+    setIsCardModalOpen(false); // Close the modal after successful submission
   };
 
   const handleProcessPayment = async () => {
@@ -212,15 +213,9 @@ function CartComponent() {
       updateCart([]);
       setShowPaymentSection(false);
       showPopUp(
-        <OrderConfirmationDialogContent
-          pedidoId={pedidoId}
-          onClose={() => {
-            // This onClose will be called when the dialog is closed
-            // You might want to do something here, e.g., navigate to home or clear state
-          }}
-        />,
-        "success", // You can choose the type of popup, 'success' seems appropriate
-        true // Make it persistent until closed by user
+        "¡Pedido exitoso! Recibirás un correo de confirmación con los detalles de tu pedido.",
+        "success",
+        false // Make it disappear automatically
       );
     } else {
       setPaymentError({ message: message || "Error al procesar el pago." });

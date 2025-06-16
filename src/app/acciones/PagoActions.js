@@ -11,6 +11,7 @@ import { guardarVenta } from '@/app/acciones/VentaActions'; // Import guardarVen
 import { getModel } from '@/utils/modelLoader';
 import { MetodoPago } from '@/models/enums/pago/MetodoPago'; // Import MetodoPago enum
 import { assignOrderToProvider } from '@/app/acciones/assignOrderToProvider'; // Import the new server action
+import { sendEmail } from '@/utils/nodemailer'; // Import sendEmail
 
 // Crear un nuevo pago
 async function guardarPago(data) {
@@ -25,7 +26,15 @@ async function guardarPago(data) {
         logger.debug('Pago saved to DB:', pagoGuardado);
         revalidatePath('/admin/pagos');
         logger.debug('Revalidated path /admin/pagos.');
-        return { success: true, data: JSON.parse(JSON.stringify(pagoGuardado)) };
+        return {
+            success: true,
+            data: {
+                ...JSON.parse(JSON.stringify(pagoGuardado)),
+                _id: pagoGuardado._id.toString(),
+                ventaId: pagoGuardado.ventaId ? pagoGuardado.ventaId.toString() : null,
+                usuarioId: pagoGuardado.usuarioId ? pagoGuardado.usuarioId.toString() : null,
+            }
+        };
     } catch (error) {
         logger.error('ERROR in guardarPago:', error);
         return { error: 'Error al guardar el pago: ' + error.message };
@@ -43,8 +52,19 @@ async function obtenerPagos() {
             .populate('usuarioId', 'Nombre primerApellido correo') // Popula algunos campos de Usuario
             .populate('ventaId', '_id') // Popula el ID de Venta
             .lean();
-        logger.debug('Payments retrieved from DB:', pagos.length, 'payments found.');
-        return { pagos: JSON.parse(JSON.stringify(pagos)) };
+
+        const formattedPagos = pagos.map(pago => ({
+            ...pago,
+            _id: pago._id.toString(),
+            ventaId: pago.ventaId ? pago.ventaId.toString() : null, // Convert ventaId to string if populated
+            usuarioId: pago.usuarioId ? {
+                ...pago.usuarioId,
+                _id: pago.usuarioId._id.toString() // Convert userId to string
+            } : null,
+        }));
+
+        logger.debug('Payments retrieved from DB and formatted:', formattedPagos.length, 'payments found.');
+        return { pagos: JSON.parse(JSON.stringify(formattedPagos)) };
     } catch (error) {
         logger.error('ERROR in obtenerPagos:', error);
         return { error: 'Error al obtener los pagos: ' + error.message };
@@ -67,8 +87,17 @@ async function ObtenerPagoPorId(id) {
             logger.debug('Payment not found for ID:', id);
             return { error: 'Pago no encontrado' };
         }
-        logger.debug('Exiting ObtenerPagoPorId with payment:', JSON.parse(JSON.stringify(pago)));
-        return JSON.parse(JSON.stringify(pago));
+        const formattedPago = {
+            ...pago,
+            _id: pago._id.toString(),
+            ventaId: pago.ventaId ? pago.ventaId.toString() : null,
+            usuarioId: pago.usuarioId ? {
+                ...pago.usuarioId,
+                _id: pago.usuarioId._id.toString()
+            } : null,
+        };
+        logger.debug('Exiting ObtenerPagoPorId with formatted payment:', formattedPago);
+        return JSON.parse(JSON.stringify(formattedPago));
     } catch (error) {
         logger.error('ERROR in ObtenerPagoPorId:', error);
         return { error: 'Error al obtener el pago: ' + error.message };
@@ -102,7 +131,15 @@ async function EditarPago(id, data) {
         revalidatePath('/admin/pagos');
         revalidatePath(`/admin/pagos/editar/${id}`);
         logger.debug('Revalidated paths /admin/pagos and /admin/pagos/editar/${id}.');
-        return { success: true, data: JSON.parse(JSON.stringify(pagoActualizado)) };
+        return {
+            success: true,
+            data: {
+                ...JSON.parse(JSON.stringify(pagoActualizado)),
+                _id: pagoActualizado._id.toString(),
+                ventaId: pagoActualizado.ventaId ? pagoActualizado.ventaId.toString() : null,
+                usuarioId: pagoActualizado.usuarioId ? pagoActualizado.usuarioId.toString() : null,
+            }
+        };
     } catch (error) {
         logger.error('ERROR in EditarPago:', error);
         return { error: 'Error al editar el pago: ' + error.message };
@@ -120,8 +157,19 @@ async function obtenerPagosPorUsuarioId(usuarioId) {
             .populate('usuarioId', 'Nombre primerApellido correo') // Popula algunos campos de Usuario
             .populate('ventaId', '_id') // Popula el ID de Venta
             .lean();
-        logger.debug('Payments retrieved for user ID:', usuarioId, 'count:', pagos.length);
-        return { success: true, pagos: JSON.parse(JSON.stringify(pagos)) };
+
+        const formattedPagos = pagos.map(pago => ({
+            ...pago,
+            _id: pago._id.toString(),
+            ventaId: pago.ventaId ? pago.ventaId.toString() : null, // Convert ventaId to string if populated
+            usuarioId: pago.usuarioId ? {
+                ...pago.usuarioId,
+                _id: pago.usuarioId._id.toString() // Convert userId to string
+            } : null,
+        }));
+
+        logger.debug('Payments retrieved for user ID and formatted:', usuarioId, 'count:', formattedPagos.length);
+        return { success: true, pagos: JSON.parse(JSON.stringify(formattedPagos)) };
     } catch (error) {
         logger.error('ERROR in obtenerPagosPorUsuarioId:', error);
         return { success: false, message: 'Error al obtener los pagos del usuario: ' + error.message };
@@ -251,6 +299,25 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
              logger.warn('Failed to clear cart after successful payment and order creation:', clearCartMessage);
         } else {
              logger.debug('Cart cleared successfully after payment and order creation.');
+        }
+
+        // 7. Enviar correo de confirmación al usuario
+        const emailSubject = 'Confirmación de Pedido BlackNoise';
+        const emailBody = `
+            <h1>¡Gracias por tu compra, ${nombre}!</h1>
+            <p>Tu pedido ha sido registrado correctamente.</p>
+            <p><strong>Número de Pedido:</strong> ${nuevoPedido._id.toString()}</p>
+            <p>Puedes ver los detalles de tu pedido en tu perfil de BlackNoise.</p>
+            <p>¡Esperamos que disfrutes tus diseños!</p>
+            <br/>
+            <p>Atentamente,</p>
+            <p>El equipo de BlackNoise</p>
+        `;
+        try {
+            await sendEmail(correo, emailSubject, emailBody);
+            logger.debug(`Confirmation email sent to ${correo} for order ${nuevoPedido._id}.`);
+        } catch (emailError) {
+            logger.error(`Failed to send confirmation email to ${correo} for order ${nuevoPedido._id}:`, emailError);
         }
 
         revalidatePath('/perfil'); // Revalidate user profile/orders page
