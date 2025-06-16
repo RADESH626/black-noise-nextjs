@@ -69,6 +69,27 @@ The user requested a custom header for the supplier view (`/proveedor/pedidos`) 
 - Update `progress.md`.
 - Propose Git commands.
 
+## Task: Fix React Hooks order in ListaPedidosProveedorPage
+
+### Problem:
+React detected a change in the order of Hooks called by `ListaPedidosProveedorPage`, specifically a `useContext` hook being `undefined` in the previous render but present in the next render. This leads to bugs and errors if not fixed, violating React's Rules of Hooks.
+
+### Analysis:
+- The `useQuery` hook was being called conditionally after `if (status === "loading")` and `if (!session || ...)` blocks.
+- React Hooks must be called unconditionally at the top level of the component to ensure their order remains consistent across renders.
+
+### Solution Implemented:
+1.  **Modified `src/app/proveedor/pedidos/page.jsx`**: Moved the `useQuery` hook call to the top of the `ListaPedidosProveedorPage` component, before any conditional `return` statements. This ensures that `useQuery` is always called in the same order on every render, regardless of the session status or user authentication.
+2.  **Refined `useQuery` in `src/app/proveedor/pedidos/page.jsx`**: Added a conditional check `if (!session?.user?.proveedorId)` inside the `queryFn` of `useQuery` to ensure `session.user.proveedorId` is available before attempting to fetch data. This prevents errors when `session` or `session.user` might be `null` or `undefined` during initial renders, even with the `enabled` flag.
+3.  **Reordered Conditional Returns in `src/app/proveedor/pedidos/page.jsx`**: Moved the `if (status === "loading")` and `if (!session || !session.user || !session.user.isSupplier)` conditional return statements to appear *after* all React Hooks (`useSession`, `useRouter`, `useQuery`) have been called. This guarantees that all Hooks are executed unconditionally and in the same order on every render, fully adhering to React's Rules of Hooks and resolving the "Rendered more hooks than during the previous render" error.
+
+### Files Modified:
+- `src/app/proveedor/pedidos/page.jsx`
+
+### Next Steps:
+- Update `progress.md`.
+- Propose Git commands.
+
 ## Task: Prevent unnecessary page refresh on supplier page re-entry and flickering
 
 ### Problem:
@@ -128,11 +149,13 @@ The supplier page (`/proveedor`) and the catalog page (`/catalogo`) were re-fetc
 ### Solution Implemented:
 1.  **Installed Dependencies**: Installed `@tanstack/react-query` and `@tanstack/react-query-devtools`.
 2.  **Configured `QueryClientProvider`**: Wrapped the application with `QueryClientProvider` in `src/app/layout.jsx` to make React Query available globally.
-3.  **Refactored Data Fetching in `ProveedorPage`**: Modified `src/app/proveedor/page.jsx` to use `useQuery` for fetching `miPerfil`, replacing the manual `useState`/`useEffect` logic. Adjusted loading and error handling to use `useQuery`'s states.
+3.  **Refactored Data Fetching in `ProveedorPage`**: Modified `src/app/proveedor/page.jsx` to use `useQuery` for fetching `miPerfil`, replacing the manual `useState`/`useEffect` logic. Adjusted loading and error handling to use `useQuery`'s states. **Refined the `enabled` option in `useQuery` to `!!session?.user?.isSupplier && !!session?.user?.id` to ensure the query only runs when `session.user.id` is fully available, preventing premature queries or `queryKey` changes.**
 4.  **Refactored Data Fetching in `ComunidadDiseños` (Catalog Page)**: Modified `src/app/catalogo/page.jsx` to use `useQuery` for fetching `allDesigns`, replacing the manual `useState`/`useEffect` logic. Adjusted loading and error handling to use `useQuery`'s states.
+5.  **Fixed "Only plain objects" Error with QueryClientProvider**: Resolved the serialization error by creating a dedicated client component (`src/app/providers.jsx`) to encapsulate the `QueryClient` instance creation and the `QueryClientProvider`, ensuring the `QueryClient` is instantiated in a client environment.
 
 ### Files Modified:
 - `src/app/layout.jsx`
+- `src/app/providers.jsx`
 - `src/app/proveedor/page.jsx`
 - `src/app/catalogo/page.jsx`
 - `package.json` (due to npm install)

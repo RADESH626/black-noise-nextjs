@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query"; // Import useQuery
 import { obtenerPedidosPorProveedorId } from "@/app/acciones/PedidoActions";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import ErrorMessage from "@/components/common/ErrorMessage";
@@ -12,52 +12,49 @@ import HeaderProveedor from "@/components/layout/proveedor/HeaderProveedor";
 export default function ListaPedidosProveedorPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [pedidos, setPedidos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    if (status === "loading") return;
-
-    if (!session || !session.user || !session.user.isSupplier) {
-      router.push("/login"); // Redirect if not authenticated or not a supplier
-      return;
-    }
-
-    const fetchPedidos = async () => {
-      setLoading(true);
-      setError(null);
-      console.log("Fetching orders for supplierId:", session.user.proveedorId); // Debug log
-      try {
-        const result = await obtenerPedidosPorProveedorId(null, session.user.proveedorId); // Pass null for pedidoId to get all orders for supplier
-        console.log("Result from obtenerPedidosPorProveedorId:", result); // Debug log
-        if (result && result.success) { // Added check for result existence
-          setPedidos(result.pedidos);
-        } else {
-          setError(result ? result.message : "Error al cargar los pedidos: Respuesta indefinida."); // Improved error message
-        }
-      } catch (err) {
-        console.error("Error fetching supplier orders list:", err);
-        setError("Error al cargar los pedidos. Inténtalo de nuevo.");
-      } finally {
-        setLoading(false);
+  // Use useQuery to fetch supplier orders
+  const { data: pedidos, isLoading, isError, error } = useQuery({
+    queryKey: ['supplierOrders', session?.user?.proveedorId], // Unique key for this query, dependent on supplier ID
+    queryFn: async () => {
+      if (!session?.user?.proveedorId) {
+        throw new Error("Supplier ID not available.");
       }
-    };
+      // Pass null for pedidoId to get all orders for supplier
+      const result = await obtenerPedidosPorProveedorId(null, session.user.proveedorId);
+      if (result && result.success) {
+        return result.pedidos;
+      } else {
+        throw new Error(result ? result.message : "Error al cargar los pedidos: Respuesta indefinida.");
+      }
+    },
+    enabled: !!session?.user?.isSupplier && !!session?.user?.proveedorId, // Only run query if user is a supplier and has a supplierId
+    staleTime: Infinity, // Data is considered fresh indefinitely for diagnostic
+    cacheTime: 10 * 60 * 1000, // Data stays in cache for 10 minutes
+    retry: 1, // Retry once on failure
+    refetchOnWindowFocus: false, // Disable refetching on window focus for diagnostic
+  });
 
-    if (session.user.isSupplier && session.user.proveedorId) {
-      fetchPedidos();
-    }
-  }, [session, status, router]);
-
-  if (loading) {
+  // Handle session loading/unauthenticated states first
+  if (status === "loading") {
     return <LoadingSpinner />;
   }
 
-  if (error) {
-    return <ErrorMessage message={error} />;
+  if (!session || !session.user || !session.user.isSupplier) {
+    router.push("/login"); // Redirect if not authenticated or not a supplier
+    return null;
   }
 
-  if (pedidos.length === 0) {
+  // Render logic
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (isError) {
+    return <ErrorMessage message={error.message || "Error al cargar los pedidos."} />;
+  }
+
+  if (!pedidos || pedidos.length === 0) { // Check if pedidos is null/undefined or empty
     return (
       <>
         <HeaderProveedor />
