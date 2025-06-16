@@ -152,3 +152,70 @@
 **Próximos Pasos:**
 
 *   Verificar que el pop-up de inicio de sesión ahora muestre el color de fondo correcto y no tenga un borde blanco.
+
+### 16/06/2025 - 03:33 PM
+
+**Tarea:** Subir cambios al repositorio.
+
+**Cambios Realizados:**
+
+*   Se realizaron `git add .`, `git commit -m "feat: Upload missing changes"`, y `git push` para subir los cambios pendientes al repositorio remoto.
+
+**Próximos Pasos:**
+
+*   Ninguno. La tarea ha sido completada.
+
+### 16/06/2025 - 03:36 PM
+
+**Tarea:** Cerrar el modal "confirmar pedido y pago" cuando los datos de la tarjeta se guarden correctamente.
+
+**Cambios Realizados:**
+
+*   **`src/components/common/CartComponent.jsx`**:
+    *   Se modificó la función `handleCardDataSubmit` para incluir `setIsCardModalOpen(false);` después de guardar la información de la tarjeta y mostrar el pop-up de éxito. Esto asegura que el modal `CardDataModal` se cierre automáticamente al guardar los datos.
+
+**Próximos Pasos:**
+
+*   Verificar que el modal de datos de la tarjeta se cierre automáticamente después de guardar la información.
+
+### 16/06/2025 - 03:54 PM
+
+**Tarea:** Simplificar el contenido del pop-up "¡Pedido Confirmado!".
+
+**Cambios Realizados:**
+
+*   **`src/components/pago/OrderConfirmationDialogContent.jsx`**:
+    *   Se modificó el título a "¡Pedido Registrado Correctamente!".
+    *   Se simplificó el texto de confirmación para ser más conciso, manteniendo la información esencial del número de pedido y la notificación de correo.
+
+**Próximos Pasos:**
+
+*   Verificar que el pop-up de confirmación de pedido muestre un mensaje más conciso y directo.
+
+### 16/06/2025 - 04:02 PM
+
+**Tarea:** Hacer que el pop-up de confirmación de pedido sea transitorio y más simple.
+
+**Cambios Realizados:**
+
+*   **`src/components/common/CartComponent.jsx`**:
+    *   Se modificó la llamada a `showPopUp` para el mensaje de confirmación de pedido.
+    *   Se reemplazó el componente `OrderConfirmationDialogContent` por una cadena de texto simple: "¡Pedido exitoso! Recibirás un correo de confirmación con los detalles de tu pedido.".
+    *   Se cambió el parámetro `persistent` de `true` a `false` para que el pop-up se cierre automáticamente después de un tiempo.
+
+**Próximos Pasos:**
+
+*   Verificar que el pop-up de confirmación de pedido aparezca como un mensaje transitorio y simple, y que desaparezca automáticamente.
+
+### 16/06/2025 - 04:30 PM
+
+**Tarea:** Corregir TypeError: sendEmail is not a function.
+
+**Cambios Realizados:**
+
+*   **`src/utils/nodemailer.js`**:
+    *   Se definió y exportó la función `sendEmail` para que pueda ser utilizada por otras partes de la aplicación. Esta función utiliza el `transporter` de Nodemailer para enviar correos electrónicos.
+
+**Próximos Pasos:**
+
+*   Verificar que los correos de confirmación se envíen correctamente después de un pedido.

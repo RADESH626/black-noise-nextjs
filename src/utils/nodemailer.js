@@ -12,6 +12,22 @@ export const transporter = nodemailer.createTransport({
   },
 });
 
+// Función para enviar correos electrónicos
+export const sendEmail = async (to, subject, html) => {
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER, // Remitente
+      to,         // Lista de destinatarios
+      subject,    // Asunto del correo
+      html,       // Contenido HTML
+    });
+    console.log(`Email sent to ${to} with subject: ${subject}`);
+  } catch (error) {
+    console.error('Error sending email:', error);
+    throw error; // Re-throw the error for handling in the calling function
+  }
+};
+
 // Verifica la conexión del transporter (opcional)
 transporter.verify(function (error, success) {
   if (error) {
