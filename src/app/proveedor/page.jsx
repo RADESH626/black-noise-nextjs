@@ -43,7 +43,7 @@ function ProveedorPage() {
             }
         };
 
-        if (session.user.isSupplier) { // Removed session.user.proveedorId check
+        if (session.user.isSupplier && !miPerfil) { // Removed session.user.proveedorId from dependency array
             fetchMiPerfil();
         }
     }, [session, status, router]); // Removed session.user.proveedorId from dependency array

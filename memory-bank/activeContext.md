@@ -61,6 +61,30 @@ The user requested a custom header for the supplier view (`/proveedor/pedidos`) 
 - `src/app/proveedor/pedidos/page.jsx`
 - `src/components/layout/proveedor/HeaderProveedor.jsx`
 
+### Git Commit:
+- `git add .`
+- `git commit -m "feat: Implement custom header for supplier view and fix supplier redirection"`
+
+### Next Steps:
+- Update `progress.md`.
+- Propose Git commands.
+
+## Task: Prevent unnecessary page refresh on supplier page re-entry
+
+### Problem:
+The supplier page (`/proveedor`) was fully refreshing (re-fetching data and showing a loading spinner) every time the user navigated away and then returned to it.
+
+### Analysis:
+- The `src/app/proveedor/page.jsx` component is a Client Component.
+- It uses a `useEffect` hook to fetch supplier profile data (`obtenerMiPerfilProveedor`).
+- The `useEffect` was configured to re-run the data fetch whenever its dependencies (`session`, `status`, `router`) changed, which happens on component remount or session state updates, leading to unnecessary re-fetching and display of the loading spinner.
+
+### Solution Implemented:
+1.  **Modified `src/app/proveedor/page.jsx`**: Adjusted the `useEffect` hook to include a condition (`!miPerfil`) before calling `fetchMiPerfil`. This ensures that the data is only fetched if `miPerfil` is `null` or `undefined`, preventing redundant data loading when the user returns to the page and the profile data is already present.
+
+### Files Modified:
+- `src/app/proveedor/page.jsx`
+
 ### Next Steps:
 - Update `progress.md`.
 - Propose Git commands.
