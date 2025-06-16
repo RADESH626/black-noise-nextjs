@@ -90,6 +90,26 @@ async function obtenerPedidosPagadosPorUsuarioId(usuarioId) {
     }
 }
 
+// Obtener pedidos por proveedor ID
+async function obtenerPedidosPorProveedorId(proveedorId) {
+    logger.debug('Entering obtenerPedidosPorProveedorId with proveedorId:', proveedorId);
+    try {
+        await connectDB();
+        logger.debug('Database connected for obtenerPedidosPorProveedorId.');
+        const Pedido = await getModel('Pedido');
+        const pedidos = await Pedido.find({ proveedorId: proveedorId })
+            .populate('userId', 'nombre email')
+            .populate('items.designId', 'nombreDesing imageData imageMimeType')
+            .populate('proveedorId', 'nombreProveedor contactoPrincipal')
+            .lean();
+        logger.debug('Orders retrieved for supplier ID:', proveedorId, 'count:', pedidos.length);
+        return { pedidos: pedidos.map(p => toPlainObject(p)) };
+    } catch (error) {
+        logger.error('ERROR in obtenerPedidosPorProveedorId:', error);
+        return { success: false, message: 'Error al obtener los pedidos del proveedor: ' + error.message };
+    }
+}
+
 // Obtener pedido por ID (para uso general/admin)
 async function ObtenerPedidoPorId(id) {
     logger.debug('Entering ObtenerPedidoPorId with ID:', id);
@@ -154,6 +174,7 @@ export {
     guardarPedido,
     obtenerPedidos,
     obtenerPedidosPorUsuarioId, // This function is now deprecated for supplier use, but kept for user-specific orders
+    obtenerPedidosPorProveedorId, // Export the new function
     ObtenerPedidoPorId,
     EditarPedido,
     obtenerPedidosPagadosPorUsuarioId, // Export the new function
