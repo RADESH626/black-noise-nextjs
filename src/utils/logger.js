@@ -1,4 +1,5 @@
 // src/utils/logger.js
+console.log('Logger module loaded.'); // Temporary debug log
 
 const LOG_LEVELS = {
   DEBUG: 0,
@@ -13,6 +14,7 @@ const currentLogLevel = LOG_LEVELS[process.env.NEXT_PUBLIC_LOG_LEVEL] || LOG_LEV
 
 const logger = {
   _log: (level, ...args) => {
+    console.log(`Attempting to log: ${level}`, ...args); // Temporary debug log
     if (LOG_LEVELS[level] >= currentLogLevel) {
       const timestamp = new Date().toISOString();
       const prefix = `[${timestamp}] [${level}]`;

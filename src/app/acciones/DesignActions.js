@@ -107,43 +107,9 @@ export async function obtenerDesigns() {
             // Create a mutable copy of the design object
             const processedDesign = { ...design };
 
-            // Convert main design _id to string
-            processedDesign._id = design._id.toString();
-            processedDesign.id = design._id.toString(); // Ensure a string ID for frontend key
-
-            // Process usuarioId to ensure it's a plain object and _id is a string
-            let processedUsuarioId = null;
-            if (processedDesign.usuarioId) {
-                processedUsuarioId = {
-                    _id: processedDesign.usuarioId._id.toString(),
-                    Nombre: processedDesign.usuarioId.Nombre,
-                    primerApellido: processedDesign.usuarioId.primerApellido,
-                };
-            }
-            processedDesign.usuarioId = processedUsuarioId; // Assign the processed plain object
-
-            let processedImageData = null;
-            if (processedDesign.imageData) {
-                if (processedDesign.imageData instanceof Buffer) {
-                    processedImageData = processedDesign.imageData;
-                } else if (Array.isArray(processedDesign.imageData) && processedDesign.imageData.every(byte => typeof byte === 'number')) {
-                    processedImageData = Buffer.from(processedDesign.imageData);
-                } else if (typeof processedDesign.imageData === 'object' && processedDesign.imageData !== null && processedDesign.imageData.type === 'Buffer' && Array.isArray(processedDesign.imageData.data)) {
-                    processedImageData = Buffer.from(processedDesign.imageData.data);
-                }
-            }
-
-            const userAvatar = processedUsuarioId && design.usuarioId.imageData && design.usuarioId.imageMimeType
-                ? `/api/images/usuario/${processedUsuarioId._id}`
-                : '/img/perfil/FotoPerfil.webp';
-
-            const designImageUrl = processedImageData instanceof Buffer && processedDesign.imageMimeType
-                ? `data:${processedDesign.imageMimeType};base64,${processedImageData.toString('base64')}`
-                : null;
-
-            // Remove original imageData and imageMimeType from the object to prevent serialization errors
-            delete processedDesign.imageData;
-            delete processedDesign.imageMimeType;
+            const designImageUrl = design.imageData && design.imageData.buffer instanceof Buffer && design.imageMimeType
+                ? `data:${design.imageMimeType};base64,${design.imageData.buffer.toString('base64')}`
+                : null; // Provide the image as a data URL
 
             return {
                 ...processedDesign,
@@ -170,8 +136,8 @@ export async function obtenerDesignsPorUsuarioId(usuarioId) {
         const designs = await Design.find({ usuarioId: usuarioId }).lean();
 
         const formattedDesigns = designs.map(design => {
-            const designImageUrl = design.imageData instanceof Buffer && design.imageMimeType
-                ? `data:${design.imageMimeType};base64,${design.imageData.toString('base64')}`
+            const designImageUrl = design.imageData && design.imageData.buffer instanceof Buffer && design.imageMimeType
+                ? `data:${design.imageMimeType};base64,${design.imageData.buffer.toString('base64')}`
                 : null; // Or a default image path if no image data
 
             return {
