@@ -26,6 +26,7 @@ Se ha implementado el nuevo "apartado de pagos pendientes" para clientes, incluy
     *   **Se modificó la función `actualizarPedidoPorProveedor` para recalcular el `total` del pedido sumando el `costoEnvio` al total original de los ítems cuando el proveedor actualiza el `costoEnvio`.**
     *   **Se añadió lógica para actualizar el `estadoPago` del pedido a `PENDIENTE` si el `costoEnvio` es mayor que 0, o a `PAGADO` si el `costoEnvio` se cambia a 0 desde un estado pendiente.**
     *   **Se añadieron revalidaciones de caché para `/perfil`, `/pagos-pendientes` y `/proveedor/pedidos/${pedidoId}` para asegurar que los cambios se reflejen en la interfaz de usuario.**
+    *   **Se importó `revalidatePath` de `next/cache` para resolver el `ReferenceError`.**
 *   `src/components/layout/general/HeaderPrincipal.jsx`:
     *   Se importó el nuevo componente `PendingPaymentsSummary`.
     *   Se integró `PendingPaymentsSummary` en el header, visible para usuarios autenticados, junto al icono del carrito.

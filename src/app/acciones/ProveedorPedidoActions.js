@@ -4,6 +4,7 @@ import connectDB from '@/utils/DBconection';
 import logger from '@/utils/logger';
 import { getModel } from '@/utils/modelLoader';
 import { toPlainObject } from '@/utils/dbUtils';
+import { revalidatePath } from 'next/cache'; // Importar revalidatePath
 
 export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId) {
     logger.debug('Entering obtenerPedidosPorProveedorId with pedidoId:', pedidoId, 'proveedorId:', proveedorId);
