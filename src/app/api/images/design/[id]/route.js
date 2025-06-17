@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET(request, { params }) {
     await connectDB();
-    const { id } = params;
+    const id = params.id;
     logger.debug(`Attempting to retrieve image for design ID: ${id}`);
 
     try {
@@ -20,6 +20,7 @@ export async function GET(request, { params }) {
             logger.warn(`Image data or mime type missing for design ID: ${id}`);
             return new NextResponse('Image data missing', { status: 404 });
         }
+
 
         // Set the appropriate content type header
         const headers = new Headers();

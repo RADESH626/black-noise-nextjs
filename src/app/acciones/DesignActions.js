@@ -108,8 +108,8 @@ export async function obtenerDesigns() {
                 ? `/api/images/usuario/${design.usuarioId._id}`
                 : '/img/perfil/FotoPerfil.webp'; // Default avatar if no image data
 
-            const designImageUrl = design.imageData instanceof Buffer && design.imageMimeType
-                ? `data:${design.imageMimeType};base64,${design.imageData.toString('base64')}`
+            const designImageUrl = design.imageData && design.imageData.buffer instanceof Buffer && design.imageMimeType
+                ? `data:${design.imageMimeType};base64,${design.imageData.buffer.toString('base64')}`
                 : null; // Provide the image as a data URL
 
             return {
@@ -141,8 +141,8 @@ export async function obtenerDesignsPorUsuarioId(usuarioId) {
         const designs = await Design.find({ usuarioId: usuarioId }).lean();
 
         const formattedDesigns = designs.map(design => {
-            const designImageUrl = design.imageData instanceof Buffer && design.imageMimeType
-                ? `data:${design.imageMimeType};base64,${design.imageData.toString('base64')}`
+            const designImageUrl = design.imageData && design.imageData.buffer instanceof Buffer && design.imageMimeType
+                ? `data:${design.imageMimeType};base64,${design.imageData.buffer.toString('base64')}`
                 : null; // Or a default image path if no image data
 
             return {
