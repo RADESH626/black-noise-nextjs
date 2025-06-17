@@ -216,7 +216,6 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
                 price: item.price,
                 // Otros campos relevantes del producto si es necesario
             })),
-            proveedorId: cartItems[0]?.proveedorId, // Assuming all items in cart are from the same supplier for simplicity
             metodoEntrega: metodoEntrega,
             estadoPedido: 'PENDIENTE',
             total: total,
