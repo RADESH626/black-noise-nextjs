@@ -23,8 +23,8 @@ function DesignCard({ diseño, addItem, isInCart }) {
       <div className="w-full h-64 flex items-center justify-center bg-black overflow-hidden">
         <img
           src={
-            // diseño.imagen 
-            // || 
+            diseño.imagen 
+            || 
             '/next.svg'
           }
           alt={`Imagen de ${diseño.prenda}`}

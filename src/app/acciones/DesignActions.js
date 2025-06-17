@@ -12,7 +12,7 @@ import { Rol } from '@/models/enums/usuario/Rol';
 // Function to save a single design
 export async function guardarDesigns(prevState, formData) {
     await connectDB();
-    logger.debug('Entering guardarDesigns with formData:', formData);
+    console.log('Entering guardarDesigns with formData:', formData);
 
     const session = await getServerSession(authOptions);
 
@@ -50,7 +50,7 @@ export async function guardarDesigns(prevState, formData) {
             const buffer = Buffer.from(bytes);
             mimeType = imageFile.type;
             imageData = buffer;
-            logger.debug(`[guardarDesigns] Buffer length: ${buffer.length}, Hex snippet: ${buffer.toString('hex').substring(0, 60)}...`);
+            console.log(`[guardarDesigns] Buffer length: ${buffer.length}, Hex snippet: ${buffer.toString('hex').substring(0, 60)}...`);
         } else {
             return { success: false, message: 'No se proporcionó una imagen para el diseño.' };
         }
@@ -69,7 +69,7 @@ export async function guardarDesigns(prevState, formData) {
         };
 
         const newDesign = await Design.create(data);
-        logger.debug('Design saved successfully:', newDesign);
+        console.log('Design saved successfully:', newDesign);
 
         revalidatePath('/admin/designs');
         revalidatePath('/catalogo');
@@ -81,12 +81,12 @@ export async function guardarDesigns(prevState, formData) {
             data: {
                 ...JSON.parse(JSON.stringify(newDesign)),
                 _id: newDesign._id.toString(),
-                imageData: undefined, // Remove imageData
-                imageMimeType: undefined, // Remove imageMimeType
+                // imageData: undefined, // Remove imageData
+                // imageMimeType: undefined, // Remove imageMimeType
             }
         };
     } catch (error) {
-        logger.error('ERROR in guardarDesigns:', error);
+        console.error('ERROR in guardarDesigns:', error);
         return { success: false, message: 'Error al registrar el diseño: ' + error.message };
     }
 }
@@ -94,41 +94,70 @@ export async function guardarDesigns(prevState, formData) {
 // Function to get all designs
 export async function obtenerDesigns() {
     await connectDB();
-    logger.debug('Entering obtenerDesigns.');
+    console.log('Entering obtenerDesigns.');
     try {
         const designs = await Design.find({})
             .populate({
                 path: 'usuarioId',
-                select: 'Nombre primerApellido imageData imageMimeType' // Select only necessary fields
+                select: 'Nombre primerApellido imageData imageMimeType'
             })
             .lean();
 
         const formattedDesigns = designs.map(design => {
-            const userAvatar = design.usuarioId && design.usuarioId.imageData && design.usuarioId.imageMimeType
-                ? `/api/images/usuario/${design.usuarioId._id}`
-                : '/img/perfil/FotoPerfil.webp'; // Default avatar if no image data
+            // Create a mutable copy of the design object
+            const processedDesign = { ...design };
 
-            const designImageUrl = design.imageData instanceof Buffer && design.imageMimeType
-                ? `data:${design.imageMimeType};base64,${design.imageData.toString('base64')}`
-                : null; // Provide the image as a data URL
+            // Convert main design _id to string
+            processedDesign._id = design._id.toString();
+            processedDesign.id = design._id.toString(); // Ensure a string ID for frontend key
+
+            // Process usuarioId to ensure it's a plain object and _id is a string
+            let processedUsuarioId = null;
+            if (processedDesign.usuarioId) {
+                processedUsuarioId = {
+                    _id: processedDesign.usuarioId._id.toString(),
+                    Nombre: processedDesign.usuarioId.Nombre,
+                    primerApellido: processedDesign.usuarioId.primerApellido,
+                };
+            }
+            processedDesign.usuarioId = processedUsuarioId; // Assign the processed plain object
+
+            let processedImageData = null;
+            if (processedDesign.imageData) {
+                if (processedDesign.imageData instanceof Buffer) {
+                    processedImageData = processedDesign.imageData;
+                } else if (Array.isArray(processedDesign.imageData) && processedDesign.imageData.every(byte => typeof byte === 'number')) {
+                    processedImageData = Buffer.from(processedDesign.imageData);
+                } else if (typeof processedDesign.imageData === 'object' && processedDesign.imageData !== null && processedDesign.imageData.type === 'Buffer' && Array.isArray(processedDesign.imageData.data)) {
+                    processedImageData = Buffer.from(processedDesign.imageData.data);
+                }
+            }
+
+            const userAvatar = processedUsuarioId && design.usuarioId.imageData && design.usuarioId.imageMimeType
+                ? `/api/images/usuario/${processedUsuarioId._id}`
+                : '/img/perfil/FotoPerfil.webp';
+
+            const designImageUrl = processedImageData instanceof Buffer && processedDesign.imageMimeType
+                ? `data:${processedDesign.imageMimeType};base64,${processedImageData.toString('base64')}`
+                : null;
+
+            // Remove original imageData and imageMimeType from the object to prevent serialization errors
+            delete processedDesign.imageData;
+            delete processedDesign.imageMimeType;
 
             return {
-                ...design,
-                _id: design._id.toString(), // Convert _id to string
-                id: design._id.toString(), // Ensure a string ID for frontend key
-                prenda: design.nombreDesing, // Map nombreDesing to prenda
-                price: design.valorDesing,   // Map valorDesing to price
-                usuario: design.usuarioId ? `${design.usuarioId.Nombre} ${design.usuarioId.primerApellido}` : 'Usuario Desconocido', // Map user name
-                userAvatar: userAvatar, // Add user avatar URL
-                imagen: designImageUrl, // Provide the image as a data URL
-                // imageData and imageMimeType are removed as they are not plain objects for client components
+                ...processedDesign,
+                prenda: processedDesign.nombreDesing,
+                price: processedDesign.valorDesing,
+                usuario: processedUsuarioId ? `${processedUsuarioId.Nombre} ${processedUsuarioId.primerApellido}` : 'Usuario Desconocido',
+                userAvatar: userAvatar,
+                imagen: designImageUrl,
             };
         });
 
-        logger.debug('Designs obtained and formatted successfully:', formattedDesigns);
-        return { data: JSON.parse(JSON.stringify(formattedDesigns)) };
+        return { data: formattedDesigns };
     } catch (error) {
-        logger.error('ERROR in obtenerDesigns:', error);
+        console.error('ERROR in obtenerDesigns:', error);
         return { error: 'Error al obtener los diseños: ' + error.message };
     }
 }
@@ -136,7 +165,7 @@ export async function obtenerDesigns() {
 // Function to get designs by user ID
 export async function obtenerDesignsPorUsuarioId(usuarioId) {
     await connectDB();
-    logger.debug('Entering obtenerDesignsPorUsuarioId with usuarioId:', usuarioId);
+    console.log('Entering obtenerDesignsPorUsuarioId with usuarioId:', usuarioId);
     try {
         const designs = await Design.find({ usuarioId: usuarioId }).lean();
 
@@ -153,10 +182,10 @@ export async function obtenerDesignsPorUsuarioId(usuarioId) {
             };
         });
 
-        logger.debug('Designs obtained by usuarioId successfully and formatted:', formattedDesigns);
+        console.log('Designs obtained by usuarioId successfully and formatted:', formattedDesigns);
         return { designs: JSON.parse(JSON.stringify(formattedDesigns)), error: null };
     } catch (error) {
-        logger.error('ERROR in obtenerDesignsPorUsuarioId:', error);
+        console.error('ERROR in obtenerDesignsPorUsuarioId:', error);
         return { designs: null, error: 'Error al obtener los diseños por usuario: ' + error.message };
     }
 }
@@ -165,16 +194,16 @@ export async function obtenerDesignsPorUsuarioId(usuarioId) {
 // Function to find a design by ID
 export async function encontrarDesignsPorId(id) {
     await connectDB();
-    logger.debug('Entering encontrarDesignsPorId with ID:', id);
+    console.log('Entering encontrarDesignsPorId with ID:', id);
     try {
         const design = await Design.findById(id).lean();
-        logger.debug('Design found by ID:', design);
+        console.log('Design found by ID:', design);
         if (!design) {
             return { error: 'Diseño no encontrado.' };
         }
         return { data: JSON.parse(JSON.stringify(design)) };
     } catch (error) {
-        logger.error('ERROR in encontrarDesignsPorId:', error);
+        console.error('ERROR in encontrarDesignsPorId:', error);
         return { error: 'Error al encontrar el diseño por ID: ' + error.message };
     }
 }
@@ -182,7 +211,7 @@ export async function encontrarDesignsPorId(id) {
 // Function to update a design
 export async function actualizarDesign(prevState, formData) {
     await connectDB();
-    logger.debug('Entering actualizarDesign with formData:', formData);
+    console.log('Entering actualizarDesign with formData:', formData);
 
     const id = formData.get('id');
     if (!id) {
@@ -234,10 +263,10 @@ export async function actualizarDesign(prevState, formData) {
         };
 
         if (updateImageData.imageData) {
-            logger.debug(`[actualizarDesign] Buffer length: ${updateImageData.imageData.length}, Hex snippet: ${updateImageData.imageData.toString('hex').substring(0, 60)}...`);
+            console.log(`[actualizarDesign] Buffer length: ${updateImageData.imageData.length}, Hex snippet: ${updateImageData.imageData.toString('hex').substring(0, 60)}...`);
         }
         const updatedDesign = await Design.findByIdAndUpdate(id, data, { new: true }).lean();
-        logger.debug('Design updated successfully:', updatedDesign);
+        console.log('Design updated successfully:', updatedDesign);
 
         revalidatePath('/admin/designs');
         revalidatePath('/catalogo');
@@ -254,7 +283,7 @@ export async function actualizarDesign(prevState, formData) {
             }
         };
     } catch (error) {
-        logger.error('ERROR in actualizarDesign:', error);
+        console.error('ERROR in actualizarDesign:', error);
         return { success: false, message: 'Error al actualizar el diseño: ' + error.message };
     }
 }
@@ -262,17 +291,17 @@ export async function actualizarDesign(prevState, formData) {
 // Function to delete a design
 export async function eliminarDesign(id) {
     await connectDB();
-    logger.debug('Entering eliminarDesign with ID:', id);
+    console.log('Entering eliminarDesign with ID:', id);
     try {
         const deletedDesign = await Design.findByIdAndDelete(id).lean();
-        logger.debug('Design deleted successfully:', deletedDesign);
+        console.log('Design deleted successfully:', deletedDesign);
 
         revalidatePath('/admin/designs');
         revalidatePath('/catalogo');
 
         return { success: true, message: 'Diseño eliminado exitosamente' };
     } catch (error) {
-        logger.error('ERROR in eliminarDesign:', error);
+        console.error('ERROR in eliminarDesign:', error);
         return { success: false, message: 'Error al eliminar el diseño: ' + error.message };
     }
 }

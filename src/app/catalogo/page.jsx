@@ -26,6 +26,7 @@ const ComunidadDiseños = () => {
     queryFn: async () => {
       const result = await obtenerDesigns();
       if (result?.data) {
+        console.log('Datos de diseños recibidos en el cliente:', result.data); // Debug log
         return result.data;
       } else {
         throw new Error(result?.error || "Error al cargar los diseños.");
