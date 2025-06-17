@@ -28,6 +28,12 @@ const PedidoSchema = new Schema({
         enum: ['DOMICILIO', 'RECOGIDA'], // Envío a domicilio o Recogida en punto
         required: true
     },
+    estadoPago: {
+        type: String,
+        enum: ['PENDIENTE', 'PAGADO', 'CANCELADO'],
+        required: true,
+        default: 'PENDIENTE'
+    },
     estadoPedido: {
         type: String,
         enum: Object.values(EstadoPedido),
