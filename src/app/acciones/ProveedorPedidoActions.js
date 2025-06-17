@@ -23,6 +23,7 @@ export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId)
         const pedidos = await Pedido.find(query)
             .populate('items.designId', 'nombreDesing imageData imageMimeType') // Popula nombre, datos binarios y tipo MIME de los diseños dentro de items
             .populate('proveedorId', 'nombreEmpresa emailContacto') // Popula algunos campos de Proveedor
+            .populate('userId', 'Nombre') // Popula el nombre del usuario
             .lean();
 
         if (pedidoId && pedidos.length === 0) {
@@ -45,5 +46,72 @@ export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId)
     } catch (error) {
         logger.error('ERROR in obtenerPedidosPorProveedorId:', error);
         return { success: false, message: 'Error al obtener los pedidos del proveedor: ' + error.message };
+    }
+}
+
+export async function actualizarPedidoPorProveedor(pedidoId, proveedorId, updateData) {
+    logger.debug('Entering actualizarPedidoPorProveedor with pedidoId:', pedidoId, 'proveedorId:', proveedorId, 'updateData:', updateData);
+    try {
+        await connectDB();
+        logger.debug('Database connected for actualizarPedidoPorProveedor.');
+
+        if (!pedidoId || !proveedorId) {
+            return { success: false, message: "ID de pedido y proveedor son requeridos." };
+        }
+
+        const Pedido = await getModel('Pedido');
+
+        // Verificar que el pedido pertenece al proveedor y obtenerlo para su total original
+        const pedidoExistente = await Pedido.findOne({ _id: pedidoId, proveedorId: proveedorId });
+        if (!pedidoExistente) {
+            logger.debug('Pedido not found for supplier or does not belong to supplier.');
+            return { success: false, message: 'Pedido no encontrado o no pertenece a este proveedor.' };
+        }
+
+        const allowedUpdates = {};
+        let newTotal = pedidoExistente.total; // Inicializar con el total existente (solo ítems)
+
+        if (updateData.estadoPedido) {
+            allowedUpdates.estadoPedido = updateData.estadoPedido;
+        }
+
+        if (updateData.costoEnvio !== undefined) { // Allow 0 as a valid cost
+            allowedUpdates.costoEnvio = updateData.costoEnvio;
+            // Recalcular el total del pedido para incluir el costo de envío
+            // El total original del pedido (pedidoExistente.total) es el total de los ítems.
+            newTotal = pedidoExistente.total + updateData.costoEnvio;
+            allowedUpdates.total = newTotal;
+
+            // Si se establece un costo de envío > 0, el estado de pago debe ser PENDIENTE
+            if (updateData.costoEnvio > 0) {
+                allowedUpdates.estadoPago = 'PENDIENTE';
+            } else if (updateData.costoEnvio === 0 && pedidoExistente.costoEnvio > 0 && pedidoExistente.estadoPago === 'PENDIENTE') {
+                // Si el costo de envío se cambia a 0 y antes era > 0 y pendiente, marcar como PAGADO
+                allowedUpdates.estadoPago = 'PAGADO';
+            }
+        }
+        // Add other fields a supplier is allowed to update here
+
+        if (Object.keys(allowedUpdates).length === 0) {
+            return { success: false, message: "No hay campos válidos para actualizar." };
+        }
+
+        const pedidoActualizado = await Pedido.findByIdAndUpdate(pedidoId, allowedUpdates, { new: true }).lean();
+
+        if (!pedidoActualizado) {
+            logger.debug('Order not found for update with ID:', pedidoId);
+            return { success: false, message: 'Pedido no encontrado para actualizar.' };
+        }
+
+        // Revalidar rutas relevantes
+        revalidatePath('/perfil'); // Para que el usuario vea el total actualizado
+        revalidatePath('/pagos-pendientes'); // Para que el usuario vea el total actualizado en pagos pendientes
+        revalidatePath(`/proveedor/pedidos/${pedidoId}`); // Para que el proveedor vea el total actualizado
+
+        logger.debug('Order updated by supplier in DB:', pedidoActualizado);
+        return { success: true, pedido: toPlainObject(pedidoActualizado) };
+    } catch (error) {
+        logger.error('ERROR in actualizarPedidoPorProveedor:', error);
+        return { success: false, message: 'Error al actualizar el pedido: ' + error.message };
     }
 }
