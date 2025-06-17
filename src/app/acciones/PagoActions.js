@@ -279,20 +279,25 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
 
         if (!ventaCreationSuccess) {
             logger.error('Error creating venta:', ventaCreationError);
-            // Consider how to handle this error: log for manual review, etc.
-            // For now, we'll just log it and proceed, as the order and payment are technically created.
+            return { success: false, message: ventaCreationError || 'Error al crear el registro de venta.' }; // Fallar si la venta no se crea
         }
         logger.debug('Venta created successfully:', nuevaVenta);
+
+        // Actualizar el Pedido con el ventaId recién creado
+        // nuevoPedido es una instancia de Mongoose ahora, gracias a la corrección anterior en PedidoActions.js
+        nuevoPedido.ventaId = nuevaVenta._id;
+        await nuevoPedido.save(); // Guardar el pedido con el ventaId
+        logger.debug('Pedido updated with ventaId successfully.');
 
         // 4. Crear un nuevo registro de Pago
         const nuevoPago = new Pago({
             usuarioId: userId,
-            pedidoId: nuevoPedido._id, // Link to the newly created Pedido
-            ventaId: nuevaVenta ? nuevaVenta._id : null, // Link to the newly created Venta
+            pedidoId: nuevoPedido._id,
+            ventaId: nuevaVenta._id, // Ahora nuevaVenta._id siempre será válido aquí
             valorPago: total,
             metodoPago,
-            estadoTransaccion: 'PAGADO', // Set to PAGADO as payment is successful
-            detallesTarjeta: { cardNumber: cardNumber ? cardNumber.slice(-4) : 'N/A', expiryDate: expiryDate || 'N/A', cvv: '***' } // Store last 4 digits, mask CVV
+            estadoTransaccion: 'PAGADO',
+            detallesTarjeta: { cardNumber: cardNumber ? cardNumber.slice(-4) : 'N/A', expiryDate: expiryDate || 'N/A', cvv: '***' }
         });
         const pagoGuardado = await nuevoPago.save();
         logger.debug('Pago record created and linked to Pedido and Venta. Pago ID:', pagoGuardado._id);
