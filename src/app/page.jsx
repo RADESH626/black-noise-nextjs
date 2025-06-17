@@ -17,19 +17,19 @@ function indexPage() {
         <HeroSection />
 
         <DesignRealClothesSection
-          imgSrc='/img/modelos/modelo 4.jpg'
+          imgSrc='/img/Modelos/Modelo 4.jpg'
           title={['DISEÑA', 'PRENDAS REALES']}
           description='Selecciona tu talla, el color, corta y crea detalles'
         />
 
         <AddElementsSection
-          imgSrc='/img/modelos/modelo 3.jpg'
+          imgSrc='/img/Modelos/Modelo 3.jpg'
           title={['AÑADE ELEMENTOS', 'A TUS PRENDAS']}
           description='Añade parches, taches, estampados y mucho más'
         />
 
         <DesignRealClothesSection
-          imgSrc='/img/modelos/modelo 5.jpg'
+          imgSrc='/img/Modelos/Modelo 5.jpg'
           title={['DISEÑA', 'PRENDAS REALES']}
           description='Selecciona tu talla, el color, corta y crea detalles'
           imageLeft={true}

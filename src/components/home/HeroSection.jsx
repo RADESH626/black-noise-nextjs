@@ -52,7 +52,7 @@ function HeroSection() {
 
             {/* IMAGEN */}
             <motion.img
-              src="/img/modelos/Modelo Editor.jpg"
+              src="/img/Modelos/Modelo-Editor.jpg"
               alt="Editor"
               className='w-full h-auto rounded-[10px]'
               initial={{ opacity: 0, y: -50 }}

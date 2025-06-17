@@ -2,6 +2,8 @@
 import React from 'react';
 
 function DesignCard({ diseño, addItem, isInCart }) {
+  console.log('Valor de diseño.userAvatar:', diseño.userAvatar);
+  console.log('Valor de diseño.imagen:', diseño.imagen);
   // console.log(`DesignCard re-rendered for ${diseño.prenda}, isInCart: ${isInCart}`);
   // console.log('Design data in DesignCard:', JSON.stringify(diseño, null, 2)); // Stringify to see full content
   return (
@@ -20,7 +22,11 @@ function DesignCard({ diseño, addItem, isInCart }) {
 
       <div className="w-full h-64 flex items-center justify-center bg-black overflow-hidden">
         <img
-          src={diseño.imagen || '/next.svg'}
+          src={
+            // diseño.imagen 
+            // || 
+            '/next.svg'
+          }
           alt={`Imagen de ${diseño.prenda}`}
           className="h-full object-contain transition-transform duration-500 ease-in-out hover:scale-110"
         />
