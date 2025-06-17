@@ -3,10 +3,10 @@ import { motion } from 'framer-motion';
 
 function GarmentTypesSection() {
   const garmentTypes = [
-    { src: '../IMG/Sweaters/Sweater 1.jpg', alt: 'Sweater 1', label: 'Sweater' },
-    { src: '../IMG/Hoddie_s/Hoddie 1.jpg', alt: 'Hoddie 1', label: "Hoddie's" },
-    { src: '../IMG/Camisas/Camisa 1.jpg', alt: 'Camisa 1', label: 'Camisas' },
-    { src: '../IMG/Pantalones/Pantalon 2.jpg', alt: 'Pantalón 2', label: 'Pantalones' },
+    { src: '../img/Sweaters/Sweater 1.jpg', alt: 'Sweater 1', label: 'Sweater' },
+    { src: '../img/Hoddie_s/Hoddie 1.jpg', alt: 'Hoddie 1', label: "Hoddie's" },
+    { src: '../img/Camisas/Camisa 1.jpg', alt: 'Camisa 1', label: 'Camisas' },
+    { src: '../img/Pantalones/Pantalon 2.jpg', alt: 'Pantalón 2', label: 'Pantalones' },
   ];
 
   return (
