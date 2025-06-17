@@ -289,8 +289,8 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
         logger.debug('Pago record created and linked to Pedido and Venta:', pagoGuardado);
 
         // 5. Actualizar el Pedido con el paymentId
-        nuevoPedido.paymentId = pagoGuardado._id;
-        await nuevoPedido.save();
+        // nuevoPedido.paymentId = pagoGuardado._id; // Esto ya no es necesario si se actualiza directamente en la DB
+        await Pedido.findByIdAndUpdate(nuevoPedido._id, { paymentId: pagoGuardado._id });
         logger.debug('Pedido updated with paymentId successfully.');
 
         // 6. Vaciar el carrito del usuario
