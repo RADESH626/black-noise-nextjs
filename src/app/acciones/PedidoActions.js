@@ -1,181 +1,102 @@
 "use server"
 
-import connectDB from '@/utils/DBconection';
-import Design from '@/models/Design';     // Necesario para popular
-import Proveedor from '@/models/Proveedor'; // Necesario para popular
+import Pedido from '@/models/Pedido';
+import dbConnect from '@/utils/DBconection';
 import { revalidatePath } from 'next/cache';
-import logger from '@/utils/logger';
-import { getModel } from '@/utils/modelLoader';
-import { toPlainObject } from '@/utils/dbUtils'; // Import toPlainObject
+import { sendEmail } from '@/utils/nodemailer';
+import { EstadoPedido } from '@/models/enums/PedidoEnums';
+import { ObtenerUsuarioPorId } from '@/app/acciones/UsuariosActions';
 
-// Crear un nuevo pedido
-async function guardarPedido(pedidoData) {
-    logger.debug('Entering guardarPedido with data:', pedidoData);
+export async function updateEstadoPedido(pedidoId, newEstado) {
     try {
-        await connectDB();
-        logger.debug('Database connected for guardarPedido.');
+        await dbConnect();
+        const pedido = await Pedido.findById(pedidoId);
 
-        const Pedido = await getModel('Pedido');
-        const nuevoPedido = new Pedido(pedidoData);
-        logger.debug('New Pedido instance created:', nuevoPedido);
-        const pedidoGuardado = await nuevoPedido.save();
-        console.log(`Nuevo pedido agregado a la base de datos con ID: ${pedidoGuardado._id}`);
-        logger.debug('Pedido saved to DB:', pedidoGuardado);
-        revalidatePath('/admin/pedidos'); // Revalidate admin orders page
-        revalidatePath('/perfil'); // Revalidate user profile page
-        logger.debug('Revalidated paths /admin/pedidos and /perfil.');
-        return { success: true, data: pedidoGuardado };
-    } catch (error) {
-        logger.error('ERROR in guardarPedido:', error);
-        return { error: 'Error al guardar el pedido: ' + error.message };
-    }
-}
-
-// Obtener todos los pedidos
-async function obtenerPedidos() {
-    logger.debug('Entering obtenerPedidos.');
-    try {
-        await connectDB();
-        logger.debug('Database connected for obtenerPedidos.');
-        const Pedido = await getModel('Pedido');
-        const pedidos = await Pedido.find({})
-            .populate('userId', 'nombre email') // Popula el usuario
-            .populate('items.designId', 'nombreDesing imageData imageMimeType') // Popula nombre, datos binarios y tipo MIME de los diseños dentro de items
-            .populate('proveedorId', 'nombreProveedor contactoPrincipal') // Popula algunos campos de Proveedor
-            .lean();
-        console.log('Pedidos after populate in obtenerPedidos:', pedidos); // Add this line for debugging
-        logger.debug('Orders retrieved from DB:', pedidos.length, 'orders found.');
-        return { pedidos: pedidos.map(p => toPlainObject(p)) };
-    } catch (error) {
-        logger.error('ERROR in obtenerPedidos:', error);
-        return { error: 'Error al obtener los pedidos: ' + error.message };
-    }
-}
-
-// Obtener pedidos por usuario ID
-async function obtenerPedidosPorUsuarioId(usuarioId) {
-    logger.debug('Entering obtenerPedidosPorUsuarioId with usuarioId:', usuarioId);
-    try {
-        await connectDB();
-        logger.debug('Database connected for obtenerPedidosPorUsuarioId.');
-        const Pedido = await getModel('Pedido');
-        const pedidos = await Pedido.find({ userId: usuarioId }) // Changed from usuarioId to userId to match schema
-            .populate('items.designId', 'nombreDesing imageData imageMimeType') // Popula nombre, datos binarios y tipo MIME de los diseños dentro de items
-            .populate('proveedorId', 'nombreProveedor contactoPrincipal')
-            .lean();
-        logger.debug('Orders retrieved for user ID:', usuarioId, 'count:', pedidos.length);
-        return { pedidos: pedidos.map(p => toPlainObject(p)) };
-    } catch (error) {
-        logger.error('ERROR in obtenerPedidosPorUsuarioId:', error);
-        return { success: false, message: 'Error al obtener los pedidos del usuario: ' + error.message };
-    }
-}
-
-// Obtener pedidos pagados por usuario ID (Historial de compras)
-async function obtenerPedidosPagadosPorUsuarioId(usuarioId) {
-    logger.debug('Entering obtenerPedidosPagadosPorUsuarioId with usuarioId:', usuarioId);
-    try {
-        await connectDB();
-        logger.debug('Database connected for obtenerPedidosPagadosPorUsuarioId.');
-        const Pedido = await getModel('Pedido');
-        const pedidos = await Pedido.find({ userId: usuarioId, estadoPago: 'PAGADO' }) // Filter by PAGADO status
-            .populate('items.designId', 'nombreDesing imageData imageMimeType') // Popula nombre, datos binarios y tipo MIME de los diseños dentro de items
-            .populate('proveedorId', 'nombreProveedor contactoPrincipal')
-            .lean();
-        logger.debug('Paid orders retrieved for user ID:', usuarioId, 'count:', pedidos.length);
-        return { pedidos: pedidos.map(p => toPlainObject(p)) };
-    } catch (error) {
-        logger.error('ERROR in obtenerPedidosPagadosPorUsuarioId:', error);
-        return { success: false, message: 'Error al obtener los pedidos pagados del usuario: ' + error.message };
-    }
-}
-
-// Obtener pedidos por proveedor ID
-async function obtenerPedidosPorProveedorId(proveedorId) {
-    logger.debug('Entering obtenerPedidosPorProveedorId with proveedorId:', proveedorId);
-    try {
-        await connectDB();
-        logger.debug('Database connected for obtenerPedidosPorProveedorId.');
-        const Pedido = await getModel('Pedido');
-        const pedidos = await Pedido.find({ proveedorId: proveedorId })
-            .populate('userId', 'nombre email')
-            .populate('items.designId', 'nombreDesing imageData imageMimeType')
-            .populate('proveedorId', 'nombreProveedor contactoPrincipal')
-            .lean();
-        logger.debug('Orders retrieved for supplier ID:', proveedorId, 'count:', pedidos.length);
-        return { pedidos: pedidos.map(p => toPlainObject(p)) };
-    } catch (error) {
-        logger.error('ERROR in obtenerPedidosPorProveedorId:', error);
-        return { success: false, message: 'Error al obtener los pedidos del proveedor: ' + error.message };
-    }
-}
-
-// Obtener pedido por ID (para uso general/admin)
-async function ObtenerPedidoPorId(id) {
-    logger.debug('Entering ObtenerPedidoPorId with ID:', id);
-    try {
-        await connectDB();
-        logger.debug('Database connected for ObtenerPedidoPorId.');
-        const Pedido = await getModel('Pedido');
-        const pedido = await Pedido.findById(id)
-            .populate('userId', 'nombre email') // Popula el usuario
-            .populate('items.designId', 'nombreDesing imageData imageMimeType') // Popula nombre, datos binarios y tipo MIME de los diseños dentro de items
-            .populate('proveedorId', 'nombreEmpresa emailContacto')
-            .lean();
-        logger.debug('Order retrieved from DB:', pedido);
         if (!pedido) {
-            logger.debug('Order not found for ID:', id);
-            return { success: false, message: 'Pedido no encontrado' };
+            return { success: false, message: 'Pedido no encontrado.' };
         }
-        logger.debug('Exiting ObtenerPedidoPorId with order:', toPlainObject(pedido));
-        return { success: true, pedido: toPlainObject(pedido) };
+
+        const oldEstado = pedido.estadoPedido; // Obtener el estado antiguo antes de actualizar
+
+        pedido.estadoPedido = newEstado;
+        await pedido.save();
+
+        // Enviar notificación si el estado ha cambiado y no es 'ENTREGADO'
+        if (oldEstado !== newEstado && newEstado !== EstadoPedido.ENTREGADO) {
+            await enviarNotificacionCambioEstadoPedido(pedido._id, newEstado, oldEstado, pedido.userId);
+        }
+
+        revalidatePath('/proveedor/pedidos'); // Revalidar la página para mostrar el cambio
+        return { success: true, message: 'Estado del pedido actualizado correctamente.' };
     } catch (error) {
-        logger.error('ERROR in ObtenerPedidoPorId:', error);
-        return { success: false, message: 'Error al obtener el pedido: ' + error.message };
+        console.error('Error al actualizar el estado del pedido:', error);
+        return { success: false, message: 'Error al actualizar el estado del pedido.', error: error.message };
     }
 }
 
-// Editar pedido (principalmente para cambiar estado, fecha estimada, detalles)
-async function EditarPedido(id, data) {
-    logger.debug('Entering EditarPedido with ID:', id, 'and data:', data);
+async function enviarNotificacionCambioEstadoPedido(pedidoId, newEstado, oldEstado, userId) {
     try {
-        await connectDB();
-        logger.debug('Database connected for EditarPedido.');
-        
-        const Pedido = await getModel('Pedido');
-        const updateData = { ...data };
-        // Assuming 'items' will be passed as an array of objects directly
-        // No need for string splitting for desingIds or items
-        if (updateData.detallesPedido && typeof updateData.detallesPedido === 'string') {
-            updateData.detallesPedido = updateData.detallesPedido.split(',').map(detalle => detalle.trim()).filter(detalle => detalle);
-            logger.debug('Converted updateData.detallesPedido to array:', updateData.detallesPedido);
-        }
-        logger.debug('Update data prepared:', updateData);
+        await dbConnect(); // Asegurarse de que la conexión a la DB está activa
 
-        const pedidoActualizado = await Pedido.findByIdAndUpdate(id, updateData, { new: true }).lean();
-        logger.debug('Order updated in DB:', pedidoActualizado);
-        if (!pedidoActualizado) {
-            logger.debug('Order not found for update with ID:', id);
-            return { error: 'Pedido no encontrado para actualizar' };
+        const userResult = await ObtenerUsuarioPorId(userId);
+
+        if (!userResult || userResult.error || !userResult.correo) {
+            console.error(`Error: Usuario o email no encontrado para userId: ${userId}. No se pudo enviar notificación. Detalle: ${userResult ? userResult.error : 'Resultado nulo'}`);
+            return;
         }
-        revalidatePath('/admin/pedidos');
-        revalidatePath(`/admin/pedidos/editar/${id}`);
-        logger.debug('Revalidated paths /admin/pedidos and /admin/pedidos/editar/${id}.');
-        return { success: true, data: toPlainObject(pedidoActualizado) };
+        const user = userResult; // El resultado de ObtenerUsuarioPorId es el objeto de usuario directamente
+
+        let subject = '';
+        let htmlContent = '';
+        const userName = user.Nombre || 'Usuario'; // Asumiendo que el modelo Usuario tiene un campo Nombre
+
+        switch (newEstado) {
+            case EstadoPedido.EN_FABRICACION:
+                subject = `Tu pedido está en fabricación - Black Noise`;
+                htmlContent = `
+                    <p>¡Hola ${userName}!</p>
+                    <p>Queremos informarte que tu pedido <strong>#${pedidoId.toString().slice(-6)}</strong> esta en FABRICACION.</p>
+                    <p>Estamos trabajando en ello y pronto lo tendrás contigo.</p>
+                    <p>Gracias por tu paciencia y confianza en Black Noise.</p>
+                `;
+                break;
+            case EstadoPedido.LISTO:
+                subject = `Tu pedido está listo para ser enviado/recogido - Black Noise`;
+                htmlContent = `
+                    <p>¡Hola ${userName}!</p>
+                    <p>¡Buenas noticias! Tu pedido <strong>#${pedidoId.toString().slice(-6)}</strong> ya fue terminado y está listo.</p>
+                    <p>Gracias por tu paciencia y confianza en Black Noise.</p>
+                `;
+                break;
+            case EstadoPedido.ENVIADO:
+                subject = `Tu pedido ha sido enviado - Black Noise`;
+                htmlContent = `
+                    <p>¡Hola ${userName}!</p>
+                    <p>Tu pedido <strong>#${pedidoId.toString().slice(-6)}</strong> ha sido enviado y está en camino.</p>
+                    <p>¡Pronto lo recibirás!</p>
+                    <p>Gracias por tu paciencia y confianza en Black Noise.</p>
+                `;
+                break;
+            case EstadoPedido.CANCELADO:
+                subject = `Tu pedido ha sido cancelado - Black Noise`;
+                htmlContent = `
+                    <p>¡Hola ${userName}!</p>
+                    <p>Queremos confirmarte que tu pedido <strong>#${pedidoId.toString().slice(-6)}</strong> ha sido cancelado.</p>
+                    <p>Si tienes alguna pregunta, no dudes en contactarnos.</p>
+                    <p>Gracias por tu comprensión.</p>
+                `;
+                break;
+            default:
+                // No hacer nada para otros estados o si no se especifica
+                return;
+        }
+
+        if (subject && htmlContent) {
+            await sendEmail(user.correo, subject, htmlContent); // Corregido de user.email a user.correo
+            console.log(`Notificación de estado de pedido enviada a ${user.correo} para pedido ${pedidoId}`); // Corregido
+        }
+
     } catch (error) {
-        logger.error('ERROR in EditarPedido:', error);
-        return { error: 'Error al editar el pedido: ' + error.message };
+        console.error(`Error al enviar notificación de cambio de estado para pedido ${pedidoId}:`, error);
     }
 }
-
-// No se implementa EliminarPedido directamente, los pedidos suelen cambiar de estado (ej. CANCELADO)
-
-export {
-    guardarPedido,
-    obtenerPedidos,
-    obtenerPedidosPorUsuarioId, // This function is now deprecated for supplier use, but kept for user-specific orders
-    obtenerPedidosPorProveedorId, // Export the new function
-    ObtenerPedidoPorId,
-    EditarPedido,
-    obtenerPedidosPagadosPorUsuarioId, // Export the new function
-};
