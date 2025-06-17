@@ -17,12 +17,12 @@ La funcionalidad de notificaciones de pedido y el apartado de pagos pendientes e
 ## Próximos Pasos
 *   Verificación y pruebas de la funcionalidad de notificación de pedidos.
 *   Verificación y pruebas de la funcionalidad del apartado de pagos pendientes (icono en header, resumen, página de detalles, modal de pago con formulario, acción de "pagar").
-*   **Verificación de la creación y actualización de pedidos y pagos después de la corrección del error y las mejoras de logging, prestando especial atención a la asignación correcta de `proveedorId` y `paymentId`.**
-*   **Verificación del decremento de `activeOrders` del proveedor cuando un pedido cambia a los estados `ENTREGADO`, `CANCELADO` o `LISTO`.**
-*   **Verificación de que los pedidos con costo de envío pendiente se muestren correctamente en la página `/pagos-pendientes` utilizando los nuevos logs para confirmar la consulta y los resultados.**
-*   **Verificación de que el `total` del pedido se actualiza correctamente en la base de datos y en la interfaz de usuario (perfil, pagos pendientes) cuando el proveedor establece el `costoEnvio`.**
-*   **Verificación completa del nuevo flujo de pagos:**
+*   Verificación de la creación y actualización de pedidos y pagos después de la corrección del error y las mejoras de logging, prestando especial atención a la asignación correcta de `proveedorId` y `paymentId`.
+*   Verificación del decremento de `activeOrders` del proveedor cuando un pedido cambia a los estados `ENTREGADO`, `CANCELADO` o `LISTO`.
+*   Verificación de que los pedidos con costo de envío pendiente se muestren correctamente en la página `/pagos-pendientes` utilizando los nuevos logs para confirmar la consulta y los resultados.
+*   Verificación de que el `total` del pedido se actualiza correctamente en la base de datos y en la interfaz de usuario (perfil, pagos pendientes) cuando el proveedor establece el `costoEnvio`.
+*   Verificación completa del nuevo flujo de pagos:
     *   Crear un pedido: `costoEnvio` inicial 0, `estadoPago` inicial `PAGADO`.
     *   Proveedor establece `costoEnvio > 0`: `total` se actualiza, `estadoPago` cambia a `PENDIENTE`.
     *   Usuario paga `costoEnvio`: `estadoPago` vuelve a `PAGADO`.
-*   **Los cambios pendientes se han subido al repositorio remoto.**
+*   Los cambios pendientes se han subido al repositorio remoto.

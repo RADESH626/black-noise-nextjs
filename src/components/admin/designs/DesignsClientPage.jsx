@@ -81,9 +81,9 @@ const DesignsClientPage = ({ initialDesigns }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {designs.map((design) => (
                         <div key={design._id} className="bg-white shadow-md rounded-lg overflow-hidden">
-                            {design.imageData && design.imageMimeType && (
+                            {design.imageData instanceof Buffer && design.imageMimeType && (
                                 <Image
-                                    src={`data:${design.imageMimeType};base64,${Buffer.from(design.imageData.data).toString('base64')}`}
+                                    src={`data:${design.imageMimeType};base64,${design.imageData.toString('base64')}`}
                                     alt={design.nombreDesing}
                                     width={300}
                                     height={200}

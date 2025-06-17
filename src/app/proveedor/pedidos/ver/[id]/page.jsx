@@ -4,7 +4,7 @@ import React from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { obtenerPedidoPorProveedorId } from "@/app/acciones/ProveedorPedidoActions";
+import { obtenerPedidosPorProveedorId } from "@/app/acciones/ProveedorPedidoActions";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { actualizarPedidoPorProveedor } from "@/app/acciones/ProveedorPedidoActions";

@@ -62,4 +62,4 @@ La implementación de la funcionalidad de "apartado de pagos pendientes" está c
 3.  La página `/pagos-pendientes` muestra la información detallada.
 4.  Al hacer clic en "Pagar Ahora", se abre el modal de pago, permite la entrada de datos simulados y, al enviar, registra el pago y actualiza el estado del pedido.
 5.  El `estadoPago` de los pedidos se actualiza correctamente cuando el proveedor añade un costo de envío y cuando el usuario lo paga.
-6.  **Los cambios pendientes se han subido al repositorio remoto.**
+6.  Los cambios pendientes se han subido al repositorio remoto.

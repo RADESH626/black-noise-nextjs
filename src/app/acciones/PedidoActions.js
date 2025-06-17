@@ -8,6 +8,7 @@ import { EstadoPedido } from '@/models/enums/PedidoEnums';
 import { ObtenerUsuarioPorId } from '@/app/acciones/UsuariosActions';
 import { getModel } from '@/utils/modelLoader'; // Importar getModel
 import Proveedor from '@/models/Proveedor'; // Importar el modelo Proveedor
+import { toPlainObject } from '@/utils/dbUtils'; // Importar toPlainObject
 
 async function guardarPedido(data) {
     try {
@@ -72,10 +73,44 @@ async function updateEstadoPedido(pedidoId, newEstado) {
     }
 }
 
+async function obtenerPedidosPorUsuarioId(userId) {
+    try {
+        await dbConnect();
+        const PedidoModel = await getModel('Pedido');
+        const pedidos = await PedidoModel.find({ userId: userId })
+            .populate('items.designId', 'nombreDesing imageData imageMimeType')
+            .populate('proveedorId', 'nombreEmpresa emailContacto')
+            .populate('userId', 'Nombre')
+            .lean();
+        return { success: true, pedidos: pedidos.map(p => toPlainObject(p)) };
+    } catch (error) {
+        console.error('Error al obtener los pedidos del usuario:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+async function obtenerPedidosPagadosPorUsuarioId(userId) {
+    try {
+        await dbConnect();
+        const PedidoModel = await getModel('Pedido');
+        const pedidos = await PedidoModel.find({ userId: userId, estadoPago: 'PAGADO' }) // Filtrar por estadoPago: 'PAGADO'
+            .populate('items.designId', 'nombreDesing imageData imageMimeType')
+            .populate('proveedorId', 'nombreEmpresa emailContacto')
+            .populate('userId', 'Nombre')
+            .lean();
+        return { success: true, pedidos: pedidos.map(p => toPlainObject(p)) };
+    } catch (error) {
+        console.error('Error al obtener los pedidos pagados del usuario:', error);
+        return { success: false, error: error.message };
+    }
+}
+
 export {
     guardarPedido,
     enviarNotificacionCambioEstadoPedido,
-    updateEstadoPedido
+    updateEstadoPedido,
+    obtenerPedidosPorUsuarioId,
+    obtenerPedidosPagadosPorUsuarioId
 };
 
 async function enviarNotificacionCambioEstadoPedido(pedidoId, newEstado, oldEstado, userId) {
