@@ -12,6 +12,7 @@ import { getModel } from '@/utils/modelLoader';
 import { MetodoPago } from '@/models/enums/pago/MetodoPago'; // Import MetodoPago enum
 import { assignOrderToProvider } from '@/app/acciones/assignOrderToProvider'; // Import the new server action
 import { sendEmail } from '@/utils/nodemailer'; // Import sendEmail
+import Proveedor from '@/models/Proveedor'; // Importar el modelo Proveedor
 
 // Crear un nuevo pago
 async function guardarPago(data) {
@@ -338,5 +339,106 @@ export {
     ObtenerPagoPorId,
     EditarPago,
     obtenerPagosPorUsuarioId,
-    procesarPagoYCrearPedido // Export the new server action
+    procesarPagoYCrearPedido,
+    obtenerPagosPendientesPorUsuario,
+    registrarPagoEnvioSimulado // Exportar la nueva acción de servidor
 };
+
+// Registrar un pago de envío simulado
+async function registrarPagoEnvioSimulado(pedidoId, paymentData) {
+    logger.debug('Entering registrarPagoEnvioSimulado with pedidoId:', pedidoId, 'and paymentData:', paymentData);
+    try {
+        await connectDB();
+        logger.debug('Database connected for registrarPagoEnvioSimulado.');
+
+        const PedidoModel = await getModel('Pedido');
+        const PagoModel = await getModel('Pago');
+
+        const pedido = await PedidoModel.findById(pedidoId).lean();
+
+        if (!pedido) {
+            logger.warn('Pedido not found for registrarPagoEnvioSimulado with ID:', pedidoId);
+            return { success: false, message: 'Pedido no encontrado.' };
+        }
+
+        if (pedido.costoEnvio <= 0 || pedido.estadoPago !== 'PENDIENTE') {
+            logger.warn('Pedido does not have a pending shipping cost or is already paid:', pedidoId);
+            return { success: false, message: 'El pedido no tiene un costo de envío pendiente o ya ha sido pagado.' };
+        }
+
+        // 1. Actualizar el estado de pago del Pedido
+        const updatedPedido = await PedidoModel.findByIdAndUpdate(
+            pedidoId,
+            { estadoPago: 'PAGADO' },
+            { new: true }
+        ).lean();
+        logger.debug('Pedido updated to PAGADO:', updatedPedido);
+
+        // 2. Crear un nuevo registro de Pago
+        const nuevoPagoEnvio = new PagoModel({
+            usuarioId: pedido.userId,
+            pedidoId: pedido._id,
+            ventaId: pedido.ventaId || null, // Usar ventaId del pedido si existe
+            valorPago: pedido.costoEnvio, // El valor del pago es el costo de envío
+            metodoPago: MetodoPago.TARJETA_CREDITO, // Asumimos tarjeta de crédito para la simulación
+            estadoTransaccion: 'PAGADO',
+            detallesTarjeta: {
+                cardNumber: paymentData.cardNumber ? paymentData.cardNumber.slice(-4) : 'N/A',
+                expiryDate: paymentData.expiryDate || 'N/A',
+                cvv: paymentData.cvv ? '***' : 'N/A'
+            }
+        });
+        const pagoEnvioGuardado = await nuevoPagoEnvio.save();
+        logger.debug('Nuevo registro de Pago de envío creado:', pagoEnvioGuardado);
+
+        revalidatePath('/pagos-pendientes');
+        revalidatePath('/perfil');
+        revalidatePath('/admin/pedidos'); // Por si acaso
+        revalidatePath('/admin/pagos'); // Por si acaso
+        logger.debug('Revalidated paths for pending payments.');
+
+        return { success: true, message: 'Pago de envío registrado exitosamente.' };
+
+    } catch (error) {
+        logger.error('ERROR in registrarPagoEnvioSimulado:', error);
+        return { success: false, message: 'Error al registrar el pago de envío simulado: ' + error.message };
+    }
+}
+
+// Obtener pagos pendientes por usuario ID
+async function obtenerPagosPendientesPorUsuario(userId) {
+    logger.debug('Entering obtenerPagosPendientesPorUsuario with userId:', userId);
+    try {
+        await connectDB();
+        logger.debug('Database connected for obtenerPagosPendientesPorUsuario.');
+        const Pedido = await getModel('Pedido');
+        const pedidosPendientes = await Pedido.find({
+            userId: userId,
+            costoEnvio: { $gt: 0 }, // Costo de envío mayor que 0
+            estadoPago: 'PENDIENTE' // Estado de pago pendiente
+        })
+        .populate('proveedorId', 'nombreEmpresa correo telefono') // Popula información del proveedor
+        .lean();
+
+        const formattedPedidos = pedidosPendientes.map(pedido => ({
+            ...pedido,
+            _id: pedido._id.toString(),
+            userId: pedido.userId.toString(),
+            proveedorId: pedido.proveedorId ? {
+                ...pedido.proveedorId,
+                _id: pedido.proveedorId._id.toString()
+            } : null,
+            items: pedido.items.map(item => ({
+                ...item,
+                designId: item.designId.toString()
+            })),
+            paymentId: pedido.paymentId ? pedido.paymentId.toString() : null,
+        }));
+
+        logger.debug('Pending payments retrieved for user ID and formatted:', userId, 'count:', formattedPedidos.length);
+        return { success: true, pedidos: JSON.parse(JSON.stringify(formattedPedidos)) };
+    } catch (error) {
+        logger.error('ERROR in obtenerPagosPendientesPorUsuario:', error);
+        return { success: false, message: 'Error al obtener los pagos pendientes del usuario: ' + error.message };
+    }
+}

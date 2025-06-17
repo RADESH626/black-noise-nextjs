@@ -1,24 +1,47 @@
 # Contexto de Sesión Activa
 
 ## Resumen de la Sesión
-Se ha implementado una nueva funcionalidad para notificar a los usuarios por correo electrónico cuando el estado de sus pedidos cambia. Esto incluye notificaciones para los estados "en fabricación", "listo", "enviado" y "cancelado". El estado "entregado" no activa una notificación.
+Se ha implementado el nuevo "apartado de pagos pendientes" para clientes, incluyendo una vista resumida en el header y una página detallada (`/pagos-pendientes`) donde los usuarios pueden ver y registrar pagos simulados con datos de entrada para los costos de envío adicionales. La lógica de estado de pago de los pedidos se ha ajustado para reflejar estos pagos pendientes.
 
 ## Cambios Realizados
 
 ### Archivos Modificados:
+*   `src/app/acciones/PagoActions.js`:
+    *   Se añadió la acción de servidor `obtenerPagosPendientesPorUsuario` para buscar pedidos con `costoEnvio > 0` y `estadoPago: 'PENDIENTE'`, poblando la información del proveedor.
+    *   Se añadió la acción de servidor `registrarPagoEnvioSimulado` para actualizar el `estadoPago` del pedido a `'PAGADO'` y crear un registro en el modelo `Pago` con los datos de pago simulados.
+    *   Se importó el modelo `Proveedor`.
 *   `src/app/acciones/PedidoActions.js`:
-    *   Se importaron `sendEmail` de `@/utils/nodemailer`, `Usuario` de `@/models/Usuario` y `EstadoPedido` de `@/models/enums/PedidoEnums`.
-    *   La función `updateEstadoPedido` ahora captura el `oldEstado` antes de la actualización.
-    *   Se añadió una llamada a la nueva función `enviarNotificacionCambioEstadoPedido` después de guardar el pedido, siempre y cuando el estado haya cambiado y el nuevo estado no sea `ENTREGADO`.
-    *   Se creó la función `enviarNotificacionCambioEstadoPedido` que:
-        *   Recupera los datos del usuario asociado al pedido.
-        *   Construye el asunto y el contenido HTML del correo electrónico basándose en el `newEstado` del pedido.
-        *   Utiliza `sendEmail` para enviar la notificación.
-        *   Maneja los errores en el envío de correos.
+    *   Se añadió la función `guardarPedido` para la creación de pedidos, que ahora establece el `estadoPago` a `'PENDIENTE'` si `costoEnvio > 0` y `'PAGADO'` si `costoEnvio` es 0.
+    *   Se eliminó la función `marcarPedidoComoPagado` y su exportación, ya que su lógica fue integrada en `registrarPagoEnvioSimulado`.
+    *   Se corrigieron los errores de exportación duplicada de `guardarPedido`, `marcarPedidoComoPagado` y `updateEstadoPedido`.
+    *   Se importó `getModel`.
+*   `src/components/layout/general/HeaderPrincipal.jsx`:
+    *   Se importó el nuevo componente `PendingPaymentsSummary`.
+    *   Se integró `PendingPaymentsSummary` en el header, visible para usuarios autenticados, junto al icono del carrito.
+*   `src/app/pagos-pendientes/page.jsx`:
+    *   Se modificó para usar `PendingPaymentModal` al hacer clic en "Pagar Ahora".
+    *   Se eliminó la importación de `marcarPedidoComoPagado` y se importó `registrarPagoEnvioSimulado` y `PendingPaymentModal`.
+    *   Se añadió la importación de `Link`.
+    *   Se añadió lógica para controlar la visibilidad del modal y pasar los datos del pedido.
+*   `src/components/common/PendingPaymentsSummary.jsx`:
+    *   Se añadió la clase `filter invert` a las etiquetas `Image` del icono de dinero para mejorar su visibilidad en el header oscuro.
 
 ### Archivos Creados:
-*   `memory-bank/functionalities/OrderStateNotifications.md`:
-    *   Documentación detallada de la nueva funcionalidad de notificación de estado de pedidos, incluyendo su propósito, los estados que activan notificaciones y los mensajes de correo electrónico asociados.
+*   `src/components/common/PendingPaymentsSummary.jsx`:
+    *   Componente React para mostrar un resumen de los pagos pendientes en el header.
+    *   Utiliza `icono-dinero.svg` y muestra un contador de pagos pendientes.
+    *   Al hacer clic, despliega un cuadro con un resumen y un botón para redirigir a la página de detalles.
+*   `src/app/pagos-pendientes/page.jsx`:
+    *   Nueva página para mostrar una lista detallada de los pagos de envío pendientes del usuario.
+    *   Muestra información del pedido (ID, proveedor, estado, total, costo de envío).
+    *   Permite al usuario "pagar" el costo de envío pendiente, lo que actualiza el estado del pedido en la base de datos.
+*   `src/components/pagos-pendientes/PendingPaymentModal.jsx`:
+    *   Nuevo componente modal para capturar datos de pago simulados (nombre, correo, tarjeta, mes, año, CVV) antes de registrar el pago de envío.
 
 ## Próximos Pasos
-La implementación de la lógica de notificación está completa. Se recomienda probar la funcionalidad para asegurar que los correos se envían correctamente en cada cambio de estado especificado.
+La implementación de la funcionalidad de "apartado de pagos pendientes" está completa a nivel de código. Se recomienda probar la funcionalidad para asegurar que:
+1.  El icono de pagos pendientes aparece y es visible en el header para usuarios autenticados.
+2.  El resumen desplegable funciona y muestra los datos correctos.
+3.  La página `/pagos-pendientes` muestra la información detallada.
+4.  Al hacer clic en "Pagar Ahora", se abre el modal de pago, permite la entrada de datos simulados y, al enviar, registra el pago y actualiza el estado del pedido.
+5.  El `estadoPago` de los pedidos se actualiza correctamente cuando el proveedor añade un costo de envío y cuando el usuario lo paga.

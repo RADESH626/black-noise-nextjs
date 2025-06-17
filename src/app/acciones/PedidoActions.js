@@ -6,8 +6,33 @@ import { revalidatePath } from 'next/cache';
 import { sendEmail } from '@/utils/nodemailer';
 import { EstadoPedido } from '@/models/enums/PedidoEnums';
 import { ObtenerUsuarioPorId } from '@/app/acciones/UsuariosActions';
+import { getModel } from '@/utils/modelLoader'; // Importar getModel
 
-export async function updateEstadoPedido(pedidoId, newEstado) {
+async function guardarPedido(data) {
+    try {
+        await dbConnect();
+        const PedidoModel = await getModel('Pedido');
+        const nuevoPedido = new PedidoModel(data);
+
+        // Si el costo de envío es mayor que 0, el estado de pago inicial es PENDIENTE
+        if (nuevoPedido.costoEnvio > 0) {
+            nuevoPedido.estadoPago = 'PENDIENTE';
+        } else {
+            // Si no hay costo de envío, o es 0, el pago se considera PAGADO
+            nuevoPedido.estadoPago = 'PAGADO';
+        }
+
+        const pedidoGuardado = await nuevoPedido.save();
+        revalidatePath('/admin/pedidos');
+        revalidatePath('/perfil'); // Revalidar el perfil del usuario para ver nuevos pedidos
+        return { success: true, data: JSON.parse(JSON.stringify(pedidoGuardado)) };
+    } catch (error) {
+        console.error('Error al guardar el pedido:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+async function updateEstadoPedido(pedidoId, newEstado) {
     try {
         await dbConnect();
         const pedido = await Pedido.findById(pedidoId);
@@ -33,6 +58,12 @@ export async function updateEstadoPedido(pedidoId, newEstado) {
         return { success: false, message: 'Error al actualizar el estado del pedido.', error: error.message };
     }
 }
+
+export {
+    guardarPedido,
+    enviarNotificacionCambioEstadoPedido,
+    updateEstadoPedido
+};
 
 async function enviarNotificacionCambioEstadoPedido(pedidoId, newEstado, oldEstado, userId) {
     try {

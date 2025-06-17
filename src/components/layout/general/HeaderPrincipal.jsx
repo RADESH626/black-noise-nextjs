@@ -9,6 +9,7 @@ import IconoPersona from '@/components/common/iconos/IconoPersona';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import CartModal from '@/components/carrito/CartModal'; // Import CartModal
 import { useCart } from '@/context/CartContext'; // Import useCart
+import PendingPaymentsSummary from '@/components/common/PendingPaymentsSummary'; // Import PendingPaymentsSummary
 
 function HeaderPrincipal() {
     const { data: session } = useSession();
@@ -54,8 +55,10 @@ function HeaderPrincipal() {
                 </h1>
 
                 <div className='flex flex-row items-center gap-4'>
-                    {/* Shopping Cart Icon */}
+                    {/* Pending Payments Icon */}
+                    {session && <PendingPaymentsSummary />}
 
+                    {/* Shopping Cart Icon */}
                     <div className="relative cursor-pointer" onClick={handleCartIconClick}>
                         <Image src="/icons/icono-carrito.svg" alt="Carrito" width={30} height={30} />
                         {cartItems.length > 0 && (
