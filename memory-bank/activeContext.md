@@ -18,6 +18,8 @@ Se ha implementado el nuevo "apartado de pagos pendientes" para clientes, incluy
     *   Se corrigieron los errores de exportación duplicada de `guardarPedido`, `marcarPedidoComoPagado` y `updateEstadoPedido`.
     *   Se importó `getModel`.
     *   **Se modificó `guardarPedido` para que devuelva la instancia de Mongoose directamente en lugar de un objeto plano, lo que mejora la consistencia y el manejo de objetos de modelo.**
+    *   **Se importó el modelo `Proveedor` para permitir la actualización de sus campos.**
+    *   **Se modificó `updateEstadoPedido` para decrementar el `activeOrders` del proveedor asociado cuando el estado del pedido cambia a `ENTREGADO`, `CANCELADO` o `LISTO`, asegurando que el contador de pedidos activos del proveedor se mantenga actualizado.**
 *   `src/components/layout/general/HeaderPrincipal.jsx`:
     *   Se importó el nuevo componente `PendingPaymentsSummary`.
     *   Se integró `PendingPaymentsSummary` en el header, visible para usuarios autenticados, junto al icono del carrito.

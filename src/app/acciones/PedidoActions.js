@@ -7,6 +7,7 @@ import { sendEmail } from '@/utils/nodemailer';
 import { EstadoPedido } from '@/models/enums/PedidoEnums';
 import { ObtenerUsuarioPorId } from '@/app/acciones/UsuariosActions';
 import { getModel } from '@/utils/modelLoader'; // Importar getModel
+import Proveedor from '@/models/Proveedor'; // Importar el modelo Proveedor
 
 async function guardarPedido(data) {
     try {
@@ -45,6 +46,21 @@ async function updateEstadoPedido(pedidoId, newEstado) {
 
         pedido.estadoPedido = newEstado;
         await pedido.save();
+
+        // Enviar notificación si el estado ha cambiado y no es 'ENTREGADO'
+        // Definir los estados que marcan un pedido como "no activo" para el proveedor
+        const finalStates = [EstadoPedido.ENTREGADO, EstadoPedido.CANCELADO, EstadoPedido.LISTO];
+
+        // Si el pedido tenía un proveedor asignado y el estado cambia a uno de los estados finales
+        // y el estado anterior NO estaba en los estados finales (para evitar doble decremento)
+        if (pedido.proveedorId && finalStates.includes(newEstado) && !finalStates.includes(oldEstado)) {
+            const proveedor = await Proveedor.findById(pedido.proveedorId);
+            if (proveedor && proveedor.activeOrders > 0) {
+                proveedor.activeOrders -= 1;
+                await proveedor.save();
+                console.log(`Decremented activeOrders for provider ${proveedor._id}. New count: ${proveedor.activeOrders}`);
+            }
+        }
 
         // Enviar notificación si el estado ha cambiado y no es 'ENTREGADO'
         if (oldEstado !== newEstado && newEstado !== EstadoPedido.ENTREGADO) {
