@@ -57,10 +57,6 @@ const ProveedorSchema = new Schema({
         type: Number,
         required: true
     },
-    permisosDetallesCredito: {
-        type: Boolean,
-        default: false
-    },
     habilitado: {
         type: Boolean,
         default: true

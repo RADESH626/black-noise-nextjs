@@ -13,7 +13,7 @@ if (!mongoose.connection.readyState) {
 export default async function connectDB() {
     try {
         if (mongoose.connection.readyState) {
-            logger.info('Using existing database connection');
+            // logger.info('Using existing database connection');
             return;
         }
 

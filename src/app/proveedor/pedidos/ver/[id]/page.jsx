@@ -7,6 +7,9 @@ import { useEffect, useState } from "react";
 import { obtenerPedidoPorProveedorId } from "@/app/acciones/ProveedorPedidoActions";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import ErrorMessage from "@/components/common/ErrorMessage";
+import { actualizarPedidoPorProveedor } from "@/app/acciones/ProveedorPedidoActions";
+import { EstadoPedido } from "@/models/enums/PedidoEnums";
+import { useDialog } from "@/context/DialogContext";
 
 export default function VerPedidoProveedorPage({ params }) {
   const { data: session, status } = useSession();
@@ -15,6 +18,10 @@ export default function VerPedidoProveedorPage({ params }) {
   const [pedido, setPedido] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [costoEnvio, setCostoEnvio] = useState(0);
+  const [estadoPedido, setEstadoPedido] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
+  const { showDialog } = useDialog();
 
   useEffect(() => {
     if (status === "loading") return;
@@ -31,6 +38,8 @@ export default function VerPedidoProveedorPage({ params }) {
         const result = await obtenerPedidoPorProveedorId(pedidoId, session.user.proveedorId);
         if (result.success) {
           setPedido(result.pedido);
+          setCostoEnvio(result.pedido.costoEnvio || 0);
+          setEstadoPedido(result.pedido.estadoPedido || "");
         } else {
           setError(result.message || "Error al cargar el pedido.");
         }
@@ -46,6 +55,28 @@ export default function VerPedidoProveedorPage({ params }) {
       fetchPedido();
     }
   }, [session, status, router, pedidoId]);
+
+  const handleUpdatePedido = async () => {
+    setIsUpdating(true);
+    try {
+      const updateData = {
+        estadoPedido: estadoPedido,
+        costoEnvio: costoEnvio,
+      };
+      const result = await actualizarPedidoPorProveedor(pedidoId, session.user.proveedorId, updateData);
+      if (result.success) {
+        setPedido(result.pedido); // Update local state with the new pedido data
+        showDialog({ title: "Éxito", message: "Pedido actualizado exitosamente!", type: "success" });
+      } else {
+        showDialog({ title: "Error", message: result.message || "Error al actualizar el pedido.", type: "error" });
+      }
+    } catch (err) {
+      console.error("Error updating supplier order:", err);
+      showDialog({ title: "Error", message: "Error al actualizar el pedido. Inténtalo de nuevo.", type: "error" });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   if (loading) {
     return <LoadingSpinner />;
@@ -63,21 +94,62 @@ export default function VerPedidoProveedorPage({ params }) {
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Detalles del Pedido #{pedido._id.toString()}</h1>
       <div className="bg-white shadow-md rounded-lg p-6">
-        <p className="mb-2"><strong>Fecha del Pedido:</strong> {new Date(pedido.fechaPedido).toLocaleDateString()}</p>
-        <p className="mb-2"><strong>Estado:</strong> {pedido.estado}</p>
-        <p className="mb-2"><strong>Total:</strong> ${pedido.total.toFixed(2)}</p>
+        <p className="mb-2"><strong>Fecha del Pedido:</strong> {new Date(pedido.createdAt).toLocaleDateString()}</p>
+        <p className="mb-2"><strong>Método de Entrega:</strong> {pedido.metodoEntrega || 'N/A'}</p>
+        <p className="mb-2"><strong>Total del Pedido:</strong> ${pedido.total.toFixed(2)}</p>
+        {pedido.metodoEntrega === 'DOMICILIO' && (
+          <div className="mb-4">
+            <label htmlFor="costoEnvio" className="block text-gray-700 text-sm font-bold mb-2">
+              Costo de Envío:
+            </label>
+            <input
+              type="number"
+              id="costoEnvio"
+              value={costoEnvio}
+              onChange={(e) => setCostoEnvio(parseFloat(e.target.value))}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              placeholder="Ingrese el costo de envío"
+            />
+          </div>
+        )}
+        <div className="mb-4">
+          <label htmlFor="estadoPedido" className="block text-gray-700 text-sm font-bold mb-2">
+            Estado del Pedido:
+          </label>
+          <select
+            id="estadoPedido"
+            value={estadoPedido}
+            onChange={(e) => setEstadoPedido(e.target.value)}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          >
+            {Object.values(EstadoPedido).map((estado) => (
+              <option key={estado} value={estado}>
+                {estado}
+              </option>
+            ))}
+          </select>
+        </div>
+        <button
+          onClick={handleUpdatePedido}
+          disabled={isUpdating}
+          className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          {isUpdating ? 'Actualizando...' : 'Actualizar Pedido'}
+        </button>
+
         <h2 className="text-xl font-semibold mt-4 mb-2">Diseños en el Pedido:</h2>
         <ul>
-          {pedido.disenos.map((diseno, index) => (
-            <li key={index} className="mb-2 border-b pb-2">
-              <p><strong>Nombre del Diseño:</strong> {diseno.nombre}</p>
-              <p><strong>Cantidad:</strong> {diseno.cantidad}</p>
-              <p><strong>Precio Unitario:</strong> ${diseno.precioUnitario.toFixed(2)}</p>
-              <p><strong>Subtotal:</strong> ${(diseno.cantidad * diseno.precioUnitario).toFixed(2)}</p>
-            </li>
-          ))}
+          {pedido.items && pedido.items.length > 0 ? (
+            pedido.items.map((item, index) => (
+              <li key={index} className="mb-2 border-b pb-2">
+                <p><strong>Nombre del Diseño:</strong> {item.designId?.nombreDesing || 'Diseño Desconocido'}</p>
+                <p><strong>Cantidad:</strong> {item.quantity}</p>
+              </li>
+            ))
+          ) : (
+            <p>No hay diseños en este pedido.</p>
+          )}
         </ul>
-        {/* Add more order details as needed, ensuring no user-specific info is displayed */}
       </div>
     </div>
   );

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from 'react';
 
-const Modal = ({ title, children, onClose, isOpen, type = 'default' }) => {
+const Modal = ({ title, children, onClose, isOpen, type = 'default', onConfirm, onCancel, confirmText = 'Confirmar', cancelText = 'Cancelar', showActions = false }) => {
   const dialogRef = useRef(null);
 
   const modalClasses = {
@@ -40,6 +40,22 @@ const Modal = ({ title, children, onClose, isOpen, type = 'default' }) => {
         >
           &times;
         </button>
+        {showActions && (
+          <div className="mt-6 flex justify-end space-x-4">
+            <button
+              onClick={onCancel}
+              className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors"
+            >
+              {cancelText}
+            </button>
+            <button
+              onClick={onConfirm}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+            >
+              {confirmText}
+            </button>
+          </div>
+        )}
       </div>
     </dialog>
   );

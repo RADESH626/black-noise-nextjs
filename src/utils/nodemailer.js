@@ -33,6 +33,6 @@ transporter.verify(function (error, success) {
   if (error) {
     console.error('Error with Nodemailer transporter:', error);
   } else {
-    console.log('Nodemailer transporter is ready to send emails');
+    // console.log('Nodemailer transporter is ready to send emails');
   }
 });

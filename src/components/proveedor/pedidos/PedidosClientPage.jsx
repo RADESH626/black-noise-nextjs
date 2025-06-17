@@ -8,11 +8,13 @@ import { actualizarPedidoPorProveedor } from "@/app/acciones/ProveedorPedidoActi
 import { useDialog } from "@/context/DialogContext";
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query"; // Mantener si se usa para invalidar, aunque la carga inicial no use useQuery
+import { EstadoPedido } from "@/models/enums/PedidoEnums";
+import { updateEstadoPedido } from "@/app/acciones/PedidoActions";
 
 export default function PedidosClientPage({ initialPedidos }) {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { showPopUp } = useDialog();
+  const { showPopUp, showConfirmDialog } = useDialog();
   const queryClient = useQueryClient(); // Se mantiene para invalidar queries si se usa React Query en otras partes o para futuras expansiones.
 
   const [pedidos, setPedidos] = useState(initialPedidos);
@@ -139,7 +141,19 @@ export default function PedidosClientPage({ initialPedidos }) {
                       'N/A'
                     )}
                   </td>
-                  <td className="py-3 px-4">{pedido.estadoPedido || 'N/A'}</td>
+                  <td className="py-3 px-4">
+                    <select
+                      value={pedido.estadoPedido}
+                      onChange={(e) => handleEstadoPedidoChange(pedido._id.toString(), e.target.value, pedido.estadoPedido)}
+                      className="p-1 border rounded text-gray-700"
+                    >
+                      {Object.values(EstadoPedido).map((estado) => (
+                        <option key={estado} value={estado}>
+                          {estado.replace(/_/g, ' ')}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
                   <td className="py-3 px-4">${pedido.total ? pedido.total.toFixed(2) : '0.00'}</td>
                   <td className="py-3 px-4">
                     <Link href={`/proveedor/pedidos/ver/${pedido._id.toString()}`} className="text-blue-600 hover:underline">
@@ -154,4 +168,47 @@ export default function PedidosClientPage({ initialPedidos }) {
       </div>
     </>
   );
+
+  async function handleEstadoPedidoChange(pedidoId, newEstado, oldEstado) {
+    const confirmed = await showConfirmDialog(
+      `¿Estás seguro de que quieres cambiar el estado del pedido a "${newEstado.replace(/_/g, ' ')}"?`
+    );
+
+    if (confirmed) {
+      setIsUpdating(prev => ({ ...prev, [pedidoId]: true }));
+      try {
+        const result = await updateEstadoPedido(pedidoId, newEstado);
+        if (result.success) {
+          showPopUp("Estado del pedido actualizado exitosamente!", "success");
+          setPedidos(prevPedidos =>
+            prevPedidos.map(pedido =>
+              pedido._id.toString() === pedidoId ? { ...pedido, estadoPedido: newEstado } : pedido
+            )
+          );
+        } else {
+          showPopUp(result.message || "Error al actualizar el estado del pedido.", "error");
+          // Revertir el select si hay un error
+          setPedidos(prevPedidos =>
+            prevPedidos.map(pedido =>
+              pedido._id.toString() === pedidoId ? { ...pedido, estadoPedido: oldEstado } : pedido
+            )
+          );
+        }
+      } catch (err) {
+        console.error("Error al actualizar el estado del pedido:", err);
+        showPopUp("Error al actualizar el estado del pedido. Inténtalo de nuevo.", "error");
+        // Revertir el select si hay un error
+        setPedidos(prevPedidos =>
+          prevPedidos.map(pedido =>
+            pedido._id.toString() === pedidoId ? { ...pedido, estadoPedido: oldEstado } : pedido
+          )
+        );
+      } finally {
+        setIsUpdating(prev => ({ ...prev, [pedidoId]: false }));
+      }
+    } else {
+      // Si el usuario cancela, el select se revertirá automáticamente porque el estado local no se actualizó
+      // No es necesario hacer nada aquí, ya que el valor del select no se ha cambiado en el estado.
+    }
+  }
 }

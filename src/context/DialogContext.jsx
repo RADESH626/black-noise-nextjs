@@ -15,6 +15,11 @@ export const DialogProvider = ({ children }) => {
   const [modalContent, setModalContent] = useState(null);
   const [modalTitle, setModalTitle] = useState('');
   const [modalType, setModalType] = useState('default');
+  const [modalOnConfirm, setModalOnConfirm] = useState(null);
+  const [modalOnCancel, setModalOnCancel] = useState(null);
+  const [showModalActions, setShowModalActions] = useState(false);
+  const [confirmText, setConfirmText] = useState('Confirmar');
+  const [cancelText, setCancelText] = useState('Cancelar');
 
   const showPopUp = useCallback((msg, msgType = 'success', persistent = false) => {
     console.log('DialogContext: showPopUp called with message:', msg, 'type:', msgType, 'persistent:', persistent);
@@ -28,10 +33,15 @@ export const DialogProvider = ({ children }) => {
     setIsPopUpPersistent(false); // Reset persistence when hiding
   }, []);
 
-  const openModal = useCallback((title, content, type = 'default') => {
+  const openModal = useCallback((title, content, type = 'default', onConfirm = null, onCancel = null, showActions = false, confirmBtnText = 'Confirmar', cancelBtnText = 'Cancelar') => {
     setModalTitle(title);
     setModalContent(content);
     setModalType(type);
+    setModalOnConfirm(() => onConfirm); // Wrap in a function to prevent direct execution
+    setModalOnCancel(() => onCancel);   // Wrap in a function to prevent direct execution
+    setShowModalActions(showActions);
+    setConfirmText(confirmBtnText);
+    setCancelText(cancelBtnText);
     setIsModalOpen(true);
   }, []);
 
@@ -40,10 +50,36 @@ export const DialogProvider = ({ children }) => {
     setModalContent(null);
     setModalTitle('');
     setModalType('default');
+    setModalOnConfirm(null);
+    setModalOnCancel(null);
+    setShowModalActions(false);
+    setConfirmText('Confirmar');
+    setCancelText('Cancelar');
   }, []);
 
+  const showConfirmDialog = useCallback((message, title = 'Confirmación', confirmBtnText = 'Confirmar', cancelBtnText = 'Cancelar') => {
+    return new Promise((resolve) => {
+      openModal(
+        title,
+        message,
+        'default', // You can make this configurable if needed
+        () => {
+          closeModal();
+          resolve(true);
+        },
+        () => {
+          closeModal();
+          resolve(false);
+        },
+        true, // showActions = true for confirm dialogs
+        confirmBtnText,
+        cancelBtnText
+      );
+    });
+  }, [openModal, closeModal]);
+
   return (
-    <DialogContext.Provider value={{ showPopUp, openModal, closeModal }}>
+    <DialogContext.Provider value={{ showPopUp, openModal, closeModal, showConfirmDialog }}>
       {children}
       {message && (
         <PopUpMessage
@@ -59,6 +95,11 @@ export const DialogProvider = ({ children }) => {
           onClose={closeModal}
           isOpen={isModalOpen}
           type={modalType}
+          onConfirm={modalOnConfirm}
+          onCancel={modalOnCancel}
+          showActions={showModalActions}
+          confirmText={confirmText}
+          cancelText={cancelText}
         >
           {modalContent}
         </Modal>
