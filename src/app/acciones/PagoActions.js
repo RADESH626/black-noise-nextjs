@@ -283,13 +283,13 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
         // Actualizar el Pedido con el ventaId recién creado
         // nuevoPedido es una instancia de Mongoose ahora, gracias a la corrección anterior en PedidoActions.js
         nuevoPedido.ventaId = nuevaVenta._id;
-        await nuevoPedido.save(); // Guardar el pedido con el ventaId
-        logger.debug('Pedido updated with ventaId successfully.');
+        const updatedPedidoAfterVentaId = await nuevoPedido.save(); // Guardar el pedido con el ventaId
+        logger.debug('Pedido updated with ventaId successfully. Updated Pedido after ventaId:', updatedPedidoAfterVentaId);
 
         // 4. Crear un nuevo registro de Pago
         const nuevoPago = new Pago({
             usuarioId: userId,
-            pedidoId: nuevoPedido._id,
+            pedidoId: updatedPedidoAfterVentaId._id, // Usar el ID del pedido actualizado
             ventaId: nuevaVenta._id, // Ahora nuevaVenta._id siempre será válido aquí
             valorPago: total,
             metodoPago,
@@ -300,8 +300,8 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
         logger.debug('Pago record created and linked to Pedido and Venta. Pago ID:', pagoGuardado._id);
 
         // 5. Actualizar el Pedido con el paymentId
-        const updatedPedidoWithPaymentId = await Pedido.findByIdAndUpdate(nuevoPedido._id, { paymentId: pagoGuardado._id }, { new: true });
-        logger.debug('Pedido updated with paymentId successfully. Updated Pedido:', updatedPedidoWithPaymentId);
+        const updatedPedidoWithPaymentId = await Pedido.findByIdAndUpdate(updatedPedidoAfterVentaId._id, { paymentId: pagoGuardado._id }, { new: true });
+        logger.debug('Pedido updated with paymentId successfully. Final Updated Pedido:', updatedPedidoWithPaymentId);
 
         // 6. Vaciar el carrito del usuario
         const { success: clearCartSuccess, message: clearCartMessage } = await clearUserCart(userId);
