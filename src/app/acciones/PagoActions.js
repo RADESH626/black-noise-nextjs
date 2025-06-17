@@ -188,7 +188,7 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
 
         const Pedido = await getModel('Pedido');
         const Pago = await getModel('Pago');
-        const { userId, nombre, correo, direccion, metodoPago: rawMetodoPago, metodoEntrega, total, cardNumber, expiryDate, cvv } = paymentDetails;
+        const { userId, nombre, correo, direccion, metodoPago: rawMetodoPago, metodoEntrega, total, cardNumber, expiryDate, cvv, costoEnvio: paymentDetailsCostEnvio } = paymentDetails;
 
         // Map rawMetodoPago to a valid enum value
         let metodoPago = rawMetodoPago;
@@ -208,6 +208,13 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
             return { success: false, message: 'El pago no pudo ser procesado.' };
         }
 
+        // Calcular costoEnvio basado en el método de entrega
+        let costoEnvioCalculado = 0;
+        if (metodoEntrega === 'DOMICILIO') {
+            // Si paymentDetailsCostEnvio es válido y mayor que 0, úsalo. De lo contrario, usa un valor fijo.
+            costoEnvioCalculado = (paymentDetailsCostEnvio && paymentDetailsCostEnvio > 0) ? paymentDetailsCostEnvio : 10.00; // Ejemplo: 10.00 si no se especifica o es 0
+        }
+
         // 2. Crear el Pedido
         const nuevoPedidoData = {
             userId: userId,
@@ -218,9 +225,9 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
                 // Otros campos relevantes del producto si es necesario
             })),
             metodoEntrega: metodoEntrega,
-            estadoPedido: 'PENDIENTE',
+            estadoPedido: 'PENDIENTE', // Esto será sobrescrito por guardarPedido si costoEnvio > 0
             total: total,
-            costoEnvio: 0, // Assuming 0 for now, or calculate based on metodoEntrega/direccion
+            costoEnvio: costoEnvioCalculado, // Usar el costo de envío calculado
             direccionEnvio: direccion,
             destinatario: { nombre, correo, direccion },
             // paymentId will be added after Pago is created
