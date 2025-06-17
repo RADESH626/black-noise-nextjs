@@ -420,13 +420,19 @@ async function obtenerPagosPendientesPorUsuario(userId) {
         await connectDB();
         logger.debug('Database connected for obtenerPagosPendientesPorUsuario.');
         const Pedido = await getModel('Pedido');
-        const pedidosPendientes = await Pedido.find({
+        
+        const query = {
             userId: userId,
             costoEnvio: { $gt: 0 }, // Costo de envío mayor que 0
             estadoPago: 'PENDIENTE' // Estado de pago pendiente
-        })
-        .populate('proveedorId', 'nombreEmpresa correo telefono') // Popula información del proveedor
-        .lean();
+        };
+        logger.debug('Query for pending payments:', query);
+
+        const pedidosPendientes = await Pedido.find(query)
+            .populate('proveedorId', 'nombreEmpresa correo telefono') // Popula información del proveedor
+            .lean();
+
+        logger.debug('Raw pending payments retrieved:', pedidosPendientes);
 
         const formattedPedidos = pedidosPendientes.map(pedido => ({
             ...pedido,
@@ -443,7 +449,7 @@ async function obtenerPagosPendientesPorUsuario(userId) {
             paymentId: pedido.paymentId ? pedido.paymentId.toString() : null,
         }));
 
-        logger.debug('Pending payments retrieved for user ID and formatted:', userId, 'count:', formattedPedidos.length);
+        logger.debug('Pending payments retrieved for user ID and formatted:', userId, 'count:', formattedPedidos.length, 'Formatted data:', formattedPedidos);
         return { success: true, pedidos: JSON.parse(JSON.stringify(formattedPedidos)) };
     } catch (error) {
         logger.error('ERROR in obtenerPagosPendientesPorUsuario:', error);

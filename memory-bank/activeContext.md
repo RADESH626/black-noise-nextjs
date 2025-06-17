@@ -13,6 +13,7 @@ Se ha implementado el nuevo "apartado de pagos pendientes" para clientes, incluy
     *   **Se corrigió el error "nuevoPedido.save is not a function" en `procesarPagoYCrearPedido` al reemplazar `await nuevoPedido.save()` con `await Pedido.findByIdAndUpdate(nuevoPedido._id, { paymentId: pagoGuardado._id })` para actualizar el `paymentId` del pedido, ya que `guardarPedido` devuelve un objeto plano.**
     *   **Se mejoró el logging en `procesarPagoYCrearPedido` para depurar la asignación de proveedor y pago, incluyendo logs para IDs de pedido y pago, y el resultado de las actualizaciones.**
     *   **Se corrigió la inicialización de `costoEnvio` en `procesarPagoYCrearPedido` para que se calcule dinámicamente basado en `metodoEntrega` (ej. 10.00 para 'DOMICILIO' si no se especifica), asegurando que los pedidos con costo de envío se creen con `costoEnvio > 0` y `estadoPago: 'PENDIENTE'`.**
+    *   **Se añadieron logs de depuración en `obtenerPagosPendientesPorUsuario` para mostrar la consulta, los resultados crudos y los datos formateados, facilitando la depuración de la visualización de pagos pendientes.**
 *   `src/app/acciones/PedidoActions.js`:
     *   Se añadió la función `guardarPedido` para la creación de pedidos, que ahora establece el `estadoPago` a `'PENDIENTE'` si `costoEnvio > 0` y `'PAGADO'` si `costoEnvio` es 0.
     *   Se eliminó la función `marcarPedidoComoPagado` y su exportación, ya que su lógica fue integrada en `registrarPagoEnvioSimulado`.
