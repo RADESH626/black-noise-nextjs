@@ -235,7 +235,7 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
             logger.error('Error creating pedido:', pedidoCreationError);
             return { success: false, message: pedidoCreationError || 'Error al crear el pedido después del pago.' };
         }
-        logger.debug('Pedido created successfully:', nuevoPedido);
+        logger.debug('Pedido created successfully (instance from guardarPedido):', nuevoPedido._id);
 
         // Fetch the newly created order and populate design details for supplier assignment
         const PedidoModel = await getModel('Pedido');
@@ -243,8 +243,10 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
             .populate('items.designId') // Populate the designId to get category
             .lean();
 
+        logger.debug('Populated Pedido for assignment:', populatedPedido);
+
         if (populatedPedido) {
-            logger.debug('Attempting to assign order to provider:', populatedPedido._id);
+            logger.debug('Attempting to assign order to provider for order ID:', populatedPedido._id);
             const { success: assignSuccess, message: assignMessage } = await assignOrderToProvider(populatedPedido);
             if (!assignSuccess) {
                 logger.warn(`Failed to assign provider for order ${populatedPedido._id}: ${assignMessage}`);
@@ -260,7 +262,7 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
         // 3. Crear un nuevo registro de Venta
         const nuevaVentaData = {
             usuarioId: userId,
-            pedidoId: nuevoPedido._id,
+            pedidoId: nuevoPedido._id, // Link to the newly created Pedido
             valorVenta: total,
             comisionAplicacion: total * 0.1, // Example: 10% commission
             fechaVenta: new Date(),
@@ -286,12 +288,11 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
             detallesTarjeta: { cardNumber: cardNumber ? cardNumber.slice(-4) : 'N/A', expiryDate: expiryDate || 'N/A', cvv: '***' } // Store last 4 digits, mask CVV
         });
         const pagoGuardado = await nuevoPago.save();
-        logger.debug('Pago record created and linked to Pedido and Venta:', pagoGuardado);
+        logger.debug('Pago record created and linked to Pedido and Venta. Pago ID:', pagoGuardado._id);
 
         // 5. Actualizar el Pedido con el paymentId
-        // nuevoPedido.paymentId = pagoGuardado._id; // Esto ya no es necesario si se actualiza directamente en la DB
-        await Pedido.findByIdAndUpdate(nuevoPedido._id, { paymentId: pagoGuardado._id });
-        logger.debug('Pedido updated with paymentId successfully.');
+        const updatedPedidoWithPaymentId = await Pedido.findByIdAndUpdate(nuevoPedido._id, { paymentId: pagoGuardado._id }, { new: true });
+        logger.debug('Pedido updated with paymentId successfully. Updated Pedido:', updatedPedidoWithPaymentId);
 
         // 6. Vaciar el carrito del usuario
         const { success: clearCartSuccess, message: clearCartMessage } = await clearUserCart(userId);

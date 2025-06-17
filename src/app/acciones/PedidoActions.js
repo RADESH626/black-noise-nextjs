@@ -25,7 +25,7 @@ async function guardarPedido(data) {
         const pedidoGuardado = await nuevoPedido.save();
         revalidatePath('/admin/pedidos');
         revalidatePath('/perfil'); // Revalidar el perfil del usuario para ver nuevos pedidos
-        return { success: true, data: JSON.parse(JSON.stringify(pedidoGuardado)) };
+        return { success: true, data: pedidoGuardado }; // Devolver la instancia de Mongoose directamente
     } catch (error) {
         console.error('Error al guardar el pedido:', error);
         return { success: false, error: error.message };
