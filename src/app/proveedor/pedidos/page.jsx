@@ -88,8 +88,10 @@ export default function ListaPedidosProveedorPage() {
             <thead className="bg-gray-200 text-gray-700">
               <tr>
                 <th className="py-3 px-4 text-left">ID Pedido</th>
-                <th className="py-3 px-4 text-left">Fecha</th>
-                <th className="py-3 px-4 text-left">Estado</th>
+                <th className="py-3 px-4 text-left">Usuario</th>
+                <th className="py-3 px-4 text-left">Diseños</th>
+                <th className="py-3 px-4 text-left">Método de Entrega</th>
+                <th className="py-3 px-4 text-left">Estado del Pedido</th>
                 <th className="py-3 px-4 text-left">Total</th>
                 <th className="py-3 px-4 text-left">Acciones</th>
               </tr>
@@ -98,15 +100,19 @@ export default function ListaPedidosProveedorPage() {
               {pedidos.map((pedido) => (
                 <tr key={pedido._id} className="border-b border-gray-200 hover:bg-gray-100">
                   <td className="py-3 px-4">{pedido._id.toString()}</td>
+                  <td className="py-3 px-4">{pedido.userId?.Nombre || 'N/A'}</td>
                   <td className="py-3 px-4">
-                    {(() => {
-                      const rawDate = pedido.fechaEstimadaEntrega;
-                      const date = new Date(rawDate);
-                      return isNaN(date.getTime()) ? "Fecha no disponible" : date.toLocaleDateString();
-                    })()}
+                    {pedido.items && pedido.items.length > 0 ? (
+                      <ul className="list-disc list-inside">
+                        {pedido.items.map((item, index) => (
+                          <li key={index}>{item.designId?.nombreDesing || 'Diseño Desconocido'} (x{item.quantity})</li>
+                        ))}
+                      </ul>
+                    ) : 'N/A'}
                   </td>
-                  <td className="py-3 px-4">{pedido.estado}</td>
-                  <td className="py-3 px-4">${pedido.total.toFixed(2)}</td>
+                  <td className="py-3 px-4">{pedido.metodoEntrega || 'N/A'}</td>
+                  <td className="py-3 px-4">{pedido.estadoPedido || 'N/A'}</td>
+                  <td className="py-3 px-4">${pedido.total ? pedido.total.toFixed(2) : '0.00'}</td>
                   <td className="py-3 px-4">
                     <Link href={`/proveedor/pedidos/ver/${pedido._id.toString()}`} className="text-blue-600 hover:underline">
                       Ver Detalles
