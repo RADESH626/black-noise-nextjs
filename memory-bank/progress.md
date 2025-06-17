@@ -25,3 +25,4 @@ La funcionalidad de notificaciones de pedido y el apartado de pagos pendientes e
     *   Crear un pedido: `costoEnvio` inicial 0, `estadoPago` inicial `PAGADO`.
     *   Proveedor establece `costoEnvio > 0`: `total` se actualiza, `estadoPago` cambia a `PENDIENTE`.
     *   Usuario paga `costoEnvio`: `estadoPago` vuelve a `PAGADO`.
+*   **Los cambios pendientes se han subido al repositorio remoto.**

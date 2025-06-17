@@ -31,7 +31,7 @@ Se ha implementado el nuevo "apartado de pagos pendientes" para clientes, incluy
     *   **Se añadió lógica para actualizar el `estadoPago` del pedido a `PENDIENTE` si el `costoEnvio` es mayor que 0, o a `PAGADO` si el `costoEnvio` se cambia a 0 desde un estado pendiente.**
     *   **Se añadieron revalidaciones de caché para `/perfil`, `/pagos-pendientes` y `/proveedor/pedidos/${pedidoId}` para asegurar que los cambios se reflejen en la interfaz de usuario.**
     *   **Se importó `revalidatePath` de `next/cache` para resolver el `ReferenceError`.**
-    *   **Se ajustó la lógica en `actualizarPedidoPorProveedor` para que, si el proveedor establece un `costoEnvio > 0`, el `estadoPago` del pedido cambie a `PENDIENTE`, y si lo establece a `0`, el `estadoPago` cambie a `PAGADO`.**
+    *   **Se ajustó la lógica en `actualizarPedidoPorProveedor` para que, si el proveedor establece un `costoEnvio > 0`, el `estadoPago` del pedido cambie a `PENDIENTE`, y si lo establece a `0`, el `estadoPago` del pedido cambie a `PAGADO`.**
 *   `src/components/layout/general/HeaderPrincipal.jsx`:
     *   Se importó el nuevo componente `PendingPaymentsSummary`.
     *   Se integró `PendingPaymentsSummary` en el header, visible para usuarios autenticados, junto al icono del carrito.
@@ -62,3 +62,4 @@ La implementación de la funcionalidad de "apartado de pagos pendientes" está c
 3.  La página `/pagos-pendientes` muestra la información detallada.
 4.  Al hacer clic en "Pagar Ahora", se abre el modal de pago, permite la entrada de datos simulados y, al enviar, registra el pago y actualiza el estado del pedido.
 5.  El `estadoPago` de los pedidos se actualiza correctamente cuando el proveedor añade un costo de envío y cuando el usuario lo paga.
+6.  **Los cambios pendientes se han subido al repositorio remoto.**
