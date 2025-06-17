@@ -363,6 +363,7 @@ async function registrarPagoEnvioSimulado(pedidoId, paymentData) {
 
         const PedidoModel = await getModel('Pedido');
         const PagoModel = await getModel('Pago');
+        const VentaModel = await getModel('Venta'); // Obtener el modelo Venta
 
         const pedido = await PedidoModel.findById(pedidoId).lean();
 
@@ -384,13 +385,31 @@ async function registrarPagoEnvioSimulado(pedidoId, paymentData) {
         ).lean();
         logger.debug('Pedido updated to PAGADO:', updatedPedido);
 
+        // **NUEVO: Crear una nueva Venta para este pago de envío**
+        const nuevaVentaEnvioData = {
+            usuarioId: pedido.userId,
+            pedidoId: pedido._id,
+            valorVenta: pedido.costoEnvio, // La venta es por el costo de envío
+            comisionAplicacion: 0, // No hay comisión para el envío, o se define aquí
+            fechaVenta: new Date(),
+            estadoVenta: 'COMPLETADA', // La venta de envío se completa al pagar
+            // Podrías añadir un campo 'tipoVenta: 'ENVIO'' si es necesario diferenciar
+        };
+        const { success: ventaEnvioSuccess, data: nuevaVentaEnvio, error: ventaEnvioError } = await guardarVenta(nuevaVentaEnvioData);
+
+        if (!ventaEnvioSuccess) {
+            logger.error('Error creating Venta for shipping payment:', ventaEnvioError);
+            return { success: false, message: ventaEnvioError || 'Error al crear la venta para el pago de envío.' };
+        }
+        logger.debug('New Venta created for shipping payment:', nuevaVentaEnvio);
+
         // 2. Crear un nuevo registro de Pago
         const nuevoPagoEnvio = new PagoModel({
             usuarioId: pedido.userId,
             pedidoId: pedido._id,
-            ventaId: pedido.ventaId || null, // Usar ventaId del pedido si existe
-            valorPago: pedido.costoEnvio, // El valor del pago es el costo de envío
-            metodoPago: MetodoPago.TARJETA_CREDITO, // Asumimos tarjeta de crédito para la simulación
+            ventaId: nuevaVentaEnvio._id, // Usar el ID de la Venta de envío recién creada
+            valorPago: pedido.costoEnvio,
+            metodoPago: MetodoPago.TARJETA_CREDITO,
             estadoTransaccion: 'PAGADO',
             detallesTarjeta: {
                 cardNumber: paymentData.cardNumber ? paymentData.cardNumber.slice(-4) : 'N/A',

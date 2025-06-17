@@ -16,6 +16,7 @@ Se ha implementado el nuevo "apartado de pagos pendientes" para clientes, incluy
     *   **Se añadieron logs de depuración en `obtenerPagosPendientesPorUsuario` para mostrar la consulta, los resultados crudos y los datos formateados, facilitando la depuración de la visualización de pagos pendientes.**
     *   **Se corrigió el error `ventaId: Path \`ventaId\` is required` en `registrarPagoEnvioSimulado` al asegurar que el `ventaId` de la `Venta` recién creada se asigne al `Pedido` en `procesarPagoYCrearPedido` antes de crear el `Pago` principal, garantizando que `pedido.ventaId` siempre sea válido.**
     *   **Se modificó `procesarPagoYCrearPedido` para que el `costoEnvio` inicial del pedido sea `0` y el `estadoPago` inicial del pedido sea `PAGADO`, reflejando que el usuario paga los ítems al inicio.**
+    *   **Se corrigió el error `ventaId: Path \`ventaId\` is required` en `registrarPagoEnvioSimulado` al implementar la creación de una nueva `Venta` específica para el pago de envío, asegurando que el `Pago` de envío siempre tenga un `ventaId` válido.**
 *   `src/app/acciones/PedidoActions.js`:
     *   Se añadió la función `guardarPedido` para la creación de pedidos, que ahora establece el `estadoPago` a `'PENDIENTE'` si `costoEnvio > 0` y `'PAGADO'` si `costoEnvio` es 0.
     *   Se eliminó la función `marcarPedidoComoPagado` y su exportación, ya que su lógica fue integrada en `registrarPagoEnvioSimulado`.
