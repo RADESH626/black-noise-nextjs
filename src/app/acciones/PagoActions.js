@@ -208,12 +208,9 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
             return { success: false, message: 'El pago no pudo ser procesado.' };
         }
 
-        // Calcular costoEnvio basado en el método de entrega
-        let costoEnvioCalculado = 0;
-        if (metodoEntrega === 'DOMICILIO') {
-            // Si paymentDetailsCostEnvio es válido y mayor que 0, úsalo. De lo contrario, usa un valor fijo.
-            costoEnvioCalculado = (paymentDetailsCostEnvio && paymentDetailsCostEnvio > 0) ? paymentDetailsCostEnvio : 10.00; // Ejemplo: 10.00 si no se especifica o es 0
-        }
+        // Según el nuevo flujo, el costo de envío inicial es 0 y el estado de pago es PAGADO
+        // El costo de envío se añadirá y se convertirá en pendiente más tarde por el proveedor.
+        const costoEnvioInicial = 0;
 
         // 2. Crear el Pedido
         const nuevoPedidoData = {
@@ -225,9 +222,9 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
                 // Otros campos relevantes del producto si es necesario
             })),
             metodoEntrega: metodoEntrega,
-            estadoPedido: 'PENDIENTE', // Esto será sobrescrito por guardarPedido si costoEnvio > 0
-            total: total,
-            costoEnvio: costoEnvioCalculado, // Usar el costo de envío calculado
+            estadoPedido: 'PENDIENTE', // El estado del pedido sigue siendo PENDIENTE para el flujo general del pedido
+            total: total, // El total inicial es solo el de los ítems
+            costoEnvio: costoEnvioInicial, // Costo de envío inicial es 0
             direccionEnvio: direccion,
             destinatario: { nombre, correo, direccion },
             // paymentId will be added after Pago is created

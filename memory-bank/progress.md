@@ -9,9 +9,10 @@
 *   **Actualización del Total del Pedido por Costo de Envío:** Se ha modificado la función `actualizarPedidoPorProveedor` para que, cuando el proveedor establezca el `costoEnvio`, el `total` del pedido se recalcule para incluir este costo. También se ajusta el `estadoPago` del pedido según el `costoEnvio` y se revalidan las rutas relevantes.
 *   **Corrección de `revalidatePath` en `ProveedorPedidoActions.js`:** Se ha importado `revalidatePath` en `src/app/acciones/ProveedorPedidoActions.js` para resolver el `ReferenceError`.
 *   **Corrección de `ventaId` requerido en `Pago`:** Se ha corregido el error `ventaId: Path \`ventaId\` is required` en `registrarPagoEnvioSimulado` al asegurar que el `ventaId` de la `Venta` recién creada se asigne al `Pedido` en `procesarPagoYCrearPedido` antes de crear el `Pago` principal.
+*   **Replanteamiento del Flujo de Pagos:** Se ha ajustado la lógica de creación de pedidos para que el `costoEnvio` inicial sea `0` y el `estadoPago` inicial sea `PAGADO` (ya que el usuario paga los ítems al inicio). La lógica de `actualizarPedidoPorProveedor` se ha modificado para que el `estadoPago` del pedido cambie a `PENDIENTE` si el proveedor establece un `costoEnvio > 0`, y a `PAGADO` si lo establece a `0`.
 
 ## Estado General
-La funcionalidad de notificaciones de pedido y el apartado de pagos pendientes están completos a nivel de código. El error crítico en el procesamiento de pagos ha sido resuelto y se han añadido mejoras de depuración para la asignación de proveedor y pago. La gestión del contador de órdenes activas del proveedor ahora es más precisa. La visualización de pagos pendientes en la página correspondiente ha sido corregida y mejorada con logs de depuración. El total del pedido ahora se actualiza correctamente para reflejar el costo de envío establecido por el proveedor. El error de `revalidatePath` ha sido resuelto. El problema de `ventaId` requerido en el modelo `Pago` también ha sido solucionado.
+La funcionalidad de notificaciones de pedido y el apartado de pagos pendientes están completos a nivel de código. El error crítico en el procesamiento de pagos ha sido resuelto y se han añadido mejoras de depuración para la asignación de proveedor y pago. La gestión del contador de órdenes activas del proveedor ahora es más precisa. La visualización de pagos pendientes en la página correspondiente ha sido corregida y mejorada con logs de depuración. El total del pedido ahora se actualiza correctamente para reflejar el costo de envío establecido por el proveedor. El error de `revalidatePath` ha sido resuelto. El problema de `ventaId` requerido en el modelo `Pago` también ha sido solucionado. El flujo de pagos ha sido replanteado para que el pago inicial cubra solo los ítems y el costo de envío se gestione como un pago pendiente posterior.
 
 ## Próximos Pasos
 *   Verificación y pruebas de la funcionalidad de notificación de pedidos.
@@ -20,3 +21,7 @@ La funcionalidad de notificaciones de pedido y el apartado de pagos pendientes e
 *   **Verificación del decremento de `activeOrders` del proveedor cuando un pedido cambia a los estados `ENTREGADO`, `CANCELADO` o `LISTO`.**
 *   **Verificación de que los pedidos con costo de envío pendiente se muestren correctamente en la página `/pagos-pendientes` utilizando los nuevos logs para confirmar la consulta y los resultados.**
 *   **Verificación de que el `total` del pedido se actualiza correctamente en la base de datos y en la interfaz de usuario (perfil, pagos pendientes) cuando el proveedor establece el `costoEnvio`.**
+*   **Verificación completa del nuevo flujo de pagos:**
+    *   Crear un pedido: `costoEnvio` inicial 0, `estadoPago` inicial `PAGADO`.
+    *   Proveedor establece `costoEnvio > 0`: `total` se actualiza, `estadoPago` cambia a `PENDIENTE`.
+    *   Usuario paga `costoEnvio`: `estadoPago` vuelve a `PAGADO`.

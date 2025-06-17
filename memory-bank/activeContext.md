@@ -15,6 +15,7 @@ Se ha implementado el nuevo "apartado de pagos pendientes" para clientes, incluy
     *   **Se corrigió la inicialización de `costoEnvio` en `procesarPagoYCrearPedido` para que se calcule dinámicamente basado en `metodoEntrega` (ej. 10.00 para 'DOMICILIO' si no se especifica), asegurando que los pedidos con costo de envío se creen con `costoEnvio > 0` y `estadoPago: 'PENDIENTE'`.**
     *   **Se añadieron logs de depuración en `obtenerPagosPendientesPorUsuario` para mostrar la consulta, los resultados crudos y los datos formateados, facilitando la depuración de la visualización de pagos pendientes.**
     *   **Se corrigió el error `ventaId: Path \`ventaId\` is required` en `registrarPagoEnvioSimulado` al asegurar que el `ventaId` de la `Venta` recién creada se asigne al `Pedido` en `procesarPagoYCrearPedido` antes de crear el `Pago` principal, garantizando que `pedido.ventaId` siempre sea válido.**
+    *   **Se modificó `procesarPagoYCrearPedido` para que el `costoEnvio` inicial del pedido sea `0` y el `estadoPago` inicial del pedido sea `PAGADO`, reflejando que el usuario paga los ítems al inicio.**
 *   `src/app/acciones/PedidoActions.js`:
     *   Se añadió la función `guardarPedido` para la creación de pedidos, que ahora establece el `estadoPago` a `'PENDIENTE'` si `costoEnvio > 0` y `'PAGADO'` si `costoEnvio` es 0.
     *   Se eliminó la función `marcarPedidoComoPagado` y su exportación, ya que su lógica fue integrada en `registrarPagoEnvioSimulado`.
@@ -23,11 +24,13 @@ Se ha implementado el nuevo "apartado de pagos pendientes" para clientes, incluy
     *   **Se modificó `guardarPedido` para que devuelva la instancia de Mongoose directamente en lugar de un objeto plano, lo que mejora la consistencia y el manejo de objetos de modelo.**
     *   **Se importó el modelo `Proveedor` para permitir la actualización de sus campos.**
     *   **Se modificó `updateEstadoPedido` para decrementar el `activeOrders` del proveedor asociado cuando el estado del pedido cambia a `ENTREGADO`, `CANCELADO` o `LISTO`, asegurando que el contador de pedidos activos del proveedor se mantenga actualizado.**
+    *   **Se modificó `guardarPedido` para que el `estadoPago` inicial del pedido siempre sea `PAGADO`, ya que el usuario paga los ítems al crear el pedido.**
 *   `src/app/acciones/ProveedorPedidoActions.js`:
     *   **Se modificó la función `actualizarPedidoPorProveedor` para recalcular el `total` del pedido sumando el `costoEnvio` al total original de los ítems cuando el proveedor actualiza el `costoEnvio`.**
     *   **Se añadió lógica para actualizar el `estadoPago` del pedido a `PENDIENTE` si el `costoEnvio` es mayor que 0, o a `PAGADO` si el `costoEnvio` se cambia a 0 desde un estado pendiente.**
     *   **Se añadieron revalidaciones de caché para `/perfil`, `/pagos-pendientes` y `/proveedor/pedidos/${pedidoId}` para asegurar que los cambios se reflejen en la interfaz de usuario.**
     *   **Se importó `revalidatePath` de `next/cache` para resolver el `ReferenceError`.**
+    *   **Se ajustó la lógica en `actualizarPedidoPorProveedor` para que, si el proveedor establece un `costoEnvio > 0`, el `estadoPago` del pedido cambie a `PENDIENTE`, y si lo establece a `0`, el `estadoPago` cambie a `PAGADO`.**
 *   `src/components/layout/general/HeaderPrincipal.jsx`:
     *   Se importó el nuevo componente `PendingPaymentsSummary`.
     *   Se integró `PendingPaymentsSummary` en el header, visible para usuarios autenticados, junto al icono del carrito.

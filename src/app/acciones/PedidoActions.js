@@ -15,13 +15,10 @@ async function guardarPedido(data) {
         const PedidoModel = await getModel('Pedido');
         const nuevoPedido = new PedidoModel(data);
 
-        // Si el costo de envío es mayor que 0, el estado de pago inicial es PENDIENTE
-        if (nuevoPedido.costoEnvio > 0) {
-            nuevoPedido.estadoPago = 'PENDIENTE';
-        } else {
-            // Si no hay costo de envío, o es 0, el pago se considera PAGADO
-            nuevoPedido.estadoPago = 'PAGADO';
-        }
+        // Según el nuevo flujo, el estado de pago inicial del pedido siempre es PAGADO
+        // ya que el usuario paga el total de los ítems al crear el pedido.
+        // El costo de envío se manejará como un pago pendiente posterior.
+        nuevoPedido.estadoPago = 'PAGADO';
 
         const pedidoGuardado = await nuevoPedido.save();
         revalidatePath('/admin/pedidos');

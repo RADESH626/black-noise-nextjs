@@ -79,15 +79,14 @@ export async function actualizarPedidoPorProveedor(pedidoId, proveedorId, update
         if (updateData.costoEnvio !== undefined) { // Allow 0 as a valid cost
             allowedUpdates.costoEnvio = updateData.costoEnvio;
             // Recalcular el total del pedido para incluir el costo de envío
-            // El total original del pedido (pedidoExistente.total) es el total de los ítems.
+            // El total original del pedido (pedidoExistente.total) es el total de los ítems pagados inicialmente.
             newTotal = pedidoExistente.total + updateData.costoEnvio;
             allowedUpdates.total = newTotal;
 
             // Si se establece un costo de envío > 0, el estado de pago debe ser PENDIENTE
             if (updateData.costoEnvio > 0) {
                 allowedUpdates.estadoPago = 'PENDIENTE';
-            } else if (updateData.costoEnvio === 0 && pedidoExistente.costoEnvio > 0 && pedidoExistente.estadoPago === 'PENDIENTE') {
-                // Si el costo de envío se cambia a 0 y antes era > 0 y pendiente, marcar como PAGADO
+            } else { // Si el costo de envío es 0, el estado de pago debe ser PAGADO
                 allowedUpdates.estadoPago = 'PAGADO';
             }
         }
