@@ -35,6 +35,7 @@ Se ha implementado el nuevo "apartado de pagos pendientes" para clientes, incluy
 *   `src/components/layout/general/HeaderPrincipal.jsx`:
     *   Se importó el nuevo componente `PendingPaymentsSummary`.
     *   Se integró `PendingPaymentsSummary` en el header, visible para usuarios autenticados, junto al icono del carrito.
+    *   **Se añadió una condición de renderizado para el icono del carrito, de modo que solo se muestre si existe una sesión de usuario activa.**
 *   `src/app/pagos-pendientes/page.jsx`:
     *   Se modificó para usar `PendingPaymentModal` al hacer clic en "Pagar Ahora".
     *   Se eliminó la importación de `marcarPedidoComoPagado` y se importó `registrarPagoEnvioSimulado` y `PendingPaymentModal`.

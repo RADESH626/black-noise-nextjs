@@ -59,20 +59,22 @@ function HeaderPrincipal() {
                     {session && <PendingPaymentsSummary />}
 
                     {/* Shopping Cart Icon */}
-                    <div className="relative cursor-pointer" onClick={handleCartIconClick}>
-                        <Image src="/icons/icono-carrito.svg" alt="Carrito" width={30} height={30} />
-                        {cartItems.length > 0 && (
-                            <span className="absolute -top-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                {cartItems.length}
-                            </span>
-                        )}
+                    {session && (
+                        <div className="relative cursor-pointer" onClick={handleCartIconClick}>
+                            <Image src="/icons/icono-carrito.svg" alt="Carrito" width={30} height={30} />
+                            {cartItems.length > 0 && (
+                                <span className="absolute -top-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                    {cartItems.length}
+                                </span>
+                            )}
 
-                        <div className="absolute mt-2 top-full right-0  z-50 w-auto ">
+                            <div className="absolute mt-2 top-full right-0  z-50 w-auto ">
 
-                            <CartModal cartItems={cartItems} onClose={() => setShowCartModal(false)} isOpen={showCartModal} onRemoveItem={removeItem} />
+                                <CartModal cartItems={cartItems} onClose={() => setShowCartModal(false)} isOpen={showCartModal} onRemoveItem={removeItem} />
 
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {session ? (
                         <div className='relative flex flex-row items-center justify-center gap-4' ref={dropdownRef}>
