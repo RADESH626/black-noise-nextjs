@@ -104,20 +104,37 @@ export async function obtenerDesigns() {
             .lean();
 
         const formattedDesigns = designs.map(design => {
-            // Create a mutable copy of the design object
-            const processedDesign = { ...design };
+            // Create a mutable copy of the design object and convert _id to string
+            const processedDesign = { ...design, _id: design._id.toString() };
+
+            // Remove imageData and imageMimeType as they are not plain objects
+            delete processedDesign.imageData;
+            delete processedDesign.imageMimeType;
 
             const designImageUrl = design.imageData && design.imageData.buffer instanceof Buffer && design.imageMimeType
                 ? `data:${design.imageMimeType};base64,${design.imageData.buffer.toString('base64')}`
                 : null; // Provide the image as a data URL
 
+            const userAvatar = design.usuarioId && design.usuarioId.imageData && design.usuarioId.imageData.buffer instanceof Buffer && design.usuarioId.imageMimeType
+                ? `data:${design.usuarioId.imageMimeType};base64,${design.usuarioId.imageData.buffer.toString('base64')}`
+                : null; // Provide the user avatar as a data URL
+
+            // Create a plain object for usuarioId
+            const processedUsuario = design.usuarioId ? {
+                _id: design.usuarioId._id.toString(),
+                Nombre: design.usuarioId.Nombre,
+                primerApellido: design.usuarioId.primerApellido,
+                // imageData and imageMimeType are not included as they are handled by userAvatar
+            } : null;
+
             return {
                 ...processedDesign,
                 prenda: processedDesign.nombreDesing,
                 price: processedDesign.valorDesing,
-                usuario: processedUsuarioId ? `${processedUsuarioId.Nombre} ${processedUsuarioId.primerApellido}` : 'Usuario Desconocido',
+                usuario: processedUsuario ? `${processedUsuario.Nombre} ${processedUsuario.primerApellido}` : 'Usuario Desconocido',
                 userAvatar: userAvatar,
                 imagen: designImageUrl,
+                usuarioId: processedUsuario, // Include the processed usuarioId object
             };
         });
 
