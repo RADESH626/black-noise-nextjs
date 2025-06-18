@@ -104,18 +104,40 @@ export async function obtenerDesigns() {
             .lean();
 
         const formattedDesigns = designs.map(design => {
-            // Create a mutable copy of the design object
-            const processedDesign = { ...design };
-
             const designImageUrl = design.imageData && design.imageData.buffer instanceof Buffer && design.imageMimeType
                 ? `data:${design.imageMimeType};base64,${design.imageData.buffer.toString('base64')}`
-                : null; // Provide the image as a data URL
+                : null;
+
+            const userAvatar = design.usuarioId && design.usuarioId.imageData && design.usuarioId.imageData.buffer instanceof Buffer && design.usuarioId.imageMimeType
+                ? `data:${design.usuarioId.imageMimeType};base64,${design.usuarioId.imageData.buffer.toString('base64')}`
+                : null;
+
+            // Create a new plain object to ensure no Mongoose objects are passed
+            const plainDesign = {
+                _id: design._id.toString(),
+                usuarioId: design.usuarioId ? {
+                    _id: design.usuarioId._id.toString(),
+                    Nombre: design.usuarioId.Nombre,
+                    primerApellido: design.usuarioId.primerApellido,
+                    // Do NOT include imageData or imageMimeType here, as they are handled by userAvatar
+                } : null,
+                nombreDesing: design.nombreDesing,
+                descripcion: design.descripcion,
+                valorDesing: design.valorDesing,
+                categoria: design.categoria,
+                estadoDesing: design.estadoDesing,
+                coloresDisponibles: design.coloresDisponibles,
+                tallasDisponibles: design.tallasDisponibles,
+                createdAt: design.createdAt.toISOString(), // Convert Date to ISO string
+                updatedAt: design.updatedAt.toISOString(), // Convert Date to ISO string
+                // Exclude imageData and imageMimeType from the top level if they are Buffers
+            };
 
             return {
-                ...processedDesign,
-                prenda: processedDesign.nombreDesing,
-                price: processedDesign.valorDesing,
-                usuario: processedUsuarioId ? `${processedUsuarioId.Nombre} ${processedUsuarioId.primerApellido}` : 'Usuario Desconocido',
+                ...plainDesign,
+                prenda: plainDesign.nombreDesing,
+                price: plainDesign.valorDesing,
+                usuario: plainDesign.usuarioId ? `${plainDesign.usuarioId.Nombre} ${plainDesign.usuarioId.primerApellido}` : 'Usuario Desconocido',
                 userAvatar: userAvatar,
                 imagen: designImageUrl,
             };
@@ -138,13 +160,27 @@ export async function obtenerDesignsPorUsuarioId(usuarioId) {
         const formattedDesigns = designs.map(design => {
             const designImageUrl = design.imageData && design.imageData.buffer instanceof Buffer && design.imageMimeType
                 ? `data:${design.imageMimeType};base64,${design.imageData.buffer.toString('base64')}`
-                : null; // Or a default image path if no image data
+                : null;
+
+            // Create a new plain object to ensure no Mongoose objects are passed
+            const plainDesign = {
+                _id: design._id.toString(),
+                usuarioId: design.usuarioId.toString(), // Convert ObjectId to string
+                nombreDesing: design.nombreDesing,
+                descripcion: design.descripcion,
+                valorDesing: design.valorDesing,
+                categoria: design.categoria,
+                estadoDesing: design.estadoDesing,
+                coloresDisponibles: design.coloresDisponibles,
+                tallasDisponibles: design.tallasDisponibles,
+                createdAt: design.createdAt.toISOString(),
+                updatedAt: design.updatedAt.toISOString(),
+                // Exclude imageData and imageMimeType from the top level if they are Buffers
+            };
 
             return {
-                ...design,
-                _id: design._id.toString(), // Convert _id to string
-                imagen: designImageUrl, // Provide the image as a data URL
-                // imageData and imageMimeType are removed as they are not plain objects for client components
+                ...plainDesign,
+                imagen: designImageUrl,
             };
         });
 

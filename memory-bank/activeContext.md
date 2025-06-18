@@ -1,7 +1,7 @@
 # Contexto de Sesión Activa
 
 ## Resumen de la Sesión
-Se ha implementado el nuevo "apartado de pagos pendientes" para clientes, incluyendo una vista resumida en el header y una página detallada (`/pagos-pendientes`) donde los usuarios pueden ver y registrar pagos simulados con datos de entrada para los costos de envío adicionales. La lógica de estado de pago de los pedidos se ha ajustado para reflejar estos pagos pendientes.
+Se ha implementado el nuevo "apartado de pagos pendientes" para clientes, incluyendo una vista resumida en el header y una página detallada (`/pagos-pendientes`) donde los usuarios pueden ver y registrar pagos simulados con datos de entrada para los costos de envío adicionales. La lógica de estado de pago de los pedidos se ha ajustado para reflejar estos pagos pendientes. Se ha corregido un `ReferenceError` en `DesignActions.js` relacionado con `processedUsuarioId` y se ha añadido la lógica para mostrar el avatar del usuario en los diseños. Además, se ha corregido la visualización de la imagen de perfil del usuario en la página de perfil y en el catálogo, y se han resuelto problemas de serialización de datos entre componentes de servidor y cliente.
 
 ## Cambios Realizados
 
@@ -32,6 +32,12 @@ Se ha implementado el nuevo "apartado de pagos pendientes" para clientes, incluy
     *   **Se añadieron revalidaciones de caché para `/perfil`, `/pagos-pendientes` y `/proveedor/pedidos/${pedidoId}` para asegurar que los cambios se reflejen en la interfaz de usuario.**
     *   **Se importó `revalidatePath` de `next/cache` para resolver el `ReferenceError`.**
     *   **Se ajustó la lógica en `actualizarPedidoPorProveedor` para que, si el proveedor establece un `costoEnvio > 0`, el `estadoPago` del pedido cambie a `PENDIENTE`, y si lo establece a `0`, el `estadoPago` del pedido cambie a `PAGADO`.**
+*   `src/app/acciones/DesignActions.js`:
+    *   **Se corrigió el `ReferenceError: processedUsuarioId is not defined` al reemplazar `processedUsuarioId` con `processedDesign.usuarioId`.**
+    *   **Se añadió la definición de `userAvatar` utilizando `processedDesign.usuarioId.imageData` y `processedDesign.usuarioId.imageMimeType` para mostrar el avatar del usuario en los diseños.**
+    *   **Se modificó `obtenerDesigns` y `obtenerDesignsPorUsuarioId` para asegurar que los objetos `_id` y `imageData` se conviertan a tipos serializables (string o data URL) antes de ser pasados a los componentes del cliente, eliminando los `Buffer`s crudos.**
+*   `src/app/acciones/UsuariosActions.js`:
+    *   **Se modificó `ObtenerUsuarioPorId` y `ObtenerUsuarioPorCorreo` para asegurar que el `_id` del usuario se convierta a string y que los campos `imageData` y `imageMimeType` se eliminen del objeto de usuario después de construir `profileImageUrl`, evitando problemas de serialización.**
 *   `src/components/layout/general/HeaderPrincipal.jsx`:
     *   Se importó el nuevo componente `PendingPaymentsSummary`.
     *   Se integró `PendingPaymentsSummary` en el header, visible para usuarios autenticados, junto al icono del carrito.
@@ -43,6 +49,8 @@ Se ha implementado el nuevo "apartado de pagos pendientes" para clientes, incluy
     *   Se añadió lógica para controlar la visibilidad del modal y pasar los datos del pedido.
 *   `src/components/common/PendingPaymentsSummary.jsx`:
     *   Se añadió la clase `filter invert` a las etiquetas `Image` del icono de dinero para mejorar su visibilidad en el header oscuro.
+*   `src/components/layout/ProfileContent.jsx`:
+    *   Se modificó la etiqueta `<img>` para usar `user?.profileImageUrl` en lugar de una ruta estática para la imagen de perfil del usuario.
 
 ### Archivos Creados:
 *   `src/components/common/PendingPaymentsSummary.jsx`:
@@ -55,6 +63,8 @@ Se ha implementado el nuevo "apartado de pagos pendientes" para clientes, incluy
     *   Permite al usuario "pagar" el costo de envío pendiente, lo que actualiza el estado del pedido en la base de datos.
 *   `src/components/pagos-pendientes/PendingPaymentModal.jsx`:
     *   Nuevo componente modal para capturar datos de pago simulados (nombre, correo, tarjeta, mes, año, CVV) antes de registrar el pago de envío.
+*   `src/app/api/images/usuario/[id]/route.js`:
+    *   Se creó una nueva ruta API para servir las imágenes de perfil de usuario almacenadas en la base de datos como `Buffer`.
 
 ## Próximos Pasos
 La implementación de la funcionalidad de "apartado de pagos pendientes" está completa a nivel de código. Se recomienda probar la funcionalidad para asegurar que:

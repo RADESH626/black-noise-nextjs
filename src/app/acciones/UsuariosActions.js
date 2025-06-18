@@ -261,8 +261,15 @@ async function ObtenerUsuarioPorId(id) {
             throw new NotFoundError(`User not found with ID: ${id}`);
         }
         const plainUser = toPlainObject(response);
+        
+        // Ensure _id is a string
+        plainUser._id = plainUser._id.toString();
+
+        // Construct profileImageUrl and remove raw image data
         if (plainUser.imageData && plainUser.imageMimeType) {
             plainUser.profileImageUrl = `/api/images/usuario/${plainUser._id}`;
+            delete plainUser.imageData; // Remove raw buffer data
+            delete plainUser.imageMimeType; // Remove raw mime type
         } else {
             plainUser.profileImageUrl = '/img/perfil/FotoPerfil.webp';
         }
@@ -287,12 +294,18 @@ async function ObtenerUsuarioPorCorreo(email) {
             return null; // Return null if user not found, handled by loginAction
         }
         const plainUser = toPlainObject(user);
+        
+        // Ensure _id is a string
+        plainUser._id = plainUser._id.toString();
+
+        // Construct profileImageUrl and remove raw image data
         if (plainUser.imageData && plainUser.imageMimeType) {
             plainUser.profileImageUrl = `/api/images/usuario/${plainUser._id}`;
+            delete plainUser.imageData; // Remove raw buffer data
+            delete plainUser.imageMimeType; // Remove raw mime type
         } else {
             plainUser.profileImageUrl = '/img/perfil/FotoPerfil.webp';
         }
-        // logger.info('Rol del usuario obtenido en ObtenerUsuarioPorCorreo:', plainUser.rol); // Removed logging
         return plainUser;
         
     } catch (error) {
