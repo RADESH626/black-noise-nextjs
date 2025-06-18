@@ -1,24 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react"; // Import useState and useEffect
+import { useState, useEffect } from "react";
 import { guardarDesigns } from "@/app/acciones/DesignActions";
 import { useDialog } from "@/context/DialogContext";
-import { CategoriaProducto } from "@/models/enums/CategoriaProducto"; // Assuming this path for enum
+import { CategoriaProducto } from "@/models/enums/CategoriaProducto";
 
 function DesignUploadModal({ onDesignSaved }) {
   const { closeModal, showPopUp } = useDialog();
 
-  // State for form fields
   const [nombreDesing, setNombreDesing] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [valorDesing, setValorDesing] = useState("");
   const [categoria, setCategoria] = useState("");
-  const [selectedImageFile, setSelectedImageFile] = useState(null); // State for the selected file
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-  const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15 MB
+  const MAX_FILE_SIZE = 15 * 1024 * 1024;
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -26,16 +25,16 @@ function DesignUploadModal({ onDesignSaved }) {
       if (!ALLOWED_MIME_TYPES.includes(file.type)) {
         setError(`Tipo de archivo no soportado: ${file.type}. Solo se permiten JPG, PNG y WEBP.`);
         setSelectedImageFile(null);
-        e.target.value = ''; // Clear the file input
+        e.target.value = '';
         return;
       }
       if (file.size > MAX_FILE_SIZE) {
         setError(`El tamaño del archivo excede el límite de ${MAX_FILE_SIZE / (1024 * 1024)} MB.`);
         setSelectedImageFile(null);
-        e.target.value = ''; // Clear the file input
+        e.target.value = '';
         return;
       }
-      setError(null); // Clear previous errors if file is valid
+      setError(null);
       setSelectedImageFile(file);
     } else {
       setSelectedImageFile(null);
@@ -46,7 +45,7 @@ function DesignUploadModal({ onDesignSaved }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
-    setError(null); // Clear errors before submission
+    setError(null);
 
     if (!selectedImageFile) {
       setError("Por favor, selecciona una imagen para el diseño.");
@@ -54,12 +53,12 @@ function DesignUploadModal({ onDesignSaved }) {
       return;
     }
 
-    // Re-validate just in case (though handleFileChange should catch most)
     if (!ALLOWED_MIME_TYPES.includes(selectedImageFile.type)) {
-      setError(`Tipo de archivo no soportado: ${selectedImageFile.type}. Solo se permiten JPG, PNG y WEBP.`);
+      setError(`Tipo de archivo no soportado: ${selectedImageFile.type}.`);
       setLoading(false);
       return;
     }
+
     if (selectedImageFile.size > MAX_FILE_SIZE) {
       setError(`El tamaño del archivo excede el límite de ${MAX_FILE_SIZE / (1024 * 1024)} MB.`);
       setLoading(false);
@@ -71,7 +70,7 @@ function DesignUploadModal({ onDesignSaved }) {
     formData.append("descripcion", descripcion);
     formData.append("valorDesing", valorDesing);
     formData.append("categoria", categoria);
-    formData.append("imagenDesing", selectedImageFile); // Append the File object
+    formData.append("imagenDesing", selectedImageFile);
 
     try {
       const result = await guardarDesigns(null, formData);
@@ -85,7 +84,6 @@ function DesignUploadModal({ onDesignSaved }) {
         setValorDesing("");
         setCategoria("");
         setSelectedImageFile(null);
-        // Clear the file input visually
         const fileInput = document.getElementById('imagenDesing');
         if (fileInput) fileInput.value = '';
       } else {
@@ -101,16 +99,16 @@ function DesignUploadModal({ onDesignSaved }) {
   };
 
   return (
-    <div className="p-6 bg-gray-900 text-white rounded-lg shadow-lg max-h-[80vh] overflow-y-auto">
-      {/* <h2 className="text-2xl font-bold mb-6 text-center">Subir Nuevo Diseño</h2> */}
+    <div className="p-6 rounded-lg shadow-lg max-h-[80vh] overflow-y-auto" style={{ backgroundColor: "#111827", color: "#FFFFFF" }}>
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="bg-red-800 text-white p-3 rounded-md text-sm mb-4">
+          <div className="p-3 rounded-md text-sm mb-4" style={{ backgroundColor: "#991B1B", color: "#FFFFFF" }}>
             {error}
           </div>
         )}
+
         <div>
-          <label htmlFor="nombreDesing" className="block text-sm font-medium text-gray-300 mb-1">
+          <label htmlFor="nombreDesing" className="block text-sm font-medium mb-1" style={{ color: "#D1D5DB" }}>
             Nombre del Diseño:
           </label>
           <input
@@ -120,13 +118,19 @@ function DesignUploadModal({ onDesignSaved }) {
             value={nombreDesing}
             onChange={(e) => setNombreDesing(e.target.value)}
             required
-            className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:ring-purple-500 focus:border-purple-500"
+            className="w-full p-3 border rounded-md focus:ring-2 focus:outline-none"
+            style={{
+              backgroundColor: "#1F2937",
+              borderColor: "#FFFFFFFF",
+              color: "#FFFFFF",
+              placeholderColor: "#6B7280"
+            }}
             placeholder="Ej: Camiseta Urbana"
           />
         </div>
 
         <div>
-          <label htmlFor="descripcion" className="block text-sm font-medium text-gray-300 mb-1">
+          <label htmlFor="descripcion" className="block text-sm font-medium mb-1" style={{ color: "#D1D5DB" }}>
             Descripción:
           </label>
           <textarea
@@ -135,13 +139,19 @@ function DesignUploadModal({ onDesignSaved }) {
             rows="3"
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
-            className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:ring-purple-500 focus:border-purple-500"
+            className="w-full p-3 border rounded-md focus:ring-2 focus:outline-none"
+            style={{
+              backgroundColor: "#1F2937",
+              borderColor: "#FFFFFFFF",
+              color: "#FFFFFF",
+              placeholderColor: "#6B7280"
+            }}
             placeholder="Una breve descripción de tu diseño (opcional)..."
           ></textarea>
         </div>
 
         <div>
-          <label htmlFor="valorDesing" className="block text-sm font-medium text-gray-300 mb-1">
+          <label htmlFor="valorDesing" className="block text-sm font-medium mb-1" style={{ color: "#D1D5DB" }}>
             Precio:
           </label>
           <input
@@ -152,13 +162,19 @@ function DesignUploadModal({ onDesignSaved }) {
             value={valorDesing}
             onChange={(e) => setValorDesing(e.target.value)}
             required
-            className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:ring-purple-500 focus:border-purple-500"
+            className="w-full p-3 border rounded-md focus:ring-2 focus:outline-none"
+            style={{
+              backgroundColor: "#1F2937",
+              borderColor: "#FFFFFFFF",
+              color: "#FFFFFF",
+              placeholderColor: "#6B7280"
+            }}
             placeholder="Ej: 25.99"
           />
         </div>
 
         <div>
-          <label htmlFor="categoria" className="block text-sm font-medium text-gray-300 mb-1">
+          <label htmlFor="categoria" className="block text-sm font-medium mb-1" style={{ color: "#D1D5DB" }}>
             Categoría:
           </label>
           <select
@@ -167,7 +183,12 @@ function DesignUploadModal({ onDesignSaved }) {
             value={categoria}
             onChange={(e) => setCategoria(e.target.value)}
             required
-            className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:ring-purple-500 focus:border-purple-500"
+            className="w-full p-3 border rounded-md focus:ring-2 focus:outline-none"
+            style={{
+              backgroundColor: "#1F2937",
+              borderColor: "#FFFFFFFF",
+              color: "#FFFFFF"
+            }}
           >
             <option value="">Selecciona una categoría</option>
             {Object.values(CategoriaProducto).map((category) => (
@@ -179,7 +200,7 @@ function DesignUploadModal({ onDesignSaved }) {
         </div>
 
         <div>
-          <label htmlFor="imagenDesing" className="block text-sm font-medium text-gray-300 mb-1">
+          <label htmlFor="imagenDesing" className="block text-sm font-medium mb-1" style={{ color: "#D1D5DB" }}>
             Subir Imagen:
           </label>
           <input
@@ -188,8 +209,13 @@ function DesignUploadModal({ onDesignSaved }) {
             name="imagenDesing"
             onChange={handleFileChange}
             required
-            className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:ring-purple-500 focus:border-purple-500"
-            accept="image/jpeg, image/png, image/webp" // Accept only specified image files
+            accept="image/jpeg, image/png, image/webp"
+            className="w-full p-3 border rounded-md focus:ring-2 focus:outline-none"
+            style={{
+              backgroundColor: "#1F2937",
+              borderColor: "#FFFFFFFF",
+              color: "#FFFFFF"
+            }}
           />
         </div>
 
@@ -197,15 +223,20 @@ function DesignUploadModal({ onDesignSaved }) {
           <button
             type="button"
             onClick={closeModal}
-            className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200 ease-in-out"
+            className="font-bold py-2 px-4 rounded focus:outline-none transition duration-200 ease-in-out"
+            style={{ backgroundColor: "#006AFFFF", color: "#FFFFFF" }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#0062FFFF")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#006AFFFF")}
           >
             Cancelar
           </button>
           <button
             type="submit"
-            aria-disabled={loading}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200 ease-in-out"
             disabled={loading}
+            className="font-bold py-2 px-4 rounded focus:outline-none transition duration-200 ease-in-out"
+            style={{ backgroundColor: "#FF0000FF", color: "#FFFFFF" }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#FF0000FF")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#FF0000FF")}
           >
             {loading ? "Guardando..." : "Guardar Diseño"}
           </button>

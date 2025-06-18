@@ -6,9 +6,9 @@ import { useDialog } from "@/context/DialogContext";
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
 import InputGeneral from "@/components/common/inputs/InputGeneral";
 import InputFiles from "@/components/common/inputs/InputFiles";
-import { actualizarDesign } from "@/app/acciones/DesignActions"; // Import the server action
+import { actualizarDesign } from "@/app/acciones/DesignActions";
 
-// Submit button component with pending state
+// Botón con estado de carga
 function SubmitButton({ customText = "Guardar Cambios" }) {
   const { pending } = useFormStatus();
   return (
@@ -18,7 +18,6 @@ function SubmitButton({ customText = "Guardar Cambios" }) {
   );
 }
 
-// Initial state for useActionState
 const initialState = {
   message: null,
   success: false,
@@ -34,15 +33,15 @@ function FormEditarDesign({ designData, onSuccess }) {
     descripcion: designData?.descripcion || "",
     valorDesing: designData?.valorDesing || "",
     categoria: designData?.categoria || "",
-    tallasDisponibles: designData?.tallasDisponibles?.join(',') || "",
-    imagenDesing: null, // For file input
+    tallasDisponibles: designData?.tallasDisponibles?.join(",") || "",
+    imagenDesing: null,
   });
 
   useEffect(() => {
     if (state.message) {
       showPopUp(state.message, state.success ? "success" : "error");
       if (state.success && onSuccess) {
-        onSuccess(state.data); // Pass updated design data back
+        onSuccess(state.data);
       }
     }
   }, [state, showPopUp, onSuccess]);
@@ -62,19 +61,21 @@ function FormEditarDesign({ designData, onSuccess }) {
     }
   };
 
-  // Create a FormData object for the server action
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.target);
-    // Manually append the file if it exists in formData state
     if (formData.imagenDesing) {
-      data.set('imagenDesing', formData.imagenDesing);
+      data.set("imagenDesing", formData.imagenDesing);
     }
     formAction(data);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 text-white">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-5"
+      style={{ color: "#FFFFFF", backgroundColor: "#111827", padding: "1.5rem", borderRadius: "0.5rem" }}
+    >
       <input type="hidden" name="id" value={formData.id} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <InputGeneral
@@ -119,7 +120,10 @@ function FormEditarDesign({ designData, onSuccess }) {
         />
 
         <div className="relative md:col-span-2">
-          <label htmlFor="imagenDesing" className="block mb-1 text-sm font-medium text-purple-400">
+          <label
+            htmlFor="imagenDesing"
+            style={{ color: "#FF0000FF", fontSize: "0.875rem", fontWeight: "500", marginBottom: "0.25rem", display: "block" }}
+          >
             Imagen del Diseño (opcional, para reemplazar)
           </label>
           <InputFiles

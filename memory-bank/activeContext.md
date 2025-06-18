@@ -52,6 +52,16 @@ Se ha implementado el nuevo "apartado de pagos pendientes" para clientes, incluy
 *   `src/components/layout/ProfileContent.jsx`:
     *   Se modificó la etiqueta `<img>` para usar `user?.profileImageUrl` en lugar de una ruta estática para la imagen de perfil del usuario.
 
+<<<<<<< HEAD
+=======
+*   `src/app/acciones/DesignActions.js`:
+    *   Corregido el error "processedUsuarioId is not defined" en la función `obtenerDesigns` al usar `design.usuarioId` en lugar de la variable indefinida.
+    *   Añadida la definición de `userAvatar` utilizando los datos del usuario poblado.
+    *   Corregido el error "Only plain objects can be passed to Client Components" al serializar los datos del usuario poblado (`usuarioId`) para asegurar que sean objetos planos antes de pasarlos a los componentes del cliente.
+    *   Corregido el error "Only plain objects can be passed to Client Components" relacionado con el objeto de diseño principal al eliminar explícitamente los campos `imageData` y `imageMimeType` antes de pasar los diseños a los componentes del cliente.
+    *   Asegurada la serialización correcta del campo `_id` del objeto de diseño principal al convertirlo explícitamente a string.
+
+>>>>>>> DieciochoDeJunioDelVeintiCincoTresYDieciNueve
 ### Archivos Creados:
 *   `src/components/common/PendingPaymentsSummary.jsx`:
     *   Componente React para mostrar un resumen de los pagos pendientes en el header.

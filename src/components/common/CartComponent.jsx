@@ -240,7 +240,7 @@ function CartComponent() {
 
   if (loadingCart) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gradient-to-br from-[#000000] via-[#0A1828] to-[#000000] text-white">
+      <div className="h-screen flex items-center justify-center" style={{ backgroundColor: "#000000", backgroundImage: "linear-gradient(to bottom, #000000, #1f2937, #000000)", color: "#FFFFFF" }}>
         Cargando carrito...
       </div>
     );
@@ -248,19 +248,19 @@ function CartComponent() {
 
   if (cartError) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gradient-to-br from-[#000000] via-[#0A1828] to-[#000000] text-red-500">
+      <div className="h-screen flex items-center justify-center" style={{ backgroundColor: "#000000", backgroundImage: "linear-gradient(to bottom, #000000, #1f2937, #000000)", color: "#EF4444" }}>
         Error al cargar el carrito: {cartError.message}
       </div>
     );
   }
 
   return (
-    <div className="bg-black p-6 md:p-8 shadow-lg h-screen justify-between flex flex-col overflow-hidden">
-      
-      <h2 className="text-2xl font-bold mb-6 text-white">Tu Carrito de Compras</h2>
+    <div className="p-6 md:p-8 shadow-lg h-screen justify-between flex flex-col overflow-hidden" style={{ background: 'linear-gradient(to bottom, #000000, #1f2937, #000000)', color: '#FFFFFF' }}>
+     
+      <h2 className="text-2xl font-bold mb-6" style={{ color: "#FFFFFF" }}>Tu Carrito de Compras</h2>
 
       {cartError && (
-        <div className="bg-red-500 text-white p-3 rounded-md mb-4 text-center">
+        <div className="p-3 rounded-md mb-4 text-center" style={{ backgroundColor: "#EF4444", color: "#FFFFFF" }}>
           {cartError.message}
         </div>
       )}
@@ -269,8 +269,8 @@ function CartComponent() {
           {cartItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full ">
               <div className="flex flex-col items-center justify-center h-full ">
-                <p className="text-gray-400 text-center ">Tu carrito está vacío.</p>
-                <Link href="/catalogo" className="text-blue-500 hover:underline">
+                <p className="text-center" style={{ color: "#9CA3AF" }}>Tu carrito está vacío.</p>
+                <Link href="/catalogo" className="hover:underline" style={{ color: "#3B82F6" }}>
                   Volver a la tienda
                 </Link>
               </div>
@@ -294,12 +294,12 @@ function CartComponent() {
       </div>
 
       {cartItems.length > 0 && (
-        <div className="mt-8 pt-4 border-t border-gray-700 ">
-          <div className="flex justify-between items-center text-white text-lg font-semibold mb-2">
+        <div className="mt-8 pt-4 border-t" style={{ borderColor: "#FFFFFFFF" }}>
+          <div className="flex justify-between items-center text-lg font-semibold mb-2" style={{ color: "#FFFFFF" }}>
             <span>Subtotal:</span>
             <span>${getTotal().toFixed(2)}</span>
           </div>
-          <div className="flex justify-between items-center text-white text-xl font-bold mb-6">
+          <div className="flex justify-between items-center text-xl font-bold mb-6" style={{ color: "#FFFFFF" }}>
             <span>Total a Pagar:</span>
             <span>${totalAPagar.toFixed(2)}</span>
           </div>
@@ -315,30 +315,31 @@ function CartComponent() {
       )}
 
       {/* Dialog for Payment Section */}
-      <dialog ref={dialogRef} className="relative p-8 rounded-lg shadow-lg max-w-2xl w-11/12 max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "#FDF9F1FF", color: "#000000FF", margin: "auto" }}>
+      <dialog ref={dialogRef} className="relative p-8 rounded-lg shadow-lg max-w-2xl w-11/12 max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "#FDF9F1", color: "#000000", margin: "auto" }}>
         <button
           onClick={handleClosePayment}
-          className="absolute top-4 right-4 text-black text-2xl font-bold"
+          className="absolute top-4 right-4 text-2xl font-bold"
+          style={{ color: "#000000" }}
           aria-label="Cerrar"
         >
           &times;
         </button>
-        <h2 className="text-2xl font-bold mb-4" style={{ color: "#111010FF" }}>Confirmar Pedido y Pago</h2>
-        
+        <h2 className="text-2xl font-bold mb-4" style={{ color: "#111010" }}>Confirmar Pedido y Pago</h2>
+       
         <UserDataForm onUserDataChange={handleUserDataChange} />
 
-        <div className="p-6 rounded shadow-md w-full mb-6" style={{ backgroundColor: "#F7F1F1FF" }}>
-          <h3 className="text-xl font-bold mb-4" style={{ color: "#111010FF" }}>Información de Pago</h3>
+        <div className="p-6 rounded shadow-md w-full mb-6" style={{ backgroundColor: "#F7F1F1" }}>
+          <h3 className="text-xl font-bold mb-4" style={{ color: "#111010" }}>Información de Pago</h3>
           <button
             type="button"
             onClick={() => setIsCardModalOpen(true)}
-            style={{ backgroundColor: "#154780FF", color: "#ffffff" }}
+            style={{ backgroundColor: "#154780", color: "#ffffff" }}
             className="w-full font-semibold py-3 rounded hover:bg-blue-700 transition"
           >
             {cardData ? 'Editar Datos de Tarjeta' : 'Ingresar Datos de Tarjeta'}
           </button>
           {cardData && (
-            <p className="mt-2 text-sm" style={{ color: "#000000FF" }}>
+            <p className="mt-2 text-sm" style={{ color: "#000000" }}>
               Tarjeta ingresada: **** **** **** {cardData.tarjeta.slice(-4)}
             </p>
           )}
@@ -347,7 +348,7 @@ function CartComponent() {
         <OrderSummary cartItems={cartItems} getTotal={() => getTotal()} />
 
         {paymentError && (
-          <p className="bg-red-500 text-white p-3 rounded-md mb-4 text-center">
+          <p className="p-3 rounded-md mb-4 text-center" style={{ backgroundColor: "#EF4444", color: "#FFFFFF" }}>
             {paymentError.message}
           </p>
         )}
@@ -355,7 +356,7 @@ function CartComponent() {
         <button
           type="button"
           onClick={handleProcessPayment}
-          style={{ backgroundColor: "#154780FF", color: "#ffffff" }}
+          style={{ backgroundColor: "#154780", color: "#ffffff" }}
           className="w-full font-semibold py-3 rounded hover:bg-blue-700 transition"
         >
           Confirmar Pedido y Pagar

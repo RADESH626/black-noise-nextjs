@@ -104,6 +104,16 @@ export async function obtenerDesigns() {
             .lean();
 
         const formattedDesigns = designs.map(design => {
+<<<<<<< HEAD
+=======
+            // Create a mutable copy of the design object and convert _id to string
+            const processedDesign = { ...design, _id: design._id.toString() };
+
+            // Remove imageData and imageMimeType as they are not plain objects
+            delete processedDesign.imageData;
+            delete processedDesign.imageMimeType;
+
+>>>>>>> 91bd118a84bd9dd60b975efb21da73e972d15242
             const designImageUrl = design.imageData && design.imageData.buffer instanceof Buffer && design.imageMimeType
                 ? `data:${design.imageMimeType};base64,${design.imageData.buffer.toString('base64')}`
                 : null;
@@ -133,13 +143,33 @@ export async function obtenerDesigns() {
                 // Exclude imageData and imageMimeType from the top level if they are Buffers
             };
 
+            const userAvatar = design.usuarioId && design.usuarioId.imageData && design.usuarioId.imageData.buffer instanceof Buffer && design.usuarioId.imageMimeType
+                ? `data:${design.usuarioId.imageMimeType};base64,${design.usuarioId.imageData.buffer.toString('base64')}`
+                : null; // Provide the user avatar as a data URL
+
+            // Create a plain object for usuarioId
+            const processedUsuario = design.usuarioId ? {
+                _id: design.usuarioId._id.toString(),
+                Nombre: design.usuarioId.Nombre,
+                primerApellido: design.usuarioId.primerApellido,
+                // imageData and imageMimeType are not included as they are handled by userAvatar
+            } : null;
+
             return {
+<<<<<<< HEAD
                 ...plainDesign,
                 prenda: plainDesign.nombreDesing,
                 price: plainDesign.valorDesing,
                 usuario: plainDesign.usuarioId ? `${plainDesign.usuarioId.Nombre} ${plainDesign.usuarioId.primerApellido}` : 'Usuario Desconocido',
+=======
+                ...processedDesign,
+                prenda: processedDesign.nombreDesing,
+                price: processedDesign.valorDesing,
+                usuario: processedUsuario ? `${processedUsuario.Nombre} ${processedUsuario.primerApellido}` : 'Usuario Desconocido',
+>>>>>>> 91bd118a84bd9dd60b975efb21da73e972d15242
                 userAvatar: userAvatar,
                 imagen: designImageUrl,
+                usuarioId: processedUsuario, // Include the processed usuarioId object
             };
         });
 
