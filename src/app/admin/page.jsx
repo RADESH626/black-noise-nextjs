@@ -1,23 +1,15 @@
 "use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
+import UsuariosDashboard from '@/components/layout/admin/dashboards/users/UsuariosDashboard';
 
-const AdminRedirectPage = () => {
-    const router = useRouter();
-
-    useEffect(() => {
-        // Redirect to the suppliers page by default for admin
-        router.push('/admin/proveedores');
-    }, [router]);
-
+const AdminDashboardPage = () => {
     return (
         <div className="flex justify-center items-center h-screen">
-            <LoadingSpinner />
-            <p className="ml-4 text-gray-600">Redirigiendo al panel de proveedores...</p>
+            <h1 className="text-2xl font-bold">Bienvenido al Panel de Administrador</h1>
+            <p className="ml-4 text-gray-600">Aquí se mostrará el contenido principal del dashboard.</p>
+            {/* <UsuariosDashboard /> */}
         </div>
     );
 };
 
-export default AdminRedirectPage;
+export default AdminDashboardPage;

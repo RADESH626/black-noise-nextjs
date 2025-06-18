@@ -5,9 +5,13 @@ import AdminSidebar from '../../components/layout/admin/AdminSidebar';
 function AdminLayoutContent({ children }) {
   return (
     <div className="flex h-screen bg-gray-100">
+
       <AdminSidebar />
-      <main className="flex-1 p-6 overflow-y-auto bg-white !important">
+
+      <main className="w-full h-full">
+
         {children}
+
       </main>
     </div>
   );

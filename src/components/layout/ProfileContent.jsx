@@ -224,7 +224,7 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
       <div className="bg-black p-6 md:p-8 rounded-lg shadow-lg mb-8 flex-shrink-0">
         <div className="flex flex-col md:flex-row items-center">
           <div className="w-32 h-32 md:w-60 md:h-60 bg-gray-700 rounded-lg mb-4 md:mb-0 md:mr-8 ">
-            <img src="/img/perfil/FotoPerfil.webp" alt="User Image" className="w-full h-full object-cover rounded-lg" />
+            <img src={user?.profileImageUrl || "/img/perfil/FotoPerfil.webp"} alt="User Image" className="w-full h-full object-cover rounded-lg" />
           </div>
           <div className="flex-grow text-center md:text-left">
             <h1 className="text-3xl md:text-4xl font-bold mb-1">{user?.Nombre} {user?.primerApellido}</h1>
@@ -235,6 +235,8 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
               <p>DIRECCIÓN: {user?.direccion}</p>
             </div>
             <div className="flex flex-col sm:flex-row justify-center md:justify-start space-y-2 sm:space-y-0 sm:space-x-3">
+
+              <BotonGeneral onClick={handleEditProfile}>EDITAR PERFIL</BotonGeneral>
               <Link href="/catalogo">
                 <BotonGeneral>VER DISEÑOS DE LA COMUNIDAD</BotonGeneral>
               </Link>
