@@ -13,9 +13,9 @@ const AdminRedirectPage = () => {
     }, [router]);
 
     return (
-        <div className="flex justify-center items-center h-screen">
+        <div className="flex justify-center items-center h-full w-full">
             <LoadingSpinner />
-            <p className="ml-4 text-gray-600">Redirigiendo al panel de proveedores...</p>
+            {/* <p className="ml-4 text-gray-600">Redirigiendo al panel de proveedores...</p> */}
         </div>
     );
 };

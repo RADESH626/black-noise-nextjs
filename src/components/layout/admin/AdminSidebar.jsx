@@ -25,6 +25,7 @@ function AdminSidebar() { // Remove activeDashboard, onSelectDashboard props
           BLACK NOISE
         </Link>
         <p className="text-xs text-gray-400">Panel de Administrador</p>
+        
       </div>
       <nav className="flex-grow">
         <ul>
