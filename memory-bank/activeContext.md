@@ -86,7 +86,7 @@ La implementación de la funcionalidad de "apartado de pagos pendientes" está c
 *   `src/components/layout/ProfileContent.jsx`:
     *   Se modificó la etiqueta `<img>` para usar `user?.profileImageUrl` en lugar de una ruta estática para la imagen de perfil del usuario.
 *   `src/app/admin/page.jsx`:
-    *   **Se importó y se integró el componente `UsersTable` para mostrar la tabla de gestión de usuarios en el panel de administrador, reemplazando el componente `UserManagement` previamente añadido.**
+    *   **Se importó y se integró el componente `UsuariosDashboard` para mostrar el panel de gestión de usuarios en el panel de administrador, reemplazando el componente `UsersTable` previamente añadido.**
 
 ### Archivos Eliminados:
 *   `src/components/admin/UserManagement.jsx`:

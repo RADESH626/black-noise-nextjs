@@ -235,6 +235,8 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
               <p>DIRECCIÓN: {user?.direccion}</p>
             </div>
             <div className="flex flex-col sm:flex-row justify-center md:justify-start space-y-2 sm:space-y-0 sm:space-x-3">
+
+              <BotonGeneral onClick={handleEditProfile}>EDITAR PERFIL</BotonGeneral>
               <Link href="/catalogo">
                 <BotonGeneral>VER DISEÑOS DE LA COMUNIDAD</BotonGeneral>
               </Link>

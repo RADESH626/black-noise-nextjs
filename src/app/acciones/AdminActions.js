@@ -84,3 +84,63 @@ export async function actualizarFotoPerfilUsuarioPorAdmin(prevState, formData) {
         return { success: false, message: 'Error al actualizar la foto de perfil: ' + error.message };
     }
 }
+
+export async function getUsers() {
+    await connectDB();
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user || session.user.rol !== 'ADMIN') {
+        throw new Error('Acceso denegado. Solo los administradores pueden ver los usuarios.');
+    }
+
+    try {
+        const users = await Usuario.find({}).lean();
+        return JSON.parse(JSON.stringify(users));
+    } catch (error) {
+        logger.error('Error fetching users:', error);
+        throw new Error('Error al obtener usuarios: ' + error.message);
+    }
+}
+
+export async function updateUser(userId, userData) {
+    await connectDB();
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user || session.user.rol !== 'ADMIN') {
+        throw new Error('Acceso denegado. Solo los administradores pueden actualizar usuarios.');
+    }
+
+    try {
+        const updatedUser = await Usuario.findByIdAndUpdate(userId, userData, { new: true }).lean();
+        if (!updatedUser) {
+            throw new Error('Usuario no encontrado.');
+        }
+        revalidatePath('/admin/users');
+        revalidatePath(`/perfil/${userId}`);
+        return JSON.parse(JSON.stringify(updatedUser));
+    } catch (error) {
+        logger.error('Error updating user:', error);
+        throw new Error('Error al actualizar usuario: ' + error.message);
+    }
+}
+
+export async function deleteUser(userId) {
+    await connectDB();
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user || session.user.rol !== 'ADMIN') {
+        throw new Error('Acceso denegado. Solo los administradores pueden eliminar usuarios.');
+    }
+
+    try {
+        const deletedUser = await Usuario.findByIdAndDelete(userId).lean();
+        if (!deletedUser) {
+            throw new Error('Usuario no encontrado.');
+        }
+        revalidatePath('/admin/users');
+        return { message: 'Usuario eliminado exitosamente.' };
+    } catch (error) {
+        logger.error('Error deleting user:', error);
+        throw new Error('Error al eliminar usuario: ' + error.message);
+    }
+}
