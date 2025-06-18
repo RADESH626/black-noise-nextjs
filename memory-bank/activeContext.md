@@ -93,6 +93,8 @@ La implementación de la funcionalidad de "apartado de pagos pendientes" está c
     *   **Se eliminó este componente ya que se decidió usar `UsersTable` en su lugar.**
 
 ### Archivos Creados:
+*   `src/app/admin/users/page.jsx`:
+    *   **Nueva página para la gestión de usuarios en el panel de administrador, que renderiza el componente `UsuariosDashboard`.**
 *   `src/components/common/PendingPaymentsSummary.jsx`:
     *   Componente React para mostrar un resumen de los pagos pendientes en el header.
     *   Utiliza `icono-dinero.svg` y muestra un contador de pagos pendientes.

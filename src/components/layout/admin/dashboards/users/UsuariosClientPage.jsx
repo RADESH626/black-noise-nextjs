@@ -134,8 +134,10 @@ export default function UsuariosClientPage({ initialUsers }) {
       <div className="my-4 p-4 bg-gray-800 rounded-lg shadow-md">
         <FormBuscarUsuario onSearchSuccess={handleSearchSuccess} />
       </div>
+
+
       {users.length > 0 ? (
-        <div className="overflow-x-auto">
+        <div className="overflow-y-auto">
           <Tabla>
             <THUsuarios />
             <tbody className='bg-gray-300 divide-y divide-gray-400'>

@@ -59,8 +59,10 @@ function FormLogin() {
         // console.log('Frontend Login: Resultado de signIn:', result);
 
         if (result.error) {
-          // console.log('Frontend Login: Error en signIn:', result.error);
-          showPopUp('Credenciales incorrectas', 'error');
+          // Si signIn falla, siempre usamos el mensaje que viene de la Server Action (state.message)
+          // Si state.message es null (lo cual no debería pasar si loginAction devuelve un mensaje),
+          // entonces usamos un mensaje genérico de fallback.
+          showPopUp(state.message || 'Credenciales incorrectas', 'error');
         } else {
           // console.log('Frontend Login: Inicio de sesión exitoso.');
           // console.log('Frontend Login: Verificando rol para redirección:', state.data.userRole); // Access userRole from state.data

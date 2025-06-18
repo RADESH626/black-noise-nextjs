@@ -30,7 +30,7 @@ export const authOptions = {
           logger.info('Result of ObtenerUsuarioPorCorreo:', user);
           
           if (user) {
-            logger.info('User found. Comparing password for user:', user.email);
+            logger.info('User found. Comparing password for user:', credentials.email);
             const isValid = await bcrypt.compare(credentials.password, user.password);
             logger.info('Password comparison result for user:', isValid);
 
@@ -46,7 +46,7 @@ export const authOptions = {
                 isSupplier: false, // Default to false
                 proveedorId: undefined, // Default to undefined
                 numeroTelefono: user.numeroTelefono
-              };
+};
 
               // If the user is a PROVEEDOR, fetch the corresponding Proveedor document
               if (user.rol === Rol.PROVEEDOR) {
@@ -64,17 +64,18 @@ export const authOptions = {
                 }
               }
               return sessionUser;
+            } else {
+              logger.warn('Password invalid for user:', credentials.email);
+              return null; // Return null for invalid password
             }
+          } else {
+            logger.warn('User not found with email:', credentials.email);
+            return null; // Return null for user not found
           }
-
-          logger.info('User not found or password invalid. Returning null.');
-          return null;
 
         } catch (error) {
           logger.error("Auth error in authorize callback:", error);
-          // Log the full error object for more details
-          logger.error("Full error object:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
-          return null;
+          return null; // Return null for any other errors
         }
       },
     }),

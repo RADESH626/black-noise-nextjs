@@ -39,27 +39,31 @@ export async function loginAction(prevState, formData) {
       // Verify password for regular user
       if (!user.password) {
         logger.warn('Server Action Login: Usuario encontrado pero sin contraseña almacenada:', user.correo);
-        return handleError('Credenciales incorrectas.', 'Invalid credentials', 401);
+        return handleError('La contraseña es incorrecta.', 'Invalid credentials', 401);
       }
+      
       const isValid = await comparePassword(password, user.password);
       
-            if (isValid) {
-              logger.info('Server Action Login: Usuario autenticado, rol:', user.rol);
-              return { 
-                message: 'Inicio de sesión exitoso.', 
-                success: true, 
-                data: { 
-                  email, 
-                  password, 
-                  userRole: user.rol, 
-                  readyForSignIn: true,
-                  profileImageUrl: user.profileImageUrl // Pass the new image URL
-                } 
-              };
-            }
-          }
+      if (isValid) {
+        logger.info('Server Action Login: Usuario autenticado, rol:', user.rol);
+        return { 
+          message: 'Inicio de sesión exitoso.', 
+          success: true, 
+          data: { 
+            email, 
+            password, 
+            userRole: user.rol, 
+            readyForSignIn: true,
+            profileImageUrl: user.profileImageUrl // Pass the new image URL
+          } 
+        };
+      } else {
+        // Password incorrect for existing user
+        return { success: false, message: 'La contraseña es incorrecta.' };
+      }
+    }
 
-    // If not a regular user or password invalid, attempt to authenticate as a supplier
+    // If not a regular user, attempt to authenticate as a supplier
     const proveedor = await Proveedor.findOne({ emailContacto: { $regex: new RegExp(`^${email.trim()}$`, 'i') } }).lean();
 
     if (proveedor) {
@@ -79,14 +83,21 @@ export async function loginAction(prevState, formData) {
             profileImageUrl: "/img/proveedores/IMAGEN-SOLICITUD-PROVEEDOR.jpg" // Default image for suppliers
           }
         };
+      } else {
+        // Password incorrect for existing supplier
+        return { success: false, message: 'La contraseña es incorrecta.' };
       }
     }
 
-    // If neither user nor supplier found/authenticated
-    return handleError('Credenciales incorrectas.', 'Invalid credentials', 401);
+    // If neither user nor supplier found
+    return { success: false, message: 'El correo electrónico no está registrado.' };
 
   } catch (error) {
-    return handleError(error, 'Error del servidor durante el login.');
+    // Ensure that the error message from handleError is correctly propagated
+    if (error.message && error.statusCode) {
+      return { success: false, message: error.message };
+    }
+    return { success: false, message: 'Error del servidor durante el login.' };
   }
 }
 
