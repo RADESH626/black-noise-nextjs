@@ -10,10 +10,12 @@ export default async function AdminUserManagementPage() {
 
     try {
         const result = await obtenerUsuarios();
-        if (result.success) {
-            users = result.users; // Assuming obtenerUsuarios returns { users: [...] }
+        // Check if result has the 'usuarios' property and it's an array
+        if (result && Array.isArray(result.usuarios)) {
+            users = result.usuarios; // Correctly access the users array
         } else {
-            error = result.message || 'Error al cargar la lista de usuarios.';
+            // Handle cases where result is not as expected or an error occurred in the action
+            error = result?.message || 'Error al cargar la lista de usuarios.';
         }
     } catch (err) {
         console.error("Error fetching users in Server Component:", err);
