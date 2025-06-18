@@ -137,7 +137,7 @@ export default function UsuariosClientPage({ initialUsers }) {
 
 
       {users.length > 0 ? (
-        <div className="overflow-y-auto">
+        <div className="overflow-y-auto max-h-[calc(100vh-300px)]">
           <Tabla>
             <THUsuarios />
             <tbody className='bg-gray-300 divide-y divide-gray-400'>
@@ -174,11 +174,6 @@ export default function UsuariosClientPage({ initialUsers }) {
                                     </div>
                                 </div>
                             </TdGeneral>
-
-                            {/* Nombre */}
-                            {/* <TdGeneral>
-                                {`${user.primerNombre} ${user.primerApellido}`}
-                            </TdGeneral> */}
 
                             {/* Información de Usuario */}
                             <TdGeneral>
