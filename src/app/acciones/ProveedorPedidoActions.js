@@ -24,7 +24,7 @@ export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId)
         const pedidos = await Pedido.find(query)
             .populate('items.designId', 'nombreDesing imageData imageMimeType') // Popula nombre, datos binarios y tipo MIME de los diseños dentro de items
             .populate('proveedorId', 'nombreEmpresa emailContacto') // Popula algunos campos de Proveedor
-            .populate('userId', 'Nombre') // Popula el nombre del usuario
+            .populate('userId', 'Nombre direccion') // Popula el nombre y la dirección del usuario
             .lean();
 
         if (pedidoId && pedidos.length === 0) {

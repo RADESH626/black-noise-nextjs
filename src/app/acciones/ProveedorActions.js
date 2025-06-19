@@ -105,7 +105,7 @@ export async function crearProveedor(prevState, formData) {
     return {
       message: "Proveedor creado exitosamente. La clave de acceso ha sido enviada al correo electrónico del proveedor.",
       success: true,
-      data: toPlainObject(nuevoProveedor), // Convert to plain object
+      data: nuevoProveedor.toObject(), // Convert to plain object
       // Do NOT return accessKey here as per user's request
     };
   } catch (error) {
@@ -190,7 +190,7 @@ export async function actualizarProveedor(prevState, formData) {
     return {
       message: "Proveedor actualizado exitosamente.",
       success: true,
-      data: toPlainObject(updatedProveedor), // Convert to plain object
+      data: updatedProveedor.toObject(), // Convert to plain object
     };
   } catch (error) {
     logger.error("Error al actualizar proveedor:", error);
