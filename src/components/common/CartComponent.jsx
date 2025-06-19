@@ -29,6 +29,7 @@ function CartComponent() {
   const [cardData, setCardData] = useState(null);
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(MetodoPago.TARJETA_CREDITO); // Default to credit card
+  const [phoneNumber, setPhoneNumber] = useState(''); // Nuevo estado para el número de teléfono
 
   const dialogRef = useRef(null);
 
@@ -57,6 +58,7 @@ function CartComponent() {
     setPaymentError(null);
     setUserData(null);
     setCardData(null);
+    setPhoneNumber(''); // Limpiar el número de teléfono al cerrar
   }, []);
 
   const addItemDebounceRef = useRef(null);
@@ -198,6 +200,12 @@ function CartComponent() {
       setPaymentError("Por favor ingresa los datos de tu tarjeta.");
       return;
     }
+
+    if ((selectedPaymentMethod === MetodoPago.NEQUI || selectedPaymentMethod === MetodoPago.DAVIPLATA) && !phoneNumber) {
+      setPaymentError("Por favor ingresa el número de teléfono para el pago.");
+      return;
+    }
+
     setPaymentError(null);
 
     const paymentDetails = {
@@ -211,6 +219,7 @@ function CartComponent() {
       mes: (selectedPaymentMethod === MetodoPago.TARJETA_CREDITO || selectedPaymentMethod === MetodoPago.TARJETA_DEBITO) ? cardData.mes : undefined,
       anio: (selectedPaymentMethod === MetodoPago.TARJETA_CREDITO || selectedPaymentMethod === MetodoPago.TARJETA_DEBITO) ? cardData.anio : undefined,
       cvv: (selectedPaymentMethod === MetodoPago.TARJETA_CREDITO || selectedPaymentMethod === MetodoPago.TARJETA_DEBITO) ? cardData.cvv : undefined,
+      numeroTelefono: (selectedPaymentMethod === MetodoPago.NEQUI || selectedPaymentMethod === MetodoPago.DAVIPLATA) ? phoneNumber : undefined,
       metodoEntrega: userData.isDelivery ? 'DOMICILIO' : 'RECOGIDA',
       costoEnvio: 0, // Set to 0 as per new requirement
     };
@@ -371,6 +380,24 @@ function CartComponent() {
                 </p>
               )}
             </>
+          )}
+
+          {(selectedPaymentMethod === MetodoPago.NEQUI || selectedPaymentMethod === MetodoPago.DAVIPLATA) && (
+            <div className="mt-4">
+              <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700" style={{ color: "#000000" }}>
+                Número de Teléfono para Pago
+              </label>
+              <input
+                type="text"
+                id="phoneNumber"
+                name="phoneNumber"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="Ej: 3001234567"
+                style={{ backgroundColor: "#FFFFFF", color: "#000000" }}
+              />
+            </div>
           )}
         </div>
 

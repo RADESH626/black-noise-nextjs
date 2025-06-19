@@ -191,7 +191,7 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
         const Pedido = await getModel('Pedido');
         const Pago = await getModel('Pago');
         const Venta = await getModel('Venta'); // Asegurarse de que el modelo Venta esté disponible
-        const { userId, nombre, correo, direccion, metodoPago: rawMetodoPago, metodoEntrega, total, cardNumber, expiryDate, cvv, costoEnvio: paymentDetailsCostEnvio } = paymentDetails;
+        const { userId, nombre, correo, direccion, metodoPago: rawMetodoPago, metodoEntrega, total, tarjeta, mes, anio, cvv, numeroTelefono, costoEnvio: paymentDetailsCostEnvio } = paymentDetails;
 
         // Map rawMetodoPago to a valid enum value
         let metodoPago = rawMetodoPago;
@@ -269,7 +269,8 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
             valorPago: total,
             metodoPago,
             estadoTransaccion: 'PAGADO', // Asumimos que el pago es exitoso aquí
-            detallesTarjeta: { cardNumber: cardNumber ? cardNumber.slice(-4) : 'N/A', expiryDate: expiryDate || 'N/A', cvv: '***' }
+            detallesTarjeta: (metodoPago === MetodoPago.TARJETA_CREDITO || metodoPago === MetodoPago.TARJETA_DEBITO) ? { cardNumber: tarjeta ? tarjeta.slice(-4) : 'N/A', expiryDate: mes && anio ? `${mes}/${anio}` : 'N/A', cvv: '***' } : undefined,
+            numeroTelefono: (metodoPago === MetodoPago.NEQUI || metodoPago === MetodoPago.DAVIPLATA) ? numeroTelefono : undefined,
         };
         let pagoGuardado;
         try {
