@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --color-primary: #1a1a1a; /* Dark, almost black */
+  --color-primary: #000000; /* Black */
   --color-secondary: #f4f4f4; /* Light grey */
   --color-accent1: #ff007f; /* Vibrant pink/magenta */
   --color-accent2: #00f0ff; /* Bright cyan */
