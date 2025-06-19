@@ -6,6 +6,7 @@ import Proveedor from "@/models/Proveedor"; // Import Proveedor model
 import connectDB from "@/utils/DBconection"; // Import connectDB
 import logger from '@/utils/logger';
 import { Rol } from "@/models/enums/usuario/Rol"; // Import Rol enum
+import { NextResponse } from "next/server"; // Import NextResponse
 
 export const authOptions = {
   providers: [
@@ -119,12 +120,6 @@ export const authOptions = {
 
 const handler = NextAuth(authOptions);
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-export { handler as GET, handler as POST };
-=======
->>>>>>> solucion_de_errores
 async function safeHandler(req, res) {
   try {
     return await handler(req, res);
@@ -136,7 +131,3 @@ async function safeHandler(req, res) {
 }
 
 export { safeHandler as GET, safeHandler as POST };
-<<<<<<< HEAD
-=======
->>>>>>> 2090330 (correccion de errores varios)
->>>>>>> solucion_de_errores
