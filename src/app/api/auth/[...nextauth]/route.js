@@ -119,4 +119,24 @@ export const authOptions = {
 
 const handler = NextAuth(authOptions);
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
 export { handler as GET, handler as POST };
+=======
+>>>>>>> solucion_de_errores
+async function safeHandler(req, res) {
+  try {
+    return await handler(req, res);
+  } catch (error) {
+    logger.error("Unhandled error in NextAuth route:", error);
+    // Return a JSON error response
+    return NextResponse.json({ error: "Internal Server Error", details: error.message }, { status: 500 });
+  }
+}
+
+export { safeHandler as GET, safeHandler as POST };
+<<<<<<< HEAD
+=======
+>>>>>>> 2090330 (correccion de errores varios)
+>>>>>>> solucion_de_errores
