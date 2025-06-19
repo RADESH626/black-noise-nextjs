@@ -38,6 +38,12 @@ function CartComponent() {
     }
   }, [showPaymentSection]);
 
+  useEffect(() => {
+    if (!loadingCart && cartItems.length === 0) {
+      router.push('/catalogo');
+    }
+  }, [loadingCart, cartItems, router]);
+
   const getTotal = () => {
     let subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     // Removed: if (userData?.isDelivery) { subtotal += userData.deliveryCost; }
