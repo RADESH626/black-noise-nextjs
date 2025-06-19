@@ -10,6 +10,23 @@ import { getModel } from '@/utils/modelLoader'; // Importar getModel
 import Proveedor from '@/models/Proveedor'; // Importar el modelo Proveedor
 import { toPlainObject } from '@/utils/dbUtils'; // Importar toPlainObject
 
+<<<<<<< HEAD
+=======
+async function obtenerPedidos() {
+    try {
+        await dbConnect();
+        const PedidoModel = await getModel('Pedido');
+        const pedidos = await PedidoModel.find({})
+            .populate('userId', 'nombre email') // Populate user name and email
+            .lean();
+        return { pedidos: pedidos.map(p => toPlainObject(p)) };
+    } catch (error) {
+        console.error('Error al obtener todos los pedidos:', error);
+        return { error: error.message };
+    }
+}
+
+>>>>>>> 2090330 (correccion de errores varios)
 async function guardarPedido(data) {
     try {
         await dbConnect();
@@ -110,7 +127,12 @@ export {
     enviarNotificacionCambioEstadoPedido,
     updateEstadoPedido,
     obtenerPedidosPorUsuarioId,
+<<<<<<< HEAD
     obtenerPedidosPagadosPorUsuarioId
+=======
+    obtenerPedidosPagadosPorUsuarioId,
+    obtenerPedidos // Export the new function
+>>>>>>> 2090330 (correccion de errores varios)
 };
 
 async function enviarNotificacionCambioEstadoPedido(pedidoId, newEstado, oldEstado, userId) {
