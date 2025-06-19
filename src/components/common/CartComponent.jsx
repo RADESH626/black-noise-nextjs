@@ -256,7 +256,7 @@ function CartComponent() {
 
   return (
     <div className="p-6 md:p-8 shadow-lg h-screen justify-between flex flex-col overflow-hidden" style={{ background: 'linear-gradient(to bottom, #000000, #1f2937, #000000)', color: '#FFFFFF' }}>
-     
+      
       <h2 className="text-2xl font-bold mb-6" style={{ color: "#FFFFFF" }}>Tu Carrito de Compras</h2>
 
       {cartError && (
@@ -325,7 +325,7 @@ function CartComponent() {
           &times;
         </button>
         <h2 className="text-2xl font-bold mb-4" style={{ color: "#111010" }}>Confirmar Pedido y Pago</h2>
-       
+        
         <UserDataForm onUserDataChange={handleUserDataChange} />
 
         <div className="p-6 rounded shadow-md w-full mb-6" style={{ backgroundColor: "#F7F1F1" }}>
