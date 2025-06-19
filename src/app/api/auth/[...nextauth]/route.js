@@ -28,7 +28,7 @@ export const authOptions = {
           logger.info('Attempting to find user by email:', credentials.email);
           const user = await ObtenerUsuarioPorCorreo(credentials.email);
           logger.info('Result of ObtenerUsuarioPorCorreo:', user);
-
+          
           if (user) {
             logger.info('User found. Comparing password for user:', credentials.email);
             const isValid = await bcrypt.compare(credentials.password, user.password);
@@ -46,7 +46,8 @@ export const authOptions = {
                 isSupplier: false, // Default to false
                 proveedorId: undefined, // Default to undefined
                 numeroTelefono: user.numeroTelefono
-              };
+};
+
               // If the user is a PROVEEDOR, fetch the corresponding Proveedor document
               if (user.rol === Rol.PROVEEDOR) {
                 logger.info('User is a PROVEEDOR. Attempting to find associated Proveedor document.');
@@ -82,49 +83,43 @@ export const authOptions = {
   pages: {
     signIn: "/login", // Specify your custom login page
   },
-  callbacks: {
-    async jwt({ token, user }) {
-      // console.log("[NextAuth Callback] JWT - Initial Token:", token);
-      // console.log("[NextAuth Callback] JWT - User:", user);
-      if (user) {
-        token.id = user.id;
-        token.name = user.name;
-        token.email = user.email; // Ensure email is passed to token
-        token.rol = user.rol;
-        token.isSupplier = user.isSupplier;
-        token.proveedorId = user.proveedorId;
-        token.image = user.image;
-        token.numeroTelefono = user.numeroTelefono; // Pass numeroTelefono to token
-      }
-      // console.log("[NextAuth Callback] JWT - Final Token:", token);
-      return token;
+    callbacks: {
+      async jwt({ token, user }) {
+        // console.log("[NextAuth Callback] JWT - Initial Token:", token);
+        // console.log("[NextAuth Callback] JWT - User:", user);
+        if (user) {
+          token.id = user.id;
+          token.name = user.name;
+          token.email = user.email; // Ensure email is passed to token
+          token.rol = user.rol;
+          token.isSupplier = user.isSupplier;
+          token.proveedorId = user.proveedorId;
+          token.image = user.image;
+          token.numeroTelefono = user.numeroTelefono; // Pass numeroTelefono to token
+        }
+        // console.log("[NextAuth Callback] JWT - Final Token:", token);
+        return token;
+      },
+      async session({ session, token }) {
+        // console.log("[NextAuth Callback] Session - Initial Session:", session);
+        // console.log("[NextAuth Callback] Session - Token:", token);
+        session.user.id = token.id;
+        session.user.name = token.name;
+        session.user.email = token.email;
+        session.user.rol = token.rol;
+        session.user.isSupplier = token.isSupplier;
+        session.user.proveedorId = token.proveedorId;
+        session.user.image = token.image;
+        session.user.numeroTelefono = token.numeroTelefono; // Pass numeroTelefono to session
+        // console.log("[NextAuth Callback] Session - Final Session:", session);
+        return session;
+      },
     },
-    async session({ session, token }) {
-      // console.log("[NextAuth Callback] Session - Initial Session:", session);
-      // console.log("[NextAuth Callback] Session - Token:", token);
-      session.user.id = token.id;
-      session.user.name = token.name;
-      session.user.email = token.email;
-      session.user.rol = token.rol;
-      session.user.isSupplier = token.isSupplier;
-      session.user.proveedorId = token.proveedorId;
-      session.user.image = token.image;
-      session.user.numeroTelefono = token.numeroTelefono; // Pass numeroTelefono to session
-      // console.log("[NextAuth Callback] Session - Final Session:", session);
-      return session;
-    },
-  },
   secret: process.env.NEXTAUTH_SECRET,
 };
 
 const handler = NextAuth(authOptions);
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-export { handler as GET, handler as POST };
-=======
->>>>>>> solucion_de_errores
 async function safeHandler(req, res) {
   try {
     return await handler(req, res);
@@ -136,7 +131,3 @@ async function safeHandler(req, res) {
 }
 
 export { safeHandler as GET, safeHandler as POST };
-<<<<<<< HEAD
-=======
->>>>>>> 2090330 (correccion de errores varios)
->>>>>>> solucion_de_errores
