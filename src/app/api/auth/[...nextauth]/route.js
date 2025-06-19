@@ -6,6 +6,7 @@ import Proveedor from "@/models/Proveedor"; // Import Proveedor model
 import connectDB from "@/utils/DBconection"; // Import connectDB
 import logger from '@/utils/logger';
 import { Rol } from "@/models/enums/usuario/Rol"; // Import Rol enum
+import { NextResponse } from "next/server"; // Import NextResponse
 
 export const authOptions = {
   providers: [

@@ -146,7 +146,7 @@ export default function PedidosClientPage({ initialPedidos }) {
                 {/* item de la lista de pedidos */}
 
                 {pedidos.map((pedido) => (
-                  <div key={pedido._id} className=" flex flex-col bg-white rounded-lg p-4 border border-gray-200 hover:shadow-lg hover:bg-gray-50 transition-all duration-200 gap-4" suppressHydrationWarning={true}>
+                  <div key={pedido._id} className=" flex flex-col bg-gray-400 rounded-lg p-4 border border-gray-200 hover:shadow-lg hover:bg-gray-50 transition-all duration-200 gap-4" suppressHydrationWarning={true}>
                     {/* Sección de Resumen */}
 
                     <div

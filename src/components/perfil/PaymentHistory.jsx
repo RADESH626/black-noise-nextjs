@@ -71,7 +71,7 @@ function PaymentHistory({ payments }) {
                     color: "#E5E7EB",
                   }}
                 >
-                  {new Date(payment.fechaRealizacion).toLocaleDateString()}
+                  {new Date(payment.createdAt).toLocaleDateString()}
                 </td>
                 <td
                   style={{
