@@ -46,9 +46,21 @@ export default function FormFiltrarVentas({ initialVentasFromPage }) {
               </div>
               <div className="p-4 gradient-text-bg flex justify-between items-center" style={{ color: '#FFFFFF' }}>
                 <div>
+<<<<<<< HEAD
                   <p className="font-semibold">ID Venta: {venta._id}</p>
                   <p className="font-semibold">Monto: ${venta.pagoIds ? venta.pagoIds.reduce((sum, pago) => sum + (pago.valorPago || 0), 0).toFixed(2) : '0.00'}</p>
                   <p className="font-semibold">Fecha: {venta.createdAt ? new Date(venta.createdAt).toLocaleDateString() : 'N/A'}</p>
+=======
+<<<<<<< HEAD
+                  <p className="font-semibold">ID Venta: {venta.id}</p>
+                  <p className="font-semibold">Monto: ${venta.amount.toFixed(2)}</p>
+                  <p className="font-semibold">Fecha: {new Date(venta.date).toLocaleDateString()}</p>
+=======
+                  <p className="font-semibold">ID Venta: {venta._id}</p>
+                  <p className="font-semibold">Monto: ${venta.pagoIds ? venta.pagoIds.reduce((sum, pago) => sum + (pago.valorPago || 0), 0).toFixed(2) : '0.00'}</p>
+                  <p className="font-semibold">Fecha: {venta.createdAt ? new Date(venta.createdAt).toLocaleDateString() : 'N/A'}</p>
+>>>>>>> 2090330 (correccion de errores varios)
+>>>>>>> solucion_de_errores
                 </div>
               </div>
             </div>

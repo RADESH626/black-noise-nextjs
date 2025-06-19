@@ -71,7 +71,15 @@ function PaymentHistory({ payments }) {
                     color: "#E5E7EB",
                   }}
                 >
+<<<<<<< HEAD
                   {new Date(payment.createdAt).toLocaleDateString()}
+=======
+<<<<<<< HEAD
+                  {new Date(payment.fechaRealizacion).toLocaleDateString()}
+=======
+                  {new Date(payment.createdAt).toLocaleDateString()}
+>>>>>>> 2090330 (correccion de errores varios)
+>>>>>>> solucion_de_errores
                 </td>
                 <td
                   style={{
