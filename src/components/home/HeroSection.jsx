@@ -80,12 +80,13 @@ function HeroSection() {
   </p>
 </motion.div>
 
-
       </div>
 
-      {/* BOTÓN */}
+      
+
+      {/* BOTÓN "Descárgalo ahora" */}
       <div className='self-center mt-8'>
-        <BotonDescargar>¡Descárgalo ahora!</BotonDescargar>
+        <BotonDescargar onClick={() => window.location.href = 'https://github.com/Cryxxis/EditorBN/tree/master'}>¡Descárgalo ahora!</BotonDescargar>
       </div>
     </motion.section>
   );
