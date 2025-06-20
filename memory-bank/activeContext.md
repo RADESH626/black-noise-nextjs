@@ -66,6 +66,28 @@ La implementación de la funcionalidad de "apartado de pagos pendientes" está c
 4.  Al hacer clic en "Pagar Ahora", se abre el modal de pago, permite la entrada de datos simulados y, al enviar, registra el pago y actualiza el estado del pedido.
 5.  El `estadoPago` de los pedidos se actualiza correctamente cuando el proveedor añade un costo de envío y cuando el usuario lo paga.
 6.  Los cambios pendientes se han subido al repositorio remoto.
+
+### Session Change Log - 20/6/2025
+
+**Task:** Revert changes to PedidosDashboard and admin page
+
+**Changes Made:**
+- Removed the `console.log` statement from the `PedidosDashboard` component.
+- Removed the `revalidatePath('/admin/pedidos');` from the `updateEstadoPedido` function in `src/app/acciones/PedidoActions.js`.
+- Re-commented the `PedidosDashboard` component in `src/app/admin/page.jsx`.
+
+**Files Modified:**
+- `src/components/layout/admin/dashboards/PedidosDashboard.jsx`
+- `src/app/acciones/PedidoActions.js`
+- `src/app/admin/page.jsx`
+- `memory-bank/activeContext.md` (updated log)
+
+**Problems Encountered:**
+- Encountered issues with git rebase, but aborted the rebase and committed the changes successfully.
+
+**Next Steps:**
+- Generate git add and commit commands.
+- Attempt Completion.
 *   `src/app/acciones/UsuariosActions.js`:
     *   **Se modificó `ObtenerUsuarioPorId` y `ObtenerUsuarioPorCorreo` para asegurar que el `_id` del usuario se convierta a string y que los campos `imageData` y `imageMimeType` se eliminen del objeto de usuario después de construir `profileImageUrl`, evitando problemas de serialización.**
 *   `src/app/acciones/adminActions.js`:
