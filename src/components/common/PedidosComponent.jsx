@@ -118,6 +118,9 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
                 <p className="font-semibold">Pedido ID: {pedido._id}</p>
                 <p className="font-semibold">Estado: {pedido.estadoPago}</p>
                 <p className="font-semibold">Total: ${pedido.total.toFixed(2)}</p> {/* Use pedido.total */}
+                {pedido.userId?.direccion && (
+                  <p className="font-semibold">Dirección: {pedido.userId.direccion}</p>
+                )}
                 {/* Display other relevant order details here */}
               </div>
             </div>

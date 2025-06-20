@@ -1,24 +1,26 @@
-### Session Change Log - 18/6/2025
+### Session Change Log - 19/6/2025
 
-**Task:** Console Error - Fix `params` access in `src\app\admin\designs\editar\[id]\page.jsx` and resolve 404 for `/admin/designs/agregar`
+**Task:** Implementar campo de número de teléfono para pagos Nequi/Daviplata.
 
 **Changes Made:**
-- Modified `src/app/admin/designs/editar/[id]/page.jsx` to unwrap the `params` object using `React.use()` before accessing the `id` property.
-- Added `import React from 'react';` to the same file to resolve "React is not defined" runtime error.
-- Created the file `src/app/admin/designs/agregar/page.jsx` to resolve the 404 error for the `/admin/designs/agregar` route.
+- Se añadió un nuevo estado `phoneNumber` en `src/components/common/CartComponent.jsx` para capturar el número de teléfono.
+- Se implementó la lógica para mostrar condicionalmente un campo de entrada de número de teléfono en `src/components/common/CartComponent.jsx` cuando `Nequi` o `Daviplata` son seleccionados como método de pago.
+- Se actualizó la validación en `handleProcessPayment` en `src/components/common/CartComponent.jsx` para requerir el número de teléfono si el método de pago es Nequi o Daviplata.
+- Se modificó el objeto `paymentDetails` en `src/components/common/CartComponent.jsx` para incluir `numeroTelefono` cuando sea aplicable.
+- Se actualizó la función `procesarPagoYCrearPedido` en `src/app/acciones/PagoActions.js` para recibir y procesar el `numeroTelefono`.
+- Se añadió el campo `numeroTelefono` al esquema del modelo `Pago` en `src/models/Pago.js`, con una validación `required` condicional.
+- Se actualizó la documentación en `memory-bank/functionalities/GestionDePedidosYPagos.md` para reflejar el nuevo campo `numeroTelefono` en el modelo `Pago`.
 
 **Files Modified:**
-- `src/app/admin/designs/editar/[id]/page.jsx`
-- `src/app/admin/designs/agregar/page.jsx` (new file)
+- `src/components/common/CartComponent.jsx`
+- `src/app/acciones/PagoActions.js`
+- `src/models/Pago.js`
+- `memory-bank/functionalities/GestionDePedidosYPagos.md`
 - `memory-bank/activeContext.md` (updated log)
 
 **Problems Encountered:**
-- Initial `replace_in_file` failed due to inexact search pattern. Corrected with a more precise pattern.
-- Encountered "React is not defined" runtime error after fixing `params` access, resolved by adding `import React`.
-- Encountered a 404 error for `/admin/designs/agregar`, resolved by creating the missing `page.jsx` file.
+- Ninguno en esta fase.
 
 **Next Steps:**
 - Log these changes in `activeContext.md`.
-- Instruct user to restart the development server to apply the changes and verify the fix for the 404.
 - Commit the changes.
-- Implement the form and logic in `src/app/admin/designs/agregar/page.jsx` (This is a potential next task).

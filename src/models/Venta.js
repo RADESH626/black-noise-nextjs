@@ -1,5 +1,5 @@
 import { Schema, model, models } from 'mongoose'
-import EstadoVenta from './enums/VentaEnums'
+import { EstadoVenta } from './enums/VentaEnums'
 
 const VentaSchema = new Schema({
     pagoIds: [{
@@ -14,6 +14,11 @@ const VentaSchema = new Schema({
     valorVenta: {
         type: Number,
         required: true
+    },
+    estadoVenta: {
+        type: String,
+        enum: Object.values(EstadoVenta),
+        default: EstadoVenta.PENDIENTE
     },
 }, {
     timestamps: true

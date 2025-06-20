@@ -9,6 +9,7 @@ import { ObtenerUsuarioPorId } from '@/app/acciones/UsuariosActions';
 import { getModel } from '@/utils/modelLoader'; // Importar getModel
 import Proveedor from '@/models/Proveedor'; // Importar el modelo Proveedor
 import { toPlainObject } from '@/utils/dbUtils'; // Importar toPlainObject
+import { Disponibilidad } from '@/models/enums/proveedor/Disponibilidad';
 
 async function obtenerPedidos() {
     try {
@@ -27,18 +28,36 @@ async function obtenerPedidos() {
 async function guardarPedido(data) {
     try {
         await dbConnect();
-        const PedidoModel = await getModel('Pedido');
-        const nuevoPedido = new PedidoModel(data);
+        const ProveedorModel = await getModel('Proveedor');
 
-        // Según el nuevo flujo, el estado de pago inicial del pedido siempre es PAGADO
-        // ya que el usuario paga el total de los ítems al crear el pedido.
-        // El costo de envío se manejará como un pago pendiente posterior.
-        nuevoPedido.estadoPago = 'PAGADO';
+        // Buscar un proveedor disponible y habilitado con menos pedidos activos
+        const proveedorDisponible = await ProveedorModel.findOne({
+            disponibilidad: Disponibilidad.DISPONIBLE,
+            habilitado: true,
+        }).sort({ activeOrders: 1, lastAssignedAt: 1 });
 
-        const pedidoGuardado = await nuevoPedido.save();
+        if (!proveedorDisponible) {
+            return { success: false, message: 'No hay proveedores disponibles en este momento para tomar tu pedido.' };
+        }
+
+        // Crear una nueva instancia de Pedido usando el modelo importado directamente
+        const nuevoPedido = new Pedido({
+            ...data, // Desestructurar los datos para asegurar que sea un objeto plano
+            // estadoPago se establecerá a 'PENDIENTE' por defecto desde el esquema del modelo Pedido.js
+            proveedorId: proveedorDisponible._id, // Asignar el proveedor al pedido
+            estadoPedido: EstadoPedido.PENDIENTE, // Asegurar que el estado inicial sea PENDIENTE
+        });
+
+        // Incrementar activeOrders del proveedor
+        proveedorDisponible.activeOrders += 1;
+        proveedorDisponible.lastAssignedAt = new Date(); // Actualizar la fecha de última asignación
+        await proveedorDisponible.save();
+
+        const pedidoGuardado = await nuevoPedido.save(); // Llamar a save en la instancia del documento
         revalidatePath('/admin/pedidos');
-        revalidatePath('/perfil'); // Revalidar el perfil del usuario para ver nuevos pedidos
-        return { success: true, data: pedidoGuardado }; // Devolver la instancia de Mongoose directamente
+        revalidatePath('/perfil');
+        revalidatePath('/proveedor/pedidos'); // Revalidar también la página de pedidos del proveedor
+        return { success: true, data: toPlainObject(pedidoGuardado) };
     } catch (error) {
         console.error('Error al guardar el pedido:', error);
         return { success: false, error: error.message };
@@ -74,8 +93,8 @@ async function updateEstadoPedido(pedidoId, newEstado) {
             }
         }
 
-        // Enviar notificación si el estado ha cambiado y no es 'ENTREGADO'
-        if (oldEstado !== newEstado && newEstado !== EstadoPedido.ENTREGADO) {
+        // Enviar notificación si el estado ha cambiado
+        if (oldEstado !== newEstado) {
             await enviarNotificacionCambioEstadoPedido(pedido._id, newEstado, oldEstado, pedido.userId);
         }
 
@@ -94,7 +113,7 @@ async function obtenerPedidosPorUsuarioId(userId) {
         const pedidos = await PedidoModel.find({ userId: userId })
             .populate('items.designId', 'nombreDesing imageData imageMimeType')
             .populate('proveedorId', 'nombreEmpresa emailContacto')
-            .populate('userId', 'Nombre')
+            .populate('userId', 'Nombre direccion')
             .lean();
         return { success: true, pedidos: pedidos.map(p => toPlainObject(p)) };
     } catch (error) {
@@ -110,7 +129,7 @@ async function obtenerPedidosPagadosPorUsuarioId(userId) {
         const pedidos = await PedidoModel.find({ userId: userId, estadoPago: 'PAGADO' }) // Filtrar por estadoPago: 'PAGADO'
             .populate('items.designId', 'nombreDesing imageData imageMimeType')
             .populate('proveedorId', 'nombreEmpresa emailContacto')
-            .populate('userId', 'Nombre')
+            .populate('userId', 'Nombre direccion')
             .lean();
         return { success: true, pedidos: pedidos.map(p => toPlainObject(p)) };
     } catch (error) {
@@ -178,6 +197,14 @@ async function enviarNotificacionCambioEstadoPedido(pedidoId, newEstado, oldEsta
                     <p>Queremos confirmarte que tu pedido <strong>#${pedidoId.toString().slice(-6)}</strong> ha sido cancelado.</p>
                     <p>Si tienes alguna pregunta, no dudes en contactarnos.</p>
                     <p>Gracias por tu comprensión.</p>
+                `;
+                break;
+            case EstadoPedido.ENTREGADO:
+                subject = `¡Tu pedido ha sido entregado! - Black Noise`;
+                htmlContent = `
+                    <p>¡Hola ${userName}!</p>
+                    <p>¡Excelentes noticias! Tu pedido <strong>#${pedidoId.toString().slice(-6)}</strong> ha sido marcado como ENTREGADO.</p>
+                    <p>Esperamos que disfrutes de tu compra. ¡Gracias por elegir Black Noise!</p>
                 `;
                 break;
             default:

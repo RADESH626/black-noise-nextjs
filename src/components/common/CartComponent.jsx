@@ -14,6 +14,7 @@ import OrderSummary from "@/components/pago/OrderSummary";
 import UserDataForm from "@/components/pago/UserDataForm";
 import CardDataModal from "@/components/pago/CardDataModal";
 import OrderConfirmationDialogContent from "@/components/pago/OrderConfirmationDialogContent";
+import { MetodoPago } from '@/models/enums/pago/MetodoPago';
 
 function CartComponent() {
   const router = useRouter();
@@ -27,6 +28,8 @@ function CartComponent() {
   const [userData, setUserData] = useState(null);
   const [cardData, setCardData] = useState(null);
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(MetodoPago.TARJETA_CREDITO); // Default to credit card
+  const [phoneNumber, setPhoneNumber] = useState(''); // Nuevo estado para el número de teléfono
 
   const dialogRef = useRef(null);
 
@@ -37,6 +40,12 @@ function CartComponent() {
       dialogRef.current?.close();
     }
   }, [showPaymentSection]);
+
+  useEffect(() => {
+    if (!loadingCart && cartItems.length === 0) {
+      router.push('/catalogo');
+    }
+  }, [loadingCart, cartItems, router]);
 
   const getTotal = () => {
     let subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
@@ -49,6 +58,7 @@ function CartComponent() {
     setPaymentError(null);
     setUserData(null);
     setCardData(null);
+    setPhoneNumber(''); // Limpiar el número de teléfono al cerrar
   }, []);
 
   const addItemDebounceRef = useRef(null);
@@ -186,10 +196,16 @@ function CartComponent() {
       return;
     }
 
-    if (!cardData || !cardData.tarjeta || !cardData.mes || !cardData.anio || !cardData.cvv) {
+    if ((selectedPaymentMethod === MetodoPago.TARJETA_CREDITO || selectedPaymentMethod === MetodoPago.TARJETA_DEBITO) && (!cardData || !cardData.tarjeta || !cardData.mes || !cardData.anio || !cardData.cvv)) {
       setPaymentError("Por favor ingresa los datos de tu tarjeta.");
       return;
     }
+
+    if ((selectedPaymentMethod === MetodoPago.NEQUI || selectedPaymentMethod === MetodoPago.DAVIPLATA) && !phoneNumber) {
+      setPaymentError("Por favor ingresa el número de teléfono para el pago.");
+      return;
+    }
+
     setPaymentError(null);
 
     const paymentDetails = {
@@ -197,12 +213,13 @@ function CartComponent() {
       nombre: userData.nombre,
       correo: userData.correo,
       direccion: userData.direccion,
-      metodoPago: "tarjeta",
+      metodoPago: selectedPaymentMethod,
       total: getTotal(),
-      tarjeta: cardData.tarjeta,
-      mes: cardData.mes,
-      anio: cardData.anio,
-      cvv: cardData.cvv,
+      tarjeta: (selectedPaymentMethod === MetodoPago.TARJETA_CREDITO || selectedPaymentMethod === MetodoPago.TARJETA_DEBITO) ? cardData.tarjeta : undefined,
+      mes: (selectedPaymentMethod === MetodoPago.TARJETA_CREDITO || selectedPaymentMethod === MetodoPago.TARJETA_DEBITO) ? cardData.mes : undefined,
+      anio: (selectedPaymentMethod === MetodoPago.TARJETA_CREDITO || selectedPaymentMethod === MetodoPago.TARJETA_DEBITO) ? cardData.anio : undefined,
+      cvv: (selectedPaymentMethod === MetodoPago.TARJETA_CREDITO || selectedPaymentMethod === MetodoPago.TARJETA_DEBITO) ? cardData.cvv : undefined,
+      numeroTelefono: (selectedPaymentMethod === MetodoPago.NEQUI || selectedPaymentMethod === MetodoPago.DAVIPLATA) ? phoneNumber : undefined,
       metodoEntrega: userData.isDelivery ? 'DOMICILIO' : 'RECOGIDA',
       costoEnvio: 0, // Set to 0 as per new requirement
     };
@@ -329,19 +346,58 @@ function CartComponent() {
         <UserDataForm onUserDataChange={handleUserDataChange} />
 
         <div className="p-6 rounded shadow-md w-full mb-6" style={{ backgroundColor: "#F7F1F1" }}>
-          <h3 className="text-xl font-bold mb-4" style={{ color: "#111010" }}>Información de Pago</h3>
-          <button
-            type="button"
-            onClick={() => setIsCardModalOpen(true)}
-            style={{ backgroundColor: "#154780", color: "#ffffff" }}
-            className="w-full font-semibold py-3 rounded hover:bg-blue-700 transition"
-          >
-            {cardData ? 'Editar Datos de Tarjeta' : 'Ingresar Datos de Tarjeta'}
-          </button>
-          {cardData && (
-            <p className="mt-2 text-sm" style={{ color: "#000000" }}>
-              Tarjeta ingresada: **** **** **** {cardData.tarjeta.slice(-4)}
-            </p>
+          <h3 className="text-xl font-bold mb-4" style={{ color: "#111010" }}>Método de Pago</h3>
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            {Object.values(MetodoPago).map((method) => (
+              <label key={method} className="flex items-center space-x-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value={method}
+                  checked={selectedPaymentMethod === method}
+                  onChange={() => setSelectedPaymentMethod(method)}
+                  className="form-radio h-4 w-4 text-blue-600"
+                  style={{ accentColor: "#154780" }}
+                />
+                <span style={{ color: "#000000" }}>{method.replace(/_/g, ' ')}</span>
+              </label>
+            ))}
+          </div>
+
+          {(selectedPaymentMethod === MetodoPago.TARJETA_CREDITO || selectedPaymentMethod === MetodoPago.TARJETA_DEBITO) && (
+            <>
+              <button
+                type="button"
+                onClick={() => setIsCardModalOpen(true)}
+                style={{ backgroundColor: "#154780", color: "#ffffff" }}
+                className="w-full font-semibold py-3 rounded hover:bg-blue-700 transition"
+              >
+                {cardData ? 'Editar Datos de Tarjeta' : 'Ingresar Datos de Tarjeta'}
+              </button>
+              {cardData && (
+                <p className="mt-2 text-sm" style={{ color: "#000000" }}>
+                  Tarjeta ingresada: **** **** **** {cardData.tarjeta.slice(-4)}
+                </p>
+              )}
+            </>
+          )}
+
+          {(selectedPaymentMethod === MetodoPago.NEQUI || selectedPaymentMethod === MetodoPago.DAVIPLATA) && (
+            <div className="mt-4">
+              <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700" style={{ color: "#000000" }}>
+                Número de Teléfono para Pago
+              </label>
+              <input
+                type="text"
+                id="phoneNumber"
+                name="phoneNumber"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="Ej: 3001234567"
+                style={{ backgroundColor: "#FFFFFF", color: "#000000" }}
+              />
+            </div>
           )}
         </div>
 

@@ -34,6 +34,13 @@ const PagoSchema = new Schema({
     detallesTarjeta: { // New field for card details
         cardNumber: { type: String }, // Store last 4 digits
         expiryDate: { type: String },
+        cvv: { type: String }, // Add CVV field
+    },
+    numeroTelefono: { // New field for phone number for Nequi/Daviplata
+        type: String,
+        required: function() {
+            return this.metodoPago === MetodoPago.NEQUI || this.metodoPago === MetodoPago.DAVIPLATA;
+        }
     }
 },{
     timestamps: true

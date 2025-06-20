@@ -194,6 +194,12 @@ export default function PedidosClientPage({ initialPedidos }) {
                               <p className="font-medium">Usuario:</p>
                               <p>{pedido.userId?.Nombre || 'N/A'}</p>
                             </div>
+                            {pedido.userId?.direccion && (
+                              <div>
+                                <p className="font-medium">Dirección:</p>
+                                <p>{pedido.userId.direccion}</p>
+                              </div>
+                            )}
 
                             <div>
                               <p className="font-medium">Total:</p>
@@ -203,12 +209,15 @@ export default function PedidosClientPage({ initialPedidos }) {
                               <p className="font-medium">Método de Entrega:</p>
                               <p>{pedido.metodoEntrega || 'N/A'}</p>
                             </div>
+
                             {pedido.fechaPedido && (
                               <div>
                                 <p className="font-medium">Fecha del Pedido:</p>
                                 <p>{new Date(pedido.fechaPedido).toLocaleDateString()}</p>
                               </div>
                             )}
+
+                            
                           </div>
 
 
