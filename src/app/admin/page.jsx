@@ -1,6 +1,6 @@
 "use client";
 
-import UsuariosDashboard from '@/components/layout/admin/dashboards/users/UsuariosDashboard';
+import UsuariosDashboard from '@/components/layout/admin/dashboards/users/UsuariosClientPage';
 import PedidosDashboard from '@/components/layout/admin/dashboards/PedidosDashboard';
 
 const AdminDashboardPage = () => {
