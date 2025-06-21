@@ -271,6 +271,7 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
             estadoTransaccion: 'PAGADO', // Asumimos que el pago es exitoso aquí
             detallesTarjeta: (metodoPago === MetodoPago.TARJETA_CREDITO || metodoPago === MetodoPago.TARJETA_DEBITO) ? { cardNumber: tarjeta ? tarjeta.slice(-4) : 'N/A', expiryDate: mes && anio ? `${mes}/${anio}` : 'N/A', cvv: '***' } : undefined,
             numeroTelefono: (metodoPago === MetodoPago.NEQUI || metodoPago === MetodoPago.DAVIPLATA) ? numeroTelefono : undefined,
+            motivo: 'Pago de Pedido', // Añadir el motivo del pago
         };
         let pagoGuardado;
         try {
@@ -434,7 +435,8 @@ async function registrarPagoEnvioSimulado(pedidoId, paymentData) {
                 cardNumber: paymentData.cardNumber ? paymentData.cardNumber.slice(-4) : 'N/A',
                 expiryDate: paymentData.expiryDate || 'N/A',
                 cvv: paymentData.cvv ? '***' : 'N/A'
-            }
+            },
+            motivo: 'Pago de Envío' // Añadir el motivo del pago
         });
         const pagoEnvioGuardado = await nuevoPagoEnvio.save();
         logger.debug('Nuevo registro de Pago de envío creado:', pagoEnvioGuardado);
