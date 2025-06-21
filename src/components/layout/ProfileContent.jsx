@@ -45,7 +45,7 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
     console.log('--- [CLIENTE] FIN DEBUGGING INICIAL ---');
   }, []);
 
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     if (status === 'authenticated' && userId) {
       setLoading(true);
       setError(null);
@@ -62,9 +62,9 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
     } else if (status === 'unauthenticated') {
       setLoading(false);
     }
-  };
+  }, [status, userId]); // Dependencias para useCallback
 
-  const fetchUserDesigns = async () => {
+  const fetchUserDesigns = useCallback(async () => {
     if (status === 'authenticated' && userId) {
       setLoading(true);
       setError(null);
@@ -77,13 +77,15 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
       }
       setLoading(false);
     }
-  };
+  }, [status, userId]); // Dependencias para useCallback
   
   useEffect(() => {
     fetchUserData();
-    fetchUserDesigns();
-  }, [userId, status]);
-
+    if (userId) { // Asegurarse de que userId esté definido antes de intentar obtener diseños
+      fetchUserDesigns();
+    }
+  }, [userId, status, fetchUserData, fetchUserDesigns]); // Añadir fetchUserData y fetchUserDesigns como dependencias
+  
   const user = currentUser;
 
   const handleEditProfile = () => {
@@ -286,7 +288,16 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
             )}
           </>
         )}
-        {activeTab === 'orders' && (<PedidosComponent userId={user?.id} />)}
+        {activeTab === 'orders' && (
+          <>
+            {userId && console.log('DEBUG - Renderizando PedidosComponent con userId:', userId)}
+            {userId ? (
+              <PedidosComponent userId={userId} />
+            ) : (
+              <p>Cargando pedidos...</p>
+            )}
+          </>
+        )}
         {activeTab === 'payments' && (<PaymentHistory payments={paymentsForHistory} />)}
       </div>
 

@@ -321,10 +321,10 @@ function CartComponent() {
             <span>${totalAPagar.toFixed(2)}</span>
           </div>
           <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
-            <BotonGeneral onClick={handleClearCart} disabled={loadingCart}>
+            <BotonGeneral onClick={handleClearCart} disabled={loadingCart} className="bg-gray-500 hover:bg-gray-600 text-white">
               Vaciar Carrito
             </BotonGeneral>
-            <BotonGeneral onClick={handleProceedToPayment} disabled={loadingCart}>
+            <BotonGeneral onClick={handleProceedToPayment} disabled={loadingCart} className="bg-gray-500 hover:bg-gray-600 text-white">
               Proceder al Pago
             </BotonGeneral>
           </div>

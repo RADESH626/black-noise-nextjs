@@ -137,7 +137,8 @@ export default function CardDataModal({ isOpen, onClose, onCardDataSubmit }) {
           </BotonGeneral>
           <BotonGeneral
             type="submit"
-            variant="primary"
+            variant="secondary"
+            className="text-black"
           >
             Guardar Tarjeta
           </BotonGeneral>

@@ -18,7 +18,7 @@ function LoginInfoSection() {
         </p>
         <div className="mt-6">
           <Link href="/">
-            <BotonGeneral>
+            <BotonGeneral variant="secondary">
               <span className="flex items-center gap-2">
                 <i className='bx bx-home-alt-2 text-xl transition-transform hover:scale-110'></i>
                 Ir al inicio

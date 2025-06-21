@@ -16,6 +16,10 @@ export function toPlainObject(doc) {
             if (value instanceof Buffer) {
                 return value.toString('base64');
             }
+            // Handle objects that are serialized Buffers (e.g., from JSON.parse)
+            if (value && typeof value === 'object' && value.type === 'Buffer' && Array.isArray(value.data)) {
+                return Buffer.from(value.data).toString('base64');
+            }
             // Check if it's a Mongoose ObjectId
             if (value._bsontype === 'ObjectId' || (value.constructor && value.constructor.name === 'ObjectId')) {
                 return value.toString();

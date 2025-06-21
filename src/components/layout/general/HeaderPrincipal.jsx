@@ -11,7 +11,7 @@ import CartModal from '@/components/carrito/CartModal'; // Import CartModal
 import { useCart } from '@/context/CartContext'; // Import useCart
 import PendingPaymentsSummary from '@/components/common/PendingPaymentsSummary'; // Import PendingPaymentsSummary
 
-function HeaderPrincipal() {
+function HeaderPrincipal({ hideCartIcon = false, showBackButton = false, backButtonHref = '/' }) {
     const { data: session } = useSession();
     // console.log("Session object in HeaderPrincipal:", session);
     const { cartItems, fetchCart, removeItem } = useCart(); // Use cartItems, fetchCart, and removeItem from CartContext
@@ -58,8 +58,15 @@ function HeaderPrincipal() {
                     {/* Pending Payments Icon */}
                     {session && <PendingPaymentsSummary />}
 
+                    {/* Back Button */}
+                    {showBackButton && (
+                        <Link href={backButtonHref} className="flex items-center gap-2 text-white hover:text-gray-300 transition-colors duration-300">
+                            <span className="text-2xl">←</span>
+                        </Link>
+                    )}
+
                     {/* Shopping Cart Icon */}
-                    {session && (
+                    {session && !hideCartIcon && (
                         <div className="relative cursor-pointer" onClick={handleCartIconClick}>
                             <Image src="/icons/icono-carrito.svg" alt="Carrito" width={30} height={30} />
                             {cartItems.length > 0 && (

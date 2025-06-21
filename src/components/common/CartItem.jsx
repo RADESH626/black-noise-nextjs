@@ -27,7 +27,7 @@ const CartItem = memo(({ item, onUpdateQuantity, onRemoveItem }) => {
           onChange={(e) => onUpdateQuantity(item.id, e.target.value)}
           className="w-20 p-2 bg-gray-700 border border-gray-600 rounded-md text-white"
         />
-        <BotonGeneral onClick={() => onRemoveItem(item.id)}>
+        <BotonGeneral onClick={() => onRemoveItem(item.id)} className="bg-gray-500 hover:bg-gray-600 text-white">
           Eliminar
         </BotonGeneral>
       </div>

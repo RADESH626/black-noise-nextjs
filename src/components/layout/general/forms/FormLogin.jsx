@@ -17,6 +17,7 @@ function SubmitButton() {
     <BotonGeneral
       type="submit"
       disabled={pending} // Disable button while pending
+      variant="secondary"
     >
       {pending ? 'Iniciando Sesión...' : 'Iniciar Sesión'}
     </BotonGeneral>
@@ -122,7 +123,7 @@ function FormLogin() {
 
       <div className="text-center mt-5">
         <p className="mb-4">¿No tienes una cuenta?</p>
-        <BotonGeneral type="button" onClick={() => { console.log('Attempting to redirect to /registro'); router.push('/registro'); }}>
+        <BotonGeneral type="button" onClick={() => { console.log('Attempting to redirect to /registro'); router.push('/registro'); }} variant="secondary">
           Regístrate ahora
         </BotonGeneral>
       </div>

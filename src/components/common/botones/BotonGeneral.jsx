@@ -10,7 +10,7 @@ function BotonGeneral({ children, onClick, type = 'button', disabled = false, cl
     switch (variant) {
         case 'primary':
             variantStyles = 'btn-gradient-primary';
-            textStyles = 'text-white';
+            // textStyles = 'text-white';
             break;
         case 'secondary':
             variantStyles = 'btn-gradient-gray-to-white';

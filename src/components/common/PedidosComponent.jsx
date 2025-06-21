@@ -159,12 +159,13 @@ const PedidosContent = () => {
             checked={showCancelled}
             onChange={() => setShowCancelled(!showCancelled)}
           />
-          <div className="relative w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+          <div className="relative w-11 h-6 bg-gray-700  dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
           <span className="ms-3 text-sm font-medium text-gray-300">Mostrar Pedidos Cancelados</span>
         </label>
       </div>
 
       <main className="grid grid-cols-1 gap-6 mt-8">
+        {console.log('DEBUG - filteredPedidos en PedidosComponent:', filteredPedidos)}
         {filteredPedidos.map((pedido, index) => {
           return (
             <motion.div
@@ -208,6 +209,7 @@ const PedidosContent = () => {
                 </div>
 
                 {/* Sección de Detalles (condicional) */}
+                {console.log('DEBUG - expandedOrders.has(pedido._id.toString()):', expandedOrders.has(pedido._id.toString()))}
                 {expandedOrders.has(pedido._id.toString()) && (
                   <div className="flex flex-col gap-2">
                     <div className="flex gap-4">
@@ -238,6 +240,7 @@ const PedidosContent = () => {
                       {/* Información de los diseños */}
                       <div className="flex flex-col flex-1 gap-2 bg-gray-500 rounded-md">
                         <p className="font-medium text-white mb-2 text-center">Diseños:</p>
+                        {console.log('DEBUG - pedido.items:', pedido.items)}
                         {pedido.items && pedido.items.length > 0 ? (
                           <div className="flex flex-col p-2 rounded-md gap-4">
                             {pedido.items.map((item, itemIndex) => (
@@ -253,10 +256,18 @@ const PedidosContent = () => {
                                       className="w-12 h-12 object-cover rounded-md"
                                     />
                                   )}
-                                  <div>
+                                  <div className="flex items-center space-x-2">
+                                    {item.designId?.imagen && (
+                                      <img
+                                      src={item.designId.imagen}
+                                        alt={item.designId.nombreDesing || 'Diseño'}
+                                        className="w-8 h-8 object-cover rounded-full border border-gray-300"
+                                      />
+                                    )}
                                     <p className="font-semibold">{item.designId?.nombreDesing || 'Diseño Desconocido'}</p>
-                                    <p className="text-sm text-gray-600">Cantidad: {item.quantity}</p>
                                   </div>
+                                  {console.log('DEBUG - item.designId completo en PedidosComponent (dentro del map):', item.designId)}
+                                  <p className="text-sm text-gray-600">Cantidad: <span className="font-bold text-white">{item.quantity}</span></p>
                                   <svg
                                     className={`w-5 h-5 text-gray-600 transform transition-transform duration-200 ${expandedDesigns.has(item.designId?._id?.toString() || `design-${itemIndex}`) ? 'rotate-180' : ''
                                       }`}
@@ -271,7 +282,8 @@ const PedidosContent = () => {
                                 {expandedDesigns.has(item.designId?._id?.toString() || `design-${itemIndex}`) && (
                                   <div className="mt-2 text-sm text-gray-700 bg-gray-300 p-2 rounded-md">
                                     <p><span className="font-medium">Categoría:</span> {item.designId?.categoria || 'N/A'}</p>
-                                    <p><span className="font-medium">Precio Unitario:</span> ${item.designId?.precioUnitario ? item.designId.precioUnitario.toFixed(2) : '0.00'}</p>
+                                    <p><span className="font-medium">Precio Unitario:</span> ${item.designId?.valorDesing ? parseFloat(item.designId.valorDesing).toFixed(2) : '0.00'}</p>
+                                    <p><span className="font-medium">Subtotal por Diseño:</span> ${item.designId?.valorDesing && item.quantity ? (parseFloat(item.designId.valorDesing) * item.quantity).toFixed(2) : '0.00'}</p>
                                     <p><span className="font-medium">Descripción:</span> {item.designId?.descripcion || 'N/A'}</p>
                                   </div>
                                 )}

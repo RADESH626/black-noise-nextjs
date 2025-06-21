@@ -111,11 +111,40 @@ async function obtenerPedidosPorUsuarioId(userId) {
         await dbConnect();
         const PedidoModel = await getModel('Pedido');
         const pedidos = await PedidoModel.find({ userId: userId })
-            .populate('items.designId', 'nombreDesing imageData imageMimeType')
+            .populate('items.designId', 'nombreDesing imageData imageMimeType categoria valorDesing descripcion')
             .populate('proveedorId', 'nombreEmpresa emailContacto')
             .populate('userId', 'Nombre direccion')
             .lean();
-        return { success: true, pedidos: pedidos.map(p => toPlainObject(p)) };
+        const processedPedidos = pedidos.map(p => {
+            const tempPedido = { ...p }; // Crear una copia mutable
+            if (tempPedido.items && Array.isArray(tempPedido.items)) {
+                tempPedido.items = tempPedido.items.map(item => {
+                    if (item.designId) {
+                        const imageUrl = item.designId.imageData && item.designId.imageData.buffer instanceof Buffer && item.designId.imageMimeType
+                            ? `data:${item.designId.imageMimeType};base64,${item.designId.imageData.buffer.toString('base64')}`
+                            : null;
+                        
+                        // Crear un nuevo objeto designId con la propiedad 'imagen' y sin imageData/imageMimeType
+                        const newDesignId = {
+                            _id: item.designId._id,
+                            nombreDesing: item.designId.nombreDesing,
+                            valorDesing: item.designId.valorDesing,
+                            categoria: item.designId.categoria,
+                            descripcion: item.designId.descripcion,
+                            imagen: imageUrl, // La imagen como base64
+                        };
+
+                        return { 
+                            ...item, 
+                            designId: newDesignId 
+                        };
+                    }
+                    return item;
+                });
+            }
+            return toPlainObject(tempPedido); // Convertir a objeto plano al final
+        });
+        return { success: true, pedidos: processedPedidos };
     } catch (error) {
         console.error('Error al obtener los pedidos del usuario:', error);
         return { success: false, error: error.message };
@@ -127,11 +156,40 @@ async function obtenerPedidosPagadosPorUsuarioId(userId) {
         await dbConnect();
         const PedidoModel = await getModel('Pedido');
         const pedidos = await PedidoModel.find({ userId: userId, estadoPago: 'PAGADO' }) // Filtrar por estadoPago: 'PAGADO'
-            .populate('items.designId', 'nombreDesing imageData imageMimeType')
+            .populate('items.designId', 'nombreDesing imageData imageMimeType categoria valorDesing descripcion')
             .populate('proveedorId', 'nombreEmpresa emailContacto')
             .populate('userId', 'Nombre direccion')
             .lean();
-        return { success: true, pedidos: pedidos.map(p => toPlainObject(p)) };
+        const processedPedidos = pedidos.map(p => {
+            const tempPedido = { ...p }; // Crear una copia mutable
+            if (tempPedido.items && Array.isArray(tempPedido.items)) {
+                tempPedido.items = tempPedido.items.map(item => {
+                    if (item.designId) {
+                        const imageUrl = item.designId.imageData && item.designId.imageData.buffer instanceof Buffer && item.designId.imageMimeType
+                            ? `data:${item.designId.imageMimeType};base64,${item.designId.imageData.buffer.toString('base64')}`
+                            : null;
+                        
+                        // Crear un nuevo objeto designId con la propiedad 'imagen' y sin imageData/imageMimeType
+                        const newDesignId = {
+                            _id: item.designId._id,
+                            nombreDesing: item.designId.nombreDesing,
+                            valorDesing: item.designId.valorDesing,
+                            categoria: item.designId.categoria,
+                            descripcion: item.designId.descripcion,
+                            imagen: imageUrl, // La imagen como base64
+                        };
+
+                        return { 
+                            ...item, 
+                            designId: newDesignId 
+                        };
+                    }
+                    return item;
+                });
+            }
+            return toPlainObject(tempPedido); // Convertir a objeto plano al final
+        });
+        return { success: true, pedidos: processedPedidos };
     } catch (error) {
         console.error('Error al obtener los pedidos pagados del usuario:', error);
         return { success: false, error: error.message };
@@ -170,7 +228,6 @@ async function enviarNotificacionCambioEstadoPedido(pedidoId, newEstado, oldEsta
                     <p>¡Hola ${userName}!</p>
                     <p>Queremos informarte que tu pedido <strong>#${pedidoId.toString().slice(-6)}</strong> esta en FABRICACION.</p>
                     <p>Estamos trabajando en ello y pronto lo tendrás contigo.</p>
-                    <p>Gracias por tu paciencia y confianza en Black Noise.</p>
                 `;
                 break;
             case EstadoPedido.LISTO:

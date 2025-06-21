@@ -40,7 +40,7 @@ function DesignCard({ diseño, addItem, isInCart }) {
 
         <div className="flex items-center justify-end mt-2">
           <BotonGeneral
-            variant={isInCart ? 'secondary' : 'primary'}
+            variant="secondary"
             onClick={() => addItem(diseño)}
             disabled={isInCart}
             className="px-3 py-1"
