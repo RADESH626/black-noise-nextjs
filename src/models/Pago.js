@@ -41,6 +41,10 @@ const PagoSchema = new Schema({
         required: function() {
             return this.metodoPago === MetodoPago.NEQUI || this.metodoPago === MetodoPago.DAVIPLATA;
         }
+    },
+    motivo: { // Campo para la razón del pago (ej. "por pedido", "por envío")
+        type: String,
+        required: false
     }
 },{
     timestamps: true

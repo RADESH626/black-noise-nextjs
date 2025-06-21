@@ -63,8 +63,34 @@ const PedidoSchema = new Schema({
         ref: 'Pago',
         required: false // Made permanently optional to resolve circular dependency
     },
-    fechaEstimadaEntrega: {
-        type: Date
+    motivo_devolucion: {
+        type: String,
+        required: false
+    },
+    motivo_rechazo_devolucion: {
+        type: String,
+        required: false
+    },
+    es_pedido_refabricado: {
+        type: Boolean,
+        default: false
+    },
+    pedido_original_id: {
+        type: Schema.Types.ObjectId,
+        ref: 'Pedido',
+        required: false
+    },
+    costos_negociados: {
+        type: Number,
+        required: false
+    },
+    fue_cancelado: {
+        type: Boolean,
+        default: false
+    },
+    fecha_cancelacion: {
+        type: Date,
+        required: false
     }
 }, {
     timestamps: true

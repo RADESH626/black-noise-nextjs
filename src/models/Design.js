@@ -21,10 +21,6 @@ const DesignSchema = new Schema({
         enum: Object.values(CategoriaProducto),
         required: true
     },
-    // likes: {
-    //     type: Number,
-    //     default: 0
-    // },
     valorDesing: {
         type: Number,
         required: true
@@ -46,6 +42,10 @@ const DesignSchema = new Schema({
     imageMimeType: {
         type: String,
         required: true
+    },
+    tallasDisponibles: {
+        type: [String], // Array de strings para las tallas (ej. ['S', 'M', 'L', 'XL'])
+        required: false // Opcional, dependiendo de si todos los diseños tienen tallas
     }
 }, {
     timestamps: true

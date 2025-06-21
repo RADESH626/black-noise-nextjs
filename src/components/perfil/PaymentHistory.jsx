@@ -32,7 +32,7 @@ function PaymentHistory({ payments }) {
         <table style={{ minWidth: "100%", backgroundColor: "#000000" }}>
           <thead>
             <tr style={{ backgroundColor: "#111827" }}>
-              {["Fecha", "Valor", "Método", "Estado", "Pedido ID"].map((text) => (
+              {["Fecha", "Valor", "Método", "Estado", "Pedido ID", "Motivo"].map((text) => (
                 <th
                   key={text}
                   style={{
@@ -111,7 +111,17 @@ function PaymentHistory({ payments }) {
                     color: "#E5E7EB",
                   }}
                 >
-                  {payment.pedidoId ? payment.pedidoId._id : 'N/A'}
+                  {payment.pedidoId}
+                </td>
+                <td
+                  style={{
+                    padding: "0.5rem 1rem",
+                    borderBottom: "1px solid #374151",
+                    fontSize: "0.875rem",
+                    color: "#E5E7EB",
+                  }}
+                >
+                  {payment.motivo || 'N/A'}
                 </td>
               </tr>
             ))}

@@ -13,14 +13,14 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
 
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError, ] = useState(null);
+  const [error, setError] = useState(null);
+  const [showCancelled, setShowCancelled] = useState(false);
 
   useEffect(() => {
     const fetchPedidos = async () => {
       if (status === 'authenticated' && userId) {
         setLoading(true);
         setError(null);
-        // Use obtenerPedidosPagadosPorUsuarioId to only fetch paid orders
         const { pedidos: fetchedPedidos, error: fetchError } = await obtenerPedidosPagadosPorUsuarioId(userId);
         if (fetchError) {
           setError({ message: fetchError });
@@ -37,6 +37,10 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
 
     fetchPedidos();
   }, [status, userId]);
+
+  const filteredPedidos = showCancelled
+    ? pedidos
+    : pedidos.filter(pedido => pedido.estadoPedido !== 'CANCELADO');
 
   // handlePayOrder is no longer needed as orders are paid first
   // const handlePayOrder = (pedidoId, valorPedido) => {
@@ -79,14 +83,27 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
     <div className="bg-black text-white font-poppins p-4">
       <h2 className="text-center text-2xl font-bold mt-4">Tus Pedidos</h2>
 
+      <div className="flex justify-end mb-4">
+        <label className="inline-flex items-center cursor-pointer">
+          <input
+            type="checkbox"
+            className="sr-only peer"
+            checked={showCancelled}
+            onChange={() => setShowCancelled(!showCancelled)}
+          />
+          <div className="relative w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+          <span className="ms-3 text-sm font-medium text-gray-300">Mostrar Pedidos Cancelados</span>
+        </label>
+      </div>
+
       <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-        {pedidos.map((pedido, index) => (
+        {filteredPedidos.map((pedido, index) => (
           <motion.div
-            key={pedido._id} // Use pedido._id as key
+            key={pedido._id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-gray-800 rounded-xl shadow-lg overflow-hidden"
+            className={`bg-gray-800 rounded-xl shadow-lg overflow-hidden ${pedido.estadoPedido === 'CANCELADO' ? 'border-2 border-red-500 opacity-70' : ''}`}
           >
             <div className="w-full h-56 bg-gray-700 relative">
               {pedido.items && pedido.items.length > 0 && pedido.items[0]?.designId?.imageData ? (
@@ -113,15 +130,40 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
                 </button>
               </div>
             </div>
-            <div className="p-4 gradient-text-bg flex justify-between items-center">
-              <div>
-                <p className="font-semibold">Pedido ID: {pedido._id}</p>
-                <p className="font-semibold">Estado: {pedido.estadoPago}</p>
-                <p className="font-semibold">Total: ${pedido.total.toFixed(2)}</p> {/* Use pedido.total */}
-                {pedido.userId?.direccion && (
-                  <p className="font-semibold">Dirección: {pedido.userId.direccion}</p>
+            <div className="p-4 gradient-text-bg flex flex-col">
+              <div className="flex justify-between items-center mb-2">
+                <div>
+                  <p className="font-semibold">Pedido ID: {pedido._id}</p>
+                  <p className="font-semibold">Estado de Pago: {pedido.estadoPago}</p>
+                  <p className="font-semibold">Estado de Pedido: {pedido.estadoPedido}</p>
+                  <p className="font-semibold">Total: ${pedido.total.toFixed(2)}</p>
+                  {pedido.proveedorId && (
+                    <p className="font-semibold">Proveedor: {pedido.proveedorId.nombreEmpresa}</p>
+                  )}
+                  {pedido.userId?.direccion && (
+                    <p className="font-semibold">Dirección: {pedido.userId.direccion}</p>
+                  )}
+                </div>
+                <button
+                  onClick={() => alert(`Solicitar devolución para el pedido: ${pedido._id}`)}
+                  className="bg-red-600 text-black font-semibold py-2 px-4 rounded-md text-sm hover:bg-red-700 transition duration-150"
+                >
+                  Solicitar Devolución
+                </button>
+              </div>
+              <div className="mt-4 border-t border-gray-700 pt-4">
+                <p className="font-semibold mb-2">Ítems del Pedido:</p>
+                {pedido.items && pedido.items.length > 0 ? (
+                  <ul className="list-disc list-inside text-sm text-gray-300">
+                    {pedido.items.map((item, itemIndex) => (
+                      <li key={itemIndex}>
+                        {item.designId?.nombreDesing} (Cantidad: {item.quantity})
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-gray-400">No hay ítems en este pedido.</p>
                 )}
-                {/* Display other relevant order details here */}
               </div>
             </div>
           </motion.div>
@@ -129,11 +171,9 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
       </main>
 
       <hr className="border-white my-6" />
-      {/* This section might need adjustment based on how order details are structured in the fetched pedido */}
       <div className="text-sm bg-[#1f2937] p-4 rounded-md">
         <p className="font-semibold mb-2">RESUMEN DE PEDIDOS:</p>
-        <p><span className="font-bold">Total de Pedidos:</span> {pedidos.length}</p>
-        {/* You might want to display aggregated info or details of a selected order here */}
+        <p><span className="font-bold">Total de Pedidos:</span> {filteredPedidos.length}</p>
       </div>
     </div>
   );
