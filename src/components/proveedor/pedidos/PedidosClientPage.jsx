@@ -139,7 +139,7 @@ export default function PedidosClientPage({ initialPedidos }) {
           <div className="w-full h-full ">
 
 
-            <div className="overflow-x-auto bg-black p-4  shadow-md">
+            <div className="overflow-x-auto bg-white p-4  shadow-md">
               {/* lista de pedidos */}
               <div className="grid grid-cols-1 gap-4">
 
@@ -153,7 +153,7 @@ export default function PedidosClientPage({ initialPedidos }) {
                       className="flex flex-col md:flex-row justify-between items-start md:items-center cursor-pointer"
                       onClick={() => handleToggleExpand(pedido._id.toString())}
                     >
-                      <h2 className="text-lg font-semibold text-gray-800 bg-gray-600 p-2 rounded">Pedido ID: {pedido._id.toString()}</h2>
+                      <h2 className="text-lg font-semibold text-white bg-gray-600 p-2 rounded">Pedido ID: {pedido._id.toString()}</h2>
                       <div className="flex items-center space-x-2">
                         <span className={`px-3 py-1 rounded-full text-sm font-medium ${pedido.estadoPedido === EstadoPedido.PENDIENTE ? 'bg-yellow-100 text-yellow-800' :
                           pedido.estadoPedido === EstadoPedido.ASIGNADO ? 'bg-blue-100 text-blue-800' :
@@ -188,7 +188,7 @@ export default function PedidosClientPage({ initialPedidos }) {
                         <div className="flex gap-4">
 
                           {/* informacion basica del pedido */}
-                          <div className="flex flex-col  gap-2 bg-black text-white rounded p-2">
+                          <div className="flex flex-col  gap-2 bg-gray-500 text-white rounded p-2">
 
                             <div>
                               <p className="font-medium">Usuario:</p>
@@ -203,7 +203,7 @@ export default function PedidosClientPage({ initialPedidos }) {
 
                             <div>
                               <p className="font-medium">Total:</p>
-                              <p className="text-xl font-bold text-green-600">${pedido.total ? pedido.total.toFixed(2) : '0.00'}</p>
+                              <p className="text-xl font-bold text-green-500">${pedido.total ? pedido.total.toFixed(2) : '0.00'}</p>
                             </div>
                             <div>
                               <p className="font-medium">Método de Entrega:</p>
@@ -222,11 +222,12 @@ export default function PedidosClientPage({ initialPedidos }) {
 
 
                           {/* Información de los diseños */}
-                          <div className="flex flex-col flex-1 gap-2 bg-black rounded-md">
+                          <div className="flex flex-col flex-1 gap-2 bg-gray-500 rounded-md">
 
                             <p className="font-medium text-white mb-2 text-center">Diseños:</p>
+
                             {pedido.items && pedido.items.length > 0 ? (
-                              <div className="flex flex-col space-y-2 bg-black p-4 rounded-md shadow-sm gap-4">
+                              <div className="flex flex-col  p-2 rounded-md gap-4">
                                 {pedido.items.map((item, index) => (
                                   <div key={index} className="flex items-center space-x-3  p-2 rounded-md bg-white">
                                     {item.designId?.imagen && (
@@ -252,7 +253,8 @@ export default function PedidosClientPage({ initialPedidos }) {
 
 
                         {/* acciones del pedido */}
-                        <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0 md:space-x-4 bg-gray-600 p-2 rounded text-black">
+                        <div className="flex flex-col 
+                        md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0 md:space-x-4 bg-gray-500 p-2 rounded text-black">
 
                           {pedido.metodoEntrega === 'DOMICILIO' && (
                             <div className="flex items-center space-x-2">
@@ -272,7 +274,7 @@ export default function PedidosClientPage({ initialPedidos }) {
                               <button
                                 onClick={() => handleUpdateCostoEnvio(pedido._id.toString())}
                                 disabled={isUpdating[pedido._id.toString()] || editableCostoEnvio[pedido._id.toString()] === pedido.costoEnvio}
-                                className={`bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md text-sm transition-colors duration-200 ${isUpdating[pedido._id.toString()] || editableCostoEnvio[pedido._id.toString()] === pedido.costoEnvio ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                className={`bg-green-500 hover:bg-green-600 text-black font-bold py-2 px-4 rounded-md text-sm transition-colors duration-200 ${isUpdating[pedido._id.toString()] || editableCostoEnvio[pedido._id.toString()] === pedido.costoEnvio ? 'opacity-50 cursor-not-allowed' : ''}`}
                               >
                                 {isUpdating[pedido._id.toString()] ? 'Guardando...' : 'Guardar'}
                               </button>

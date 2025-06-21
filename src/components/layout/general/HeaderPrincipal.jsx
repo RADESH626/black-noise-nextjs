@@ -48,9 +48,9 @@ function HeaderPrincipal() {
 
     return (
         <div>
-            <header className='flex flex-row justify-between items-center p-10 top-0 fixed w-full h-16 z-50' style={{ backgroundColor: '#000000' }}>
+            <header className='flex flex-row justify-between items-center p-10 top-0 fixed w-full h-16 z-50 bg-black'>
 
-                <h1 className='font-bold text-3xl hover:text-white transition-colors duration-500' style={{ color: '#FFFFFFFF' }}>
+                <h1 className='font-bold text-3xl hover:text-white transition-colors duration-500 text-white'>
                     BLACK NOISE
                 </h1>
 

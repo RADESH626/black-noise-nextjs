@@ -5,8 +5,7 @@ import BotonGeneral from '@/components/common/botones/BotonGeneral';
 function AddElementsSection({ imgSrc, title, description }) {
   return (
     <motion.section
-      className='flex flex-col justify-between items-center gap-4 p-10 text-white w-full'
-      style={{ background: 'linear-gradient(to bottom, #000000,#1f2937, #000000)' }}
+      className='flex flex-col justify-between items-center gap-4 p-10 text-white w-full bg-gradient-section'
       initial={{ opacity: 0, y: 60 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}

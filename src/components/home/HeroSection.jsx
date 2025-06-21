@@ -5,8 +5,7 @@ import BotonDescargar from '@/components/common/botones/BotonDescargar';
 function HeroSection() {
   return (
     <motion.section
-      className='flex flex-col justify-start items-start gap-5 px-90 py-16 text-white'
-      style={{ background: 'linear-gradient(to bottom, #000000, #0A1828, #000000)' }}
+      className='flex flex-col justify-start items-start gap-5 px-90 py-16 text-white bg-gradient-hero'
       initial={{ opacity: 0, y: 60 }}
       whileInView={{ opacity: 1, y: 5 }}
       transition={{ duration: 1.2, ease: 'easeOut' }}

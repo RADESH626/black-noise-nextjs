@@ -20,8 +20,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es">
-      <body className="bg-primary text-secondary">
+    <html lang="es" className="m-0 p-0 w-full">
+      <body className="bg-primary text-secondary m-0 p-0 w-full">
         <Providers> {/* Use the new Providers component */}
           <DialogProvider>
                   <SessionProviderWrapper>
