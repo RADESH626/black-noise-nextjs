@@ -29,6 +29,9 @@
     *   **`src/components/perfil/PaymentHistory.jsx`**: Se modificó la tabla para incluir una columna "Motivo" que muestra el nuevo campo `motivo` del pago.
     *   **`src/models/Pago.js`**: Se añadió el campo `motivo` (String) para especificar la razón del pago (ej. "por pedido", "por envío del pedido").
 
+4.  **Corrección de Estilo en Pedidos de Proveedor:**
+    *   **`src/components/proveedor/pedidos/PedidosClientPage.jsx`**: Se eliminó la clase `hover:bg-gray-50` para evitar que los elementos de pedido se pongan blancos al pasar el cursor.
+
 **Archivos Modificados:**
 *   `src/components/common/DesignsComponent.jsx`
 *   `src/components/common/PedidosComponent.jsx`
@@ -37,3 +40,4 @@
 *   `src/models/Pago.js`
 *   `src/models/Pedido.js`
 *   `src/models/enums/PedidoEnums.js`
+*   `src/components/proveedor/pedidos/PedidosClientPage.jsx`
