@@ -38,6 +38,11 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
     console.log('Pedido ID:', selectedPedidoId);
     console.log('Razón de la devolución:', returnReason);
 
+    if (!returnReason) {
+      alert('Por favor, seleccione o especifique la razón de la devolución.');
+      return;
+    }
+
     try {
       const response = await fetch('/api/devoluciones', {
         method: 'POST',
@@ -51,13 +56,13 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
       });
 
       if (response.ok) {
-        alert('Solicitud de devolución enviada correctamente');
+        showPopUp('Solicitud de devolución enviada correctamente', 'success');
       } else {
-        alert('Error al enviar la solicitud de devolución');
+        showPopUp('Error al enviar la solicitud de devolución', 'error');
       }
     } catch (error) {
       console.error('Error al enviar la solicitud de devolución:', error);
-      alert('Error al enviar la solicitud de devolución');
+      showPopUp('Error al enviar la solicitud de devolución', 'error');
     }
 
     handleCloseDevolucionModal();
@@ -149,73 +154,73 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
             <motion.div
               key={pedido._id}
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className={`bg-gray-800 rounded-xl shadow-lg overflow-hidden ${pedido.estadoPedido === 'CANCELADO' ? 'border-2 border-red-500 opacity-70' : ''}`}
-            >
-              <div className="w-full h-56 bg-gray-700 relative">
-                {pedido.items && pedido.items.length > 0 && pedido.items[0]?.designId?.imageData ? (
-                  <DesignImageDisplay
-                    imageData={pedido.items[0].designId.imageData}
-                    imageMimeType={pedido.items[0].designId.imageMimeType}
-                    altText={pedido.items[0].designId.nombreDesing || "Producto"}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <img
-                    src="/public/img/Fondos/Fondo 1.jpg" // Default image if no items or image data
-                    alt="No hay imagen disponible"
-                    className="w-full h-full object-cover"
-                  />
-                )}
-                <div className="absolute top-0 right-0 m-3">
-                  <BotonGeneral
-                    onClick={() => alert(`Ver detalles del pedido: ${pedido._id}`)}
-                    variant="info"
-                    className="py-1 px-4 text-sm"
-                  >
-                    VER DETALLES
-                  </BotonGeneral>
-                </div>
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className={`bg-gray-800 rounded-xl shadow-lg overflow-hidden ${pedido.estadoPedido === 'CANCELADO' ? 'border-2 border-red-500 opacity-70' : ''}`}
+          >
+            <div className="w-full h-56 bg-gray-700 relative">
+              {pedido.items && pedido.items.length > 0 && pedido.items[0]?.designId?.imageData ? (
+                <DesignImageDisplay
+                  imageData={pedido.items[0].designId.imageData}
+                  imageMimeType={pedido.items[0].designId.imageMimeType}
+                  altText={pedido.items[0].designId.nombreDesing || "Producto"}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <img
+                  src="/public/img/Fondos/Fondo 1.jpg" // Default image if no items or image data
+                  alt="No hay imagen disponible"
+                  className="w-full h-full object-cover"
+                />
+              )}
+              <div className="absolute top-0 right-0 m-3">
+                <BotonGeneral
+                  onClick={() => alert(`Ver detalles del pedido: ${pedido._id}`)}
+                  variant="info"
+                  className="py-1 px-4 text-sm"
+                >
+                  VER DETALLES
+                </BotonGeneral>
               </div>
-              <div className="p-4 gradient-text-bg flex flex-col">
-                <div className="flex justify-between items-center mb-2">
-                  <div>
-                    <p className="font-semibold">Pedido ID: {pedido._id}</p>
-                    <p className="font-semibold">Estado de Pago: {pedido.estadoPago}</p>
-                    <p className="font-semibold">Estado de Pedido: {pedido.estadoPedido}</p>
-                    <p className="font-semibold">Total: ${pedido.total.toFixed(2)}</p>
-                    {pedido.proveedorId && (
-                      <p className="font-semibold">Proveedor: {pedido.proveedorId.nombreEmpresa}</p>
-                    )}
-                    {pedido.userId?.direccion && (
-                      <p className="font-semibold">Dirección: {pedido.userId.direccion}</p>
-                    )}
-                  </div>
-                  <BotonGeneral
-                    onClick={() => handleSolicitarDevolucion(pedido._id)}
-                    variant="danger"
-                    className="py-2 px-4 text-sm"
-                  >
-                    Solicitar Devolución
-                  </BotonGeneral>
-                </div>
-                <div className="mt-4 border-t border-gray-700 pt-4">
-                  <p className="font-semibold mb-2">Ítems del Pedido:</p>
-                  {pedido.items && pedido.items.length > 0 ? (
-                    <ul className="list-disc list-inside text-sm text-gray-300">
-                      {pedido.items.map((item, itemIndex) => (
-                        <li key={itemIndex}>
-                          {item.designId?.nombreDesing} (Cantidad: {item.quantity})
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-sm text-gray-400">No hay ítems en este pedido.</p>
+            </div>
+            <div className="p-4 gradient-text-bg flex flex-col">
+              <div className="flex justify-between items-center mb-2">
+                <div>
+                  <p className="font-semibold">Pedido ID: {pedido._id}</p>
+                  <p className="font-semibold">Estado de Pago: {pedido.estadoPago}</p>
+                  <p className="font-semibold">Estado de Pedido: {pedido.estadoPedido}</p>
+                  <p className="font-semibold">Total: ${pedido.total.toFixed(2)}</p>
+                  {pedido.proveedorId && (
+                    <p className="font-semibold">Proveedor: {pedido.proveedorId.nombreEmpresa}</p>
+                  )}
+                  {pedido.userId?.direccion && (
+                    <p className="font-semibold">Dirección: {pedido.userId.direccion}</p>
                   )}
                 </div>
+                <BotonGeneral
+                  onClick={() => handleSolicitarDevolucion(pedido._id)}
+                  variant="danger"
+                  className="py-2 px-4 text-sm"
+                >
+                  Solicitar Devolución
+                </BotonGeneral>
               </div>
-            </motion.div>
+              <div className="mt-4 border-t border-gray-700 pt-4">
+                <p className="font-semibold mb-2">Ítems del Pedido:</p>
+                {pedido.items && pedido.items.length > 0 ? (
+                  <ul className="list-disc list-inside text-sm text-gray-300">
+                    {pedido.items.map((item, itemIndex) => (
+                      <li key={itemIndex}>
+                        {item.designId?.nombreDesing} (Cantidad: {item.quantity})
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-gray-400">No hay ítems en este pedido.</p>
+                )}
+              </div>
+            </div>
+          </motion.div>
           );
         })}
       </main>
@@ -300,6 +305,12 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
           </div>
         </Modal>
       )}
+
+      <hr className="border-white my-6" />
+      <div className="text-sm bg-[#1f2937] p-4 rounded-md">
+        <p className="font-semibold mb-2">RESUMEN DE PEDIDOS:</p>
+        <p><span className="font-bold">Total de Pedidos:</span> {filteredPedidos.length}</p>
+      </div>
     </div>
   );
 };
