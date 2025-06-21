@@ -1,105 +1,14 @@
-### Session Change Log - 19/6/2025
+### 2025-06-20 - Redirección de Pagos Pendientes
 
-**Task:** Implementar campo de número de teléfono para pagos Nequi/Daviplata.
+**Descripción:** Se implementó una redirección automática desde la página `/pagos-pendientes` a `/catalogo` cuando el usuario no tiene pagos de envío pendientes. Esto mejora la experiencia del usuario al evitar que vean una página vacía y los guía directamente a la sección de compras.
 
-<<<<<<< HEAD
-Además, se ha abordado a potential database connection issue by:
-* Moving the MongoDB URI to the `.env.local` file.
-* Modifying the `connectDB` function to handle the case where the existing connection might be disconnected.
-* Adding specific error handling for `ECONNRESET` errors in `obtenerPedidosPorProveedorId` and attempt to reconnect if the error occurs.
+**Archivos Modificados:**
+- `src/app/pagos-pendientes/page.jsx`:
+  - Se añadió lógica dentro de `fetchPedidosPendientes` para redirigir a `/catalogo` si `pedidos.length` es 0.
+  - Se eliminó el bloque de renderizado condicional que mostraba un mensaje "No tienes pagos de envío pendientes" y un enlace, ya que la redirección lo hace redundante.
 
-## Cambios Realizados
+**Problemas Resueltos:**
+- Se abordó la necesidad de redirigir a los usuarios de manera eficiente cuando no hay pagos pendientes, mejorando la navegación y la usabilidad.
 
-### Archivos Modificados:
-*   `src/app/acciones/PagoActions.js`:
-    *   Se añadió la acción de servidor `obtenerPagosPendientesPorUsuario` para buscar pedidos con `costoEnvio > 0` y `estadoPago: 'PENDIENTE'`, poblando la información del proveedor.
-    *   Se añadió la acción de servidor `registrarPagoEnvioSimulado` para actualizar el `estadoPago` del pedido a `'PAGADO'` y crear un registro en el modelo `Pago` con los datos de pago simulados.
-    *   Se importó el modelo `Proveedor`.
-    *   **Se corrigió el error "nuevoPedido.save is not a function" en `procesarPagoYCrearPedido` al reemplazar `await nuevoPedido.save()` con `await Pedido.findByIdAndUpdate(nuevoPedido._id, { paymentId: pagoGuardado._id })` para actualizar el `paymentId` del pedido, ya que `guardarPedido` devuelve un objeto plano.**
-    *   **Se mejoró el logging en `procesarPagoYCrearPedido` para depurar la asignación de proveedor y pago, incluyendo logs para IDs de pedido y pago, y el resultado de las actualizaciones.**
-    *   **Se corrigió la inicialización de `costoEnvio` en `procesarPagoYCrearPedido` para que se calcule dinámicamente basado en `metodoEntrega` (ej. 10.00 para 'DOMICILIO' si no se especifica), asegurando que los pedidos con costo de envío se creen con `costoEnvio > 0` y `estadoPago: 'PENDIENTE'`.**
-    *   **Se añadieron logs de depuración en `obtenerPagosPendientesPorUsuario` para mostrar la consulta, los resultados crudos y los datos formateados, facilitando la depuración de la visualización de pagos pendientes.**
-    *   **Se corrigió el error `ventaId: Path \`ventaId\` is required` en `registrarPagoEnvioSimulado` al asegurar que el `ventaId` de la `Venta` recién creada se asigne al `Pedido` en `procesarPagoYCrearPedido` antes de crear el `Pago` principal, garantizando que `pedido.ventaId` siempre sea válido.**
-    *   **Se modificó `procesarPagoYCrearPedido` para que el `costoEnvio` inicial del pedido sea `0` y el `estadoPago` inicial del pedido sea `PAGADO`, reflejando que el usuario paga los ítems al inicio.**
-    *   **Se corrigió el error `ventaId: Path \`ventaId\` is required` en `registrarPagoEnvioSimulado` al implementar la creación de una nueva `Venta` específica para el pago de envío, asegurando que el `Pago` de envío siempre tenga un `ventaId` válido.**
-*   `src/app/acciones/PedidoActions.js`:
-    *   Se añadió la función `guardarPedido` para la creación de pedidos, que ahora establece el `estadoPago` a `'PENDIENTE'` si `costoEnvio > 0` y `'PAGADO'` si `costoEnvio` es 0.
-    *   Se eliminó la función `marcarPedidoComoPagado` y su exportación, ya que su lógica fue integrada en `registrarPagoEnvioSimulado`.
-    *   Se corrigieron los errores de exportación duplicada de `guardarPedido`, `marcarPedidoComoPagado` y `updateEstadoPedido`.
-    *   Se importó `getModel`.
-    *   **Se modificó `guardarPedido` para que devuelva la instancia de Mongoose directamente en lugar de un objeto plano, lo que mejora la consistencia y el manejo de objetos de modelo.**
-    *   **Se importó el modelo `Proveedor` para permitir la actualización de sus campos.**
-    *   **Se modificó `updateEstadoPedido` para decrementar el `activeOrders` del proveedor asociado cuando el estado del pedido cambia a `ENTREGADO`, `CANCELADO` o `LISTO`, asegurando que el contador de pedidos activos del proveedor se mantenga actualizado.**
-    *   **Se modificó `guardarPedido` para que el `estadoPago` inicial del pedido siempre sea `PAGADO`, ya que el usuario paga los ítems al crear el pedido.**
-*   `src/app/acciones/ProveedorPedidoActions.js`:
-    *   **Se modificó la función `actualizarPedidoPorProveedor` para recalcular el `total` del pedido sumando el `costoEnvio` al total original de los ítems cuando el proveedor actualiza el `costoEnvio`.**
-    *   **Se añadió lógica para actualizar el `estadoPago` del pedido a `PENDIENTE` si el `costoEnvio` es mayor que 0, o a `PAGADO` si el `costoEnvio` se cambia a 0 desde un estado pendiente.**
-    *   **Se añadieron revalidaciones de caché para `/perfil`, `/pagos-pendientes` y `/proveedor/pedidos/${pedidoId}` para asegurar que los cambios se reflejen en la interfaz de usuario.**
-    *   **Se importó `revalidatePath` de `next/cache` para resolver el `ReferenceError`.**
-    *   **Se ajustó la lógica en `actualizarPedidoPorProveedor` para que, si el proveedor establece un `costoEnvio > 0`, el `estadoPago` del pedido cambie a `PENDIENTE`, y si lo establece a `0`, el `estadoPago` del pedido cambie a `PAGADO`.**
-    *   **Se añadió error handling for `ECONNRESET` errors, attempting to reconnect to the database and retry the query.**
-*   `src/app/acciones/DesignActions.js`:
-    *   **Se corrigió el `ReferenceError: processedUsuarioId is not defined` al reemplazar `processedUsuarioId` con `processedDesign.usuarioId`.**
-    *   **Se añadió la definición de `userAvatar` utilizando `processedDesign.usuarioId.imageData` y `processedDesign.usuarioId.imageMimeType` para mostrar el avatar del usuario en los diseños.**
-    *   **Se modificó `obtenerDesigns` y `obtenerDesignsPorUsuarioId` para asegurar que los objetos `_id` y `imageData` se conviertan a tipos serializables (string o data URL) antes de ser pasados a los componentes del cliente, eliminando los `Buffer`s crudos.**
-*   `src/app/acciones/DesignActions.js`:
-    *   Corregido el error "processedUsuarioId is not defined" en la función `obtenerDesigns` al usar `design.usuarioId` en lugar de la variable indefinida.
-    *   Añadida la definición de `userAvatar` utilizando los datos del usuario poblado.
-    *   Corregido el error "Only plain objects can be passed to Client Components" al serializar los datos del usuario poblado (`usuarioId`) para asegurar que sean objetos planos antes de pasarlos a los componentes del cliente.
-    *   Corregido el error "Only plain objects can be passed to Client Components" relacionado con el objeto de diseño principal al eliminar explícitamente los campos `imageData` y `imageMimeType` antes de pasar los diseños a los componentes del cliente.
-    *   Asegurada la serialización correcta del campo `_id` del objeto de diseño principal al convertirlo explícitamente a string.
-*   `src/utils/DBconection.js`:
-    *   **Modified to use `process.env.MONGODB_URI` to get the MongoDB URI.**
-    *   **Added logic to handle disconnected database connections and attempt to reconnect.**
-*   `.env.local`:
-    *   **Added the `MONGODB_URI` environment variable.**
-
->>>>>>> DieciochoDeJunioDelVeintiCincoTresYDieciNueve
-### Archivos Creados:
-*   `src/app/admin/users/page.jsx`:
-    *   **Nueva página para la gestión de usuarios en el panel de administrador, que renderiza el componente `UsuariosDashboard`.**
-*   `src/components/common/PendingPaymentsSummary.jsx`:
-    *   Componente React para mostrar un resumen de los pagos pendientes en el header.
-    *   Utiliza `icono-dinero.svg` y muestra un contador de pagos pendientes.
-    *   Al hacer clic, despliega un cuadro con un resumen y un botón para redirigir a la página de detalles.
-*   `src/app/pagos-pendientes/page.jsx`:
-    *   Nueva página para mostrar una lista detallada de los pagos de envío pendientes del usuario.
-    *   Muestra información del pedido (ID, proveedor, estado, total, costo de envío).
-    *   Permite al usuario "pagar" el costo de envío pendiente, lo que actualiza el estado del pedido en la base de datos.
-*   `src/components/pagos-pendientes/PendingPaymentModal.jsx`:
-    *   Nuevo componente modal para capturar datos de pago simulados (nombre, correo, tarjeta, mes, año, CVV) antes de registrar el pago de envío.
-*   `src/app/api/images/usuario/[id]/route.js`:
-    *   Se creó una nueva ruta API para servir las imágenes de perfil de usuario almacenadas en la base de datos como `Buffer`.
-
-## Próximos Pasos
-La implementación de la funcionalidad de "apartado de pagos pendientes" está completa a nivel de código. Se recomienda probar la funcionalidad para asegurar que:
-1.  El icono de pagos pendientes aparece y es visible en el header para usuarios autenticados.
-2.  El resumen desplegable funciona y muestra los datos correctos.
-3.  La página `/pagos-pendientes` muestra la información detallada.
-4.  Al hacer clic en "Pagar Ahora", se abre el modal de pago, permite la entrada de datos simulados y, al enviar, registra el pago y actualiza el estado del pedido.
-5.  El `estadoPago` de los pedidos se actualiza correctamente cuando el proveedor añade un costo de envío y cuando el usuario lo paga.
-6.  Los cambios pendientes se han subido al repositorio remoto.
-=======
-**Changes Made:**
-- Se añadió un nuevo estado `phoneNumber` en `src/components/common/CartComponent.jsx` para capturar el número de teléfono.
-- Se implementó la lógica para mostrar condicionalmente un campo de entrada de número de teléfono en `src/components/common/CartComponent.jsx` cuando `Nequi` o `Daviplata` son seleccionados como método de pago.
-- Se actualizó la validación en `handleProcessPayment` en `src/components/common/CartComponent.jsx` para requerir el número de teléfono si el método de pago es Nequi o Daviplata.
-- Se modificó el objeto `paymentDetails` en `src/components/common/CartComponent.jsx` para incluir `numeroTelefono` cuando sea aplicable.
-- Se actualizó la función `procesarPagoYCrearPedido` en `src/app/acciones/PagoActions.js` para recibir y procesar el `numeroTelefono`.
-- Se añadió el campo `numeroTelefono` al esquema del modelo `Pago` en `src/models/Pago.js`, con una validación `required` condicional.
-- Se actualizó la documentación en `memory-bank/functionalities/GestionDePedidosYPagos.md` para reflejar el nuevo campo `numeroTelefono` en el modelo `Pago`.
-
-**Files Modified:**
-- `src/components/common/CartComponent.jsx`
-- `src/app/acciones/PagoActions.js`
-- `src/models/Pago.js`
-- `memory-bank/functionalities/GestionDePedidosYPagos.md`
-- `memory-bank/activeContext.md` (updated log)
-
-**Problems Encountered:**
-- Ninguno en esta fase.
-
-**Next Steps:**
-- Log these changes in `activeContext.md`.
-- Commit the changes.
->>>>>>> 3e3b1001f22a7e0cc2724dec6e2e142bb4a027cd
+**Próximos Pasos:**
+- Ninguno, la tarea ha sido completada.

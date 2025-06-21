@@ -32,6 +32,9 @@ function PagosPendientesPage() {
             const { success, pedidos, message } = await obtenerPagosPendientesPorUsuario(userId);
             if (success) {
                 setPedidosPendientes(pedidos);
+                if (pedidos.length === 0) {
+                    router.push('/catalogo');
+                }
             } else {
                 setError(message || "Error al cargar los pagos pendientes.");
                 showPopUp(message || "Error al cargar los pagos pendientes.", "error");
@@ -94,17 +97,6 @@ function PagosPendientesPage() {
         );
     }
 
-    if (pedidosPendientes.length === 0) {
-        return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#000000] via-[#0A1828] to-[#000000] text-white p-4">
-                <h2 className="text-3xl font-bold mb-6">Pagos Pendientes</h2>
-                <p className="text-gray-400 text-center">No tienes pagos de envío pendientes en este momento.</p>
-                <Link href="/catalogo" className="mt-4 text-blue-500 hover:underline">
-                    Volver a la tienda
-                </Link>
-            </div>
-        );
-    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#000000] via-[#0A1828] to-[#000000] text-white p-8 pt-24">
