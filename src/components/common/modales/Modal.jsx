@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useEffect, useRef } from 'react';
+<<<<<<< HEAD
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+=======
+>>>>>>> db35ad5 (diseños login y registro)
 
 const Modal = ({ title, children, onClose, isOpen, type = 'default', onConfirm, onCancel, confirmText = 'Confirmar', cancelText = 'Cancelar', showActions = false }) => {
   const dialogRef = useRef(null);
@@ -43,6 +46,7 @@ const Modal = ({ title, children, onClose, isOpen, type = 'default', onConfirm, 
         </button>
         {showActions && (
           <div className="mt-6 flex justify-end space-x-4">
+<<<<<<< HEAD
             <BotonGeneral
               onClick={onCancel}
               variant="secondary"
@@ -57,6 +61,20 @@ const Modal = ({ title, children, onClose, isOpen, type = 'default', onConfirm, 
             >
               {confirmText}
             </BotonGeneral>
+=======
+            <button
+              onClick={onCancel}
+              className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors"
+            >
+              {cancelText}
+            </button>
+            <button
+              onClick={onConfirm}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+            >
+              {confirmText}
+            </button>
+>>>>>>> db35ad5 (diseños login y registro)
           </div>
         )}
       </div>

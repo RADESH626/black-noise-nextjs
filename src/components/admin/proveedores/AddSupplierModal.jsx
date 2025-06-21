@@ -7,7 +7,10 @@ import { useSession } from 'next-auth/react'; // Import useSession
 import { useDialog } from '@/context/DialogContext'; // Import useDialog
 import { CategoriaProducto } from '@/models/enums/CategoriaProducto'; // Import CategoriaProducto enum
 import { MetodoPago } from '@/models/enums/pago/MetodoPago'; // Import MetodoPago enum
+<<<<<<< HEAD
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+=======
+>>>>>>> db35ad5 (diseños login y registro)
 
 const AddSupplierModal = ({ onSuccess, onModalClose }) => { // Removed isOpen, onClose
     const { data: session } = useSession(); // Get session data
@@ -248,6 +251,7 @@ const AddSupplierModal = ({ onSuccess, onModalClose }) => { // Removed isOpen, o
                             onChange={handleChange}
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         />
+<<<<<<< HEAD
                         <BotonGeneral
                             type="button"
                             onClick={handleFillWithMyPhone}
@@ -256,6 +260,15 @@ const AddSupplierModal = ({ onSuccess, onModalClose }) => { // Removed isOpen, o
                         >
                             Llenar con mis datos
                         </BotonGeneral>
+=======
+                        <button
+                            type="button"
+                            onClick={handleFillWithMyPhone}
+                            className="ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline text-sm"
+                        >
+                            Llenar con mis datos
+                        </button>
+>>>>>>> db35ad5 (diseños login y registro)
                     </div>
                 </div>
                 <div>
@@ -358,6 +371,7 @@ const AddSupplierModal = ({ onSuccess, onModalClose }) => { // Removed isOpen, o
                     </label>
                 </div>
                 <div className="flex justify-end space-x-4 mt-6">
+<<<<<<< HEAD
                     <BotonGeneral
                         type="submit"
                         variant="primary"
@@ -373,6 +387,23 @@ const AddSupplierModal = ({ onSuccess, onModalClose }) => { // Removed isOpen, o
                     >
                         Cancelar
                     </BotonGeneral>
+=======
+                    <button
+                        type="submit"
+                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        disabled={loading}
+                    >
+                        {loading ? 'Agregando...' : 'Agregar Proveedor'}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={onModalClose} // Use onModalClose here
+                        className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        disabled={loading}
+                    >
+                        Cancelar
+                    </button>
+>>>>>>> db35ad5 (diseños login y registro)
                 </div>
             </form>
         </>

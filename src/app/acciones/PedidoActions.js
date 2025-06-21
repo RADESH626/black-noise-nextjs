@@ -111,6 +111,7 @@ async function obtenerPedidosPorUsuarioId(userId) {
         await dbConnect();
         const PedidoModel = await getModel('Pedido');
         const pedidos = await PedidoModel.find({ userId: userId })
+<<<<<<< HEAD
             .populate('items.designId', 'nombreDesing imageData imageMimeType categoria valorDesing descripcion')
             .populate('proveedorId', 'nombreEmpresa emailContacto')
             .populate('userId', 'Nombre direccion')
@@ -145,6 +146,13 @@ async function obtenerPedidosPorUsuarioId(userId) {
             return toPlainObject(tempPedido); // Convertir a objeto plano al final
         });
         return { success: true, pedidos: processedPedidos };
+=======
+            .populate('items.designId', 'nombreDesing imageData imageMimeType')
+            .populate('proveedorId', 'nombreEmpresa emailContacto')
+            .populate('userId', 'Nombre direccion')
+            .lean();
+        return { success: true, pedidos: pedidos.map(p => toPlainObject(p)) };
+>>>>>>> db35ad5 (diseños login y registro)
     } catch (error) {
         console.error('Error al obtener los pedidos del usuario:', error);
         return { success: false, error: error.message };
@@ -156,6 +164,7 @@ async function obtenerPedidosPagadosPorUsuarioId(userId) {
         await dbConnect();
         const PedidoModel = await getModel('Pedido');
         const pedidos = await PedidoModel.find({ userId: userId, estadoPago: 'PAGADO' }) // Filtrar por estadoPago: 'PAGADO'
+<<<<<<< HEAD
             .populate('items.designId', 'nombreDesing imageData imageMimeType categoria valorDesing descripcion')
             .populate('proveedorId', 'nombreEmpresa emailContacto')
             .populate('userId', 'Nombre direccion')
@@ -190,6 +199,13 @@ async function obtenerPedidosPagadosPorUsuarioId(userId) {
             return toPlainObject(tempPedido); // Convertir a objeto plano al final
         });
         return { success: true, pedidos: processedPedidos };
+=======
+            .populate('items.designId', 'nombreDesing imageData imageMimeType')
+            .populate('proveedorId', 'nombreEmpresa emailContacto')
+            .populate('userId', 'Nombre direccion')
+            .lean();
+        return { success: true, pedidos: pedidos.map(p => toPlainObject(p)) };
+>>>>>>> db35ad5 (diseños login y registro)
     } catch (error) {
         console.error('Error al obtener los pedidos pagados del usuario:', error);
         return { success: false, error: error.message };
@@ -228,6 +244,10 @@ async function enviarNotificacionCambioEstadoPedido(pedidoId, newEstado, oldEsta
                     <p>¡Hola ${userName}!</p>
                     <p>Queremos informarte que tu pedido <strong>#${pedidoId.toString().slice(-6)}</strong> esta en FABRICACION.</p>
                     <p>Estamos trabajando en ello y pronto lo tendrás contigo.</p>
+<<<<<<< HEAD
+=======
+                    <p>Gracias por tu paciencia y confianza en Black Noise.</p>
+>>>>>>> db35ad5 (diseños login y registro)
                 `;
                 break;
             case EstadoPedido.LISTO:

@@ -45,7 +45,11 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
     console.log('--- [CLIENTE] FIN DEBUGGING INICIAL ---');
   }, []);
 
+<<<<<<< HEAD
   const fetchUserData = useCallback(async () => {
+=======
+  const fetchUserData = async () => {
+>>>>>>> db35ad5 (diseños login y registro)
     if (status === 'authenticated' && userId) {
       setLoading(true);
       setError(null);
@@ -62,9 +66,15 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
     } else if (status === 'unauthenticated') {
       setLoading(false);
     }
+<<<<<<< HEAD
   }, [status, userId]); // Dependencias para useCallback
 
   const fetchUserDesigns = useCallback(async () => {
+=======
+  };
+
+  const fetchUserDesigns = async () => {
+>>>>>>> db35ad5 (diseños login y registro)
     if (status === 'authenticated' && userId) {
       setLoading(true);
       setError(null);
@@ -77,6 +87,7 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
       }
       setLoading(false);
     }
+<<<<<<< HEAD
   }, [status, userId]); // Dependencias para useCallback
   
   useEffect(() => {
@@ -86,6 +97,15 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
     }
   }, [userId, status, fetchUserData, fetchUserDesigns]); // Añadir fetchUserData y fetchUserDesigns como dependencias
   
+=======
+  };
+  
+  useEffect(() => {
+    fetchUserData();
+    fetchUserDesigns();
+  }, [userId, status]);
+
+>>>>>>> db35ad5 (diseños login y registro)
   const user = currentUser;
 
   const handleEditProfile = () => {
@@ -238,12 +258,21 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
             </div>
             <div className="flex flex-col sm:flex-row justify-center md:justify-start space-y-2 sm:space-y-0 sm:space-x-3">
 
+<<<<<<< HEAD
               <BotonGeneral onClick={handleEditProfile} variant="info">EDITAR PERFIL</BotonGeneral>
               <Link href="/catalogo">
                 <BotonGeneral variant="secondary">VER DISEÑOS DE LA COMUNIDAD</BotonGeneral>
               </Link>
               {/* Removed: <BotonGeneral onClick={handleCreateNewOrder}>CREAR NUEVO PEDIDO</BotonGeneral> */}
               <BotonGeneral onClick={() => signOut({ callbackUrl: '/login' })} variant="secondary">CERRAR SESIÓN</BotonGeneral>
+=======
+              <BotonGeneral onClick={handleEditProfile}>EDITAR PERFIL</BotonGeneral>
+              <Link href="/catalogo">
+                <BotonGeneral>VER DISEÑOS DE LA COMUNIDAD</BotonGeneral>
+              </Link>
+              {/* Removed: <BotonGeneral onClick={handleCreateNewOrder}>CREAR NUEVO PEDIDO</BotonGeneral> */}
+              <BotonGeneral onClick={() => signOut({ callbackUrl: '/login' })}>CERRAR SESIÓN</BotonGeneral>
+>>>>>>> db35ad5 (diseños login y registro)
             </div>
           </div>
         </div>
@@ -265,9 +294,15 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
           <>
             {/* Always show the Add Design button */}
             <div className="flex justify-center mb-4">
+<<<<<<< HEAD
               <BotonGeneral onClick={handleAddDesign} variant="primary" className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg transform transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50" aria-label="Agregar nuevo diseño">
                 <img src="/icons/icono +.svg" alt="Agregar" className="w-8 h-8" />
               </BotonGeneral>
+=======
+              <button onClick={handleAddDesign} className="w-16 h-16 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center shadow-lg transform transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50" aria-label="Agregar nuevo diseño">
+                <img src="/icons/icono +.svg" alt="Agregar" className="w-8 h-8" />
+              </button>
+>>>>>>> db35ad5 (diseños login y registro)
             </div>
 
             {userDesigns.length === 0 ? (
@@ -288,6 +323,7 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
             )}
           </>
         )}
+<<<<<<< HEAD
         {activeTab === 'orders' && (
           <>
             {userId && console.log('DEBUG - Renderizando PedidosComponent con userId:', userId)}
@@ -298,6 +334,9 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
             )}
           </>
         )}
+=======
+        {activeTab === 'orders' && (<PedidosComponent userId={user?.id} />)}
+>>>>>>> db35ad5 (diseños login y registro)
         {activeTab === 'payments' && (<PaymentHistory payments={paymentsForHistory} />)}
       </div>
 

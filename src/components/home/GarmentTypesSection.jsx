@@ -11,7 +11,12 @@ function GarmentTypesSection() {
 
   return (
     <motion.section
+<<<<<<< HEAD
       className='flex flex-wrap justify-center items-center gap-10 p-10 text-white w-full bg-gradient-section'
+=======
+      className='flex flex-wrap justify-center items-center gap-10 p-10 text-white w-full'
+      style={{ background: 'linear-gradient(to bottom, #000000, #1f2937, #000000)' }}
+>>>>>>> db35ad5 (diseños login y registro)
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}

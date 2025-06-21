@@ -5,7 +5,10 @@ import logger from '@/utils/logger';
 import { getModel } from '@/utils/modelLoader';
 import { toPlainObject } from '@/utils/dbUtils';
 import { revalidatePath } from 'next/cache'; // Importar revalidatePath
+<<<<<<< HEAD
 import mongoose from 'mongoose'; // Importar mongoose
+=======
+>>>>>>> db35ad5 (diseños login y registro)
 
 export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId) {
     logger.debug('Entering obtenerPedidosPorProveedorId with pedidoId:', pedidoId, 'proveedorId:', proveedorId);
@@ -17,9 +20,13 @@ export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId)
             return { success: false, message: "ID de proveedor es requerido." };
         }
         const Pedido = await getModel('Pedido');
+<<<<<<< HEAD
         // Convertir proveedorId a ObjectId de Mongoose
         const objectIdProveedorId = new mongoose.Types.ObjectId(proveedorId);
         let query = { proveedorId: objectIdProveedorId };
+=======
+        let query = { proveedorId: proveedorId };
+>>>>>>> db35ad5 (diseños login y registro)
         if (pedidoId) {
             query._id = pedidoId;
         }
@@ -49,6 +56,7 @@ export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId)
         }
     } catch (error) {
         logger.error('ERROR in obtenerPedidosPorProveedorId:', error);
+<<<<<<< HEAD
         if (error.message.includes('ECONNRESET')) {
             logger.warn('ECONNRESET error detected, attempting to reconnect...');
             try {
@@ -61,6 +69,8 @@ export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId)
                 return { success: false, message: 'Error al obtener los pedidos del proveedor tras intentar reconectar: ' + reconnectError.message };
             }
         }
+=======
+>>>>>>> db35ad5 (diseños login y registro)
         return { success: false, message: 'Error al obtener los pedidos del proveedor: ' + error.message };
     }
 }

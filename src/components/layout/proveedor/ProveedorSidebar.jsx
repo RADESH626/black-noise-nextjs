@@ -37,7 +37,10 @@ export default function ProveedorSidebar({ activeDashboard, onSelectDashboard })
       <div className="p-4 border-t border-gray-700">
         <BotonGeneral
           onClick={() => signOut({ callbackUrl: "/login" })}
+<<<<<<< HEAD
           variant="secondary"
+=======
+>>>>>>> db35ad5 (diseños login y registro)
           className="w-full" // Apply w-full to BotonGeneral if needed for full width
         >
           Cerrar Sesión

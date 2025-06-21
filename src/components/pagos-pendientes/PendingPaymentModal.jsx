@@ -3,7 +3,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { ObtenerUsuarioPorCorreo } from '@/app/acciones/UsuariosActions';
+<<<<<<< HEAD
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+=======
+>>>>>>> db35ad5 (diseños login y registro)
 
 export default function PendingPaymentModal({ isOpen, onClose, onPaymentSubmit, pedidoId, costoEnvio }) {
     const { data: session, status } = useSession();
@@ -197,6 +200,7 @@ export default function PendingPaymentModal({ isOpen, onClose, onPaymentSubmit, 
                 {error && <p style={{ color: "#FF0000FF" }} className="mb-4">{error}</p>}
 
                 <div className="flex justify-end gap-4">
+<<<<<<< HEAD
                     <BotonGeneral
                         type="button"
                         onClick={onClose}
@@ -210,6 +214,22 @@ export default function PendingPaymentModal({ isOpen, onClose, onPaymentSubmit, 
                     >
                         Pagar Ahora
                     </BotonGeneral>
+=======
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded hover:bg-gray-400 transition"
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        type="submit"
+                        style={{ backgroundColor: "#154780FF", color: "#ffffff" }}
+                        className="font-semibold py-2 px-4 rounded hover:bg-blue-700 transition"
+                    >
+                        Pagar Ahora
+                    </button>
+>>>>>>> db35ad5 (diseños login y registro)
                 </div>
             </form>
         </dialog>

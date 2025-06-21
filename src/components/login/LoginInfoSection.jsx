@@ -6,7 +6,11 @@ import BotonGeneral from "@/components/common/botones/BotonGeneral";
 function LoginInfoSection() {
   return (
     <motion.div
+<<<<<<< HEAD
       className="flex flex-1 flex-col bg-gradient-to-r from-[#000000] to-[#1a1a1a] text-[#ffffff] p-8 justify-center text-center"
+=======
+      className="flex flex-1 flex-col bg-[#F7F7F7] text-[#000000] p-8 justify-center text-center border border-[#D9D9D9] rounded-lg"
+>>>>>>> db35ad5 (diseños login y registro)
       initial={{ x: 50, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.8 }}
@@ -18,7 +22,11 @@ function LoginInfoSection() {
         </p>
         <div className="mt-6">
           <Link href="/">
+<<<<<<< HEAD
             <BotonGeneral variant="secondary">
+=======
+            <BotonGeneral>
+>>>>>>> db35ad5 (diseños login y registro)
               <span className="flex items-center gap-2">
                 <i className='bx bx-home-alt-2 text-xl transition-transform hover:scale-110'></i>
                 Ir al inicio

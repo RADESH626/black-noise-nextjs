@@ -39,7 +39,11 @@ function InputPassword(props) {
           transform
           -translate-y-1/2
           bg-bn-accent
+<<<<<<< HEAD
           text-white
+=======
+          text-black
+>>>>>>> db35ad5 (diseños login y registro)
           text-xs
           px-2
           py-1

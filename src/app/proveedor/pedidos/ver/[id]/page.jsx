@@ -35,13 +35,22 @@ export default function VerPedidoProveedorPage({ params }) {
       setLoading(true);
       setError(null);
       try {
+<<<<<<< HEAD
         const result = await obtenerPedidosPorProveedorId(pedidoId, session.user.proveedorId);
         if (result?.success && result?.pedido) {
+=======
+        const result = await obtenerPedidoPorProveedorId(pedidoId, session.user.proveedorId);
+        if (result.success) {
+>>>>>>> db35ad5 (diseños login y registro)
           setPedido(result.pedido);
           setCostoEnvio(result.pedido.costoEnvio || 0);
           setEstadoPedido(result.pedido.estadoPedido || "");
         } else {
+<<<<<<< HEAD
           setError(result?.message || "Error al cargar el pedido.");
+=======
+          setError(result.message || "Error al cargar el pedido.");
+>>>>>>> db35ad5 (diseños login y registro)
         }
       } catch (err) {
         console.error("Error fetching supplier order:", err);

@@ -3,7 +3,11 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+<<<<<<< HEAD
 // import HeaderProveedor from "@/components/layout/proveedor/HeaderProveedor";
+=======
+import HeaderProveedor from "@/components/layout/proveedor/HeaderProveedor";
+>>>>>>> db35ad5 (diseños login y registro)
 import { actualizarPedidoPorProveedor } from "@/app/acciones/ProveedorPedidoActions";
 import { useDialog } from "@/context/DialogContext";
 import { useState, useEffect } from "react";
@@ -27,7 +31,10 @@ export default function PedidosClientPage({ initialPedidos }) {
   });
   const [isUpdating, setIsUpdating] = useState({});
   const [expandedOrders, setExpandedOrders] = useState(new Set()); // Estado para controlar los pedidos expandidos
+<<<<<<< HEAD
   const [expandedDesigns, setExpandedDesigns] = useState(new Set()); // Nuevo estado para controlar los diseños expandidos
+=======
+>>>>>>> db35ad5 (diseños login y registro)
 
   useEffect(() => {
     setPedidos(initialPedidos);
@@ -51,6 +58,7 @@ export default function PedidosClientPage({ initialPedidos }) {
     });
   };
 
+<<<<<<< HEAD
   const handleToggleDesignExpand = (designId) => {
     setExpandedDesigns(prev => {
       const newSet = new Set(prev);
@@ -63,6 +71,8 @@ export default function PedidosClientPage({ initialPedidos }) {
     });
   };
 
+=======
+>>>>>>> db35ad5 (diseños login y registro)
   const handleCostoEnvioChange = (pedidoId, value) => {
     setEditableCostoEnvio(prev => ({
       ...prev,
@@ -139,9 +149,15 @@ export default function PedidosClientPage({ initialPedidos }) {
 
   return (
     <>
+<<<<<<< HEAD
       {/* <HeaderProveedor /> */}
       <div>
         <h1 className="text-2xl font-bold mb-4 text-gray-800 p-2">Mis Pedidos</h1>
+=======
+      <HeaderProveedor />
+      <div>
+        <h1 className="text-2xl font-bold mb-4 text-gray-800">Mis Pedidos</h1>
+>>>>>>> db35ad5 (diseños login y registro)
 
         {pedidos && pedidos.length === 0 ? (
           <div className="text-center">
@@ -152,21 +168,33 @@ export default function PedidosClientPage({ initialPedidos }) {
           <div className="w-full h-full ">
 
 
+<<<<<<< HEAD
             <div className="overflow-x-auto bg-white p-4  shadow-md">
+=======
+            <div className="overflow-x-auto bg-black p-4  shadow-md">
+>>>>>>> db35ad5 (diseños login y registro)
               {/* lista de pedidos */}
               <div className="grid grid-cols-1 gap-4">
 
                 {/* item de la lista de pedidos */}
 
                 {pedidos.map((pedido) => (
+<<<<<<< HEAD
                   <div key={pedido._id} className=" flex flex-col bg-gray-400 rounded-lg p-4 border border-gray-200 hover:shadow-lg transition-all duration-200 gap-4" suppressHydrationWarning={true}>
+=======
+                  <div key={pedido._id} className=" flex flex-col bg-gray-400 rounded-lg p-4 border border-gray-200 hover:shadow-lg hover:bg-gray-50 transition-all duration-200 gap-4" suppressHydrationWarning={true}>
+>>>>>>> db35ad5 (diseños login y registro)
                     {/* Sección de Resumen */}
 
                     <div
                       className="flex flex-col md:flex-row justify-between items-start md:items-center cursor-pointer"
                       onClick={() => handleToggleExpand(pedido._id.toString())}
                     >
+<<<<<<< HEAD
                       <h2 className="text-lg font-semibold text-white bg-gray-600 p-2 rounded">Pedido ID: {pedido._id.toString()}</h2>
+=======
+                      <h2 className="text-lg font-semibold text-gray-800 bg-gray-600 p-2 rounded">Pedido ID: {pedido._id.toString()}</h2>
+>>>>>>> db35ad5 (diseños login y registro)
                       <div className="flex items-center space-x-2">
                         <span className={`px-3 py-1 rounded-full text-sm font-medium ${pedido.estadoPedido === EstadoPedido.PENDIENTE ? 'bg-yellow-100 text-yellow-800' :
                           pedido.estadoPedido === EstadoPedido.ASIGNADO ? 'bg-blue-100 text-blue-800' :
@@ -201,7 +229,11 @@ export default function PedidosClientPage({ initialPedidos }) {
                         <div className="flex gap-4">
 
                           {/* informacion basica del pedido */}
+<<<<<<< HEAD
                           <div className="flex flex-col  gap-2 bg-gray-500 text-white rounded p-2">
+=======
+                          <div className="flex flex-col  gap-2 bg-black text-white rounded p-2">
+>>>>>>> db35ad5 (diseños login y registro)
 
                             <div>
                               <p className="font-medium">Usuario:</p>
@@ -216,7 +248,11 @@ export default function PedidosClientPage({ initialPedidos }) {
 
                             <div>
                               <p className="font-medium">Total:</p>
+<<<<<<< HEAD
                               <p className="text-xl font-bold text-green-500">${pedido.total ? pedido.total.toFixed(2) : '0.00'}</p>
+=======
+                              <p className="text-xl font-bold text-green-600">${pedido.total ? pedido.total.toFixed(2) : '0.00'}</p>
+>>>>>>> db35ad5 (diseños login y registro)
                             </div>
                             <div>
                               <p className="font-medium">Método de Entrega:</p>
@@ -230,10 +266,15 @@ export default function PedidosClientPage({ initialPedidos }) {
                               </div>
                             )}
 
+<<<<<<< HEAD
+=======
+                            
+>>>>>>> db35ad5 (diseños login y registro)
                           </div>
 
 
                           {/* Información de los diseños */}
+<<<<<<< HEAD
                           <div className="flex flex-col flex-1 gap-2 bg-gray-500 rounded-md">
 
                             <p className="font-medium text-white mb-2 text-center">Diseños:</p>
@@ -276,6 +317,26 @@ export default function PedidosClientPage({ initialPedidos }) {
                                         {/* Agrega más detalles del diseño aquí si son relevantes */}
                                       </div>
                                     )}
+=======
+                          <div className="flex flex-col flex-1 gap-2 bg-black rounded-md">
+
+                            <p className="font-medium text-white mb-2 text-center">Diseños:</p>
+                            {pedido.items && pedido.items.length > 0 ? (
+                              <div className="flex flex-col space-y-2 bg-black p-4 rounded-md shadow-sm gap-4">
+                                {pedido.items.map((item, index) => (
+                                  <div key={index} className="flex items-center space-x-3  p-2 rounded-md bg-white">
+                                    {item.designId?.imagen && (
+                                      <img
+                                        src={item.designId.imagen}
+                                        alt={item.designId.nombreDesing || 'Diseño'}
+                                        className="w-12 h-12 object-cover rounded-md"
+                                      />
+                                    )}
+                                    <div>
+                                      <p className="font-semibold">{item.designId?.nombreDesing || 'Diseño Desconocido'}</p>
+                                      <p className="text-sm text-gray-600">Cantidad: {item.quantity}</p>
+                                    </div>
+>>>>>>> db35ad5 (diseños login y registro)
                                   </div>
                                 ))}
                               </div>
@@ -288,8 +349,12 @@ export default function PedidosClientPage({ initialPedidos }) {
 
 
                         {/* acciones del pedido */}
+<<<<<<< HEAD
                         <div className="flex flex-col 
                         md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0 md:space-x-4 bg-gray-500 p-2 rounded text-black">
+=======
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0 md:space-x-4 bg-gray-600 p-2 rounded text-black">
+>>>>>>> db35ad5 (diseños login y registro)
 
                           {pedido.metodoEntrega === 'DOMICILIO' && (
                             <div className="flex items-center space-x-2">
@@ -309,7 +374,11 @@ export default function PedidosClientPage({ initialPedidos }) {
                               <button
                                 onClick={() => handleUpdateCostoEnvio(pedido._id.toString())}
                                 disabled={isUpdating[pedido._id.toString()] || editableCostoEnvio[pedido._id.toString()] === pedido.costoEnvio}
+<<<<<<< HEAD
                                 className={`bg-green-500 hover:bg-green-600 text-black font-bold py-2 px-4 rounded-md text-sm transition-colors duration-200 ${isUpdating[pedido._id.toString()] || editableCostoEnvio[pedido._id.toString()] === pedido.costoEnvio ? 'opacity-50 cursor-not-allowed' : ''}`}
+=======
+                                className={`bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md text-sm transition-colors duration-200 ${isUpdating[pedido._id.toString()] || editableCostoEnvio[pedido._id.toString()] === pedido.costoEnvio ? 'opacity-50 cursor-not-allowed' : ''}`}
+>>>>>>> db35ad5 (diseños login y registro)
                               >
                                 {isUpdating[pedido._id.toString()] ? 'Guardando...' : 'Guardar'}
                               </button>
@@ -333,7 +402,13 @@ export default function PedidosClientPage({ initialPedidos }) {
                             </select>
                           </div>
 
+<<<<<<< HEAD
                           {/* Se elimina el Link a la página de detalles del pedido */}
+=======
+                          <Link href={`/proveedor/pedidos/ver/${pedido._id.toString()}`} className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md text-sm text-center transition-colors duration-200">
+                            Ver Detalles
+                          </Link>
+>>>>>>> db35ad5 (diseños login y registro)
                         </div>
                       </div>
                     )}

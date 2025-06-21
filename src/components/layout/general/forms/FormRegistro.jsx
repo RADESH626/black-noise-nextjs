@@ -252,7 +252,11 @@ function FormRegistro() {
 
         </div>
 
+<<<<<<< HEAD
         <small className="text-xs text-black mt-1">Mínimo 8 caracteres, Mayúscula, minúscula, número y símbolo.</small>
+=======
+        <small className="text-xs text-gray-700 mt-1">Mínimo 8 caracteres, Mayúscula, minúscula, número y símbolo.</small>
+>>>>>>> db35ad5 (diseños login y registro)
 
       </div>
 
@@ -275,7 +279,11 @@ function FormRegistro() {
 
       </div>
 
+<<<<<<< HEAD
       <div className="text-center mt-5 text-[#000000]">
+=======
+      <div className="text-center mt-5 text-[#5f5c5c]">
+>>>>>>> db35ad5 (diseños login y registro)
         <p className="mb-4">¿Ya tienes una cuenta?</p>
         <a href="/login" id="showLogin">
           <BotonGeneral>

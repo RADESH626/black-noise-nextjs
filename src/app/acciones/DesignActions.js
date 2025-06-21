@@ -174,7 +174,10 @@ export async function obtenerDesignsPorUsuarioId(usuarioId) {
         const designs = await Design.find({ usuarioId: usuarioId }).lean();
 
         const formattedDesigns = designs.map(design => {
+<<<<<<< HEAD
             
+=======
+>>>>>>> db35ad5 (diseños login y registro)
             const designImageUrl = design.imageData && design.imageData.buffer instanceof Buffer && design.imageMimeType
                 ? `data:${design.imageMimeType};base64,${design.imageData.buffer.toString('base64')}`
                 : null;
@@ -202,7 +205,10 @@ export async function obtenerDesignsPorUsuarioId(usuarioId) {
         });
 
         console.log('Designs obtained by usuarioId successfully and formatted:', formattedDesigns);
+<<<<<<< HEAD
 
+=======
+>>>>>>> db35ad5 (diseños login y registro)
         return { designs: JSON.parse(JSON.stringify(formattedDesigns)), error: null };
     } catch (error) {
         console.error('ERROR in obtenerDesignsPorUsuarioId:', error);

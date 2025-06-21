@@ -4,7 +4,10 @@ import { useState, useEffect } from "react";
 import { guardarDesigns } from "@/app/acciones/DesignActions";
 import { useDialog } from "@/context/DialogContext";
 import { CategoriaProducto } from "@/models/enums/CategoriaProducto";
+<<<<<<< HEAD
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+=======
+>>>>>>> db35ad5 (diseños login y registro)
 
 function DesignUploadModal({ onDesignSaved }) {
   const { closeModal, showPopUp } = useDialog();
@@ -221,6 +224,7 @@ function DesignUploadModal({ onDesignSaved }) {
         </div>
 
         <div className="flex justify-end space-x-4 mt-6">
+<<<<<<< HEAD
           <BotonGeneral
             type="button"
             onClick={closeModal}
@@ -235,10 +239,36 @@ function DesignUploadModal({ onDesignSaved }) {
           >
             {loading ? "Guardando..." : "Guardar Diseño"}
           </BotonGeneral>
+=======
+          <button
+            type="button"
+            onClick={closeModal}
+            className="font-bold py-2 px-4 rounded focus:outline-none transition duration-200 ease-in-out"
+            style={{ backgroundColor: "#006AFFFF", color: "#FFFFFF" }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#0062FFFF")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#006AFFFF")}
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="font-bold py-2 px-4 rounded focus:outline-none transition duration-200 ease-in-out"
+            style={{ backgroundColor: "#FF0000FF", color: "#FFFFFF" }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#FF0000FF")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#FF0000FF")}
+          >
+            {loading ? "Guardando..." : "Guardar Diseño"}
+          </button>
+>>>>>>> db35ad5 (diseños login y registro)
         </div>
       </form>
     </div>
   );
 }
 
+<<<<<<< HEAD
 export default DesignUploadModal;
+=======
+export default DesignUploadModal;
+>>>>>>> db35ad5 (diseños login y registro)

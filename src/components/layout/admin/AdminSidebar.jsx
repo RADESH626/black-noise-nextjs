@@ -4,7 +4,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation'; // Import useRouter
+<<<<<<< HEAD
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+=======
+>>>>>>> db35ad5 (diseños login y registro)
 
 function AdminSidebar() { // Remove activeDashboard, onSelectDashboard props
   const router = useRouter(); // Initialize useRouter
@@ -57,6 +60,7 @@ function AdminSidebar() { // Remove activeDashboard, onSelectDashboard props
         </ul>
       </nav>
        <div className="mt-auto">
+<<<<<<< HEAD
         <BotonGeneral
           onClick={() => signOut({ callbackUrl: '/login' })} // Redirect to login page after logout
           variant="secondary"
@@ -65,6 +69,15 @@ function AdminSidebar() { // Remove activeDashboard, onSelectDashboard props
           <Image src="/icons/icono-salida.svg" alt="Cerrar Sesión" width={20} height={20} className="mr-3 filter invert" />
           <span>Cerrar Sesión</span>
         </BotonGeneral>
+=======
+        <button
+          onClick={() => signOut({ callbackUrl: '/login' })} // Redirect to login page after logout
+          className="flex items-center p-3 hover:bg-gray-700 rounded-md transition-colors w-full text-left"
+        >
+          <Image src="/icons/icono-salida.svg" alt="Cerrar Sesión" width={20} height={20} className="mr-3 filter invert" />
+          <span>Cerrar Sesión</span>
+        </button>
+>>>>>>> db35ad5 (diseños login y registro)
       </div>
     </aside>
   );

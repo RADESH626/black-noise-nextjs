@@ -6,8 +6,13 @@ function InputTipoDocumentoIdentidad(props) {
         className='
             w-full
             p-3
+<<<<<<< HEAD
             bg-black
             text-white
+=======
+            bg-white
+            text-black
+>>>>>>> db35ad5 (diseños login y registro)
             border
             border-bn-accent
             rounded-md

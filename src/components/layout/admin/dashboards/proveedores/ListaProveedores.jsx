@@ -12,7 +12,10 @@ import { useDialog } from '@/context/DialogContext';
 import { useActionState } from 'react'; // For React 19
 import { useFormStatus } from 'react-dom'; // For React 19
 import { MetodoPago } from '@/models/enums/pago/MetodoPago';
+<<<<<<< HEAD
 import BotonGeneral from '@/components/common/botones/BotonGeneral'; // Import BotonGeneral
+=======
+>>>>>>> db35ad5 (diseños login y registro)
 
 const PAYMENT_METHODS = Object.values(MetodoPago);
 const PAYMENT_METHOD_DISPLAY_NAMES = {
@@ -43,6 +46,7 @@ function DeleteProviderForm({ providerId, onProviderDeleted }) {
     return (
         <form action={formAction}>
             <input type="hidden" name="id" value={providerId} />
+<<<<<<< HEAD
             <BotonGeneral
                 type="submit"
                 disabled={pending}
@@ -51,6 +55,15 @@ function DeleteProviderForm({ providerId, onProviderDeleted }) {
             >
                 {pending ? 'Eliminando...' : 'Eliminar'}
             </BotonGeneral>
+=======
+            <button
+                type="submit"
+                disabled={pending}
+                className="px-3 py-1.5 font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75 text-sm whitespace-nowrap bg-red-600 text-white hover:bg-red-700 focus:ring-red-500"
+            >
+                {pending ? 'Eliminando...' : 'Eliminar'}
+            </button>
+>>>>>>> db35ad5 (diseños login y registro)
         </form>
     );
 }

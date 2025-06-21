@@ -5,6 +5,7 @@
   --color-secondary: #f4f4f4; /* Light grey */
   --color-accent1: #ff007f; /* Vibrant pink/magenta */
   --color-accent2: #00f0ff; /* Bright cyan */
+<<<<<<< HEAD
 
   /* Gradientes para botones */
   --gradient-primary: #000000; /* Negro sólido para el botón primario */
@@ -13,6 +14,8 @@
   --gradient-success: linear-gradient(to right, #28a745, #218838); /* Verde oscuro a verde más claro */
   --gradient-info: linear-gradient(to right, #17a2b8, #138496); /* Azul oscuro a azul más claro */
 
+=======
+>>>>>>> db35ad5 (diseños login y registro)
   --color-neutral-100: #ffffff; /* White */
   --color-neutral-200: #e0e0e0; /* Lighter grey */
   --color-neutral-300: #c0c0c0; /* Medium grey */
@@ -22,6 +25,7 @@
   --color-neutral-700: #222222; /* Very dark grey */
   --color-neutral-800: #111111; /* Almost black */
   --color-neutral-900: #000000; /* Black */
+<<<<<<< HEAD
 
   /* Clases de gradiente personalizadas */
   .btn-gradient-primary {
@@ -43,6 +47,8 @@
 .btn-gradient-gray-to-white {
     background-image: linear-gradient(to right, #a0a0a0, #ffffff);
 }
+=======
+>>>>>>> db35ad5 (diseños login y registro)
 }
 
 html, body {

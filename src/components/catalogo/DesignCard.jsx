@@ -1,6 +1,9 @@
 'use client'
 import React from 'react';
+<<<<<<< HEAD
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+=======
+>>>>>>> db35ad5 (diseños login y registro)
 
 function DesignCard({ diseño, addItem, isInCart }) {
   console.log('Valor de diseño.userAvatar:', diseño.userAvatar);
@@ -39,6 +42,7 @@ function DesignCard({ diseño, addItem, isInCart }) {
         <p>Precio: ${diseño.price !== undefined && diseño.price !== null ? diseño.price.toFixed(2) : '0.00'}</p>
 
         <div className="flex items-center justify-end mt-2">
+<<<<<<< HEAD
           <BotonGeneral
             variant="secondary"
             onClick={() => addItem(diseño)}
@@ -47,6 +51,17 @@ function DesignCard({ diseño, addItem, isInCart }) {
           >
             {isInCart ? 'En el carrito' : 'Añadir al carrito'}
           </BotonGeneral>
+=======
+          <button
+            className={`px-3 py-1 rounded transition ${
+              isInCart ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
+            }`}
+            onClick={() => addItem(diseño)}
+            disabled={isInCart}
+          >
+            {isInCart ? 'En el carrito' : 'Añadir al carrito'}
+          </button>
+>>>>>>> db35ad5 (diseños login y registro)
         </div>
       </div>
     </div>

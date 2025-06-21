@@ -14,7 +14,10 @@ import OrderSummary from "@/components/pago/OrderSummary";
 import UserDataForm from "@/components/pago/UserDataForm";
 import CardDataModal from "@/components/pago/CardDataModal";
 import OrderConfirmationDialogContent from "@/components/pago/OrderConfirmationDialogContent";
+<<<<<<< HEAD
 import { MetodoPago } from '@/models/enums/pago/MetodoPago';
+=======
+>>>>>>> db35ad5 (diseños login y registro)
 
 function CartComponent() {
   const router = useRouter();
@@ -28,8 +31,11 @@ function CartComponent() {
   const [userData, setUserData] = useState(null);
   const [cardData, setCardData] = useState(null);
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
+<<<<<<< HEAD
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(MetodoPago.TARJETA_CREDITO); // Default to credit card
   const [phoneNumber, setPhoneNumber] = useState(''); // Nuevo estado para el número de teléfono
+=======
+>>>>>>> db35ad5 (diseños login y registro)
 
   const dialogRef = useRef(null);
 
@@ -41,12 +47,15 @@ function CartComponent() {
     }
   }, [showPaymentSection]);
 
+<<<<<<< HEAD
   useEffect(() => {
     if (!loadingCart && cartItems.length === 0) {
       router.push('/catalogo');
     }
   }, [loadingCart, cartItems, router]);
 
+=======
+>>>>>>> db35ad5 (diseños login y registro)
   const getTotal = () => {
     let subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     // Removed: if (userData?.isDelivery) { subtotal += userData.deliveryCost; }
@@ -58,7 +67,10 @@ function CartComponent() {
     setPaymentError(null);
     setUserData(null);
     setCardData(null);
+<<<<<<< HEAD
     setPhoneNumber(''); // Limpiar el número de teléfono al cerrar
+=======
+>>>>>>> db35ad5 (diseños login y registro)
   }, []);
 
   const addItemDebounceRef = useRef(null);
@@ -196,6 +208,7 @@ function CartComponent() {
       return;
     }
 
+<<<<<<< HEAD
     if ((selectedPaymentMethod === MetodoPago.TARJETA_CREDITO || selectedPaymentMethod === MetodoPago.TARJETA_DEBITO) && (!cardData || !cardData.tarjeta || !cardData.mes || !cardData.anio || !cardData.cvv)) {
       setPaymentError("Por favor ingresa los datos de tu tarjeta.");
       return;
@@ -206,6 +219,12 @@ function CartComponent() {
       return;
     }
 
+=======
+    if (!cardData || !cardData.tarjeta || !cardData.mes || !cardData.anio || !cardData.cvv) {
+      setPaymentError("Por favor ingresa los datos de tu tarjeta.");
+      return;
+    }
+>>>>>>> db35ad5 (diseños login y registro)
     setPaymentError(null);
 
     const paymentDetails = {
@@ -213,6 +232,7 @@ function CartComponent() {
       nombre: userData.nombre,
       correo: userData.correo,
       direccion: userData.direccion,
+<<<<<<< HEAD
       metodoPago: selectedPaymentMethod,
       total: getTotal(),
       tarjeta: (selectedPaymentMethod === MetodoPago.TARJETA_CREDITO || selectedPaymentMethod === MetodoPago.TARJETA_DEBITO) ? cardData.tarjeta : undefined,
@@ -220,6 +240,14 @@ function CartComponent() {
       anio: (selectedPaymentMethod === MetodoPago.TARJETA_CREDITO || selectedPaymentMethod === MetodoPago.TARJETA_DEBITO) ? cardData.anio : undefined,
       cvv: (selectedPaymentMethod === MetodoPago.TARJETA_CREDITO || selectedPaymentMethod === MetodoPago.TARJETA_DEBITO) ? cardData.cvv : undefined,
       numeroTelefono: (selectedPaymentMethod === MetodoPago.NEQUI || selectedPaymentMethod === MetodoPago.DAVIPLATA) ? phoneNumber : undefined,
+=======
+      metodoPago: "tarjeta",
+      total: getTotal(),
+      tarjeta: cardData.tarjeta,
+      mes: cardData.mes,
+      anio: cardData.anio,
+      cvv: cardData.cvv,
+>>>>>>> db35ad5 (diseños login y registro)
       metodoEntrega: userData.isDelivery ? 'DOMICILIO' : 'RECOGIDA',
       costoEnvio: 0, // Set to 0 as per new requirement
     };
@@ -321,10 +349,17 @@ function CartComponent() {
             <span>${totalAPagar.toFixed(2)}</span>
           </div>
           <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
+<<<<<<< HEAD
             <BotonGeneral onClick={handleClearCart} disabled={loadingCart} className="bg-gray-500 hover:bg-gray-600 text-white">
               Vaciar Carrito
             </BotonGeneral>
             <BotonGeneral onClick={handleProceedToPayment} disabled={loadingCart} className="bg-gray-500 hover:bg-gray-600 text-white">
+=======
+            <BotonGeneral onClick={handleClearCart} disabled={loadingCart}>
+              Vaciar Carrito
+            </BotonGeneral>
+            <BotonGeneral onClick={handleProceedToPayment} disabled={loadingCart}>
+>>>>>>> db35ad5 (diseños login y registro)
               Proceder al Pago
             </BotonGeneral>
           </div>
@@ -346,6 +381,7 @@ function CartComponent() {
         <UserDataForm onUserDataChange={handleUserDataChange} />
 
         <div className="p-6 rounded shadow-md w-full mb-6" style={{ backgroundColor: "#F7F1F1" }}>
+<<<<<<< HEAD
           <h3 className="text-xl font-bold mb-4" style={{ color: "#111010" }}>Método de Pago</h3>
           <div className="grid grid-cols-2 gap-4 mb-4">
             {Object.values(MetodoPago).map((method) => (
@@ -398,6 +434,21 @@ function CartComponent() {
                 style={{ backgroundColor: "#FFFFFF", color: "#000000" }}
               />
             </div>
+=======
+          <h3 className="text-xl font-bold mb-4" style={{ color: "#111010" }}>Información de Pago</h3>
+          <button
+            type="button"
+            onClick={() => setIsCardModalOpen(true)}
+            style={{ backgroundColor: "#154780", color: "#ffffff" }}
+            className="w-full font-semibold py-3 rounded hover:bg-blue-700 transition"
+          >
+            {cardData ? 'Editar Datos de Tarjeta' : 'Ingresar Datos de Tarjeta'}
+          </button>
+          {cardData && (
+            <p className="mt-2 text-sm" style={{ color: "#000000" }}>
+              Tarjeta ingresada: **** **** **** {cardData.tarjeta.slice(-4)}
+            </p>
+>>>>>>> db35ad5 (diseños login y registro)
           )}
         </div>
 
@@ -428,4 +479,8 @@ function CartComponent() {
   );
 }
 
+<<<<<<< HEAD
 export default CartComponent;
+=======
+export default CartComponent;
+>>>>>>> db35ad5 (diseños login y registro)

@@ -13,4 +13,8 @@ function BotonEnviarCorreo(props) {
     )
 }
 
+<<<<<<< HEAD
 export default BotonEnviarCorreo
+=======
+export default BotonEnviarCorreo
+>>>>>>> db35ad5 (diseños login y registro)

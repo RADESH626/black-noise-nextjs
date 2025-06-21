@@ -1,4 +1,5 @@
 import React from 'react';
+<<<<<<< HEAD
 import BotonGeneral from './BotonGeneral'; // Import BotonGeneral
 
 function BotonAgregarProveedores({ children, onClick, type = 'button', disabled = false, className = '' }) {
@@ -12,6 +13,14 @@ function BotonAgregarProveedores({ children, onClick, type = 'button', disabled 
     >
       {children || "Agregar Proveedor"}
     </BotonGeneral>
+=======
+
+function BotonAgregarProveedores({ children, ...props }) {
+  return (
+    <button {...props}>
+      {children || "Agregar Proveedor"}
+    </button>
+>>>>>>> db35ad5 (diseños login y registro)
   );
 }
 

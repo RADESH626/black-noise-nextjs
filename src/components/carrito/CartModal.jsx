@@ -3,7 +3,10 @@
 import React, { useRef } from 'react'; // Import useRef
 import Link from 'next/link';
 import Image from 'next/image';
+<<<<<<< HEAD
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+=======
+>>>>>>> db35ad5 (diseños login y registro)
 
 // Add an isOpen prop to control the dialog visibility
 const CartModal = ({ cartItems, onClose, isOpen, onRemoveItem }) => {
@@ -22,9 +25,15 @@ const CartModal = ({ cartItems, onClose, isOpen, onRemoveItem }) => {
 
       <div className="mt-4 px-4 pb-2">
         <Link href="/carrito">
+<<<<<<< HEAD
           <BotonGeneral variant="secondary" className="w-full py-2">
             Ir al Carrito
           </BotonGeneral>
+=======
+          <button className="w-full bg-black text-white py-2 rounded hover:bg-gray-800">
+            Ir al Carrito
+          </button>
+>>>>>>> db35ad5 (diseños login y registro)
         </Link>
       </div>
 
@@ -53,6 +62,7 @@ const CartModal = ({ cartItems, onClose, isOpen, onRemoveItem }) => {
                 </div>
 
 
+<<<<<<< HEAD
                 <BotonGeneral
                   onClick={() => onRemoveItem(item.designId)}
                   variant="danger"
@@ -60,6 +70,14 @@ const CartModal = ({ cartItems, onClose, isOpen, onRemoveItem }) => {
                 >
                   <Image src="/icons/icono-basurero.svg" alt="Eliminar" width={24} height={24} />
                 </BotonGeneral>
+=======
+                <button
+                  onClick={() => onRemoveItem(item.designId)}
+                  className=" rounded-full hover:bg-gray-100 flex "
+                >
+                  <Image src="/icons/icono-basurero.svg" alt="Eliminar" width={24} height={24} />
+                </button>
+>>>>>>> db35ad5 (diseños login y registro)
               </li>
             ))}
           </ul>

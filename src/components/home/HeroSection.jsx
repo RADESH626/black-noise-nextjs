@@ -5,7 +5,12 @@ import BotonDescargar from '@/components/common/botones/BotonDescargar';
 function HeroSection() {
   return (
     <motion.section
+<<<<<<< HEAD
       className='flex flex-col justify-start items-start gap-5 px-90 py-16 text-white bg-gradient-hero'
+=======
+      className='flex flex-col justify-start items-start gap-5 px-90 py-16 text-white'
+      style={{ background: 'linear-gradient(to bottom, #000000, #0A1828, #000000)' }}
+>>>>>>> db35ad5 (diseños login y registro)
       initial={{ opacity: 0, y: 60 }}
       whileInView={{ opacity: 1, y: 5 }}
       transition={{ duration: 1.2, ease: 'easeOut' }}
@@ -79,6 +84,7 @@ function HeroSection() {
   </p>
 </motion.div>
 
+<<<<<<< HEAD
       </div>
 
       
@@ -86,6 +92,14 @@ function HeroSection() {
       {/* BOTÓN "Descárgalo ahora" */}
       <div className='self-center mt-8'>
         <BotonDescargar onClick={() => window.location.href = 'https://github.com/Cryxxis/EditorBN/tree/master'}>¡Descárgalo ahora!</BotonDescargar>
+=======
+
+      </div>
+
+      {/* BOTÓN */}
+      <div className='self-center mt-8'>
+        <BotonDescargar>¡Descárgalo ahora!</BotonDescargar>
+>>>>>>> db35ad5 (diseños login y registro)
       </div>
     </motion.section>
   );

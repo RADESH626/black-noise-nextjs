@@ -11,7 +11,11 @@ import CartModal from '@/components/carrito/CartModal'; // Import CartModal
 import { useCart } from '@/context/CartContext'; // Import useCart
 import PendingPaymentsSummary from '@/components/common/PendingPaymentsSummary'; // Import PendingPaymentsSummary
 
+<<<<<<< HEAD
 function HeaderPrincipal({ hideCartIcon = false, showBackButton = false, backButtonHref = '/' }) {
+=======
+function HeaderPrincipal() {
+>>>>>>> db35ad5 (diseños login y registro)
     const { data: session } = useSession();
     // console.log("Session object in HeaderPrincipal:", session);
     const { cartItems, fetchCart, removeItem } = useCart(); // Use cartItems, fetchCart, and removeItem from CartContext
@@ -48,9 +52,15 @@ function HeaderPrincipal({ hideCartIcon = false, showBackButton = false, backBut
 
     return (
         <div>
+<<<<<<< HEAD
             <header className='flex flex-row justify-between items-center p-10 top-0 fixed w-full h-16 z-50 bg-black'>
 
                 <h1 className='font-bold text-3xl hover:text-white transition-colors duration-500 text-white'>
+=======
+            <header className='flex flex-row justify-between items-center p-10 top-0 fixed w-full h-16 z-50' style={{ backgroundColor: '#000000' }}>
+
+                <h1 className='font-bold text-3xl hover:text-white transition-colors duration-500' style={{ color: '#FFFFFFFF' }}>
+>>>>>>> db35ad5 (diseños login y registro)
                     BLACK NOISE
                 </h1>
 
@@ -58,6 +68,7 @@ function HeaderPrincipal({ hideCartIcon = false, showBackButton = false, backBut
                     {/* Pending Payments Icon */}
                     {session && <PendingPaymentsSummary />}
 
+<<<<<<< HEAD
                     {/* Back Button */}
                     {showBackButton && (
                         <Link href={backButtonHref} className="flex items-center gap-2 text-white hover:text-gray-300 transition-colors duration-300">
@@ -67,6 +78,10 @@ function HeaderPrincipal({ hideCartIcon = false, showBackButton = false, backBut
 
                     {/* Shopping Cart Icon */}
                     {session && !hideCartIcon && (
+=======
+                    {/* Shopping Cart Icon */}
+                    {session && (
+>>>>>>> db35ad5 (diseños login y registro)
                         <div className="relative cursor-pointer" onClick={handleCartIconClick}>
                             <Image src="/icons/icono-carrito.svg" alt="Carrito" width={30} height={30} />
                             {cartItems.length > 0 && (
@@ -104,6 +119,7 @@ function HeaderPrincipal({ hideCartIcon = false, showBackButton = false, backBut
                                     <Link href="/perfil" className="block px-4 py-2 text-sm text-white hover:bg-gray-700" onClick={() => setIsDropdownOpen(false)}>
                                         Ver Perfil
                                     </Link>
+<<<<<<< HEAD
                                     <BotonGeneral
                                         onClick={() => { signOut({ callbackUrl: '/login' }); setIsDropdownOpen(false); }}
                                         variant="secondary"
@@ -111,6 +127,14 @@ function HeaderPrincipal({ hideCartIcon = false, showBackButton = false, backBut
                                     >
                                         Cerrar Sesión
                                     </BotonGeneral>
+=======
+                                    <button
+                                        onClick={() => { signOut({ callbackUrl: '/login' }); setIsDropdownOpen(false); }}
+                                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700"
+                                    >
+                                        Cerrar Sesión
+                                    </button>
+>>>>>>> db35ad5 (diseños login y registro)
                                 </div>
                             )}
                         </div>

@@ -10,12 +10,16 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import { obtenerMiPerfilProveedor } from '@/app/acciones/ProveedorActions';
+<<<<<<< HEAD
 import { obtenerPedidosPorProveedorId } from '@/app/acciones/ProveedorPedidoActions';
+=======
+>>>>>>> db35ad5 (diseños login y registro)
 
 function ProveedorPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
 
+<<<<<<< HEAD
     // Use useQuery to fetch supplier profile data
     const { data: miPerfil, isLoading: isLoadingPerfil, isError: isErrorPerfil, error: errorPerfil } = useQuery({
         queryKey: ['miPerfilProveedor', session?.user?.id], // Use session.user.id for the profile query
@@ -52,6 +56,8 @@ function ProveedorPage() {
         refetchOnWindowFocus: false,
     });
 
+=======
+>>>>>>> db35ad5 (diseños login y registro)
     // Handle session loading/unauthenticated states first
     if (status === "loading") {
         return <LoadingSpinner />;
@@ -59,6 +65,7 @@ function ProveedorPage() {
 
     if (!session || !session.user || !session.user.isSupplier) {
         router.push("/login");
+<<<<<<< HEAD
         return null;
     }
 
@@ -77,6 +84,40 @@ function ProveedorPage() {
 
     // If session exists and user is a supplier, but profile not loaded (e.g., not found after fetch attempt)
     if (!miPerfil) {
+=======
+        return null; // Return null or a simple message while redirecting
+    }
+
+    // Use useQuery to fetch supplier profile data
+    const { data: miPerfil, isLoading, isError, error } = useQuery({
+        queryKey: ['miPerfilProveedor', session.user.id], // Unique key for this query, dependent on user ID
+        queryFn: async () => {
+            const result = await obtenerMiPerfilProveedor();
+            if (result.success) {
+                return result.proveedor;
+            } else {
+                throw new Error(result.message || "Error al cargar el perfil del proveedor.");
+            }
+        },
+        enabled: !!session?.user?.isSupplier && !!session?.user?.id, // Only run query if user is a supplier and ID is available
+        staleTime: Infinity, // Data is considered fresh indefinitely for diagnostic
+        cacheTime: 10 * 60 * 1000, // Data stays in cache for 10 minutes
+        retry: 1, // Retry once on failure
+        refetchOnWindowFocus: false, // Disable refetching on window focus for diagnostic
+    });
+
+    // Render logic for authenticated suppliers
+    if (isLoading) { // Use isLoading from useQuery
+        return <LoadingSpinner />;
+    }
+
+    if (isError) { // Use isError and error from useQuery
+        return <ErrorMessage message={error.message || "Error al cargar el perfil del proveedor."} />;
+    }
+
+    // If session exists and user is a supplier, but profile not loaded (e.g., not found after fetch attempt)
+    if (!miPerfil) { // We are here only if not loading, no error, but miPerfil is null
+>>>>>>> db35ad5 (diseños login y registro)
         return (
             <div className="flex flex-col items-center justify-center h-full">
                 <h1 className="text-3xl font-bold mb-4 text-gray-800">Portal de Proveedores</h1>
@@ -85,6 +126,7 @@ function ProveedorPage() {
         );
     }
 
+<<<<<<< HEAD
     // Calculate metrics
     const totalPedidosPendientes = pedidos?.filter(p => p.estadoPedido === 'PENDIENTE' || p.estadoPedido === 'SOLICITUD_DEVOLUCION').length || 0;
     const totalPedidosEnProceso = pedidos?.filter(p => p.estadoPedido === 'EN_FABRICACION' || p.estadoPedido === 'LISTO' || p.estadoPedido === 'ENVIADO').length || 0;
@@ -120,6 +162,13 @@ function ProveedorPage() {
                 </div>
             </div>
 
+=======
+    // Finally, render the actual content if miPerfil is available
+    return (
+        <div className="h-full">
+            <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">Bienvenido, {miPerfil?.nombreEmpresa || 'Proveedor'}</h1>
+
+>>>>>>> db35ad5 (diseños login y registro)
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
                 <div className="bg-gray-100 rounded-lg shadow-lg p-6 text-center">
                     <h2 className="text-xl font-semibold mb-4 text-gray-700">Mis Pedidos</h2>

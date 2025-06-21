@@ -10,7 +10,10 @@ import { Rol } from "@/models/enums/usuario/Rol";
 import bcrypt from "bcryptjs";
 import logger from '@/utils/logger';
 import { transporter } from '@/utils/nodemailer'; // Import the centralized transporter
+<<<<<<< HEAD
 import { toPlainObject } from '@/utils/dbUtils'; // Import toPlainObject
+=======
+>>>>>>> db35ad5 (diseños login y registro)
 
 export async function crearProveedor(prevState, formData) {
   const session = await getServerSession(authOptions);
@@ -106,11 +109,15 @@ export async function crearProveedor(prevState, formData) {
     return {
       message: "Proveedor creado exitosamente. La clave de acceso ha sido enviada al correo electrónico del proveedor.",
       success: true,
+<<<<<<< HEAD
       data: {
         ...nuevoProveedor.toObject(),
         _id: nuevoProveedor._id.toString(),
         userId: nuevoProveedor.userId ? nuevoProveedor.userId.toString() : null,
       },
+=======
+      data: nuevoProveedor.toObject(), // Convert to plain object
+>>>>>>> db35ad5 (diseños login y registro)
       // Do NOT return accessKey here as per user's request
     };
   } catch (error) {
@@ -195,11 +202,15 @@ export async function actualizarProveedor(prevState, formData) {
     return {
       message: "Proveedor actualizado exitosamente.",
       success: true,
+<<<<<<< HEAD
       data: {
         ...updatedProveedor.toObject(),
         _id: updatedProveedor._id.toString(),
         userId: updatedProveedor.userId ? updatedProveedor.userId.toString() : null,
       },
+=======
+      data: updatedProveedor.toObject(), // Convert to plain object
+>>>>>>> db35ad5 (diseños login y registro)
     };
   } catch (error) {
     logger.error("Error al actualizar proveedor:", error);
@@ -211,10 +222,21 @@ export async function obtenerProveedoresHabilitados() {
   await connectDB();
   try {
     const proveedores = await Proveedor.find({ habilitado: true }).lean();
+<<<<<<< HEAD
     // Deep clone and serialize to ensure all fields are plain objects/primitives
     const serializedProveedores = JSON.parse(JSON.stringify(proveedores));
     return {
       proveedores: serializedProveedores,
+=======
+    return {
+      proveedores: proveedores.map(p => ({
+        ...p,
+        _id: p._id.toString(),
+        userId: p.userId ? p.userId.toString() : null, // Convert userId to string
+        createdAt: p.createdAt ? new Date(p.createdAt).toISOString() : null,
+        updatedAt: p.updatedAt ? new Date(p.updatedAt).toISOString() : null,
+      })),
+>>>>>>> db35ad5 (diseños login y registro)
       success: true
     };
   } catch (error) {
@@ -304,7 +326,16 @@ export async function obtenerMiPerfilProveedor() {
     }
 
     return {
+<<<<<<< HEAD
       proveedor: toPlainObject(proveedor), // Convert to plain object
+=======
+      proveedor: {
+        ...proveedor,
+        _id: proveedor._id.toString(),
+        createdAt: proveedor.createdAt ? new Date(proveedor.createdAt).toISOString() : null,
+        updatedAt: proveedor.updatedAt ? new Date(proveedor.updatedAt).toISOString() : null,
+      },
+>>>>>>> db35ad5 (diseños login y registro)
       success: true
     };
   } catch (error) {

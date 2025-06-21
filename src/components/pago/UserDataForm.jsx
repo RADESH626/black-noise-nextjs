@@ -3,7 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { ObtenerUsuarioPorCorreo } from '@/app/acciones/UsuariosActions';
+<<<<<<< HEAD
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+=======
+>>>>>>> db35ad5 (diseños login y registro)
 
 export default function UserDataForm({ onUserDataChange }) {
   const { data: session, status } = useSession();
@@ -147,6 +150,7 @@ export default function UserDataForm({ onUserDataChange }) {
             className="w-full border rounded px-3 py-2 mt-1"
             placeholder="Tu dirección completa"
           />
+<<<<<<< HEAD
           <BotonGeneral
             type="button"
             onClick={handleAutoFillAddress}
@@ -155,6 +159,15 @@ export default function UserDataForm({ onUserDataChange }) {
           >
             Rellenar dirección
           </BotonGeneral>
+=======
+          <button
+            type="button"
+            onClick={handleAutoFillAddress}
+            className="mt-2 w-full bg-gray-300 text-gray-800 font-semibold py-2 rounded hover:bg-gray-400 transition"
+          >
+            Rellenar dirección
+          </button>
+>>>>>>> db35ad5 (diseños login y registro)
         </label>
       )}
     </div>

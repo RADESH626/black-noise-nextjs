@@ -32,7 +32,11 @@ function PaymentHistory({ payments }) {
         <table style={{ minWidth: "100%", backgroundColor: "#000000" }}>
           <thead>
             <tr style={{ backgroundColor: "#111827" }}>
+<<<<<<< HEAD
               {["Fecha", "Valor", "Método", "Estado", "Pedido ID", "Motivo"].map((text) => (
+=======
+              {["Fecha", "Valor", "Método", "Estado", "Pedido ID"].map((text) => (
+>>>>>>> db35ad5 (diseños login y registro)
                 <th
                   key={text}
                   style={{
@@ -111,6 +115,7 @@ function PaymentHistory({ payments }) {
                     color: "#E5E7EB",
                   }}
                 >
+<<<<<<< HEAD
                   {payment.pedidoId}
                 </td>
                 <td
@@ -122,6 +127,9 @@ function PaymentHistory({ payments }) {
                   }}
                 >
                   {payment.motivo || 'N/A'}
+=======
+                  {payment.pedidoId ? payment.pedidoId._id : 'N/A'}
+>>>>>>> db35ad5 (diseños login y registro)
                 </td>
               </tr>
             ))}
@@ -132,4 +140,8 @@ function PaymentHistory({ payments }) {
   );
 }
 
+<<<<<<< HEAD
 export default PaymentHistory;
+=======
+export default PaymentHistory;
+>>>>>>> db35ad5 (diseños login y registro)

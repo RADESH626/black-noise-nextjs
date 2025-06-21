@@ -63,6 +63,7 @@ const PedidoSchema = new Schema({
         ref: 'Pago',
         required: false // Made permanently optional to resolve circular dependency
     },
+<<<<<<< HEAD
     motivo_devolucion: {
         type: String,
         required: false
@@ -95,6 +96,10 @@ const PedidoSchema = new Schema({
     cancellationDate: {
         type: Date,
         required: false
+=======
+    fechaEstimadaEntrega: {
+        type: Date
+>>>>>>> db35ad5 (diseños login y registro)
     }
 }, {
     timestamps: true

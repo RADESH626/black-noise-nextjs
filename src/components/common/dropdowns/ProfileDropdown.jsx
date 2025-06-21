@@ -3,7 +3,10 @@
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import React, { useRef, useEffect } from 'react';
+<<<<<<< HEAD
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+=======
+>>>>>>> db35ad5 (diseños login y registro)
 
 function ProfileDropdown({ isOpen, onClose }) {
   const router = useRouter();
@@ -44,6 +47,7 @@ function ProfileDropdown({ isOpen, onClose }) {
       ref={dropdownRef}
       className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-50"
     >
+<<<<<<< HEAD
       <BotonGeneral
         onClick={handleViewProfile}
         variant="info"
@@ -58,6 +62,20 @@ function ProfileDropdown({ isOpen, onClose }) {
       >
         Cerrar Sesión
       </BotonGeneral>
+=======
+      <button
+        onClick={handleViewProfile}
+        className="block px-4 py-2 text-sm text-white hover:bg-gray-700 w-full text-left"
+      >
+        Ver Perfil
+      </button>
+      <button
+        onClick={handleLogout}
+        className="block px-4 py-2 text-sm text-red-400 hover:bg-gray-700 w-full text-left"
+      >
+        Cerrar Sesión
+      </button>
+>>>>>>> db35ad5 (diseños login y registro)
     </div>
   );
 }

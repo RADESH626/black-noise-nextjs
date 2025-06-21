@@ -210,9 +210,13 @@ function FormularioAgregarProveedor({ onSuccess }) {
         )}
       </div>
       {displayedAccessKey ? (
+<<<<<<< HEAD
         <BotonGeneral type="button" onClick={handleCloseModal} variant="secondary">
           Cerrar
         </BotonGeneral>
+=======
+        <BotonGeneral type="button" onClick={handleCloseModal} customText="Cerrar" />
+>>>>>>> db35ad5 (diseños login y registro)
       ) : (
         <SubmitButton />
       )}

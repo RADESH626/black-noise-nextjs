@@ -21,6 +21,13 @@ const DesignSchema = new Schema({
         enum: Object.values(CategoriaProducto),
         required: true
     },
+<<<<<<< HEAD
+=======
+    // likes: {
+    //     type: Number,
+    //     default: 0
+    // },
+>>>>>>> db35ad5 (diseños login y registro)
     valorDesing: {
         type: Number,
         required: true
@@ -42,10 +49,13 @@ const DesignSchema = new Schema({
     imageMimeType: {
         type: String,
         required: true
+<<<<<<< HEAD
     },
     tallasDisponibles: {
         type: [String], // Array de strings para las tallas (ej. ['S', 'M', 'L', 'XL'])
         required: false // Opcional, dependiendo de si todos los diseños tienen tallas
+=======
+>>>>>>> db35ad5 (diseños login y registro)
     }
 }, {
     timestamps: true

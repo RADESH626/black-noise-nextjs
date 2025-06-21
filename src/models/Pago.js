@@ -34,6 +34,7 @@ const PagoSchema = new Schema({
     detallesTarjeta: { // New field for card details
         cardNumber: { type: String }, // Store last 4 digits
         expiryDate: { type: String },
+<<<<<<< HEAD
         cvv: { type: String }, // Add CVV field
     },
     numeroTelefono: { // New field for phone number for Nequi/Daviplata
@@ -45,6 +46,8 @@ const PagoSchema = new Schema({
     motivo: { // Campo para la razón del pago (ej. "por pedido", "por envío")
         type: String,
         required: false
+=======
+>>>>>>> db35ad5 (diseños login y registro)
     }
 },{
     timestamps: true

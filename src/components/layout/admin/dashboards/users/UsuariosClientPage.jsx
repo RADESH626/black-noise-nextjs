@@ -42,6 +42,7 @@ function ToggleUserStatusForm({ userId, currentStatus, onStatusChanged }) {
         <form action={formAction}>
             <input type="hidden" name="id" value={userId} />
             <input type="hidden" name="newStatus" value={String(!currentStatus)} />
+<<<<<<< HEAD
             <BotonGeneral
                 type="submit"
                 disabled={pending}
@@ -50,6 +51,18 @@ function ToggleUserStatusForm({ userId, currentStatus, onStatusChanged }) {
             >
                 {pending ? (currentStatus ? 'Deshabilitando...' : 'Habilitando...') : (currentStatus ? 'Deshabilitar' : 'Habilitar')}
             </BotonGeneral>
+=======
+            <button
+                type="submit"
+                disabled={pending}
+                className={`px-3 py-1.5 font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75 text-sm whitespace-nowrap ${currentStatus
+                    ? 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500'
+                    : 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500'
+                }`}
+            >
+                {pending ? (currentStatus ? 'Deshabilitando...' : 'Habilitando...') : (currentStatus ? 'Deshabilitar' : 'Habilitar')}
+            </button>
+>>>>>>> db35ad5 (diseños login y registro)
         </form>
     );
 }

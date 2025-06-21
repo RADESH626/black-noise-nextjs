@@ -191,7 +191,11 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
         const Pedido = await getModel('Pedido');
         const Pago = await getModel('Pago');
         const Venta = await getModel('Venta'); // Asegurarse de que el modelo Venta esté disponible
+<<<<<<< HEAD
         const { userId, nombre, correo, direccion, metodoPago: rawMetodoPago, metodoEntrega, total, tarjeta, mes, anio, cvv, numeroTelefono, costoEnvio: paymentDetailsCostEnvio } = paymentDetails;
+=======
+        const { userId, nombre, correo, direccion, metodoPago: rawMetodoPago, metodoEntrega, total, cardNumber, expiryDate, cvv, costoEnvio: paymentDetailsCostEnvio } = paymentDetails;
+>>>>>>> db35ad5 (diseños login y registro)
 
         // Map rawMetodoPago to a valid enum value
         let metodoPago = rawMetodoPago;
@@ -256,7 +260,11 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
         if (!ventaCreationSuccess) {
             logger.error('Error creating venta:', ventaCreationError);
             // Si la venta falla, cancelar el pedido
+<<<<<<< HEAD
             await Pedido.findByIdAndUpdate(nuevoPedido._id, { estadoPago: 'FALLIDO', estadoPedido: 'CANCELADO', fue_cancelado: true, cancellationDate: new Date() });
+=======
+            await Pedido.findByIdAndUpdate(nuevoPedido._id, { estadoPago: 'FALLIDO', estadoPedido: 'CANCELADO' });
+>>>>>>> db35ad5 (diseños login y registro)
             return { success: false, message: ventaCreationError || 'Error al crear el registro de venta. Pedido marcado como fallido.' };
         }
         logger.debug('Venta created successfully:', nuevaVenta);
@@ -269,9 +277,13 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
             valorPago: total,
             metodoPago,
             estadoTransaccion: 'PAGADO', // Asumimos que el pago es exitoso aquí
+<<<<<<< HEAD
             detallesTarjeta: (metodoPago === MetodoPago.TARJETA_CREDITO || metodoPago === MetodoPago.TARJETA_DEBITO) ? { cardNumber: tarjeta ? tarjeta.slice(-4) : 'N/A', expiryDate: mes && anio ? `${mes}/${anio}` : 'N/A', cvv: '***' } : undefined,
             numeroTelefono: (metodoPago === MetodoPago.NEQUI || metodoPago === MetodoPago.DAVIPLATA) ? numeroTelefono : undefined,
             motivo: 'Pago de Pedido', // Añadir el motivo del pago
+=======
+            detallesTarjeta: { cardNumber: cardNumber ? cardNumber.slice(-4) : 'N/A', expiryDate: expiryDate || 'N/A', cvv: '***' }
+>>>>>>> db35ad5 (diseños login y registro)
         };
         let pagoGuardado;
         try {
@@ -281,7 +293,11 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
         } catch (pagoError) {
             logger.error('Error creating pago:', pagoError);
             // Si el pago falla, cancelar el pedido y la venta
+<<<<<<< HEAD
             await Pedido.findByIdAndUpdate(nuevoPedido._id, { estadoPago: 'CANCELADO', estadoPedido: 'CANCELADO', fue_cancelado: true, cancellationDate: new Date() });
+=======
+            await Pedido.findByIdAndUpdate(nuevoPedido._id, { estadoPago: 'CANCELADO', estadoPedido: 'CANCELADO' });
+>>>>>>> db35ad5 (diseños login y registro)
             await Venta.findByIdAndDelete(nuevaVenta._id); // Eliminar la venta si el pago falla
             return { success: false, message: 'Error al registrar el pago. Pedido y venta cancelados.' };
         }
@@ -435,8 +451,12 @@ async function registrarPagoEnvioSimulado(pedidoId, paymentData) {
                 cardNumber: paymentData.cardNumber ? paymentData.cardNumber.slice(-4) : 'N/A',
                 expiryDate: paymentData.expiryDate || 'N/A',
                 cvv: paymentData.cvv ? '***' : 'N/A'
+<<<<<<< HEAD
             },
             motivo: 'Pago de Envío' // Añadir el motivo del pago
+=======
+            }
+>>>>>>> db35ad5 (diseños login y registro)
         });
         const pagoEnvioGuardado = await nuevoPagoEnvio.save();
         logger.debug('Nuevo registro de Pago de envío creado:', pagoEnvioGuardado);

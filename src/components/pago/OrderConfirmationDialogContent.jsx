@@ -2,7 +2,10 @@
 
 import React from 'react';
 import Link from 'next/link';
+<<<<<<< HEAD
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+=======
+>>>>>>> db35ad5 (diseños login y registro)
 
 function OrderConfirmationDialogContent({ pedidoId, onClose }) {
   return (
@@ -17,6 +20,7 @@ function OrderConfirmationDialogContent({ pedidoId, onClose }) {
       <p className="text-gray-700 mb-6">Recibirás un correo de confirmación con los detalles de tu pedido.</p>
       <div className="flex flex-col space-y-3">
         <Link href="/catalogo" passHref>
+<<<<<<< HEAD
           <BotonGeneral
             onClick={onClose}
             variant="secondary"
@@ -33,6 +37,22 @@ function OrderConfirmationDialogContent({ pedidoId, onClose }) {
           >
             Ver Mis Pedidos
           </BotonGeneral>
+=======
+          <button
+            onClick={onClose}
+            className="w-full bg-blue-600 text-white font-semibold py-3 rounded hover:bg-blue-700 transition"
+          >
+            Continuar Comprando
+          </button>
+        </Link>
+        <Link href="/perfil/mis-pedidos" passHref>
+          <button
+            onClick={onClose}
+            className="w-full bg-gray-300 text-gray-800 font-semibold py-3 rounded hover:bg-gray-400 transition"
+          >
+            Ver Mis Pedidos
+          </button>
+>>>>>>> db35ad5 (diseños login y registro)
         </Link>
       </div>
     </div>

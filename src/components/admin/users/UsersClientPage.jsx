@@ -8,7 +8,10 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+<<<<<<< HEAD
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+=======
+>>>>>>> db35ad5 (diseños login y registro)
 import { Rol } from '@/models/enums/usuario/Rol';
 
 const initialState = {
@@ -175,6 +178,7 @@ export default function UsersClientPage({ initialUsers }) {
                             {file && <p className="mt-2 text-sm text-gray-500">Archivo seleccionado: {file.name}</p>}
                         </div>
 
+<<<<<<< HEAD
                         <BotonGeneral
                             type="submit"
                             variant="primary"
@@ -182,6 +186,15 @@ export default function UsersClientPage({ initialUsers }) {
                         >
                             {isLoading ? 'Actualizando...' : 'Actualizar Foto de Perfil'}
                         </BotonGeneral>
+=======
+                        <button
+                            type="submit"
+                            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            disabled={!file || isLoading}
+                        >
+                            {isLoading ? 'Actualizando...' : 'Actualizar Foto de Perfil'}
+                        </button>
+>>>>>>> db35ad5 (diseños login y registro)
                     </form>
                 </div>
             )}

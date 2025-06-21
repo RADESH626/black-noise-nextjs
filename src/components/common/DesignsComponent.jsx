@@ -38,8 +38,11 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign, handl
                 <p className="font-semibold">nombre: {design.nombreDesing}</p>
                 <p className="font-semibold">precio: ${design.valorDesing}</p>
                 <p className="font-semibold">categoría: {design.categoria}</p>
+<<<<<<< HEAD
                 <p className="font-semibold">estado: {design.estadoDesing}</p>
                 <p className="font-semibold">creado: {new Date(design.createdAt).toLocaleDateString()}</p>
+=======
+>>>>>>> db35ad5 (diseños login y registro)
               </div>
               {mode === 'catalog' && (
                 (cartItems || []).some(item => item.id === design._id) ? (
