@@ -333,14 +333,14 @@ function CartComponent() {
 
       {/* Dialog for Payment Section */}
       <dialog ref={dialogRef} className="relative p-8 rounded-lg shadow-lg max-w-2xl w-11/12 max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "#FDF9F1", color: "#000000", margin: "auto" }}>
-        <button
+        <BotonGeneral
           onClick={handleClosePayment}
+          variant="secondary"
           className="absolute top-4 right-4 text-2xl font-bold"
-          style={{ color: "#000000" }}
           aria-label="Cerrar"
         >
-          &times;
-        </button>
+          Cerrar
+        </BotonGeneral>
         <h2 className="text-2xl font-bold mb-4" style={{ color: "#111010" }}>Confirmar Pedido y Pago</h2>
         
         <UserDataForm onUserDataChange={handleUserDataChange} />
@@ -366,14 +366,14 @@ function CartComponent() {
 
           {(selectedPaymentMethod === MetodoPago.TARJETA_CREDITO || selectedPaymentMethod === MetodoPago.TARJETA_DEBITO) && (
             <>
-              <button
+              <BotonGeneral
                 type="button"
                 onClick={() => setIsCardModalOpen(true)}
-                style={{ backgroundColor: "#154780", color: "#ffffff" }}
-                className="w-full font-semibold py-3 rounded hover:bg-blue-700 transition"
+                variant="primary"
+                className="w-full"
               >
                 {cardData ? 'Editar Datos de Tarjeta' : 'Ingresar Datos de Tarjeta'}
-              </button>
+              </BotonGeneral>
               {cardData && (
                 <p className="mt-2 text-sm" style={{ color: "#000000" }}>
                   Tarjeta ingresada: **** **** **** {cardData.tarjeta.slice(-4)}
@@ -409,14 +409,14 @@ function CartComponent() {
           </p>
         )}
 
-        <button
+        <BotonGeneral
           type="button"
           onClick={handleProcessPayment}
-          style={{ backgroundColor: "#154780", color: "#ffffff" }}
-          className="w-full font-semibold py-3 rounded hover:bg-blue-700 transition"
+          variant="primary"
+          className="w-full"
         >
           Confirmar Pedido y Pagar
-        </button>
+        </BotonGeneral>
       </dialog>
 
       <CardDataModal

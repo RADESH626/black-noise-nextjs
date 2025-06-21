@@ -10,6 +10,7 @@ import ErrorMessage from "@/components/common/ErrorMessage";
 import { actualizarPedidoPorProveedor } from "@/app/acciones/ProveedorPedidoActions";
 import { EstadoPedido } from "@/models/enums/PedidoEnums";
 import { useDialog } from "@/context/DialogContext";
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 export default function VerPedidoProveedorPage({ params }) {
   const { data: session, status } = useSession();
@@ -129,13 +130,14 @@ export default function VerPedidoProveedorPage({ params }) {
             ))}
           </select>
         </div>
-        <button
+        <BotonGeneral
           onClick={handleUpdatePedido}
           disabled={isUpdating}
-          className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
+          variant="primary"
+          className={`focus:outline-none focus:shadow-outline ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           {isUpdating ? 'Actualizando...' : 'Actualizar Pedido'}
-        </button>
+        </BotonGeneral>
 
         <h2 className="text-xl font-semibold mt-4 mb-2">Diseños en el Pedido:</h2>
         <ul>

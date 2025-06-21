@@ -221,7 +221,7 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
   return (
     <div className="mx-auto p-4 md:p-8 bg-black text-white w-screen flex flex-col min-h-screen">
       {/* User Info Section */}
-      <div className="bg-black p-6 md:p-8 rounded-lg shadow-lg mb-8 flex-shrink-0">
+      <div className="bg-transparent p-6 md:p-8 rounded-lg shadow-lg mb-8 flex-shrink-0">
         <div className="flex flex-col md:flex-row items-center">
           <div className="w-32 h-32 md:w-60 md:h-60 bg-gray-700 rounded-lg mb-4 md:mb-0 md:mr-8 ">
             <img src={user?.profileImageUrl || "/img/perfil/FotoPerfil.webp"} alt="User Image" className="w-full h-full object-cover rounded-lg" />
@@ -241,7 +241,7 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
                 <BotonGeneral variant="secondary">VER DISEÑOS DE LA COMUNIDAD</BotonGeneral>
               </Link>
               {/* Removed: <BotonGeneral onClick={handleCreateNewOrder}>CREAR NUEVO PEDIDO</BotonGeneral> */}
-              <BotonGeneral onClick={() => signOut({ callbackUrl: '/login' })} variant="danger">CERRAR SESIÓN</BotonGeneral>
+              <BotonGeneral onClick={() => signOut({ callbackUrl: '/login' })} variant="primary">CERRAR SESIÓN</BotonGeneral>
             </div>
           </div>
         </div>
@@ -250,9 +250,9 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
       {/* nav */}
       <nav className="mb-8 flex-shrink-0">
         <div className="flex border-b border-gray-700">
-          <button className={`py-3 px-6 text-lg font-medium ${activeTab === 'designs' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`} onClick={() => setActiveTab('designs')}>DISEÑOS</button>
-          <button className={`py-3 px-6 text-lg font-medium ${activeTab === 'orders' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`} onClick={() => setActiveTab('orders')}>PEDIDOS</button>
-          <button className={`py-3 px-6 text-lg font-medium ${activeTab === 'payments' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`} onClick={() => setActiveTab('payments')}>PAGOS</button>
+          <BotonGeneral type="button" className={`py-3 px-6 text-lg font-medium ${activeTab === 'designs' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`} onClick={() => setActiveTab('designs')} variant="secondary">DISEÑOS</BotonGeneral>
+          <BotonGeneral type="button" className={`py-3 px-6 text-lg font-medium ${activeTab === 'orders' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`} onClick={() => setActiveTab('orders')} variant="secondary">PEDIDOS</BotonGeneral>
+          <BotonGeneral type="button" className={`py-3 px-6 text-lg font-medium ${activeTab === 'payments' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`} onClick={() => setActiveTab('payments')} variant="secondary">PAGOS</BotonGeneral>
         </div>
       </nav>
 

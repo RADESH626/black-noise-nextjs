@@ -2,6 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useDialog } from '@/context/DialogContext';
 import FormEditarUsuario from '@/components/layout/admin/usuarios/forms/FormEditarUsuario'; // Will create this next
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 function ModalEditarUsuario({ isOpen, onClose, onUserUpdated, userData }) {
     const dialogRef = useRef(null);
@@ -41,14 +42,15 @@ function ModalEditarUsuario({ isOpen, onClose, onUserUpdated, userData }) {
                 onClick={e => e.stopPropagation()}
             >
                 <div className="relative w-full p-6 overflow-y-auto">
-                    <button 
+                    <BotonGeneral
                         onClick={onClose}
-                        className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 z-10"
+                        variant="secondary"
+                        className="absolute top-4 right-4 z-10"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
-                    </button>
+                    </BotonGeneral>
 
                     <div className="rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.2)] overflow-hidden">
                         <div className="p-8 bg-black bg-gradient-to-l from-black to-gray-900">

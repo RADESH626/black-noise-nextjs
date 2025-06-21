@@ -9,7 +9,7 @@ export default function HeaderProveedor() {
   const appTitle = "Black Noise"; // Or get from a config if available
 
   return (
-    <header className="bg-black text-white p-4 flex justify-between items-center">
+    <header className="bg-transparent text-white p-4 flex justify-between items-center">
       <div className="flex items-center">
         {/* <Link href="/" className="text-2xl font-bold no-underline">
           {appTitle}
@@ -20,7 +20,8 @@ export default function HeaderProveedor() {
           <span className="text-lg">Bienvenido, {session.user.name}</span>
           <BotonGeneral
             onClick={() => signOut({ callbackUrl: '/login' })}
-            className="bg-red-600 hover:bg-red-700 text-black font-bold py-2 px-4 rounded"
+            variant="secondary"
+            className="w-full"
           >
             Cerrar Sesión
           </BotonGeneral>

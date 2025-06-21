@@ -8,7 +8,7 @@
 
   /* Gradientes para botones */
   --gradient-primary: #000000; /* Negro sólido para el botón primario */
-  --gradient-secondary: linear-gradient(to right, #ffffff, #e0e0e0); /* Blanco a gris claro */
+  --gradient-secondary: linear-gradient(to right, #a0a0a0, #ffffff); /* Gris más claro a blanco */
   --gradient-danger: linear-gradient(to right, #dc3545, #c82333); /* Rojo oscuro a rojo más claro */
   --gradient-success: linear-gradient(to right, #28a745, #218838); /* Verde oscuro a verde más claro */
   --gradient-info: linear-gradient(to right, #17a2b8, #138496); /* Azul oscuro a azul más claro */
@@ -22,6 +22,27 @@
   --color-neutral-700: #222222; /* Very dark grey */
   --color-neutral-800: #111111; /* Almost black */
   --color-neutral-900: #000000; /* Black */
+
+  /* Clases de gradiente personalizadas */
+  .btn-gradient-primary {
+      background-image: var(--gradient-primary);
+  }
+
+  .btn-gradient-danger {
+      background-image: var(--gradient-danger);
+  }
+
+  .btn-gradient-success {
+      background-image: var(--gradient-success);
+  }
+
+  .btn-gradient-info {
+      background-image: var(--gradient-info);
+  }
+
+.btn-gradient-gray-to-white {
+    background-image: linear-gradient(to right, #000000, #808080); /* Negro a gris */
+}
 }
 
 html, body {
@@ -71,6 +92,10 @@ html, body {
 
 .animate-fadeIn {
     animation: fadeIn 0.2s ease-out forwards;
+}
+
+.btn-gradient-gray-to-white {
+    background-image: linear-gradient(to right, #a0a0a0, #ffffff);
 }
 
 dialog::backdrop {

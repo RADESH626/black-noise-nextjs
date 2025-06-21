@@ -1,15 +1,17 @@
 import IconoEnviarCorreo from '../iconos/IconoEnviarCorreo'
+import BotonGeneral from './BotonGeneral';
 
 
 function BotonEnviarCorreo(props) {
     return (
-        <button
+        <BotonGeneral
             type="button"
-            className="flex items-center gap-2 px-4 py-2 rounded shadow-sm bg-yellow-500 text-black font-bold text-base transition-colors duration-300 hover:bg-green-700"
+            variant="success"
+            className="flex items-center gap-2 px-4 py-2 rounded shadow-sm"
             {...props}
         >
             <IconoEnviarCorreo className="w-5 h-5" /> Enviar Correo
-        </button>
+        </BotonGeneral>
     )
 }
 

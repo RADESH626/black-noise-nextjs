@@ -15,7 +15,7 @@ export default function ProveedorSidebar({ activeDashboard, onSelectDashboard })
   ];
 
   return (
-    <aside className="w-64 bg-gray-800 text-white flex flex-col">
+    <aside className="w-64 bg-transparent text-white flex flex-col">
       <div className="p-4 text-center border-b border-gray-700">
         <h2 className="text-xl font-semibold">Panel Proveedor</h2>
       </div>
@@ -37,7 +37,8 @@ export default function ProveedorSidebar({ activeDashboard, onSelectDashboard })
       <div className="p-4 border-t border-gray-700">
         <BotonGeneral
           onClick={() => signOut({ callbackUrl: "/login" })}
-          className="w-full" // Apply w-full to BotonGeneral if needed for full width
+          variant="secondary"
+          className="w-full"
         >
           Cerrar Sesión
         </BotonGeneral>

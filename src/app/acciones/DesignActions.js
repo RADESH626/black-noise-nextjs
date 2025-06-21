@@ -200,7 +200,10 @@ export async function obtenerDesignsPorUsuarioId(usuarioId) {
             };
         });
 
-        console.log('Designs obtained by usuarioId successfully and formatted:', formattedDesigns);
+        logger.debug('Designs obtained by usuarioId successfully and formatted. Count:', formattedDesigns.length);
+        formattedDesigns.forEach(design => {
+            logger.debug(`Design ID: ${design._id}, Name: ${design.nombreDesing}, Image Length: ${design.imagen ? design.imagen.length : 'N/A'}`);
+        });
         return { designs: JSON.parse(JSON.stringify(formattedDesigns)), error: null };
     } catch (error) {
         console.error('ERROR in obtenerDesignsPorUsuarioId:', error);

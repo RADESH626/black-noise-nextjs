@@ -48,7 +48,7 @@ function HeaderPrincipal() {
 
     return (
         <div>
-            <header className='flex flex-row justify-between items-center p-10 top-0 fixed w-full h-16 z-50 bg-black'>
+            <header className='flex flex-row justify-between items-center p-10 top-0 fixed w-full h-16 z-50 bg-transparent'>
 
                 <h1 className='font-bold text-3xl hover:text-white transition-colors duration-500 text-white'>
                     BLACK NOISE
@@ -99,7 +99,7 @@ function HeaderPrincipal() {
                                     </Link>
                                     <BotonGeneral
                                         onClick={() => { signOut({ callbackUrl: '/login' }); setIsDropdownOpen(false); }}
-                                        variant="danger"
+                                        variant="secondary"
                                         className="w-full text-left"
                                     >
                                         Cerrar Sesión

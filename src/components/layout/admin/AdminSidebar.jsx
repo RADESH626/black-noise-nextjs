@@ -20,9 +20,9 @@ function AdminSidebar() { // Remove activeDashboard, onSelectDashboard props
   ];
 
   return (
-    <aside className="w-64 bg-black text-white flex flex-col p-4 shadow-lg">
+    <aside className="w-64 bg-transparent text-white flex flex-col p-4 shadow-lg">
       <div className="mb-8 text-center">
-        <Link href="/admin" className="text-2xl font-bold text-white hover:text-pink-400 transition-colors"> {/* Use Link for home */}
+        <Link href="/admin" className="text-2xl font-bold text-white transition-colors"> {/* Use Link for home */}
           BLACK NOISE
         </Link>
         <p className="text-xs text-gray-400">Panel de Administrador</p>
@@ -59,7 +59,7 @@ function AdminSidebar() { // Remove activeDashboard, onSelectDashboard props
        <div className="mt-auto">
         <BotonGeneral
           onClick={() => signOut({ callbackUrl: '/login' })} // Redirect to login page after logout
-          variant="danger"
+          variant="secondary"
           className="flex items-center justify-center w-full text-left"
         >
           <Image src="/icons/icono-salida.svg" alt="Cerrar Sesión" width={20} height={20} className="mr-3 filter invert" />

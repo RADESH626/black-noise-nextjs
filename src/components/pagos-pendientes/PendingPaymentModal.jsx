@@ -81,13 +81,14 @@ export default function PendingPaymentModal({ isOpen, onClose, onPaymentSubmit, 
 
     return (
         <dialog ref={dialogRef} className="relative p-8 rounded-lg shadow-lg max-w-md w-11/12 max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "#F7F1F1FF", color: "#000000FF", margin: "auto" }}>
-            <button
+            <BotonGeneral
                 onClick={onClose}
+                variant="secondary"
                 className="absolute top-4 right-4 text-black text-2xl font-bold"
                 aria-label="Cerrar"
             >
-                &times;
-            </button>
+                Cerrar
+            </BotonGeneral>
             <h2 className="text-2xl font-bold mb-4" style={{ color: "#111010FF" }}>Pagar Costo de Envío</h2>
             <p className="text-lg font-semibold mb-4" style={{ color: "#000000FF" }}>
                 Pedido #{pedidoId ? pedidoId.slice(-6) : 'N/A'} - Monto: ${costoEnvio ? costoEnvio.toFixed(2) : '0.00'}

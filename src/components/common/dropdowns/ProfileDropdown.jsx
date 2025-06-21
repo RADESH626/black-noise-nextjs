@@ -42,7 +42,7 @@ function ProfileDropdown({ isOpen, onClose }) {
   return (
     <div
       ref={dropdownRef}
-      className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-50"
+      className="absolute right-0 mt-2 w-48 bg-transparent rounded-md shadow-lg py-1 z-50"
     >
       <BotonGeneral
         onClick={handleViewProfile}
@@ -53,7 +53,7 @@ function ProfileDropdown({ isOpen, onClose }) {
       </BotonGeneral>
       <BotonGeneral
         onClick={handleLogout}
-        variant="danger"
+        variant="secondary"
         className="w-full text-left"
       >
         Cerrar Sesión

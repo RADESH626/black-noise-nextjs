@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { encontrarDesignsPorId, actualizarDesign } from "@/app/acciones/DesignActions";
 import { useDialog } from "@/context/DialogContext";
 import { CategoriaProducto } from "@/models/enums/CategoriaProducto";
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 function EditDesignPage({ params }) {
   const router = useRouter();
@@ -279,21 +280,22 @@ function EditDesignPage({ params }) {
         </div>
 
         <div className="flex justify-end space-x-4 mt-6">
-          <button
+          <BotonGeneral
             type="button"
             onClick={() => router.push("/admin/designs")}
-            className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200 ease-in-out"
+            variant="secondary"
+            className="transition duration-200 ease-in-out"
           >
             Cancelar
-          </button>
-          <button
+          </BotonGeneral>
+          <BotonGeneral
             type="submit"
-            aria-disabled={loading}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200 ease-in-out"
             disabled={loading}
+            variant="primary"
+            className="transition duration-200 ease-in-out"
           >
             {loading ? "Actualizando..." : "Actualizar Diseño"}
-          </button>
+          </BotonGeneral>
         </div>
       </form>
     </div>

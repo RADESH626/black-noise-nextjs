@@ -1,6 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import { MetodoPago } from '../../models/enums/pago/MetodoPago';
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 function PaymentForm({ handlePago }) {
   const [nombre, setNombre] = useState("");
@@ -190,23 +191,13 @@ function PaymentForm({ handlePago }) {
         <p style={{ color: "#252424FF", marginBottom: "1rem" }}>{error}</p>
       )}
 
-      <button
+      <BotonGeneral
         type="submit"
-        style={{
-          width: "100%",
-          backgroundColor: "#FFFFFFFF",
-          color: "#FFFFFF",
-          fontWeight: "600",
-          padding: "0.75rem",
-          borderRadius: "0.375rem",
-          cursor: "pointer",
-          transition: "background-color 0.3s",
-        }}
-        onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#154780FF")}
-        onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#154780FF")}
+        variant="primary"
+        className="w-full"
       >
         Pagar Ahora
-      </button>
+      </BotonGeneral>
     </form>
   );
 }

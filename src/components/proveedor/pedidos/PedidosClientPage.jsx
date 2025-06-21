@@ -7,9 +7,10 @@ import Link from "next/link";
 import { actualizarPedidoPorProveedor } from "@/app/acciones/ProveedorPedidoActions";
 import { useDialog } from "@/context/DialogContext";
 import { useState, useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query"; // Mantener si se usa para invalidar, aunque la carga inicial no use useQuery
+import { useQueryClient } from "@tanstack/react-query"; // Se mantiene para invalidar queries, aunque la carga inicial no use useQuery
 import { EstadoPedido } from "@/models/enums/PedidoEnums";
 import { updateEstadoPedido } from "@/app/acciones/PedidoActions";
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 export default function PedidosClientPage({ initialPedidos }) {
   const { data: session, status } = useSession();
@@ -271,13 +272,14 @@ export default function PedidosClientPage({ initialPedidos }) {
                                 placeholder="Costo"
                               />
 
-                              <button
+                              <BotonGeneral
                                 onClick={() => handleUpdateCostoEnvio(pedido._id.toString())}
                                 disabled={isUpdating[pedido._id.toString()] || editableCostoEnvio[pedido._id.toString()] === pedido.costoEnvio}
-                                className={`bg-green-500 hover:bg-green-600 text-black font-bold py-2 px-4 rounded-md text-sm transition-colors duration-200 ${isUpdating[pedido._id.toString()] || editableCostoEnvio[pedido._id.toString()] === pedido.costoEnvio ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                variant="success"
+                                className={`text-sm ${isUpdating[pedido._id.toString()] || editableCostoEnvio[pedido._id.toString()] === pedido.costoEnvio ? 'opacity-50 cursor-not-allowed' : ''}`}
                               >
                                 {isUpdating[pedido._id.toString()] ? 'Guardando...' : 'Guardar'}
-                              </button>
+                              </BotonGeneral>
                             </div>
                           )}
 

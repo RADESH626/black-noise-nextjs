@@ -15,9 +15,9 @@ const CartModal = ({ cartItems, onClose, isOpen, onRemoveItem }) => {
     <div ref={dialogRef} className="absolute right-0 mt-2 p-4 rounded-lg shadow-lg max-w-xs w-80 max-h-96 overflow-y-auto z-50" style={{ backgroundColor: "#FFFFFF" }}>
       <div className="flex justify-between items-center mb-4 px-4 pt-2">
         <h2 className="text-xl font-bold">Tu Carrito</h2>
-        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+        <BotonGeneral onClick={onClose} variant="secondary" className="text-gray-500 hover:text-gray-700">
           <Image src="/icons/icono-x.svg" alt="Cerrar" width={24} height={24} />
-        </button>
+        </BotonGeneral>
       </div>
 
       <div className="mt-4 px-4 pb-2">

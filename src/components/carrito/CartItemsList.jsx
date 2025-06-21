@@ -1,5 +1,6 @@
 'use client'
 import { motion } from "framer-motion";
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 function CartItemsList({ cartItems }) {
   return (
@@ -19,7 +20,13 @@ function CartItemsList({ cartItems }) {
         >
           <div className="w-12 h-12 bg-[#000000] rounded-full border-2 border-[#1F57ACFF]"></div>
           <div className="flex-1">
-            <button className="text-xs mb-2 px-2 py-1 bg-[#2a2a2a] rounded-full hover:bg-[#1F57ACFF] hover:text-white transition-colors duration-300">EDITAR</button>
+            <BotonGeneral
+              type="button"
+              variant="secondary"
+              className="text-xs mb-2 px-2 py-1 rounded-full hover:bg-[#1F57ACFF] hover:text-white transition-colors duration-300"
+            >
+              EDITAR
+            </BotonGeneral>
             <div className="text-sm text-[#1F57ACFF] flex items-center gap-1 mb-2">
               ❤️ <span>2 mil</span>
             </div>

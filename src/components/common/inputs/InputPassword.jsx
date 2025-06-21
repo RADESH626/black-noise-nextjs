@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 function InputPassword(props) {
   const [showPassword, setShowPassword] = useState(false);
@@ -29,26 +30,24 @@ function InputPassword(props) {
         required
         {...props}
       />
-      <button
+      <BotonGeneral
         type="button"
         onClick={togglePasswordVisibility}
+        variant="info"
         className="
           absolute
           right-3
           top-1/2
           transform
           -translate-y-1/2
-          bg-bn-accent
-          text-white
           text-xs
           px-2
           py-1
           rounded
-          hover:bg-bn-accent-opaque
         "
       >
         {showPassword ? 'Ocultar' : 'Mostrar'}
-      </button>
+      </BotonGeneral>
     </div>
   );
 }

@@ -9,23 +9,23 @@ function BotonGeneral({ children, onClick, type = 'button', disabled = false, cl
 
     switch (variant) {
         case 'primary':
-            variantStyles = 'bg-gradient-primary-button';
+            variantStyles = 'btn-gradient-primary';
             textStyles = 'text-white'; // Texto blanco para el botón primario
             break;
         case 'secondary':
-            variantStyles = 'bg-gradient-secondary-button';
-            textStyles = 'text-black';
+            variantStyles = 'btn-gradient-gray-to-white'; // Clase CSS personalizada para el gradiente
+            textStyles = 'text-white';
             break;
         case 'danger':
-            variantStyles = 'bg-gradient-danger-button';
+            variantStyles = 'btn-gradient-danger';
             textStyles = 'text-white';
             break;
         case 'success':
-            variantStyles = 'bg-gradient-success-button';
+            variantStyles = 'btn-gradient-success';
             textStyles = 'text-white';
             break;
         case 'info':
-            variantStyles = 'bg-gradient-info-button';
+            variantStyles = 'btn-gradient-info';
             textStyles = 'text-white';
             break;
         default:

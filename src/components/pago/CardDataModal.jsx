@@ -48,13 +48,14 @@ export default function CardDataModal({ isOpen, onClose, onCardDataSubmit }) {
 
   return (
     <dialog ref={dialogRef} className="relative p-8 rounded-lg shadow-lg max-w-md w-11/12 max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "#F7F1F1FF", color: "#000000FF", margin: "auto" }}>
-      <button
+      <BotonGeneral
         onClick={onClose}
+        variant="secondary"
         className="absolute top-4 right-4 text-black text-2xl font-bold"
         aria-label="Cerrar"
       >
-        &times;
-      </button>
+        Cerrar
+      </BotonGeneral>
       <h2 className="text-2xl font-bold mb-4" style={{ color: "#111010FF" }}>Datos de la Tarjeta</h2>
 
       <form onSubmit={handleSubmit}>

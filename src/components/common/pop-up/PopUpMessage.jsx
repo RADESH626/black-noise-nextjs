@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 const PopUpMessage = ({ message, type, onClose, persistent = false }) => {
   const [isVisible, setIsVisible] = useState(true);
@@ -54,12 +55,13 @@ const PopUpMessage = ({ message, type, onClose, persistent = false }) => {
             </span>
             <p className="font-medium text-lg">{message}</p>
           </div>
-          <button 
-            onClick={() => { setIsVisible(false); onClose(); }} 
-            className="ml-4 text-secondary hover:text-neutral-300 transition-colors duration-200"
+          <BotonGeneral
+            onClick={() => { setIsVisible(false); onClose(); }}
+            variant="secondary"
+            className="ml-4"
           >
-            ✕
-          </button>
+            Cerrar
+          </BotonGeneral>
         </div>
       </div>
     </dialog>
