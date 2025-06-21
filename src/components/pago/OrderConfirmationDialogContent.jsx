@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 function OrderConfirmationDialogContent({ pedidoId, onClose }) {
   return (
@@ -16,20 +17,22 @@ function OrderConfirmationDialogContent({ pedidoId, onClose }) {
       <p className="text-gray-700 mb-6">Recibirás un correo de confirmación con los detalles de tu pedido.</p>
       <div className="flex flex-col space-y-3">
         <Link href="/catalogo" passHref>
-          <button
+          <BotonGeneral
             onClick={onClose}
-            className="w-full bg-blue-600 text-white font-semibold py-3 rounded hover:bg-blue-700 transition"
+            variant="secondary"
+            className="w-full py-3"
           >
             Continuar Comprando
-          </button>
+          </BotonGeneral>
         </Link>
         <Link href="/perfil/mis-pedidos" passHref>
-          <button
+          <BotonGeneral
             onClick={onClose}
-            className="w-full bg-gray-300 text-gray-800 font-semibold py-3 rounded hover:bg-gray-400 transition"
+            variant="info"
+            className="w-full py-3"
           >
             Ver Mis Pedidos
-          </button>
+          </BotonGeneral>
         </Link>
       </div>
     </div>

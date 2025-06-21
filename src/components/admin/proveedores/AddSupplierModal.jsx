@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react'; // Import useSession
 import { useDialog } from '@/context/DialogContext'; // Import useDialog
 import { CategoriaProducto } from '@/models/enums/CategoriaProducto'; // Import CategoriaProducto enum
 import { MetodoPago } from '@/models/enums/pago/MetodoPago'; // Import MetodoPago enum
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 const AddSupplierModal = ({ onSuccess, onModalClose }) => { // Removed isOpen, onClose
     const { data: session } = useSession(); // Get session data
@@ -247,13 +248,14 @@ const AddSupplierModal = ({ onSuccess, onModalClose }) => { // Removed isOpen, o
                             onChange={handleChange}
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         />
-                        <button
+                        <BotonGeneral
                             type="button"
                             onClick={handleFillWithMyPhone}
-                            className="ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline text-sm"
+                            variant="info"
+                            className="ml-2 text-sm"
                         >
                             Llenar con mis datos
-                        </button>
+                        </BotonGeneral>
                     </div>
                 </div>
                 <div>
@@ -356,21 +358,21 @@ const AddSupplierModal = ({ onSuccess, onModalClose }) => { // Removed isOpen, o
                     </label>
                 </div>
                 <div className="flex justify-end space-x-4 mt-6">
-                    <button
+                    <BotonGeneral
                         type="submit"
-                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        variant="primary"
                         disabled={loading}
                     >
                         {loading ? 'Agregando...' : 'Agregar Proveedor'}
-                    </button>
-                    <button
+                    </BotonGeneral>
+                    <BotonGeneral
                         type="button"
                         onClick={onModalClose} // Use onModalClose here
-                        className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        variant="secondary"
                         disabled={loading}
                     >
                         Cancelar
-                    </button>
+                    </BotonGeneral>
                 </div>
             </form>
         </>

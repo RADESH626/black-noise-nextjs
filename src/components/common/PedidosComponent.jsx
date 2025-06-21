@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { obtenerPedidosPagadosPorUsuarioId } from "@/app/acciones/PedidoActions";
 // import PaymentModal from '@/components/pago/PaymentModal'; // No longer needed
 import DesignImageDisplay from '@/components/common/DesignImageDisplay';
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 const PedidosContent = () => { // No longer needs onPaymentSuccess prop
   const { data: session, status } = useSession();
@@ -121,13 +122,13 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
                 />
               )}
               <div className="absolute top-0 right-0 m-3">
-                {/* The "Pagar" button is removed as orders are paid first */}
-                <button
+                <BotonGeneral
                   onClick={() => alert(`Ver detalles del pedido: ${pedido._id}`)}
-                  className="bg-white text-purple-700 font-semibold py-1 px-4 rounded-md text-sm hover:bg-gray-200 transition duration-150"
+                  variant="info"
+                  className="py-1 px-4 text-sm"
                 >
                   VER DETALLES
-                </button>
+                </BotonGeneral>
               </div>
             </div>
             <div className="p-4 gradient-text-bg flex flex-col">
@@ -144,12 +145,13 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
                     <p className="font-semibold">Dirección: {pedido.userId.direccion}</p>
                   )}
                 </div>
-                <button
+                <BotonGeneral
                   onClick={() => alert(`Solicitar devolución para el pedido: ${pedido._id}`)}
-                  className="bg-red-600 text-black font-semibold py-2 px-4 rounded-md text-sm hover:bg-red-700 transition duration-150"
+                  variant="danger"
+                  className="py-2 px-4 text-sm"
                 >
                   Solicitar Devolución
-                </button>
+                </BotonGeneral>
               </div>
               <div className="mt-4 border-t border-gray-700 pt-4">
                 <p className="font-semibold mb-2">Ítems del Pedido:</p>

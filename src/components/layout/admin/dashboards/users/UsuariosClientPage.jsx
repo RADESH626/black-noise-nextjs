@@ -15,6 +15,7 @@ import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import { useDialog } from '@/context/DialogContext';
 import { useActionState } from 'react'; // For React 19
 import { useFormStatus } from 'react-dom'; // For React 19
+import BotonGeneral from '@/components/common/botones/BotonGeneral'; // Import BotonGeneral
 
 // Utility function for date formatting
 const formatDate = (dateString) => {
@@ -42,16 +43,14 @@ function ToggleUserStatusForm({ userId, currentStatus, onStatusChanged }) {
         <form action={formAction}>
             <input type="hidden" name="id" value={userId} />
             <input type="hidden" name="newStatus" value={String(!currentStatus)} />
-            <button
+            <BotonGeneral
                 type="submit"
                 disabled={pending}
-                className={`px-3 py-1.5 font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75 text-sm whitespace-nowrap ${currentStatus
-                    ? 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500'
-                    : 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500'
-                }`}
+                variant={currentStatus ? 'danger' : 'success'}
+                className="px-3 py-1.5 text-sm whitespace-nowrap"
             >
                 {pending ? (currentStatus ? 'Deshabilitando...' : 'Habilitando...') : (currentStatus ? 'Deshabilitar' : 'Habilitar')}
-            </button>
+            </BotonGeneral>
         </form>
     );
 }

@@ -11,9 +11,9 @@ export default function HeaderProveedor() {
   return (
     <header className="bg-black text-white p-4 flex justify-between items-center">
       <div className="flex items-center">
-        <Link href="/" className="text-2xl font-bold">
+        {/* <Link href="/" className="text-2xl font-bold no-underline">
           {appTitle}
-        </Link>
+        </Link> */}
       </div>
       {session?.user?.name && (
         <div className="flex items-center space-x-4">

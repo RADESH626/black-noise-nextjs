@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { ObtenerUsuarioPorCorreo } from '@/app/acciones/UsuariosActions';
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 export default function UserDataForm({ onUserDataChange }) {
   const { data: session, status } = useSession();
@@ -146,13 +147,14 @@ export default function UserDataForm({ onUserDataChange }) {
             className="w-full border rounded px-3 py-2 mt-1"
             placeholder="Tu dirección completa"
           />
-          <button
+          <BotonGeneral
             type="button"
             onClick={handleAutoFillAddress}
-            className="mt-2 w-full bg-gray-300 text-gray-800 font-semibold py-2 rounded hover:bg-gray-400 transition"
+            variant="info"
+            className="mt-2 w-full py-2"
           >
             Rellenar dirección
-          </button>
+          </BotonGeneral>
         </label>
       )}
     </div>

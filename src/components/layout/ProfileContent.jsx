@@ -236,12 +236,12 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
             </div>
             <div className="flex flex-col sm:flex-row justify-center md:justify-start space-y-2 sm:space-y-0 sm:space-x-3">
 
-              <BotonGeneral onClick={handleEditProfile}>EDITAR PERFIL</BotonGeneral>
+              <BotonGeneral onClick={handleEditProfile} variant="info">EDITAR PERFIL</BotonGeneral>
               <Link href="/catalogo">
-                <BotonGeneral>VER DISEÑOS DE LA COMUNIDAD</BotonGeneral>
+                <BotonGeneral variant="secondary">VER DISEÑOS DE LA COMUNIDAD</BotonGeneral>
               </Link>
               {/* Removed: <BotonGeneral onClick={handleCreateNewOrder}>CREAR NUEVO PEDIDO</BotonGeneral> */}
-              <BotonGeneral onClick={() => signOut({ callbackUrl: '/login' })}>CERRAR SESIÓN</BotonGeneral>
+              <BotonGeneral onClick={() => signOut({ callbackUrl: '/login' })} variant="danger">CERRAR SESIÓN</BotonGeneral>
             </div>
           </div>
         </div>
@@ -263,9 +263,9 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
           <>
             {/* Always show the Add Design button */}
             <div className="flex justify-center mb-4">
-              <button onClick={handleAddDesign} className="w-16 h-16 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center shadow-lg transform transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50" aria-label="Agregar nuevo diseño">
+              <BotonGeneral onClick={handleAddDesign} variant="primary" className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg transform transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50" aria-label="Agregar nuevo diseño">
                 <img src="/icons/icono +.svg" alt="Agregar" className="w-8 h-8" />
-              </button>
+              </BotonGeneral>
             </div>
 
             {userDesigns.length === 0 ? (

@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 function DesignsTable({ designs }) {
   if (!designs || designs.length === 0) {
@@ -67,32 +68,19 @@ function DesignsTable({ designs }) {
                 ${typeof design.precio === 'number' ? design.precio.toFixed(2) : '0.00'}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <Link
-                  href={`/admin/designs/editar/${design._id}`}
+                <BotonGeneral
+                  onClick={() => console.log('Editar diseño:', design._id)} // Assuming this will navigate or open a modal
+                  variant="info"
                   className="mr-4"
-                  style={{
-                    color: '#2563EB', // text-blue-600
-                    textDecoration: 'none',
-                  }}
-                  onMouseOver={(e) => (e.currentTarget.style.color = '#1D4ED8')} // hover:text-blue-900
-                  onMouseOut={(e) => (e.currentTarget.style.color = '#2563EB')}
                 >
                   Editar
-                </Link>
-                <button
+                </BotonGeneral>
+                <BotonGeneral
                   onClick={() => console.log('Eliminar diseño:', design._id)}
-                  style={{
-                    color: '#DC2626', // text-red-600
-                    background: 'none',
-                    border: 'none',
-                    padding: 0,
-                    cursor: 'pointer',
-                  }}
-                  onMouseOver={(e) => (e.currentTarget.style.color = '#7F1D1D')} // hover:text-red-900
-                  onMouseOut={(e) => (e.currentTarget.style.color = '#DC2626')}
+                  variant="danger"
                 >
                   Eliminar
-                </button>
+                </BotonGeneral>
               </td>
             </tr>
           ))}

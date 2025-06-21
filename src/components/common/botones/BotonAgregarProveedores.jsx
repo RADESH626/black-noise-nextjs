@@ -1,10 +1,17 @@
 import React from 'react';
+import BotonGeneral from './BotonGeneral'; // Import BotonGeneral
 
-function BotonAgregarProveedores({ children, ...props }) {
+function BotonAgregarProveedores({ children, onClick, type = 'button', disabled = false, className = '' }) {
   return (
-    <button {...props}>
+    <BotonGeneral
+      onClick={onClick}
+      type={type}
+      disabled={disabled}
+      variant="primary"
+      className={className}
+    >
       {children || "Agregar Proveedor"}
-    </button>
+    </BotonGeneral>
   );
 }
 

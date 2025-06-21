@@ -3,6 +3,7 @@
 import React, { useRef } from 'react'; // Import useRef
 import Link from 'next/link';
 import Image from 'next/image';
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 // Add an isOpen prop to control the dialog visibility
 const CartModal = ({ cartItems, onClose, isOpen, onRemoveItem }) => {
@@ -21,9 +22,9 @@ const CartModal = ({ cartItems, onClose, isOpen, onRemoveItem }) => {
 
       <div className="mt-4 px-4 pb-2">
         <Link href="/carrito">
-          <button className="w-full bg-black text-white py-2 rounded hover:bg-gray-800">
+          <BotonGeneral variant="secondary" className="w-full py-2">
             Ir al Carrito
-          </button>
+          </BotonGeneral>
         </Link>
       </div>
 
@@ -52,12 +53,13 @@ const CartModal = ({ cartItems, onClose, isOpen, onRemoveItem }) => {
                 </div>
 
 
-                <button
+                <BotonGeneral
                   onClick={() => onRemoveItem(item.designId)}
-                  className=" rounded-full hover:bg-gray-100 flex "
+                  variant="danger"
+                  className="p-1 rounded-full flex items-center justify-center"
                 >
                   <Image src="/icons/icono-basurero.svg" alt="Eliminar" width={24} height={24} />
-                </button>
+                </BotonGeneral>
               </li>
             ))}
           </ul>

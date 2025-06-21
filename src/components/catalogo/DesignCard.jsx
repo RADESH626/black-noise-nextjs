@@ -1,5 +1,6 @@
 'use client'
 import React from 'react';
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 function DesignCard({ diseño, addItem, isInCart }) {
   console.log('Valor de diseño.userAvatar:', diseño.userAvatar);
@@ -38,15 +39,14 @@ function DesignCard({ diseño, addItem, isInCart }) {
         <p>Precio: ${diseño.price !== undefined && diseño.price !== null ? diseño.price.toFixed(2) : '0.00'}</p>
 
         <div className="flex items-center justify-end mt-2">
-          <button
-            className={`px-3 py-1 rounded transition ${
-              isInCart ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
-            }`}
+          <BotonGeneral
+            variant={isInCart ? 'secondary' : 'primary'}
             onClick={() => addItem(diseño)}
             disabled={isInCart}
+            className="px-3 py-1"
           >
             {isInCart ? 'En el carrito' : 'Añadir al carrito'}
-          </button>
+          </BotonGeneral>
         </div>
       </div>
     </div>

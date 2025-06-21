@@ -6,7 +6,7 @@ function ProveedorLayoutContent({ children }) {
   return (
     <div className="flex h-screen bg-gray-100">
       <ProveedorSidebar />
-      <main className="w-full h-full">
+      <main className="w-full h-full ">
         {children}
       </main>
     </div>

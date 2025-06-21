@@ -97,12 +97,13 @@ function HeaderPrincipal() {
                                     <Link href="/perfil" className="block px-4 py-2 text-sm text-white hover:bg-gray-700" onClick={() => setIsDropdownOpen(false)}>
                                         Ver Perfil
                                     </Link>
-                                    <button
+                                    <BotonGeneral
                                         onClick={() => { signOut({ callbackUrl: '/login' }); setIsDropdownOpen(false); }}
-                                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700"
+                                        variant="danger"
+                                        className="w-full text-left"
                                     >
                                         Cerrar Sesión
-                                    </button>
+                                    </BotonGeneral>
                                 </div>
                             )}
                         </div>

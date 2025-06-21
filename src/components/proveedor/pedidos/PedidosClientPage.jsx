@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import HeaderProveedor from "@/components/layout/proveedor/HeaderProveedor";
+// import HeaderProveedor from "@/components/layout/proveedor/HeaderProveedor";
 import { actualizarPedidoPorProveedor } from "@/app/acciones/ProveedorPedidoActions";
 import { useDialog } from "@/context/DialogContext";
 import { useState, useEffect } from "react";
@@ -126,9 +126,9 @@ export default function PedidosClientPage({ initialPedidos }) {
 
   return (
     <>
-      <HeaderProveedor />
+      {/* <HeaderProveedor /> */}
       <div>
-        <h1 className="text-2xl font-bold mb-4 text-gray-800">Mis Pedidos</h1>
+        <h1 className="text-2xl font-bold mb-4 text-gray-800 p-2">Mis Pedidos</h1>
 
         {pedidos && pedidos.length === 0 ? (
           <div className="text-center">
@@ -229,7 +229,7 @@ export default function PedidosClientPage({ initialPedidos }) {
                             {pedido.items && pedido.items.length > 0 ? (
                               <div className="flex flex-col  p-2 rounded-md gap-4">
                                 {pedido.items.map((item, index) => (
-                                  <div key={index} className="flex items-center space-x-3  p-2 rounded-md bg-white">
+                                  <div key={index} className="flex items-center space-x-3  p-2 rounded-md bg-gray-400">
                                     {item.designId?.imagen && (
                                       <img
                                         src={item.designId.imagen}

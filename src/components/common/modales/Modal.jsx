@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from 'react';
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 const Modal = ({ title, children, onClose, isOpen, type = 'default', onConfirm, onCancel, confirmText = 'Confirmar', cancelText = 'Cancelar', showActions = false }) => {
   const dialogRef = useRef(null);
@@ -42,18 +43,20 @@ const Modal = ({ title, children, onClose, isOpen, type = 'default', onConfirm, 
         </button>
         {showActions && (
           <div className="mt-6 flex justify-end space-x-4">
-            <button
+            <BotonGeneral
               onClick={onCancel}
-              className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors"
+              variant="secondary"
+              className="px-4 py-2"
             >
               {cancelText}
-            </button>
-            <button
+            </BotonGeneral>
+            <BotonGeneral
               onClick={onConfirm}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+              variant="primary"
+              className="px-4 py-2"
             >
               {confirmText}
-            </button>
+            </BotonGeneral>
           </div>
         )}
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 export default function FormFiltrarVentas({ initialVentasFromPage }) {
   const [ventas, setVentas] = useState(initialVentasFromPage || []);
@@ -30,18 +31,13 @@ export default function FormFiltrarVentas({ initialVentasFromPage }) {
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute top-0 right-0 m-3">
-                  <button
+                  <BotonGeneral
                     onClick={() => alert(`Ver detalles de la venta: ${venta._id}`)}
-                    className="font-semibold py-1 px-4 rounded-md text-sm transition duration-150"
-                    style={{
-                      backgroundColor: '#FFFFFF', /* bg-white */
-                      color: '#6B21A8'           /* text-purple-700 */
-                    }}
-                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#E5E7EB')} /* hover:bg-gray-200 */
-                    onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#FFFFFF')}
+                    variant="info"
+                    className="py-1 px-4 text-sm"
                   >
                     VER DETALLES
-                  </button>
+                  </BotonGeneral>
                 </div>
               </div>
               <div className="p-4 gradient-text-bg flex justify-between items-center" style={{ color: '#FFFFFF' }}>

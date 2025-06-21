@@ -13,6 +13,7 @@ import { Rol } from '@/models/enums/usuario/Rol';
 import { obtenerProveedores } from '@/app/acciones/ProveedorActions'; // Import the new action
 import { useDialog } from '@/context/DialogContext'; // Import useDialog
 import AddSupplierModal from '@/components/admin/proveedores/AddSupplierModal'; // Import AddSupplierModal
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 const ProveedoresClientPage = ({ initialProveedores }) => {
     const { data: session, status } = useSession();
@@ -84,12 +85,12 @@ const ProveedoresClientPage = ({ initialProveedores }) => {
         <div className="container mx-auto p-4">
             <h1 className="text-3xl font-bold mb-6 text-gray-800">Gestión de Proveedores</h1>
             <div className="mb-4">
-                <button
+                <BotonGeneral
                     onClick={handleOpenModal}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    variant="primary"
                 >
                     Agregar Proveedor
-                </button>
+                </BotonGeneral>
             </div>
             {proveedores.length === 0 ? (
                 <p className="text-gray-600">No hay proveedores registrados.</p>
@@ -115,9 +116,12 @@ const ProveedoresClientPage = ({ initialProveedores }) => {
                                     <TdGeneral>{proveedor.direccionEmpresa || 'N/A'}</TdGeneral>
                                     <TdGeneral>{proveedor.habilitado ? 'Habilitado' : 'Deshabilitado'}</TdGeneral>
                                     <TdGeneral>
-                                        {/* Add action buttons here, e.g., Edit, Delete */}
-                                        <button className="text-blue-600 hover:underline mr-2">Editar</button>
-                                        <button className="text-red-600 hover:underline">Eliminar</button>
+                                        <BotonGeneral variant="info" className="mr-2" onClick={() => { /* TODO: Implement edit modal for provider */ }}>
+                                            Editar
+                                        </BotonGeneral>
+                                        <BotonGeneral variant="danger" onClick={() => { /* TODO: Implement delete action for provider */ }}>
+                                            Eliminar
+                                        </BotonGeneral>
                                     </TdGeneral>
                                 </tr>
                             ))}

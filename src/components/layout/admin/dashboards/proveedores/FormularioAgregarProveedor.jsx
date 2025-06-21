@@ -210,7 +210,9 @@ function FormularioAgregarProveedor({ onSuccess }) {
         )}
       </div>
       {displayedAccessKey ? (
-        <BotonGeneral type="button" onClick={handleCloseModal} customText="Cerrar" />
+        <BotonGeneral type="button" onClick={handleCloseModal} variant="secondary">
+          Cerrar
+        </BotonGeneral>
       ) : (
         <SubmitButton />
       )}

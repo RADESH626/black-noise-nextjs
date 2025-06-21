@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation'; // Import useRouter
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 function AdminSidebar() { // Remove activeDashboard, onSelectDashboard props
   const router = useRouter(); // Initialize useRouter
@@ -56,13 +57,14 @@ function AdminSidebar() { // Remove activeDashboard, onSelectDashboard props
         </ul>
       </nav>
        <div className="mt-auto">
-        <button
+        <BotonGeneral
           onClick={() => signOut({ callbackUrl: '/login' })} // Redirect to login page after logout
-          className="flex items-center p-3 hover:bg-gray-700 rounded-md transition-colors w-full text-left"
+          variant="danger"
+          className="flex items-center justify-center w-full text-left"
         >
           <Image src="/icons/icono-salida.svg" alt="Cerrar Sesión" width={20} height={20} className="mr-3 filter invert" />
           <span>Cerrar Sesión</span>
-        </button>
+        </BotonGeneral>
       </div>
     </aside>
   );

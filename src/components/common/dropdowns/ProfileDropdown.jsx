@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import React, { useRef, useEffect } from 'react';
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 function ProfileDropdown({ isOpen, onClose }) {
   const router = useRouter();
@@ -43,18 +44,20 @@ function ProfileDropdown({ isOpen, onClose }) {
       ref={dropdownRef}
       className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-50"
     >
-      <button
+      <BotonGeneral
         onClick={handleViewProfile}
-        className="block px-4 py-2 text-sm text-white hover:bg-gray-700 w-full text-left"
+        variant="info"
+        className="w-full text-left"
       >
         Ver Perfil
-      </button>
-      <button
+      </BotonGeneral>
+      <BotonGeneral
         onClick={handleLogout}
-        className="block px-4 py-2 text-sm text-red-400 hover:bg-gray-700 w-full text-left"
+        variant="danger"
+        className="w-full text-left"
       >
         Cerrar Sesión
-      </button>
+      </BotonGeneral>
     </div>
   );
 }

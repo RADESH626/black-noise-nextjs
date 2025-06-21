@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react'; // Import useRef
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 export default function CardDataModal({ isOpen, onClose, onCardDataSubmit }) {
   const [tarjeta, setTarjeta] = useState('');
@@ -127,20 +128,19 @@ export default function CardDataModal({ isOpen, onClose, onCardDataSubmit }) {
         {error && <p style={{ color: "#FF0000FF" }} className="mb-4">{error}</p>}
 
         <div className="flex justify-end gap-4">
-          <button
+          <BotonGeneral
             type="button"
             onClick={onClose}
-            className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded hover:bg-gray-400 transition"
+            variant="secondary"
           >
             Cancelar
-          </button>
-          <button
+          </BotonGeneral>
+          <BotonGeneral
             type="submit"
-            style={{ backgroundColor: "#154780FF", color: "#ffffff" }}
-            className="font-semibold py-2 px-4 rounded hover:bg-blue-700 transition"
+            variant="primary"
           >
             Guardar Tarjeta
-          </button>
+          </BotonGeneral>
         </div>
       </form>
     </dialog>
