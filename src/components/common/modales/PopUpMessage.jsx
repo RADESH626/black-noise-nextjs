@@ -37,7 +37,7 @@ const PopUpMessage = ({ message, type, onClose, persistent = false }) => { // Ad
     <dialog
       ref={dialogRef}
       className={`
-        ${type === 'success' ? 'bg-green-700' : 'bg-red-700'}
+${type === 'success' ? 'bg-green-700' : type === 'error' ? 'bg-red-700' : 'bg-gray-700'}
         text-secondary px-6 py-4 rounded-b-lg
         min-w-[300px] max-w-[500px] absolute top-4 left-1/2 -translate-x-1/2 z-50
         border-0 outline-0
@@ -45,17 +45,22 @@ const PopUpMessage = ({ message, type, onClose, persistent = false }) => { // Ad
     >
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-3 p-2 rounded">
-          <span className={`text-2xl ${type === 'success' ? 'text-neutral-100' : 'text-neutral-100'}`}>
-            {type === 'success' ? '✓' : '✕'}
-          </span>
+          {type === 'success' && (
+            <span className="text-2xl text-neutral-100">✓</span>
+          )}
+          {type === 'error' && (
+            <span className="text-2xl text-neutral-100">✕</span>
+          )}
           <span className="font-medium text-lg text-neutral-100">{message}</span>
         </div>
-        <button 
-          onClick={() => { setIsVisible(false); onClose(); }} 
-          className="ml-4 text-secondary hover:text-neutral-300 transition-colors duration-200"
-        >
-          ✕
-        </button>
+        {!persistent && (
+          <button 
+            onClick={() => { setIsVisible(false); onClose(); }} 
+            className="ml-4 text-secondary hover:text-neutral-300 transition-colors duration-200"
+          >
+            ✕
+          </button>
+        )}
       </div >
     </dialog>
   );

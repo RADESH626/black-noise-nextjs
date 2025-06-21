@@ -66,7 +66,7 @@ function PagosPendientesPage() {
     };
 
     const handlePaymentSubmit = async (pedidoId, paymentData) => {
-        showPopUp("Procesando pago...", "info", false); // Mostrar pop-up de carga
+        showPopUp("Procesando pago...", "info", true); // Mostrar pop-up de carga persistente
         try {
             const { success, message } = await registrarPagoEnvioSimulado(pedidoId, paymentData);
             if (success) {
@@ -79,6 +79,7 @@ function PagosPendientesPage() {
         } catch (err) {
             showPopUp(err.message || "Error de red al procesar el pago.", "error");
         }
+        
     };
 
     if (loading) {
