@@ -18,11 +18,7 @@ function ProveedorSidebar() {
   return (
     <aside className="w-64 bg-black text-white flex flex-col p-4 shadow-lg">
       <div className="mb-8 text-center">
-<<<<<<< HEAD
-        <Link href="/proveedor" className="text-2xl font-bold text-white  transition-colors">
-=======
         <Link href="/proveedor" className="text-2xl font-bold text-white hover:text-pink-400 transition-colors">
->>>>>>> c32cb53 (primer commit)
           BLACK NOISE
         </Link>
         <p className="text-xs text-gray-400">Panel de Proveedor</p>

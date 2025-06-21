@@ -1,10 +1,6 @@
 "use client";
 
-<<<<<<< HEAD
-import UsuariosDashboard from '@/components/layout/admin/dashboards/users/UsuariosClientPage';
-=======
 import UsuariosClientPage from '@/components/layout/admin/dashboards/users/UsuariosClientPage';
->>>>>>> d6a2e0d28c456f0d664ba2fcb2bec0ea9e8b114d
 import PedidosDashboard from '@/components/layout/admin/dashboards/PedidosDashboard';
 
 const AdminDashboardPage = () => {
