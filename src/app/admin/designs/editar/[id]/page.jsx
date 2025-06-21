@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { encontrarDesignsPorId, actualizarDesign } from "@/app/acciones/DesignActions";
 import { useDialog } from "@/context/DialogContext";
@@ -9,7 +9,7 @@ import { CategoriaProducto } from "@/models/enums/CategoriaProducto";
 function EditDesignPage({ params }) {
   const router = useRouter();
   const { showPopUp } = useDialog();
-  const designId = params.id;
+  const designId = React.use(params).id;
 
   const [nombreDesing, setNombreDesing] = useState("");
   const [descripcion, setDescripcion] = useState("");

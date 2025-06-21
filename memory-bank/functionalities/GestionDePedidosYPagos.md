@@ -78,6 +78,7 @@ Este documento describe la funcionalidad de gestión de pedidos y el flujo de pa
 *   **`Pago` Model (`src/models/Pago.js`):**
     *   Nuevo modelo para registrar cada transacción de pago. Incluirá campos como `pedidoId`, `monto`, `fechaPago`, `metodoPago`, `estadoTransaccion`.
     *   **Actualización Importante:** El campo `metodoPago` ahora utiliza el enum centralizado `MetodoPago` definido en `src/models/enums/pago/MetodoPago.js` para asegurar consistencia y evitar valores hardcodeados.
+    *   Se añade el campo `numeroTelefono` de tipo `String`, que será **requerido** si el `metodoPago` es `NEQUI` o `DAVIPLATA`.
 *   **`Pedido` Model (`src/models/Pedido.js`):**
     *   Se añade el campo `paymentId` de tipo `Schema.Types.ObjectId` que hace referencia al modelo `Pago`. Este campo es **requerido** ya que un pedido solo se crea después de un pago exitoso.
 

@@ -26,12 +26,12 @@ export default function FormFiltrarVentas({ initialVentasFromPage }) {
               >
                 <img
                   src="/public/img/Fondos/Fondo 1.jpg"
-                  alt={`Venta ${venta.id}`}
+                  alt={`Venta ${venta._id}`}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute top-0 right-0 m-3">
                   <button
-                    onClick={() => alert(`Ver detalles de la venta: ${venta.id}`)}
+                    onClick={() => alert(`Ver detalles de la venta: ${venta._id}`)}
                     className="font-semibold py-1 px-4 rounded-md text-sm transition duration-150"
                     style={{
                       backgroundColor: '#FFFFFF', /* bg-white */
@@ -62,6 +62,6 @@ export default function FormFiltrarVentas({ initialVentasFromPage }) {
           No hay ventas para mostrar.
         </p>
       )}
-    </div>
-  );
+    </div>
+  );
 }

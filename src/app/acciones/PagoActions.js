@@ -181,14 +181,17 @@ async function obtenerPagosPorUsuarioId(usuarioId) {
 
 // Procesar un pago y crear un pedido
 async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
+
     logger.debug('Entering procesarPagoYCrearPedido with cartItems:', cartItems, 'and paymentDetails:', paymentDetails);
+    
     try {
         await connectDB();
         logger.debug('Database connected for procesarPagoYCrearPedido.');
 
         const Pedido = await getModel('Pedido');
         const Pago = await getModel('Pago');
-        const { userId, nombre, correo, direccion, metodoPago: rawMetodoPago, metodoEntrega, total, cardNumber, expiryDate, cvv, costoEnvio: paymentDetailsCostEnvio } = paymentDetails;
+        const Venta = await getModel('Venta'); // Asegurarse de que el modelo Venta esté disponible
+        const { userId, nombre, correo, direccion, metodoPago: rawMetodoPago, metodoEntrega, total, tarjeta, mes, anio, cvv, numeroTelefono, costoEnvio: paymentDetailsCostEnvio } = paymentDetails;
 
         // Map rawMetodoPago to a valid enum value
         let metodoPago = rawMetodoPago;
@@ -201,35 +204,33 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
 
         // 1. Simular procesamiento de pago (aquí iría la integración real con pasarela de pago)
         // Por ahora, asumimos que el pago siempre es exitoso.
-        const paymentSuccessful = true;
+        const paymentSuccessful = true; // Simulación de pago
 
         if (!paymentSuccessful) {
             logger.warn('Payment simulation failed.');
             return { success: false, message: 'El pago no pudo ser procesado.' };
         }
 
-        // Según el nuevo flujo, el costo de envío inicial es 0 y el estado de pago es PAGADO
-        // El costo de envío se añadirá y se convertirá en pendiente más tarde por el proveedor.
         const costoEnvioInicial = 0;
 
-        // 2. Crear el Pedido
+        // 1. Crear el Pedido (inicialmente con estadoPago PENDIENTE)
         const nuevoPedidoData = {
             userId: userId,
             items: cartItems.map(item => ({
                 designId: item.designId,
                 quantity: item.quantity,
                 price: item.price,
-                // Otros campos relevantes del producto si es necesario
             })),
             metodoEntrega: metodoEntrega,
-            estadoPedido: 'PENDIENTE', // El estado del pedido sigue siendo PENDIENTE para el flujo general del pedido
-            total: total, // El total inicial es solo el de los ítems
-            costoEnvio: costoEnvioInicial, // Costo de envío inicial es 0
+            estadoPedido: 'PENDIENTE',
+            total: total,
+            costoEnvio: costoEnvioInicial,
             direccionEnvio: direccion,
             destinatario: { nombre, correo, direccion },
-            // paymentId will be added after Pago is created
-            fechaEstimadaEntrega: new Date(new Date().setDate(new Date().getDate() + 7)), // Example: 7 days from now
+            fechaEstimadaEntrega: new Date(new Date().setDate(new Date().getDate() + 7)),
+            estadoPago: 'PENDIENTE', // Asegurar que el estado inicial sea PENDIENTE
         };
+
         logger.debug('Value of nuevoPedidoData:', nuevoPedidoData);
         logger.debug('Type of nuevoPedidoData:', typeof nuevoPedidoData);
 
@@ -237,33 +238,11 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
 
         if (!pedidoCreationSuccess) {
             logger.error('Error creating pedido:', pedidoCreationError);
-            return { success: false, message: pedidoCreationError || 'Error al crear el pedido después del pago.' };
+            return { success: false, message: pedidoCreationError || 'Error al crear el pedido.' };
         }
         logger.debug('Pedido created successfully (instance from guardarPedido):', nuevoPedido._id);
 
-        // Fetch the newly created order and populate design details for supplier assignment
-        const PedidoModel = await getModel('Pedido');
-        const populatedPedido = await PedidoModel.findById(nuevoPedido._id)
-            .populate('items.designId') // Populate the designId to get category
-            .lean();
-
-        logger.debug('Populated Pedido for assignment:', populatedPedido);
-
-        if (populatedPedido) {
-            logger.debug('Attempting to assign order to provider for order ID:', populatedPedido._id);
-            const { success: assignSuccess, message: assignMessage } = await assignOrderToProvider(populatedPedido);
-            if (!assignSuccess) {
-                logger.warn(`Failed to assign provider for order ${populatedPedido._id}: ${assignMessage}`);
-                // Optionally, update order status to indicate assignment failure or pending manual review
-                // This is already handled within assignOrderToProvider, but can be logged here.
-            } else {
-                logger.debug(`Order ${populatedPedido._id} successfully assigned to provider.`);
-            }
-        } else {
-            logger.error(`Could not find newly created order ${nuevoPedido._id} for provider assignment.`);
-        }
-
-        // 3. Crear un nuevo registro de Venta
+        // 2. Crear un nuevo registro de Venta
         const nuevaVentaData = {
             usuarioId: userId,
             pedidoId: nuevoPedido._id, // Link to the newly created Pedido
@@ -276,32 +255,71 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
 
         if (!ventaCreationSuccess) {
             logger.error('Error creating venta:', ventaCreationError);
-            return { success: false, message: ventaCreationError || 'Error al crear el registro de venta.' }; // Fallar si la venta no se crea
+            // Si la venta falla, cancelar el pedido
+            await Pedido.findByIdAndUpdate(nuevoPedido._id, { estadoPago: 'FALLIDO', estadoPedido: 'CANCELADO' });
+            return { success: false, message: ventaCreationError || 'Error al crear el registro de venta. Pedido marcado como fallido.' };
         }
         logger.debug('Venta created successfully:', nuevaVenta);
 
-        // Actualizar el Pedido con el ventaId recién creado
-        // nuevoPedido es una instancia de Mongoose ahora, gracias a la corrección anterior en PedidoActions.js
-        nuevoPedido.ventaId = nuevaVenta._id;
-        const updatedPedidoAfterVentaId = await nuevoPedido.save(); // Guardar el pedido con el ventaId
-        logger.debug('Pedido updated with ventaId successfully. Updated Pedido after ventaId:', updatedPedidoAfterVentaId);
-
-        // 4. Crear un nuevo registro de Pago
-        const nuevoPago = new Pago({
+        // 3. Crear un nuevo registro de Pago
+        const nuevoPagoData = {
             usuarioId: userId,
-            pedidoId: updatedPedidoAfterVentaId._id, // Usar el ID del pedido actualizado
-            ventaId: nuevaVenta._id, // Ahora nuevaVenta._id siempre será válido aquí
+            pedidoId: nuevoPedido._id,
+            ventaId: nuevaVenta._id, // Ahora ventaId está disponible
             valorPago: total,
             metodoPago,
-            estadoTransaccion: 'PAGADO',
-            detallesTarjeta: { cardNumber: cardNumber ? cardNumber.slice(-4) : 'N/A', expiryDate: expiryDate || 'N/A', cvv: '***' }
-        });
-        const pagoGuardado = await nuevoPago.save();
-        logger.debug('Pago record created and linked to Pedido and Venta. Pago ID:', pagoGuardado._id);
+            estadoTransaccion: 'PAGADO', // Asumimos que el pago es exitoso aquí
+            detallesTarjeta: (metodoPago === MetodoPago.TARJETA_CREDITO || metodoPago === MetodoPago.TARJETA_DEBITO) ? { cardNumber: tarjeta ? tarjeta.slice(-4) : 'N/A', expiryDate: mes && anio ? `${mes}/${anio}` : 'N/A', cvv: '***' } : undefined,
+            numeroTelefono: (metodoPago === MetodoPago.NEQUI || metodoPago === MetodoPago.DAVIPLATA) ? numeroTelefono : undefined,
+        };
+        let pagoGuardado;
+        try {
+            const nuevoPago = new Pago(nuevoPagoData);
+            pagoGuardado = await nuevoPago.save();
+            logger.debug('Pago record created and linked to Pedido and Venta. Pago ID:', pagoGuardado._id);
+        } catch (pagoError) {
+            logger.error('Error creating pago:', pagoError);
+            // Si el pago falla, cancelar el pedido y la venta
+            await Pedido.findByIdAndUpdate(nuevoPedido._id, { estadoPago: 'CANCELADO', estadoPedido: 'CANCELADO' });
+            await Venta.findByIdAndDelete(nuevaVenta._id); // Eliminar la venta si el pago falla
+            return { success: false, message: 'Error al registrar el pago. Pedido y venta cancelados.' };
+        }
 
-        // 5. Actualizar el Pedido con el paymentId
-        const updatedPedidoWithPaymentId = await Pedido.findByIdAndUpdate(updatedPedidoAfterVentaId._id, { paymentId: pagoGuardado._id }, { new: true });
-        logger.debug('Pedido updated with paymentId successfully. Final Updated Pedido:', updatedPedidoWithPaymentId);
+        // 4. Actualizar el Pedido con el paymentId y estadoPago a PAGADO
+        const updatedPedidoWithPaymentId = await Pedido.findByIdAndUpdate(
+            nuevoPedido._id,
+            { paymentId: pagoGuardado._id, estadoPago: 'PAGADO', ventaId: nuevaVenta._id }, // Añadir ventaId aquí
+            { new: true }
+        );
+        logger.debug('Pedido updated with paymentId, ventaId and estadoPago PAGADO. Final Updated Pedido:', updatedPedidoWithPaymentId);
+
+        // 5. Actualizar la Venta con el pagoId recién creado
+        const updatedVentaWithPagoId = await Venta.findByIdAndUpdate(
+            nuevaVenta._id,
+            { $push: { pagoIds: pagoGuardado._id } },
+            { new: true }
+        );
+        logger.debug('Venta updated with pagoId successfully. Final Updated Venta:', updatedVentaWithPagoId);
+
+        // Fetch the newly created order and populate design details for supplier assignment
+        const PedidoModel = await getModel('Pedido');
+        const populatedPedido = await PedidoModel.findById(updatedPedidoWithPaymentId._id) // Usar updatedPedidoWithPaymentId
+            .populate('items.designId') // Populate the designId to get category
+            .lean();
+
+        logger.debug('Populated Pedido for assignment:', populatedPedido);
+
+        if (populatedPedido) {
+            logger.debug('Attempting to assign order to provider for order ID:', populatedPedido._id);
+            const { success: assignSuccess, message: assignMessage } = await assignOrderToProvider(populatedPedido);
+            if (!assignSuccess) {
+                logger.warn(`Failed to assign provider for order ${populatedPedido._id}: ${assignMessage}`);
+            } else {
+                logger.debug(`Order ${populatedPedido._id} successfully assigned to provider.`);
+            }
+        } else {
+            logger.error(`Could not find newly created order ${updatedPedidoWithPaymentId._id} for provider assignment.`);
+        }
 
         // 6. Vaciar el carrito del usuario
         const { success: clearCartSuccess, message: clearCartMessage } = await clearUserCart(userId);
@@ -333,7 +351,8 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
         revalidatePath('/perfil'); // Revalidate user profile/orders page
         revalidatePath('/admin/pedidos'); // Revalidate admin orders page
         revalidatePath('/admin/pagos'); // Revalidate admin payments page
-        logger.debug('Revalidated paths /perfil, /admin/pedidos, and /admin/pagos.');
+        revalidatePath('/admin/ventas'); // Revalidate admin sales page
+        logger.debug('Revalidated paths /perfil, /admin/pedidos, /admin/pagos, and /admin/ventas.');
 
         return { success: true, message: 'Pago procesado y pedido creado exitosamente.', pedidoId: nuevoPedido._id.toString() };
 

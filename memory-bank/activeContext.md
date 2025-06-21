@@ -1,8 +1,8 @@
-# Contexto de Sesión Activa
+### Session Change Log - 19/6/2025
 
-## Resumen de la Sesión
-Se ha implementado el nuevo "apartado de pagos pendientes" para clientes, incluyendo una vista resumida en el header y una página detallada (`/pagos-pendientes`) donde los usuarios pueden ver y registrar pagos simulados con datos de entrada para los costos de envío adicionales. La lógica de estado de pago de los pedidos se ha ajustado para reflejar estos pagos pendientes. Se ha corregido un `ReferenceError` en `DesignActions.js` relacionado con `processedUsuarioId` y se ha añadido la lógica para mostrar el avatar del usuario en los diseños. Además, se ha corregido la visualización de la imagen de perfil del usuario en la página de perfil y en el catálogo, y se han resuelto problemas de serialización de datos entre componentes de servidor y cliente.
+**Task:** Implementar campo de número de teléfono para pagos Nequi/Daviplata.
 
+<<<<<<< HEAD
 Además, se ha abordado a potential database connection issue by:
 * Moving the MongoDB URI to the `.env.local` file.
 * Modifying the `connectDB` function to handle the case where the existing connection might be disconnected.
@@ -79,3 +79,27 @@ La implementación de la funcionalidad de "apartado de pagos pendientes" está c
 4.  Al hacer clic en "Pagar Ahora", se abre el modal de pago, permite la entrada de datos simulados y, al enviar, registra el pago y actualiza el estado del pedido.
 5.  El `estadoPago` de los pedidos se actualiza correctamente cuando el proveedor añade un costo de envío y cuando el usuario lo paga.
 6.  Los cambios pendientes se han subido al repositorio remoto.
+=======
+**Changes Made:**
+- Se añadió un nuevo estado `phoneNumber` en `src/components/common/CartComponent.jsx` para capturar el número de teléfono.
+- Se implementó la lógica para mostrar condicionalmente un campo de entrada de número de teléfono en `src/components/common/CartComponent.jsx` cuando `Nequi` o `Daviplata` son seleccionados como método de pago.
+- Se actualizó la validación en `handleProcessPayment` en `src/components/common/CartComponent.jsx` para requerir el número de teléfono si el método de pago es Nequi o Daviplata.
+- Se modificó el objeto `paymentDetails` en `src/components/common/CartComponent.jsx` para incluir `numeroTelefono` cuando sea aplicable.
+- Se actualizó la función `procesarPagoYCrearPedido` en `src/app/acciones/PagoActions.js` para recibir y procesar el `numeroTelefono`.
+- Se añadió el campo `numeroTelefono` al esquema del modelo `Pago` en `src/models/Pago.js`, con una validación `required` condicional.
+- Se actualizó la documentación en `memory-bank/functionalities/GestionDePedidosYPagos.md` para reflejar el nuevo campo `numeroTelefono` en el modelo `Pago`.
+
+**Files Modified:**
+- `src/components/common/CartComponent.jsx`
+- `src/app/acciones/PagoActions.js`
+- `src/models/Pago.js`
+- `memory-bank/functionalities/GestionDePedidosYPagos.md`
+- `memory-bank/activeContext.md` (updated log)
+
+**Problems Encountered:**
+- Ninguno en esta fase.
+
+**Next Steps:**
+- Log these changes in `activeContext.md`.
+- Commit the changes.
+>>>>>>> 3e3b1001f22a7e0cc2724dec6e2e142bb4a027cd

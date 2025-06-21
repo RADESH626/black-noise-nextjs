@@ -105,7 +105,11 @@ export async function crearProveedor(prevState, formData) {
     return {
       message: "Proveedor creado exitosamente. La clave de acceso ha sido enviada al correo electrónico del proveedor.",
       success: true,
-      data: toPlainObject(nuevoProveedor), // Convert to plain object
+      data: {
+        ...nuevoProveedor.toObject(),
+        _id: nuevoProveedor._id.toString(),
+        userId: nuevoProveedor.userId ? nuevoProveedor.userId.toString() : null,
+      },
       // Do NOT return accessKey here as per user's request
     };
   } catch (error) {
@@ -190,7 +194,11 @@ export async function actualizarProveedor(prevState, formData) {
     return {
       message: "Proveedor actualizado exitosamente.",
       success: true,
-      data: toPlainObject(updatedProveedor), // Convert to plain object
+      data: {
+        ...updatedProveedor.toObject(),
+        _id: updatedProveedor._id.toString(),
+        userId: updatedProveedor.userId ? updatedProveedor.userId.toString() : null,
+      },
     };
   } catch (error) {
     logger.error("Error al actualizar proveedor:", error);
@@ -202,14 +210,10 @@ export async function obtenerProveedoresHabilitados() {
   await connectDB();
   try {
     const proveedores = await Proveedor.find({ habilitado: true }).lean();
+    // Deep clone and serialize to ensure all fields are plain objects/primitives
+    const serializedProveedores = JSON.parse(JSON.stringify(proveedores));
     return {
-      proveedores: proveedores.map(p => ({
-        ...p,
-        _id: p._id.toString(),
-        userId: p.userId ? p.userId.toString() : null, // Convert userId to string
-        createdAt: p.createdAt ? new Date(p.createdAt).toISOString() : null,
-        updatedAt: p.updatedAt ? new Date(p.updatedAt).toISOString() : null,
-      })),
+      proveedores: serializedProveedores,
       success: true
     };
   } catch (error) {

@@ -147,7 +147,7 @@ export async function getCartByUserId(userId) {
             items: populatedCartItems, // Replace the original items array with the populated one
         };
 
-        logger.debug('Populated cart obtained by userId:', populatedCart);
+        // logger.debug('Populated cart obtained by userId:', populatedCart);
         return { cart: JSON.parse(JSON.stringify(populatedCart)), error: null };
     } catch (error) {
         logger.error('ERROR in getCartByUserId:', error);
