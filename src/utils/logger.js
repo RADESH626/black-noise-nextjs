@@ -1,4 +1,9 @@
 // src/utils/logger.js
+<<<<<<< HEAD
+=======
+console.log('Logger module loaded.'); // Temporary debug log
+
+>>>>>>> c32cb53 (primer commit)
 const LOG_LEVELS = {
   DEBUG: 0,
   INFO: 1,
@@ -12,9 +17,16 @@ const currentLogLevel = LOG_LEVELS[process.env.NEXT_PUBLIC_LOG_LEVEL] || LOG_LEV
 
 const logger = {
   _log: (level, ...args) => {
+<<<<<<< HEAD
     if (LOG_LEVELS[level] >= currentLogLevel) {
       const timestamp = new Date().toISOString();
       const prefix = `${timestamp} [${level}]`;
+=======
+    console.log(`Attempting to log: ${level}`, ...args); // Temporary debug log
+    if (LOG_LEVELS[level] >= currentLogLevel) {
+      const timestamp = new Date().toISOString();
+      const prefix = `[${timestamp}] [${level}]`;
+>>>>>>> c32cb53 (primer commit)
 
       // Determinar el método de console a usar
       let consoleMethod = console.log;

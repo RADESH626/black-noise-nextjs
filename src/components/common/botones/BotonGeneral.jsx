@@ -9,6 +9,7 @@ function BotonGeneral({ children, onClick, type = 'button', disabled = false, cl
 
     switch (variant) {
         case 'primary':
+<<<<<<< HEAD
             variantStyles = 'btn-gradient-primary';
             textStyles = 'text-white'; // Texto blanco para el botón primario
             break;
@@ -26,6 +27,25 @@ function BotonGeneral({ children, onClick, type = 'button', disabled = false, cl
             break;
         case 'info':
             variantStyles = 'btn-gradient-info';
+=======
+            variantStyles = 'bg-gradient-primary-button';
+            textStyles = 'text-white'; // Texto blanco para el botón primario
+            break;
+        case 'secondary':
+            variantStyles = 'bg-gradient-secondary-button';
+            textStyles = 'text-black';
+            break;
+        case 'danger':
+            variantStyles = 'bg-gradient-danger-button';
+            textStyles = 'text-white';
+            break;
+        case 'success':
+            variantStyles = 'bg-gradient-success-button';
+            textStyles = 'text-white';
+            break;
+        case 'info':
+            variantStyles = 'bg-gradient-info-button';
+>>>>>>> c32cb53 (primer commit)
             textStyles = 'text-white';
             break;
         default:

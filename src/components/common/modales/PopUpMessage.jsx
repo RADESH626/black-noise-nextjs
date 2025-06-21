@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
+<<<<<<< HEAD
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+=======
+>>>>>>> c32cb53 (primer commit)
 // Removed: import styles from './PopUpMessage.module.css';
 
 const PopUpMessage = ({ message, type, onClose, persistent = false }) => { // Add persistent prop
@@ -55,6 +58,7 @@ ${type === 'success' ? 'bg-green-700' : type === 'error' ? 'bg-red-700' : 'bg-gr
           <span className="font-medium text-lg text-neutral-100">{message}</span>
         </div>
         {!persistent && (
+<<<<<<< HEAD
           <BotonGeneral
             onClick={() => { setIsVisible(false); onClose(); }}
             variant="secondary"
@@ -62,6 +66,14 @@ ${type === 'success' ? 'bg-green-700' : type === 'error' ? 'bg-red-700' : 'bg-gr
           >
             Cerrar
           </BotonGeneral>
+=======
+          <button 
+            onClick={() => { setIsVisible(false); onClose(); }} 
+            className="ml-4 text-secondary hover:text-neutral-300 transition-colors duration-200"
+          >
+            ✕
+          </button>
+>>>>>>> c32cb53 (primer commit)
         )}
       </div >
     </dialog>

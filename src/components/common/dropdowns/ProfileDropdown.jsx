@@ -42,7 +42,11 @@ function ProfileDropdown({ isOpen, onClose }) {
   return (
     <div
       ref={dropdownRef}
+<<<<<<< HEAD
       className="absolute right-0 mt-2 w-48 bg-transparent rounded-md shadow-lg py-1 z-50"
+=======
+      className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-50"
+>>>>>>> c32cb53 (primer commit)
     >
       <BotonGeneral
         onClick={handleViewProfile}
@@ -53,7 +57,11 @@ function ProfileDropdown({ isOpen, onClose }) {
       </BotonGeneral>
       <BotonGeneral
         onClick={handleLogout}
+<<<<<<< HEAD
         variant="secondary"
+=======
+        variant="danger"
+>>>>>>> c32cb53 (primer commit)
         className="w-full text-left"
       >
         Cerrar Sesión

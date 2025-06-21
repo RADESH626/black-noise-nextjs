@@ -8,7 +8,11 @@
 
   /* Gradientes para botones */
   --gradient-primary: #000000; /* Negro sólido para el botón primario */
+<<<<<<< HEAD
   --gradient-secondary: linear-gradient(to right, #a0a0a0, #ffffff); /* Gris más claro a blanco */
+=======
+  --gradient-secondary: linear-gradient(to right, #ffffff, #e0e0e0); /* Blanco a gris claro */
+>>>>>>> c32cb53 (primer commit)
   --gradient-danger: linear-gradient(to right, #dc3545, #c82333); /* Rojo oscuro a rojo más claro */
   --gradient-success: linear-gradient(to right, #28a745, #218838); /* Verde oscuro a verde más claro */
   --gradient-info: linear-gradient(to right, #17a2b8, #138496); /* Azul oscuro a azul más claro */
@@ -22,6 +26,7 @@
   --color-neutral-700: #222222; /* Very dark grey */
   --color-neutral-800: #111111; /* Almost black */
   --color-neutral-900: #000000; /* Black */
+<<<<<<< HEAD
 
   /* Clases de gradiente personalizadas */
   .btn-gradient-primary {
@@ -43,6 +48,8 @@
 .btn-gradient-gray-to-white {
     background-image: linear-gradient(to right, #000000, #808080); /* Negro a gris */
 }
+=======
+>>>>>>> c32cb53 (primer commit)
 }
 
 html, body {
@@ -94,10 +101,13 @@ html, body {
     animation: fadeIn 0.2s ease-out forwards;
 }
 
+<<<<<<< HEAD
 .btn-gradient-gray-to-white {
     background-image: linear-gradient(to right, #a0a0a0, #ffffff);
 }
 
+=======
+>>>>>>> c32cb53 (primer commit)
 dialog::backdrop {
     background-color: transparent; /* No backdrop unless explicitly requested */
 }

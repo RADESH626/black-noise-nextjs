@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from 'react';
+<<<<<<< HEAD
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+=======
+>>>>>>> c32cb53 (primer commit)
 
 export default function FormFiltrarDesigns() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -39,6 +42,7 @@ export default function FormFiltrarDesigns() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+<<<<<<< HEAD
         <BotonGeneral
           type="submit"
           variant="primary"
@@ -46,6 +50,20 @@ export default function FormFiltrarDesigns() {
         >
           Buscar
         </BotonGeneral>
+=======
+        <button
+          type="submit"
+          className="px-6 py-3 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2"
+          style={{
+            backgroundColor: '#2563EB', // bg-blue-600
+            color: '#FFFFFF', // text-white
+            '--tw-ring-color': '#3B82F6', // focus:ring-blue-500
+            '--tw-ring-opacity': '0.5'
+          }}
+        >
+          Buscar
+        </button>
+>>>>>>> c32cb53 (primer commit)
       </form>
     </div>
   );

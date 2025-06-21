@@ -18,6 +18,7 @@ export const authOptions = {
       },
       id: "credentials",
       async authorize(credentials, req) {
+<<<<<<< HEAD
         await connectDB(); // Ensure DB connection for direct model access
 
         try {
@@ -31,6 +32,27 @@ export const authOptions = {
 
             if (isValid) {
               logger.debug('User authenticated:', user.email);
+=======
+        logger.info('Authorize callback initiated.');
+        logger.info('Credentials received:', credentials);
+
+        await connectDB(); // Ensure DB connection for direct model access
+        logger.info('Database connection established in authorize callback.');
+
+        try {
+          // Attempt to authenticate as a regular user first
+          logger.info('Attempting to find user by email:', credentials.email);
+          const user = await ObtenerUsuarioPorCorreo(credentials.email);
+          logger.info('Result of ObtenerUsuarioPorCorreo:', user);
+          
+          if (user) {
+            logger.info('User found. Comparing password for user:', credentials.email);
+            const isValid = await bcrypt.compare(credentials.password, user.password);
+            logger.info('Password comparison result for user:', isValid);
+
+            if (isValid) {
+              logger.info('User authenticated successfully:', user.email);
+>>>>>>> c32cb53 (primer commit)
 
               let sessionUser = {
                 id: user._id.toString(),
@@ -45,8 +67,15 @@ export const authOptions = {
 
               // If the user is a PROVEEDOR, fetch the corresponding Proveedor document
               if (user.rol === Rol.PROVEEDOR) {
+<<<<<<< HEAD
                 const proveedor = await Proveedor.findOne({ userId: user._id }).lean();
                 if (proveedor) {
+=======
+                logger.info('User is a PROVEEDOR. Attempting to find associated Proveedor document.');
+                const proveedor = await Proveedor.findOne({ userId: user._id }).lean();
+                if (proveedor) {
+                  logger.info('Associated Proveedor found:', proveedor._id);
+>>>>>>> c32cb53 (primer commit)
                   sessionUser.isSupplier = true;
                   sessionUser.proveedorId = proveedor._id.toString();
                   // Optionally, update name/image from supplier if preferred for supplier role
@@ -78,6 +107,11 @@ export const authOptions = {
   },
     callbacks: {
       async jwt({ token, user }) {
+<<<<<<< HEAD
+=======
+        // console.log("[NextAuth Callback] JWT - Initial Token:", token);
+        // console.log("[NextAuth Callback] JWT - User:", user);
+>>>>>>> c32cb53 (primer commit)
         if (user) {
           token.id = user.id;
           token.name = user.name;
@@ -88,9 +122,18 @@ export const authOptions = {
           token.image = user.image;
           token.numeroTelefono = user.numeroTelefono; // Pass numeroTelefono to token
         }
+<<<<<<< HEAD
         return token;
       },
       async session({ session, token }) {
+=======
+        // console.log("[NextAuth Callback] JWT - Final Token:", token);
+        return token;
+      },
+      async session({ session, token }) {
+        // console.log("[NextAuth Callback] Session - Initial Session:", session);
+        // console.log("[NextAuth Callback] Session - Token:", token);
+>>>>>>> c32cb53 (primer commit)
         session.user.id = token.id;
         session.user.name = token.name;
         session.user.email = token.email;
@@ -99,6 +142,10 @@ export const authOptions = {
         session.user.proveedorId = token.proveedorId;
         session.user.image = token.image;
         session.user.numeroTelefono = token.numeroTelefono; // Pass numeroTelefono to session
+<<<<<<< HEAD
+=======
+        // console.log("[NextAuth Callback] Session - Final Session:", session);
+>>>>>>> c32cb53 (primer commit)
         return session;
       },
     },

@@ -4,7 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { crearDesign } from "@/app/acciones/DesignActions"; // Assuming a create action exists
 import { useDialog } from "@/context/DialogContext"; // Assuming dialog context is used
+<<<<<<< HEAD
 import BotonGeneral from '@/components/common/botones/BotonGeneral'; // Import BotonGeneral
+=======
+>>>>>>> c32cb53 (primer commit)
 
 function AddDesignPage() {
   const router = useRouter();
@@ -18,6 +21,7 @@ function AddDesignPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+<<<<<<< HEAD
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -49,10 +53,15 @@ function AddDesignPage() {
       setLoading(false);
     }
   };
+=======
+  // You'll need a form and handleSubmit logic similar to the edit page
+  // to handle input fields and call the crearDesign action.
+>>>>>>> c32cb53 (primer commit)
 
   return (
     <div className="p-6 bg-black text-white rounded-lg shadow-lg max-h-[80vh] overflow-y-auto">
       <h2 className="text-2xl font-bold mb-6 text-center">Agregar Nuevo Diseño</h2>
+<<<<<<< HEAD
       <form onSubmit={handleSubmit} className="space-y-4">
         <label className="block">
           <span className="text-white">Nombre del Diseño:</span>
@@ -109,6 +118,19 @@ function AddDesignPage() {
           {loading ? "Guardando..." : "Guardar Diseño"}
         </BotonGeneral>
       </form>
+=======
+      {/* Add your form elements here */}
+      <p>Formulario para agregar diseño goes here.</p>
+      {/* Example form structure (needs implementation) */}
+      {/*
+      <form onSubmit={handleSubmit} className="space-y-4">
+        ... input fields for nombreDesing, descripcion, valorDesing, categoria, imagenDesing ...
+        <button type="submit" disabled={loading}>
+          {loading ? "Guardando..." : "Guardar Diseño"}
+        </button>
+      </form>
+      */}
+>>>>>>> c32cb53 (primer commit)
     </div>
   );
 }

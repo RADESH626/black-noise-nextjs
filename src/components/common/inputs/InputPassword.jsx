@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
+<<<<<<< HEAD
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+=======
+>>>>>>> c32cb53 (primer commit)
 
 function InputPassword(props) {
   const [showPassword, setShowPassword] = useState(false);
@@ -30,24 +33,43 @@ function InputPassword(props) {
         required
         {...props}
       />
+<<<<<<< HEAD
       <BotonGeneral
         type="button"
         onClick={togglePasswordVisibility}
         variant="info"
+=======
+      <button
+        type="button"
+        onClick={togglePasswordVisibility}
+>>>>>>> c32cb53 (primer commit)
         className="
           absolute
           right-3
           top-1/2
           transform
           -translate-y-1/2
+<<<<<<< HEAD
+=======
+          bg-bn-accent
+          text-white
+>>>>>>> c32cb53 (primer commit)
           text-xs
           px-2
           py-1
           rounded
+<<<<<<< HEAD
         "
       >
         {showPassword ? 'Ocultar' : 'Mostrar'}
       </BotonGeneral>
+=======
+          hover:bg-bn-accent-opaque
+        "
+      >
+        {showPassword ? 'Ocultar' : 'Mostrar'}
+      </button>
+>>>>>>> c32cb53 (primer commit)
     </div>
   );
 }
