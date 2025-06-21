@@ -256,7 +256,7 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
         if (!ventaCreationSuccess) {
             logger.error('Error creating venta:', ventaCreationError);
             // Si la venta falla, cancelar el pedido
-            await Pedido.findByIdAndUpdate(nuevoPedido._id, { estadoPago: 'FALLIDO', estadoPedido: 'CANCELADO' });
+            await Pedido.findByIdAndUpdate(nuevoPedido._id, { estadoPago: 'FALLIDO', estadoPedido: 'CANCELADO', fue_cancelado: true, cancellationDate: new Date() });
             return { success: false, message: ventaCreationError || 'Error al crear el registro de venta. Pedido marcado como fallido.' };
         }
         logger.debug('Venta created successfully:', nuevaVenta);
@@ -280,7 +280,7 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
         } catch (pagoError) {
             logger.error('Error creating pago:', pagoError);
             // Si el pago falla, cancelar el pedido y la venta
-            await Pedido.findByIdAndUpdate(nuevoPedido._id, { estadoPago: 'CANCELADO', estadoPedido: 'CANCELADO' });
+            await Pedido.findByIdAndUpdate(nuevoPedido._id, { estadoPago: 'CANCELADO', estadoPedido: 'CANCELADO', fue_cancelado: true, cancellationDate: new Date() });
             await Venta.findByIdAndDelete(nuevaVenta._id); // Eliminar la venta si el pago falla
             return { success: false, message: 'Error al registrar el pago. Pedido y venta cancelados.' };
         }

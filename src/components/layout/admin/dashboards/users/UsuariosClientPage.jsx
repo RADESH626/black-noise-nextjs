@@ -15,7 +15,6 @@ import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import { useDialog } from '@/context/DialogContext';
 import { useActionState } from 'react'; // For React 19
 import { useFormStatus } from 'react-dom'; // For React 19
-import BotonGeneral from '@/components/common/botones/BotonGeneral'; // Import BotonGeneral
 
 // Utility function for date formatting
 const formatDate = (dateString) => {

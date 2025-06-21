@@ -12,6 +12,7 @@ function ProveedorSidebar() {
   const navItems = [
     { id: 'inicio', label: 'Inicio', icon: '/icons/icono-casa.svg', needsInvert: true, href: '/proveedor' },
     { id: 'pedidos', label: 'Mis Pedidos Asignados', icon: '/icons/icono-carrito.svg', needsInvert: true, href: '/proveedor/pedidos' },
+    { id: 'devoluciones', label: 'Devoluciones y Cancelaciones', icon: '/icons/icono-basurero.svg', needsInvert: true, href: '/proveedor/devoluciones' },
     { id: 'pagos', label: 'Pagos Recibidos', icon: '/icons/icono-dinero.svg', needsInvert: true, href: '/proveedor/pagos' }
   ];
 
