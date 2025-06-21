@@ -3,13 +3,16 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { DialogProvider } from '@/context/DialogContext';
 
 const queryClient = new QueryClient();
 
 export function Providers({ children }) {
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
+      <DialogProvider>
+        {children}
+      </DialogProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );

@@ -16,7 +16,7 @@ export default function FormFiltrarVentas({ initialVentasFromPage }) {
         <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {ventas.map((venta) => (
             <div
-              key={venta.id}
+              key={venta._id}
               className="rounded-xl shadow-lg overflow-hidden"
               style={{ backgroundColor: '#1F2937' }} /* bg-gray-800 */
             >

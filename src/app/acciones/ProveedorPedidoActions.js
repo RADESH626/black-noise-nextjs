@@ -46,6 +46,18 @@ export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId)
         }
     } catch (error) {
         logger.error('ERROR in obtenerPedidosPorProveedorId:', error);
+        if (error.message.includes('ECONNRESET')) {
+            logger.warn('ECONNRESET error detected, attempting to reconnect...');
+            try {
+                await connectDB(); // Attempt to reconnect
+                logger.info('Database reconnected successfully.');
+                // Retry the query
+                return obtenerPedidosPorProveedorId(pedidoId, proveedorId);
+            } catch (reconnectError) {
+                logger.error('Failed to reconnect to database:', reconnectError);
+                return { success: false, message: 'Error al obtener los pedidos del proveedor tras intentar reconectar: ' + reconnectError.message };
+            }
+        }
         return { success: false, message: 'Error al obtener los pedidos del proveedor: ' + error.message };
     }
 }

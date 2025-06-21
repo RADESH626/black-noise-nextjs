@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import logger from './logger';
 import '@/models'; // Import all models to ensure they are registered
 
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://Emanuel:Emanuelgalvis123@clusteremanuelgalvis.djph7.mongodb.net/BlackNoise?retryWrites=true&w=majority&appName=ClusterEmanuelGalvis";
+const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!mongoose.connection.readyState) {
     mongoose.set('strictQuery', false);
@@ -12,9 +12,21 @@ if (!mongoose.connection.readyState) {
 
 export default async function connectDB() {
     try {
-        if (mongoose.connection.readyState) {
+        if (mongoose.connection.readyState === 1) {
             // logger.info('Using existing database connection');
             return;
+        }
+
+        if (mongoose.connection.readyState === 2) {
+            logger.warn('Database is connecting...');
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait a bit
+            return;
+        }
+
+        if (mongoose.connection.readyState === 0) {
+            logger.warn('Database is disconnected, attempting to reconnect...');
+        } else {
+            logger.warn(`Database state is ${mongoose.connection.readyState}, attempting to reconnect...`);
         }
 
         const db = await mongoose.connect(MONGODB_URI, {
