@@ -53,7 +53,7 @@ function ProfileDropdown({ isOpen, onClose }) {
       </BotonGeneral>
       <BotonGeneral
         onClick={handleLogout}
-        variant="danger"
+        variant="secondary"
         className="w-full text-left"
       >
         Cerrar Sesión

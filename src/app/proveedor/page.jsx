@@ -10,24 +10,15 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import { obtenerMiPerfilProveedor } from '@/app/acciones/ProveedorActions';
+import { obtenerPedidosPorProveedorId } from '@/app/acciones/ProveedorPedidoActions';
 
 function ProveedorPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
 
-    // Handle session loading/unauthenticated states first
-    if (status === "loading") {
-        return <LoadingSpinner />;
-    }
-
-    if (!session || !session.user || !session.user.isSupplier) {
-        router.push("/login");
-        return null; // Return null or a simple message while redirecting
-    }
-
     // Use useQuery to fetch supplier profile data
-    const { data: miPerfil, isLoading, isError, error } = useQuery({
-        queryKey: ['miPerfilProveedor', session.user.id], // Unique key for this query, dependent on user ID
+    const { data: miPerfil, isLoading: isLoadingPerfil, isError: isErrorPerfil, error: errorPerfil } = useQuery({
+        queryKey: ['miPerfilProveedor', session?.user?.id], // Use session.user.id for the profile query
         queryFn: async () => {
             const result = await obtenerMiPerfilProveedor();
             if (result.success) {
@@ -36,24 +27,56 @@ function ProveedorPage() {
                 throw new Error(result.message || "Error al cargar el perfil del proveedor.");
             }
         },
-        enabled: !!session?.user?.isSupplier && !!session?.user?.id, // Only run query if user is a supplier and ID is available
-        staleTime: Infinity, // Data is considered fresh indefinitely for diagnostic
-        cacheTime: 10 * 60 * 1000, // Data stays in cache for 10 minutes
-        retry: 1, // Retry once on failure
-        refetchOnWindowFocus: false, // Disable refetching on window focus for diagnostic
+        enabled: status === "authenticated" && !!session?.user?.id, // Only run query if authenticated and user ID is available
+        staleTime: Infinity,
+        cacheTime: 10 * 60 * 1000,
+        retry: 1,
+        refetchOnWindowFocus: false,
     });
 
-    // Render logic for authenticated suppliers
-    if (isLoading) { // Use isLoading from useQuery
+    // Use useQuery to fetch orders data, dependent on miPerfil being loaded
+    const { data: pedidos, isLoading: isLoadingPedidos, isError: isErrorPedidos, error: errorPedidos } = useQuery({
+        queryKey: ['pedidosProveedor', miPerfil?._id], // Use miPerfil._id for orders query
+        queryFn: async () => {
+            const result = await obtenerPedidosPorProveedorId(null, miPerfil._id);
+            if (result.success) {
+                return result.pedidos;
+            } else {
+                throw new Error(result.message || "Error al cargar los pedidos del proveedor.");
+            }
+        },
+        enabled: status === "authenticated" && !!miPerfil?._id, // Only run if authenticated and miPerfil._id is available
+        staleTime: 5 * 60 * 1000,
+        cacheTime: 10 * 60 * 1000,
+        retry: 1,
+        refetchOnWindowFocus: false,
+    });
+
+    // Handle session loading/unauthenticated states first
+    if (status === "loading") {
         return <LoadingSpinner />;
     }
 
-    if (isError) { // Use isError and error from useQuery
-        return <ErrorMessage message={error.message || "Error al cargar el perfil del proveedor."} />;
+    if (!session || !session.user || !session.user.isSupplier) {
+        router.push("/login");
+        return null;
+    }
+
+    // Render logic for authenticated suppliers
+    if (isLoadingPerfil || isLoadingPedidos) {
+        return <LoadingSpinner />;
+    }
+
+    if (isErrorPerfil) {
+        return <ErrorMessage message={errorPerfil.message || "Error al cargar el perfil del proveedor."} />;
+    }
+
+    if (isErrorPedidos) {
+        return <ErrorMessage message={errorPedidos.message || "Error al cargar los pedidos del proveedor."} />;
     }
 
     // If session exists and user is a supplier, but profile not loaded (e.g., not found after fetch attempt)
-    if (!miPerfil) { // We are here only if not loading, no error, but miPerfil is null
+    if (!miPerfil) {
         return (
             <div className="flex flex-col items-center justify-center h-full">
                 <h1 className="text-3xl font-bold mb-4 text-gray-800">Portal de Proveedores</h1>
@@ -62,10 +85,40 @@ function ProveedorPage() {
         );
     }
 
+    // Calculate metrics
+    const totalPedidosPendientes = pedidos?.filter(p => p.estadoPedido === 'PENDIENTE' || p.estadoPedido === 'SOLICITUD_DEVOLUCION').length || 0;
+    const totalPedidosEnProceso = pedidos?.filter(p => p.estadoPedido === 'EN_FABRICACION' || p.estadoPedido === 'LISTO' || p.estadoPedido === 'ENVIADO').length || 0;
+    const totalPedidosCompletados = pedidos?.filter(p => p.estadoPedido === 'ENTREGADO').length || 0;
+    const ingresosTotales = pedidos
+        ?.filter(p => p.estadoPedido === 'ENTREGADO' && p.estadoPago === 'PAGADO')
+        .reduce((sum, p) => sum + p.total, 0) || 0;
+
     // Finally, render the actual content if miPerfil is available
     return (
-        <div className="h-full">
+        <div className="h-full p-4">
             <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">Bienvenido, {miPerfil?.nombreEmpresa || 'Proveedor'}</h1>
+
+            <div className="max-w-6xl mx-auto mb-8">
+                <h2 className="text-2xl font-semibold mb-6 text-gray-700">Métricas de Pedidos</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="bg-white rounded-lg shadow-md p-6 text-center border border-blue-200">
+                        <h3 className="text-lg font-medium text-blue-600 mb-2">Pedidos Pendientes</h3>
+                        <p className="text-4xl font-bold text-blue-800">{totalPedidosPendientes}</p>
+                    </div>
+                    <div className="bg-white rounded-lg shadow-md p-6 text-center border border-yellow-200">
+                        <h3 className="text-lg font-medium text-yellow-600 mb-2">Pedidos en Proceso</h3>
+                        <p className="text-4xl font-bold text-yellow-800">{totalPedidosEnProceso}</p>
+                    </div>
+                    <div className="bg-white rounded-lg shadow-md p-6 text-center border border-green-200">
+                        <h3 className="text-lg font-medium text-green-600 mb-2">Pedidos Completados</h3>
+                        <p className="text-4xl font-bold text-green-800">{totalPedidosCompletados}</p>
+                    </div>
+                    <div className="bg-white rounded-lg shadow-md p-6 text-center border border-purple-200">
+                        <h3 className="text-lg font-medium text-purple-600 mb-2">Ingresos Totales</h3>
+                        <p className="text-4xl font-bold text-purple-800">${ingresosTotales.toFixed(2)}</p>
+                    </div>
+                </div>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
                 <div className="bg-gray-100 rounded-lg shadow-lg p-6 text-center">

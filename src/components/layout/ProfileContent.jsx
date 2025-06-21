@@ -241,7 +241,7 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
                 <BotonGeneral variant="secondary">VER DISEÑOS DE LA COMUNIDAD</BotonGeneral>
               </Link>
               {/* Removed: <BotonGeneral onClick={handleCreateNewOrder}>CREAR NUEVO PEDIDO</BotonGeneral> */}
-              <BotonGeneral onClick={() => signOut({ callbackUrl: '/login' })} variant="danger">CERRAR SESIÓN</BotonGeneral>
+              <BotonGeneral onClick={() => signOut({ callbackUrl: '/login' })} variant="secondary">CERRAR SESIÓN</BotonGeneral>
             </div>
           </div>
         </div>

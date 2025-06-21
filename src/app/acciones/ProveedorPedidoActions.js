@@ -5,6 +5,7 @@ import logger from '@/utils/logger';
 import { getModel } from '@/utils/modelLoader';
 import { toPlainObject } from '@/utils/dbUtils';
 import { revalidatePath } from 'next/cache'; // Importar revalidatePath
+import mongoose from 'mongoose'; // Importar mongoose
 
 export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId) {
     logger.debug('Entering obtenerPedidosPorProveedorId with pedidoId:', pedidoId, 'proveedorId:', proveedorId);
@@ -16,7 +17,9 @@ export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId)
             return { success: false, message: "ID de proveedor es requerido." };
         }
         const Pedido = await getModel('Pedido');
-        let query = { proveedorId: proveedorId };
+        // Convertir proveedorId a ObjectId de Mongoose
+        const objectIdProveedorId = new mongoose.Types.ObjectId(proveedorId);
+        let query = { proveedorId: objectIdProveedorId };
         if (pedidoId) {
             query._id = pedidoId;
         }

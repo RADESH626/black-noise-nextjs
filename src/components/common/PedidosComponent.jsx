@@ -3,15 +3,15 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { obtenerPedidosPagadosPorUsuarioId } from "@/app/acciones/PedidoActions";
-// import PaymentModal from '@/components/pago/PaymentModal'; // No longer needed
-import DesignImageDisplay from '@/components/common/DesignImageDisplay';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import Modal from '@/components/common/modales/Modal';
+import { EstadoPedido } from "@/models/enums/PedidoEnums";
+import { useDialog } from "@/context/DialogContext";
 
-const PedidosContent = () => { // No longer needs onPaymentSuccess prop
+const PedidosContent = () => {
   const { data: session, status } = useSession();
   const userId = session?.user?.id;
-  // const { openModal, closeModal } = useModal(); // No longer needed
+  const { showPopUp } = useDialog();
 
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,6 +22,8 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
   const [showOtraReason, setShowOtraReason] = useState(false);
   const [selectedReturnReason, setSelectedReturnReason] = useState('');
   const [otraReason, setOtraReason] = useState('');
+  const [expandedOrders, setExpandedOrders] = useState(new Set());
+  const [expandedDesigns, setExpandedDesigns] = useState(new Set());
 
   const handleSolicitarDevolucion = (pedidoId) => {
     setSelectedPedidoId(pedidoId);
@@ -31,6 +33,9 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
   const handleCloseDevolucionModal = () => {
     setShowDevolucionModal(false);
     setSelectedPedidoId(null);
+    setSelectedReturnReason('');
+    setOtraReason('');
+    setShowOtraReason(false);
   };
 
   const handleEnviarSolicitud = async () => {
@@ -39,7 +44,7 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
     console.log('Razón de la devolución:', returnReason);
 
     if (!returnReason) {
-      alert('Por favor, seleccione o especifique la razón de la devolución.');
+      showPopUp('Por favor, seleccione o especifique la razón de la devolución.', 'error');
       return;
     }
 
@@ -94,18 +99,29 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
     ? pedidos
     : pedidos.filter(pedido => pedido.estadoPedido !== 'CANCELADO');
 
-  // handlePayOrder is no longer needed as orders are paid first
-  // const handlePayOrder = (pedidoId, valorPedido) => {
-  //   openModal(
-  //     "Realizar Pago",
-  //     <PaymentModal
-  //       pedidoId={pedidoId}
-  //       valorPedido={valorPedido}
-  //       onClose={closeModal}
-  //       onPaymentSuccess={onPaymentSuccess}
-  //     />
-  //   );
-  // };
+  const handleToggleExpand = (pedidoId) => {
+    setExpandedOrders(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(pedidoId)) {
+        newSet.delete(pedidoId);
+      } else {
+        newSet.add(pedidoId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleToggleDesignExpand = (designId) => {
+    setExpandedDesigns(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(designId)) {
+        newSet.delete(designId);
+      } else {
+        newSet.add(designId);
+      }
+      return newSet;
+    });
+  };
 
   if (loading) {
     return (
@@ -148,79 +164,138 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
         </label>
       </div>
 
-      <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <main className="grid grid-cols-1 gap-6 mt-8">
         {filteredPedidos.map((pedido, index) => {
           return (
             <motion.div
               key={pedido._id}
               initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className={`bg-gray-800 rounded-xl shadow-lg overflow-hidden ${pedido.estadoPedido === 'CANCELADO' ? 'border-2 border-red-500 opacity-70' : ''}`}
-          >
-            <div className="w-full h-56 bg-gray-700 relative">
-              {pedido.items && pedido.items.length > 0 && pedido.items[0]?.designId?.imageData ? (
-                <DesignImageDisplay
-                  imageData={pedido.items[0].designId.imageData}
-                  imageMimeType={pedido.items[0].designId.imageMimeType}
-                  altText={pedido.items[0].designId.nombreDesing || "Producto"}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <img
-                  src="/public/img/Fondos/Fondo 1.jpg" // Default image if no items or image data
-                  alt="No hay imagen disponible"
-                  className="w-full h-full object-cover"
-                />
-              )}
-              <div className="absolute top-0 right-0 m-3">
-                <BotonGeneral
-                  onClick={() => alert(`Ver detalles del pedido: ${pedido._id}`)}
-                  variant="info"
-                  className="py-1 px-4 text-sm"
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className={`bg-gray-800 rounded-xl shadow-lg overflow-hidden ${pedido.estadoPedido === 'CANCELADO' ? 'border-2 border-red-500 opacity-70' : ''}`}
+            >
+              <div className="flex flex-col bg-gray-400 rounded-lg p-4 border border-gray-200 hover:shadow-lg transition-all duration-200 gap-4" suppressHydrationWarning={true}>
+                {/* Sección de Resumen */}
+                <div
+                  className="flex flex-col md:flex-row justify-between items-start md:items-center cursor-pointer"
+                  onClick={() => handleToggleExpand(pedido._id.toString())}
                 >
-                  VER DETALLES
-                </BotonGeneral>
-              </div>
-            </div>
-            <div className="p-4 gradient-text-bg flex flex-col">
-              <div className="flex justify-between items-center mb-2">
-                <div>
-                  <p className="font-semibold">Pedido ID: {pedido._id}</p>
-                  <p className="font-semibold">Estado de Pago: {pedido.estadoPago}</p>
-                  <p className="font-semibold">Estado de Pedido: {pedido.estadoPedido}</p>
-                  <p className="font-semibold">Total: ${pedido.total.toFixed(2)}</p>
-                  {pedido.proveedorId && (
-                    <p className="font-semibold">Proveedor: {pedido.proveedorId.nombreEmpresa}</p>
-                  )}
-                  {pedido.userId?.direccion && (
-                    <p className="font-semibold">Dirección: {pedido.userId.direccion}</p>
-                  )}
+                  <h2 className="text-lg font-semibold text-white bg-gray-600 p-2 rounded">Pedido ID: {pedido._id.toString()}</h2>
+                  <div className="flex items-center space-x-2">
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${pedido.estadoPedido === EstadoPedido.PENDIENTE ? 'bg-yellow-100 text-yellow-800' :
+                      pedido.estadoPedido === EstadoPedido.ASIGNADO ? 'bg-blue-100 text-blue-800' :
+                        pedido.estadoPedido === EstadoPedido.EN_PROCESO ? 'bg-purple-100 text-purple-800' :
+                          pedido.estadoPedido === EstadoPedido.LISTO_PARA_RECOGER ? 'bg-green-100 text-green-800' :
+                            pedido.estadoPedido === EstadoPedido.ENVIADO ? 'bg-indigo-100 text-indigo-800' :
+                              pedido.estadoPedido === EstadoPedido.ENTREGADO ? 'bg-teal-100 text-teal-800' :
+                                pedido.estadoPedido === EstadoPedido.CANCELADO ? 'bg-red-100 text-red-800' :
+                                  'bg-gray-100 text-gray-800'
+                      }`}>
+                      {pedido.estadoPedido.replace(/_/g, ' ')}
+                    </span>
+
+                    <svg
+                      className={`w-5 h-5 text-gray-600 transform transition-transform duration-200 ${expandedOrders.has(pedido._id.toString()) ? 'rotate-180' : ''
+                        }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </div>
                 </div>
-                <BotonGeneral
-                  onClick={() => handleSolicitarDevolucion(pedido._id)}
-                  variant="danger"
-                  className="py-2 px-4 text-sm"
-                >
-                  Solicitar Devolución
-                </BotonGeneral>
-              </div>
-              <div className="mt-4 border-t border-gray-700 pt-4">
-                <p className="font-semibold mb-2">Ítems del Pedido:</p>
-                {pedido.items && pedido.items.length > 0 ? (
-                  <ul className="list-disc list-inside text-sm text-gray-300">
-                    {pedido.items.map((item, itemIndex) => (
-                      <li key={itemIndex}>
-                        {item.designId?.nombreDesing} (Cantidad: {item.quantity})
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-sm text-gray-400">No hay ítems en este pedido.</p>
+
+                {/* Sección de Detalles (condicional) */}
+                {expandedOrders.has(pedido._id.toString()) && (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-4">
+                      {/* informacion basica del pedido */}
+                      <div className="flex flex-col gap-2 bg-gray-500 text-white rounded p-2">
+                        <div>
+                          <p className="font-medium">Total:</p>
+                          <p className="text-xl font-bold text-green-500">${pedido.total ? pedido.total.toFixed(2) : '0.00'}</p>
+                        </div>
+                        <div>
+                          <p className="font-medium">Método de Entrega:</p>
+                          <p>{pedido.metodoEntrega || 'N/A'}</p>
+                        </div>
+                        {pedido.fechaPedido && (
+                          <div>
+                            <p className="font-medium">Fecha del Pedido:</p>
+                            <p>{new Date(pedido.fechaPedido).toLocaleDateString()}</p>
+                          </div>
+                        )}
+                        {pedido.costoEnvio !== undefined && (
+                          <div>
+                            <p className="font-medium">Costo de Envío:</p>
+                            <p>${pedido.costoEnvio.toFixed(2)}</p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Información de los diseños */}
+                      <div className="flex flex-col flex-1 gap-2 bg-gray-500 rounded-md">
+                        <p className="font-medium text-white mb-2 text-center">Diseños:</p>
+                        {pedido.items && pedido.items.length > 0 ? (
+                          <div className="flex flex-col p-2 rounded-md gap-4">
+                            {pedido.items.map((item, itemIndex) => (
+                              <div key={itemIndex} className="flex flex-col bg-gray-400 rounded-md p-2">
+                                <div
+                                  className="flex items-center space-x-3 cursor-pointer"
+                                  onClick={() => handleToggleDesignExpand(item.designId?._id?.toString() || `design-${itemIndex}`)}
+                                >
+                                  {item.designId?.imagen && (
+                                    <img
+                                      src={item.designId.imagen}
+                                      alt={item.designId.nombreDesing || 'Diseño'}
+                                      className="w-12 h-12 object-cover rounded-md"
+                                    />
+                                  )}
+                                  <div>
+                                    <p className="font-semibold">{item.designId?.nombreDesing || 'Diseño Desconocido'}</p>
+                                    <p className="text-sm text-gray-600">Cantidad: {item.quantity}</p>
+                                  </div>
+                                  <svg
+                                    className={`w-5 h-5 text-gray-600 transform transition-transform duration-200 ${expandedDesigns.has(item.designId?._id?.toString() || `design-${itemIndex}`) ? 'rotate-180' : ''
+                                      }`}
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                  </svg>
+                                </div>
+                                {expandedDesigns.has(item.designId?._id?.toString() || `design-${itemIndex}`) && (
+                                  <div className="mt-2 text-sm text-gray-700 bg-gray-300 p-2 rounded-md">
+                                    <p><span className="font-medium">Categoría:</span> {item.designId?.categoria || 'N/A'}</p>
+                                    <p><span className="font-medium">Precio Unitario:</span> ${item.designId?.precioUnitario ? item.designId.precioUnitario.toFixed(2) : '0.00'}</p>
+                                    <p><span className="font-medium">Descripción:</span> {item.designId?.descripcion || 'N/A'}</p>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-gray-600">No hay diseños asociados.</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex justify-end">
+                      <BotonGeneral
+                        onClick={() => handleSolicitarDevolucion(pedido._id)}
+                        variant="danger"
+                        className="py-2 px-4 text-sm"
+                      >
+                        Solicitar Devolución
+                      </BotonGeneral>
+                    </div>
+                  </div>
                 )}
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
           );
         })}
       </main>
@@ -238,7 +313,11 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
                   type="radio"
                   name="returnReason"
                   value="El producto llegó dañado o es defectuoso"
-                  onChange={(e) => setSelectedReturnReason(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedReturnReason(e.target.value);
+                    setShowOtraReason(false);
+                  }}
+                  checked={selectedReturnReason === "El producto llegó dañado o es defectuoso"}
                 />
                 El producto llegó dañado o es defectuoso
               </label>
@@ -247,7 +326,11 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
                   type="radio"
                   name="returnReason"
                   value="La talla o el tamaño es incorrecto"
-                  onChange={(e) => setSelectedReturnReason(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedReturnReason(e.target.value);
+                    setShowOtraReason(false);
+                  }}
+                  checked={selectedReturnReason === "La talla o el tamaño es incorrecto"}
                 />
                 La talla o el tamaño es incorrecto
               </label>
@@ -256,7 +339,11 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
                   type="radio"
                   name="returnReason"
                   value="Recibí un artículo equivocado"
-                  onChange={(e) => setSelectedReturnReason(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedReturnReason(e.target.value);
+                    setShowOtraReason(false);
+                  }}
+                  checked={selectedReturnReason === "Recibí un artículo equivocado"}
                 />
                 Recibí un artículo equivocado
               </label>
@@ -265,7 +352,11 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
                   type="radio"
                   name="returnReason"
                   value="El producto es diferente a la descripción o a las fotos"
-                  onChange={(e) => setSelectedReturnReason(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedReturnReason(e.target.value);
+                    setShowOtraReason(false);
+                  }}
+                  checked={selectedReturnReason === "El producto es diferente a la descripción o a las fotos"}
                 />
                 El producto es diferente a la descripción o a las fotos
               </label>
@@ -274,7 +365,11 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
                   type="radio"
                   name="returnReason"
                   value="La calidad no es la esperada"
-                  onChange={(e) => setSelectedReturnReason(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedReturnReason(e.target.value);
+                    setShowOtraReason(false);
+                  }}
+                  checked={selectedReturnReason === "La calidad no es la esperada"}
                 />
                 La calidad no es la esperada
               </label>
@@ -284,9 +379,10 @@ const PedidosContent = () => { // No longer needs onPaymentSuccess prop
                   name="returnReason"
                   value="Otra"
                   onChange={(e) => {
-                    setShowOtraReason(e.target.checked);
                     setSelectedReturnReason('Otra');
+                    setShowOtraReason(true);
                   }}
+                  checked={selectedReturnReason === "Otra"}
                 />
                 Otra
               </label>

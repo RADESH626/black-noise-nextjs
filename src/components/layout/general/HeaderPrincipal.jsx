@@ -99,7 +99,7 @@ function HeaderPrincipal() {
                                     </Link>
                                     <BotonGeneral
                                         onClick={() => { signOut({ callbackUrl: '/login' }); setIsDropdownOpen(false); }}
-                                        variant="danger"
+                                        variant="secondary"
                                         className="w-full text-left"
                                     >
                                         Cerrar Sesión

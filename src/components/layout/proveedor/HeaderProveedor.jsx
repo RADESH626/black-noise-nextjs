@@ -20,7 +20,7 @@ export default function HeaderProveedor() {
           <span className="text-lg">Bienvenido, {session.user.name}</span>
           <BotonGeneral
             onClick={() => signOut({ callbackUrl: '/login' })}
-            className="bg-red-600 hover:bg-red-700 text-black font-bold py-2 px-4 rounded"
+            variant="secondary"
           >
             Cerrar Sesión
           </BotonGeneral>

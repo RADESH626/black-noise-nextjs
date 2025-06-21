@@ -55,7 +55,7 @@ function ProveedorSidebar() {
        <div className="mt-auto">
         <BotonGeneral
           onClick={() => signOut({ callbackUrl: '/login' })}
-          variant="danger"
+          variant="secondary"
           className="flex items-center justify-center w-full text-left"
         >
           <Image src="/icons/icono-salida.svg" alt="Cerrar Sesión" width={20} height={20} className="mr-3 filter invert" />

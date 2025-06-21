@@ -10,6 +10,7 @@ import { Rol } from "@/models/enums/usuario/Rol";
 import bcrypt from "bcryptjs";
 import logger from '@/utils/logger';
 import { transporter } from '@/utils/nodemailer'; // Import the centralized transporter
+import { toPlainObject } from '@/utils/dbUtils'; // Import toPlainObject
 
 export async function crearProveedor(prevState, formData) {
   const session = await getServerSession(authOptions);
@@ -303,12 +304,7 @@ export async function obtenerMiPerfilProveedor() {
     }
 
     return {
-      proveedor: {
-        ...proveedor,
-        _id: proveedor._id.toString(),
-        createdAt: proveedor.createdAt ? new Date(proveedor.createdAt).toISOString() : null,
-        updatedAt: proveedor.updatedAt ? new Date(proveedor.updatedAt).toISOString() : null,
-      },
+      proveedor: toPlainObject(proveedor), // Convert to plain object
       success: true
     };
   } catch (error) {

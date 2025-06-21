@@ -27,6 +27,7 @@ export default function PedidosClientPage({ initialPedidos }) {
   });
   const [isUpdating, setIsUpdating] = useState({});
   const [expandedOrders, setExpandedOrders] = useState(new Set()); // Estado para controlar los pedidos expandidos
+  const [expandedDesigns, setExpandedDesigns] = useState(new Set()); // Nuevo estado para controlar los diseños expandidos
 
   useEffect(() => {
     setPedidos(initialPedidos);
@@ -45,6 +46,18 @@ export default function PedidosClientPage({ initialPedidos }) {
         newSet.delete(pedidoId);
       } else {
         newSet.add(pedidoId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleToggleDesignExpand = (designId) => {
+    setExpandedDesigns(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(designId)) {
+        newSet.delete(designId);
+      } else {
+        newSet.add(designId);
       }
       return newSet;
     });
@@ -217,7 +230,6 @@ export default function PedidosClientPage({ initialPedidos }) {
                               </div>
                             )}
 
-                            
                           </div>
 
 
@@ -227,20 +239,43 @@ export default function PedidosClientPage({ initialPedidos }) {
                             <p className="font-medium text-white mb-2 text-center">Diseños:</p>
 
                             {pedido.items && pedido.items.length > 0 ? (
-                              <div className="flex flex-col  p-2 rounded-md gap-4">
+                              <div className="flex flex-col p-2 rounded-md gap-4">
                                 {pedido.items.map((item, index) => (
-                                  <div key={index} className="flex items-center space-x-3  p-2 rounded-md bg-gray-400">
-                                    {item.designId?.imagen && (
-                                      <img
-                                        src={item.designId.imagen}
-                                        alt={item.designId.nombreDesing || 'Diseño'}
-                                        className="w-12 h-12 object-cover rounded-md"
-                                      />
-                                    )}
-                                    <div>
-                                      <p className="font-semibold">{item.designId?.nombreDesing || 'Diseño Desconocido'}</p>
-                                      <p className="text-sm text-gray-600">Cantidad: {item.quantity}</p>
+                                  <div key={index} className="flex flex-col bg-gray-400 rounded-md p-2">
+                                    <div
+                                      className="flex items-center space-x-3 cursor-pointer"
+                                      onClick={() => handleToggleDesignExpand(item.designId?._id?.toString() || `design-${index}`)}
+                                    >
+                                      {item.designId?.imagen && (
+                                        <img
+                                          src={item.designId.imagen}
+                                          alt={item.designId.nombreDesing || 'Diseño'}
+                                          className="w-12 h-12 object-cover rounded-md"
+                                        />
+                                      )}
+                                      <div>
+                                        <p className="font-semibold">{item.designId?.nombreDesing || 'Diseño Desconocido'}</p>
+                                        <p className="text-sm text-gray-600">Cantidad: {item.quantity}</p>
+                                      </div>
+                                      <svg
+                                        className={`w-5 h-5 text-gray-600 transform transition-transform duration-200 ${expandedDesigns.has(item.designId?._id?.toString() || `design-${index}`) ? 'rotate-180' : ''
+                                          }`}
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                      </svg>
                                     </div>
+                                    {expandedDesigns.has(item.designId?._id?.toString() || `design-${index}`) && (
+                                      <div className="mt-2 text-sm text-gray-700 bg-gray-300 p-2 rounded-md">
+                                        <p><span className="font-medium">Categoría:</span> {item.designId?.categoria || 'N/A'}</p>
+                                        <p><span className="font-medium">Precio Unitario:</span> ${item.designId?.precioUnitario ? item.designId.precioUnitario.toFixed(2) : '0.00'}</p>
+                                        <p><span className="font-medium">Descripción:</span> {item.designId?.descripcion || 'N/A'}</p>
+                                        {/* Agrega más detalles del diseño aquí si son relevantes */}
+                                      </div>
+                                    )}
                                   </div>
                                 ))}
                               </div>
@@ -298,9 +333,7 @@ export default function PedidosClientPage({ initialPedidos }) {
                             </select>
                           </div>
 
-                          <Link href={`/proveedor/pedidos/ver/${pedido._id.toString()}`} className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md text-sm text-center transition-colors duration-200">
-                            Ver Detalles
-                          </Link>
+                          {/* Se elimina el Link a la página de detalles del pedido */}
                         </div>
                       </div>
                     )}
