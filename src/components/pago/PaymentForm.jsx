@@ -1,10 +1,6 @@
 'use client'
 import React, { useState } from 'react';
 import { MetodoPago } from '../../models/enums/pago/MetodoPago';
-<<<<<<< HEAD
-import BotonGeneral from '@/components/common/botones/BotonGeneral';
-=======
->>>>>>> c32cb53 (primer commit)
 
 function PaymentForm({ handlePago }) {
   const [nombre, setNombre] = useState("");
@@ -194,15 +190,6 @@ function PaymentForm({ handlePago }) {
         <p style={{ color: "#252424FF", marginBottom: "1rem" }}>{error}</p>
       )}
 
-<<<<<<< HEAD
-      <BotonGeneral
-        type="submit"
-        variant="primary"
-        className="w-full"
-      >
-        Pagar Ahora
-      </BotonGeneral>
-=======
       <button
         type="submit"
         style={{
@@ -220,7 +207,6 @@ function PaymentForm({ handlePago }) {
       >
         Pagar Ahora
       </button>
->>>>>>> c32cb53 (primer commit)
     </form>
   );
 }

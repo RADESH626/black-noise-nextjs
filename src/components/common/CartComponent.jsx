@@ -333,16 +333,6 @@ function CartComponent() {
 
       {/* Dialog for Payment Section */}
       <dialog ref={dialogRef} className="relative p-8 rounded-lg shadow-lg max-w-2xl w-11/12 max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "#FDF9F1", color: "#000000", margin: "auto" }}>
-<<<<<<< HEAD
-        <BotonGeneral
-          onClick={handleClosePayment}
-          variant="secondary"
-          className="absolute top-4 right-4 text-2xl font-bold"
-          aria-label="Cerrar"
-        >
-          Cerrar
-        </BotonGeneral>
-=======
         <button
           onClick={handleClosePayment}
           className="absolute top-4 right-4 text-2xl font-bold"
@@ -351,7 +341,6 @@ function CartComponent() {
         >
           &times;
         </button>
->>>>>>> c32cb53 (primer commit)
         <h2 className="text-2xl font-bold mb-4" style={{ color: "#111010" }}>Confirmar Pedido y Pago</h2>
         
         <UserDataForm onUserDataChange={handleUserDataChange} />
@@ -377,16 +366,6 @@ function CartComponent() {
 
           {(selectedPaymentMethod === MetodoPago.TARJETA_CREDITO || selectedPaymentMethod === MetodoPago.TARJETA_DEBITO) && (
             <>
-<<<<<<< HEAD
-              <BotonGeneral
-                type="button"
-                onClick={() => setIsCardModalOpen(true)}
-                variant="primary"
-                className="w-full"
-              >
-                {cardData ? 'Editar Datos de Tarjeta' : 'Ingresar Datos de Tarjeta'}
-              </BotonGeneral>
-=======
               <button
                 type="button"
                 onClick={() => setIsCardModalOpen(true)}
@@ -395,7 +374,6 @@ function CartComponent() {
               >
                 {cardData ? 'Editar Datos de Tarjeta' : 'Ingresar Datos de Tarjeta'}
               </button>
->>>>>>> c32cb53 (primer commit)
               {cardData && (
                 <p className="mt-2 text-sm" style={{ color: "#000000" }}>
                   Tarjeta ingresada: **** **** **** {cardData.tarjeta.slice(-4)}
@@ -431,16 +409,6 @@ function CartComponent() {
           </p>
         )}
 
-<<<<<<< HEAD
-        <BotonGeneral
-          type="button"
-          onClick={handleProcessPayment}
-          variant="primary"
-          className="w-full"
-        >
-          Confirmar Pedido y Pagar
-        </BotonGeneral>
-=======
         <button
           type="button"
           onClick={handleProcessPayment}
@@ -449,7 +417,6 @@ function CartComponent() {
         >
           Confirmar Pedido y Pagar
         </button>
->>>>>>> c32cb53 (primer commit)
       </dialog>
 
       <CardDataModal

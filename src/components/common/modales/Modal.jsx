@@ -34,16 +34,6 @@ const Modal = ({ title, children, onClose, isOpen, type = 'default', onConfirm, 
         <div className="modal-content">
           {children}
         </div>
-<<<<<<< HEAD
-        <BotonGeneral
-          onClick={onClose}
-          variant="secondary"
-          className="absolute top-3 right-3 text-3xl leading-none"
-          aria-label="Cerrar modal"
-        >
-          Cerrar
-        </BotonGeneral>
-=======
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-3xl leading-none"
@@ -51,7 +41,6 @@ const Modal = ({ title, children, onClose, isOpen, type = 'default', onConfirm, 
         >
           &times;
         </button>
->>>>>>> c32cb53 (primer commit)
         {showActions && (
           <div className="mt-6 flex justify-end space-x-4">
             <BotonGeneral

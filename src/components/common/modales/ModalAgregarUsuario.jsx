@@ -90,25 +90,14 @@ function ModalAgregarUsuario({ isOpen, onClose, onUserAdded }) {
                 onClick={e => e.stopPropagation()}
             >
                 <div className="relative w-full p-6 overflow-y-auto">
-<<<<<<< HEAD
-                    <BotonGeneral
-                        onClick={onClose}
-                        variant="secondary"
-                        className="absolute top-4 right-4 z-10"
-=======
                     <button 
                         onClick={onClose}
                         className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 z-10"
->>>>>>> c32cb53 (primer commit)
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
-<<<<<<< HEAD
-                    </BotonGeneral>
-=======
                     </button>
->>>>>>> c32cb53 (primer commit)
 
                     <div className="rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.2)] overflow-hidden">
                         <div className="p-8 bg-black bg-gradient-to-l from-black to-gray-900">

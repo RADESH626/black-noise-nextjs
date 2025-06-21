@@ -5,10 +5,6 @@ import { useRouter } from "next/navigation";
 import { encontrarDesignsPorId, actualizarDesign } from "@/app/acciones/DesignActions";
 import { useDialog } from "@/context/DialogContext";
 import { CategoriaProducto } from "@/models/enums/CategoriaProducto";
-<<<<<<< HEAD
-import BotonGeneral from '@/components/common/botones/BotonGeneral';
-=======
->>>>>>> c32cb53 (primer commit)
 
 function EditDesignPage({ params }) {
   const router = useRouter();
@@ -283,24 +279,6 @@ function EditDesignPage({ params }) {
         </div>
 
         <div className="flex justify-end space-x-4 mt-6">
-<<<<<<< HEAD
-          <BotonGeneral
-            type="button"
-            onClick={() => router.push("/admin/designs")}
-            variant="secondary"
-            className="transition duration-200 ease-in-out"
-          >
-            Cancelar
-          </BotonGeneral>
-          <BotonGeneral
-            type="submit"
-            disabled={loading}
-            variant="primary"
-            className="transition duration-200 ease-in-out"
-          >
-            {loading ? "Actualizando..." : "Actualizar Diseño"}
-          </BotonGeneral>
-=======
           <button
             type="button"
             onClick={() => router.push("/admin/designs")}
@@ -316,7 +294,6 @@ function EditDesignPage({ params }) {
           >
             {loading ? "Actualizando..." : "Actualizar Diseño"}
           </button>
->>>>>>> c32cb53 (primer commit)
         </div>
       </form>
     </div>

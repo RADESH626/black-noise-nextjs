@@ -48,11 +48,7 @@ function HeaderPrincipal() {
 
     return (
         <div>
-<<<<<<< HEAD
-            <header className='flex flex-row justify-between items-center p-10 top-0 fixed w-full h-16 z-50 bg-transparent'>
-=======
             <header className='flex flex-row justify-between items-center p-10 top-0 fixed w-full h-16 z-50 bg-black'>
->>>>>>> c32cb53 (primer commit)
 
                 <h1 className='font-bold text-3xl hover:text-white transition-colors duration-500 text-white'>
                     BLACK NOISE
@@ -103,11 +99,7 @@ function HeaderPrincipal() {
                                     </Link>
                                     <BotonGeneral
                                         onClick={() => { signOut({ callbackUrl: '/login' }); setIsDropdownOpen(false); }}
-<<<<<<< HEAD
-                                        variant="secondary"
-=======
                                         variant="danger"
->>>>>>> c32cb53 (primer commit)
                                         className="w-full text-left"
                                     >
                                         Cerrar Sesión
