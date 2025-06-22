@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { DBconection } from '@/utils/DBconection';
+import connectDB from '@/utils/DBconection';
 import Pedido from '@/models/Pedido';
 
 export async function GET(request) {
   try {
-    await DBconection();
+    await connectDB();
 
     const devoluciones = await Pedido.find({ estadoPedido: 'SOLICITUD_DE_DEVOLUCION' }).lean();
 

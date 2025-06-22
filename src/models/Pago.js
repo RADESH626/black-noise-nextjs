@@ -1,5 +1,16 @@
 import { Schema, model, models } from 'mongoose'
 import { MetodoPago } from '@/models/enums/pago/MetodoPago';
+import connectDB from '@/utils/DBconection';
+
+let mongoose;
+
+async function getMongoose() {
+    if (!mongoose) {
+        const { mongoose: mongooseInstance } = await connectDB();
+        mongoose = mongooseInstance;
+    }
+    return mongoose;
+}
 
 const PagoSchema = new Schema({
     usuarioId: {
@@ -51,4 +62,7 @@ const PagoSchema = new Schema({
 })
 
 // Check if the model exists before creating a new one
-export default models.Pago || model('Pago', PagoSchema)
+export default async function getPagoModel() {
+    const mongooseInstance = await getMongoose();
+    return mongooseInstance.models.Pago || model('Pago', PagoSchema);
+}

@@ -29,7 +29,10 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }) {
+import connectDB from '@/utils/DBconection';
+
+export default async function RootLayout({ children }) {
+  await connectDB();
   return (
     <html lang="es" className={`${geistSans.variable} ${geistMono.variable}`}>
       <head>

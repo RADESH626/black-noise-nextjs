@@ -2,6 +2,13 @@
 
 import mongoose from 'mongoose';
 import logger from './logger';
+import '@/models/Cart'; // Import the Cart model explicitly
+import '@/models/Design'; // Import the Design model explicitly
+import '@/models/Pago'; // Import the Pago model explicitly
+import getPedidoModel from '@/models/Pedido'; // Import the Pedido model explicitly
+import '@/models/Proveedor'; // Import the Proveedor model explicitly
+import '@/models/Usuario'; // Import the Usuario model explicitly
+import '@/models/Venta'; // Import the Venta model explicitly
 import '@/models'; // Import all models to ensure they are registered
 
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -32,8 +39,10 @@ export default async function connectDB() {
         const db = await mongoose.connect(MONGODB_URI, {
         });
 
+        await getPedidoModel();
+
         logger.info('Database connected successfully');
-        return db;
+        return { mongoose: mongoose };
     } catch (error) {
         logger.error('Error connecting to database:', error);
         // Don't exit the process, let the error handling cascade up
