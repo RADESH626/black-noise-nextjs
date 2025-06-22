@@ -16,11 +16,14 @@ export async function GET() {
     }
 
     const providerId = session.user.id;
+    console.log('providerId:', providerId);
 
     const cancelledOrders = await Pedido.find({
-      proveedorId: providerId,
+      proveedorId: session.user.id,
       estadoPedido: 'CANCELADO'
     }).populate('userId').populate('items.designId').lean().exec();
+
+    console.log('cancelledOrders:', cancelledOrders);
 
     return NextResponse.json(cancelledOrders);
   } catch (error) {
