@@ -11,6 +11,7 @@ import ErrorMessage from '@/components/common/ErrorMessage';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import { obtenerMiPerfilProveedor } from '@/app/acciones/ProveedorActions';
 import { obtenerPedidosPorProveedorId } from '@/app/acciones/ProveedorPedidoActions';
+import DevolucionesProveedor from '@/components/proveedor/DevolucionesProveedor';
 
 function ProveedorPage() {
     const { data: session, status } = useSession();
