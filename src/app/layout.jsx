@@ -4,6 +4,7 @@ import { DialogProvider } from '../context/DialogContext';
 import SessionProviderWrapper from './SessionProviderWrapper';
 import { Providers } from './providers';
 import ClientHeaderLoader from './ClientHeaderLoader';
+import DynamicFooterWrapper from '@/components/layout/DynamicFooterWrapper';
 
 // Configuración optimizada de fuentes
 const geistSans = Geist({
@@ -42,8 +43,10 @@ export default function RootLayout({ children }) {
         <Providers>
           <DialogProvider>
             <SessionProviderWrapper>
-              <ClientHeaderLoader />
+              {/* <ClientHeaderLoader /> */}
               {children}
+
+              <DynamicFooterWrapper />
             </SessionProviderWrapper>
           </DialogProvider>
         </Providers>

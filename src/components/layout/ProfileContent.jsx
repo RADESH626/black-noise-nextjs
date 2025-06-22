@@ -16,6 +16,7 @@ import { useDialog } from "@/context/DialogContext";
 import { useRef, useCallback } from "react";
 import FormEditarDesign from "@/components/perfil/FormEditarDesign";
 import { useCart } from "@/context/CartContext";
+import HeaderPrincipal from "./general/HeaderPrincipal";
 // Removed: import NewOrderModal from "@/components/common/modales/NewOrderModal";
 
 function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [], initialUserPayments = [] }) {
@@ -222,6 +223,10 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
 
   return (
     <div className="mx-auto p-4 md:p-8 bg-white text-white w-screen flex flex-col min-h-screen">
+      {/* Header */}
+      {/* <HeaderPrincipal /> */}
+
+
       {/* User Info Section */}
       <div className="bg-black p-6 md:p-8 rounded-lg shadow-lg mb-8 flex-shrink-0">
         <div className="flex flex-col md:flex-row items-center">
