@@ -222,7 +222,7 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
   // Removed: const handleCreateNewOrder = () => { setIsNewOrderModalOpen(true); };
 
   return (
-    <div className="mx-auto p-4 md:p-8 bg-white text-white w-screen flex flex-col min-h-screen">
+    <div className="mx-auto p-4 md:p-8 bg-gray-300 text-white w-screen flex flex-col min-h-screen">
       {/* Header */}
       {/* <HeaderPrincipal /> */}
 
