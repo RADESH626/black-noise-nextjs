@@ -19,7 +19,7 @@ This functionality allows users to request returns for their orders. The process
 1.  **Proceso de Revisión Manual:** All return requests must be reviewed by the supplier. The supplier must contact the customer to agree on the details.
 2.  **Notificación por Correo:** An email is sent to the supplier when a return is requested.
 3.  **Cambio de Estado del Pedido (Flujo Sugerido):**
-    *   Usuario solicita devolución -> El sistema cambia el estado a "Solicitud de devolución".
+    *   Usuario solicita devolución -> El sistema cambia el estado a "SOLICITUD_DE_DEVOLUCION".
     *   Proveedor revisa la solicitud -> El proveedor contacts the customer. From their panel, they can:
         *   Aprobar Devolución (Reembolso total/parcial): Changes the status to "Devolución aprobada".
         *   Rechazar Devolución: Changes the status to "Devolución rechazada" and must fill in a mandatory field with the reason.
@@ -33,11 +33,16 @@ This functionality allows users to request returns for their orders. The process
 4.  **Visibilidad para el Proveedor:** The supplier will see this new order in their panel, clearly marked as a "Pedido a Rehacer".
 
 ## Implementation Details
-*   **Modal Component:** Use the existing `src/components/common/modales/Modal.jsx` or create a new modal component for the return request.
-*   **API Endpoint:** Create an API endpoint to handle the return request and send the email notification to the supplier.
-*   **Order Status:** Update the order status in the database.
-*   **Email Notification:** Use the existing email sending functionality or create a new one for the return request notification.
-*   **Interfaz de Negociación:** Create an interface for the supplier to configure the new order.
-*   **Negociación de Costos:** Implement the logic for the supplier to adjust the costs of the new order.
-*   **Nuevo Pedido sin Costo (o costo negociado):** Implement the logic to generate a new order linked to the original with the negotiated costs.
-*   **Visibilidad para el Proveedor:** Update the supplier panel to display the new order clearly marked as a "Pedido a Rehacer".
+*   **Modal Component:** The `src/components/common/modales/Modal.jsx` component is used for the return request.
+*   **API Endpoint:** The return request is handled by the `/api/devoluciones` endpoint.
+*   **Order Status:** The order status is updated to "SOLICITUD\_DE\_DEVOLUCION" in the database.
+*   **Email Notification:** The system sends an email notification to the supplier upon a return request.
+*   **Supplier View:** The supplier can view return requests in their panel.
+
+## API Endpoints
+*   `/api/devoluciones`: Handles the return request.
+*   `/api/proveedor/returns`: Returns a list of return requests for the supplier.
+
+## Components
+*   `src/components/common/PedidosComponent.jsx`: Displays the customer's orders and handles the return request action.
+*   `src/components/proveedor/DevolucionesProveedor.jsx`: Displays the return requests for the supplier.

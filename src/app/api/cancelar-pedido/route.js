@@ -3,10 +3,18 @@ import { sendEmail } from '@/utils/nodemailer';
 import { DBconection } from '@/utils/DBconection';
 import Pedido from '@/models/Pedido';
 import Usuario from '@/models/Usuario';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 export async function POST(request) {
   try {
     const { pedidoId } = await request.json();
+
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user) {
+      return NextResponse.json({ message: 'No autorizado' }, { status: 401 });
+    }
 
     await DBconection();
 
@@ -14,6 +22,11 @@ export async function POST(request) {
 
     if (!pedido) {
       return NextResponse.json({ message: 'Pedido no encontrado' }, { status: 404 });
+    }
+
+    // Check if the user is authorized to cancel the order
+    if (pedido.userId._id.toString() !== session.user.id) {
+      return NextResponse.json({ message: 'No autorizado' }, { status: 403 });
     }
 
     const userEmail = pedido.userId.correo;

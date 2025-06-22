@@ -20,7 +20,7 @@ export async function GET() {
     const returns = await Pedido.find({
       proveedorId: providerId,
       estadoPedido: { $in: [ 'SOLICITUD_DEVOLUCION', 'DEVOLUCION_APROBADA', 'DEVUELTO' ] }
-    }).sort({ cancellationDate: -1, _id: -1 }).lean().exec();
+    }).populate('userId').populate('items.designId').sort({ cancellationDate: -1, _id: -1 }).lean().exec();
 
     return NextResponse.json(returns);
   } catch (error) {

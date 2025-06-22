@@ -130,6 +130,7 @@ function ProveedorPage() {
                         </BotonGeneral>
                     </Link>
                 </div>
+                <DevolucionesProveedor />
             </div>
         </div>
     );

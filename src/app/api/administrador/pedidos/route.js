@@ -18,7 +18,7 @@ export const GET = withAuthorization(async (request) => {
         filter = { estadoPedido: { $ne: 'CANCELADO' } };
     }
 
-    return getAllHandler(Pedido, [], filter)();
+    return getAllHandler(Pedido, ['userId', 'proveedorId', 'items.designId'], filter)();
 }, 'ADMINISTRADOR');
 
 export const POST = withAuthorization(async (request) => {

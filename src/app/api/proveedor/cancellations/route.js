@@ -20,7 +20,7 @@ export async function GET() {
     const cancelledOrders = await Pedido.find({
       proveedorId: providerId,
       estadoPedido: 'CANCELADO'
-    }).sort({ cancellationDate: -1, _id: -1 }).lean().exec();
+    }).populate('userId').populate('items.designId').lean().exec();
 
     return NextResponse.json(cancelledOrders);
   } catch (error) {

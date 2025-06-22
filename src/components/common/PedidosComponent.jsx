@@ -93,6 +93,14 @@ const PedidosContent = () => {
 
       if (response.ok) {
         showPopUp('Solicitud de devolución enviada correctamente', 'success');
+         // Refresh pedidos after return request
+         const { pedidos: fetchedPedidos, error: fetchError } = await obtenerPedidosPagadosPorUsuarioId(userId);
+         if (fetchError) {
+           setError({ message: fetchError });
+           setPedidos([]);
+         } else {
+           setPedidos(fetchedPedidos || []);
+         }
       } else {
         showPopUp('Error al enviar la solicitud de devolución', 'error');
       }
@@ -327,14 +335,17 @@ const PedidosContent = () => {
                       </div>
                     </div>
                     <div className="flex justify-end">
-                      <BotonGeneral
-                        onClick={() => handleSolicitarDevolucion(pedido._id)}
-                        variant="danger"
-                        className="py-2 px-4 text-sm"
-                      >
-                        Solicitar Devolución
-                      </BotonGeneral>
-                      {pedido.estadoPedido === 'PENDIENTE' || pedido.estadoPedido === 'ASIGNADO' ? (
+                    <div className="flex justify-end">
+                      {pedido.estadoPedido === EstadoPedido.ENTREGADO ? (
+                        <BotonGeneral
+                          onClick={() => handleSolicitarDevolucion(pedido._id)}
+                          variant="danger"
+                          className="py-2 px-4 text-sm"
+                        >
+                          Solicitar Devolución
+                        </BotonGeneral>
+                      ) : null}
+                      {pedido.estadoPedido === EstadoPedido.PENDIENTE ? (
                         <BotonGeneral
                           onClick={() => handleCancelarPedido(pedido._id)}
                           variant="danger"
