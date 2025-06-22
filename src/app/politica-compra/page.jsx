@@ -1,7 +1,6 @@
 "use client";
 import React from 'react';
 import Footer from '@/components/layout/general/footer/Footer';
-import HeaderSoloLogo from '@/components/layout/general/HeaderSoloLogo'; // Importación agregada
 import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
 
 export default function PoliticaCompraPage() {

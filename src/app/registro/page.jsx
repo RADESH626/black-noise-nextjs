@@ -2,7 +2,6 @@
 import { motion } from "framer-motion";
 import FormRegistro from "@/components/layout/general/forms/FormRegistro";
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
-import HeaderSoloLogo from "@/components/layout/general/HeaderSoloLogo";
 import Footer from "@/components/layout/general/footer/Footer";
 
 function Registro() {
@@ -14,17 +13,17 @@ function Registro() {
       <div className="absolute inset-0 bg-gradient-to-b from-white/70 to-white/0"></div>
 
       {/* Header */}
-      <HeaderSoloLogo />
 
       {/* Contenido principal */}
       <main className="flex-1 flex items-center justify-center p-5 relative z-10">
         <motion.div
-          className="rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.2)] overflow-hidden text-[#ffffff] max-w-6xl w-full"
+          className="rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.2)] overflow-hidden text-[#ffffff] max-w-6xl h-full "
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <div className="flex flex-row">
+          <div className="flex flex-row h-full">
+
             <motion.div
               className="p-10 flex-1 border border-[#D9D9D9] rounded-lg bg-white bg-opacity-90 text-black"
               initial={{ x: -50, opacity: 0 }}

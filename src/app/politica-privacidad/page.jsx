@@ -1,7 +1,6 @@
 "use client";
 import React from 'react';
 import Footer from '@/components/layout/general/footer/Footer';
-import HeaderSoloLogo from '@/components/layout/general/HeaderSoloLogo'; // Importado correctamente
 import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal'; // Importación agregada
 
 export default function PoliticaPrivacidadPage() {
