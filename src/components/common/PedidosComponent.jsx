@@ -320,7 +320,6 @@ const PedidosContent = () => {
                       >
                         Solicitar Devolución
                       </BotonGeneral>
-                    )}
                     {pedido.estadoPedido === EstadoPedido.PENDIENTE && (
                       <BotonGeneral
                         onClick={() => handleCancelarPedido(pedido._id)}
