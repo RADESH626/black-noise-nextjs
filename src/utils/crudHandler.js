@@ -35,7 +35,7 @@ export const createHandler = (Model, requiredFields = []) => async (request) => 
 export const getAllHandler = (Model, populateFields = []) => async () => {
     try {
         await connectDB();
-        let query = Model.find({});
+        let query = Model.find({}, { fue_cancelado: 1 }); // Include fue_cancelado field
 
         if (populateFields.length > 0) {
             populateFields.forEach(field => {
@@ -69,7 +69,7 @@ export const getByIdHandler = (Model, populateFields = []) => async (request, { 
     try {
         await connectDB();
         const { id } = params;
-        let query = Model.findById(id);
+        let query = Model.findById(id, { fue_cancelado: 1 }); // Include fue_cancelado field
 
         if (populateFields.length > 0) {
             populateFields.forEach(field => {

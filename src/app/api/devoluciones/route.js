@@ -7,7 +7,12 @@ export async function POST(request) {
   try {
     const { pedidoId, returnReason } = await request.json();
 
-    await DBconection();
+    try {
+      await DBconection();
+    } catch (dbError) {
+      console.error("Database connection error:", dbError);
+      return NextResponse.json({ message: 'Error connecting to database' }, { status: 500 });
+    }
 
     const pedido = await Pedido.findById(pedidoId).populate('proveedorId');
 
