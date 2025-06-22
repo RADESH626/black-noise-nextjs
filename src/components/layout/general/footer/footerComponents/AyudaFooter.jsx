@@ -9,7 +9,7 @@ function AyudaFooter() {
       </H3Footer>
       <Link href="/terminos" className="link-footer">
         Términos y condiciones
-      </Link>
+      </Link> 
       <Link href="/politica-privacidad" className="link-footer">
         Política de privacidad
       </Link>

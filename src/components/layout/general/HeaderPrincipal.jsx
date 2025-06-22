@@ -1,42 +1,39 @@
-"use client"; // Required for onClick events
-
+"use client";
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import { useSession } from 'next-auth/react';
 import { useState, useEffect, useRef } from 'react';
-import Image from 'next/image'; // Import Image for the cart icon
+import Image from 'next/image';
 import IconoPersona from '@/components/common/iconos/IconoPersona';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
-import CartModal from '@/components/carrito/CartModal'; // Import CartModal
-import { useCart } from '@/context/CartContext'; // Import useCart
-import PendingPaymentsSummary from '@/components/common/PendingPaymentsSummary'; // Import PendingPaymentsSummary
+import CartModal from '@/components/carrito/CartModal';
+import { useCart } from '@/context/CartContext';
+import PendingPaymentsSummary from '@/components/common/PendingPaymentsSummary';
 
-function HeaderPrincipal({ hideCartIcon = false, showBackButton = false, backButtonHref = '/' }) {
+function HeaderPrincipal() {
     const { data: session } = useSession();
-    // console.log("Session object in HeaderPrincipal:", session);
-    const { cartItems, fetchCart, removeItem } = useCart(); // Use cartItems, fetchCart, and removeItem from CartContext
+    const { cartItems, fetchCart, removeItem } = useCart();
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
 
-    const [showCartModal, setShowCartModal] = useState(false); // State for cart modal visibility
+    const [showCartModal, setShowCartModal] = useState(false);
 
     const handleUserIconClick = () => {
         setIsDropdownOpen(!isDropdownOpen);
-        setShowCartModal(false); // Close cart modal if user dropdown opens
+        setShowCartModal(false);
     };
 
     const handleCartIconClick = async () => {
-        await fetchCart(); // Fetch latest cart data when modal is opened
+        await fetchCart();
         setShowCartModal(!showCartModal);
-        setIsDropdownOpen(false); // Close user dropdown if cart modal opens
+        setIsDropdownOpen(false);
     };
 
     const handleClickOutside = (event) => {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
             setIsDropdownOpen(false);
         }
-        // No need for cartModalRef check, dialog handles outside clicks natively
     };
 
     useEffect(() => {
@@ -46,27 +43,49 @@ function HeaderPrincipal({ hideCartIcon = false, showBackButton = false, backBut
         };
     }, []);
 
+    // Animación de scroll para ocultar/aparecer header:
+    const [showHeader, setShowHeader] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
+
+    const controlHeader = () => {
+        if (typeof window !== 'undefined') {
+            if (window.scrollY > lastScrollY) {
+                // Scrolling down
+                setShowHeader(false);
+            } else {
+                // Scrolling up
+                setShowHeader(true);
+            }
+            setLastScrollY(window.scrollY);
+        }
+    };
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            window.addEventListener('scroll', controlHeader);
+
+            return () => {
+                window.removeEventListener('scroll', controlHeader);
+            };
+        }
+    }, [lastScrollY]);
+
     return (
         <div>
-            <header className='flex flex-row justify-between items-center p-10 top-0 fixed w-full h-16 z-50 bg-black'>
-
-                <h1 className='font-bold text-3xl hover:text-white transition-colors duration-500 text-white'>
+            <header
+                className={`flex flex-row justify-between items-center p-10 top-0 fixed w-full h-16 z-50 transition-transform duration-500 ${
+                    showHeader ? 'translate-y-0' : '-translate-y-full'
+                }`}
+                style={{ backgroundColor: '#000000FF' }}
+            >
+                <h1 className='font-bold text-3xl hover:text-white transition-colors duration-500' style={{ color: '#FFFFFFFF' }}>
                     BLACK NOISE
                 </h1>
 
                 <div className='flex flex-row items-center gap-4'>
-                    {/* Pending Payments Icon */}
                     {session && <PendingPaymentsSummary />}
 
-                    {/* Back Button */}
-                    {showBackButton && (
-                        <Link href={backButtonHref} className="flex items-center gap-2 text-white hover:text-gray-300 transition-colors duration-300">
-                            <span className="text-2xl">←</span>
-                        </Link>
-                    )}
-
-                    {/* Shopping Cart Icon */}
-                    {session && !hideCartIcon && (
+                    {session && (
                         <div className="relative cursor-pointer" onClick={handleCartIconClick}>
                             <Image src="/icons/icono-carrito.svg" alt="Carrito" width={30} height={30} />
                             {cartItems.length > 0 && (
@@ -75,10 +94,13 @@ function HeaderPrincipal({ hideCartIcon = false, showBackButton = false, backBut
                                 </span>
                             )}
 
-                            <div className="absolute mt-2 top-full right-0  z-50 w-auto ">
-
-                                <CartModal cartItems={cartItems} onClose={() => setShowCartModal(false)} isOpen={showCartModal} onRemoveItem={removeItem} />
-
+                            <div className="absolute mt-2 top-full right-0 z-50 w-auto">
+                                <CartModal
+                                    cartItems={cartItems}
+                                    onClose={() => setShowCartModal(false)}
+                                    isOpen={showCartModal}
+                                    onRemoveItem={removeItem}
+                                />
                             </div>
                         </div>
                     )}
@@ -88,7 +110,6 @@ function HeaderPrincipal({ hideCartIcon = false, showBackButton = false, backBut
                             <span className='text-white'>
                                 ¡Bienvenido {session?.user?.name || session?.user?.email || 'Usuario'}!
                             </span>
-                            {/* User Icon to trigger dropdown */}
                             <div
                                 className="w-8 h-8 rounded-full overflow-hidden cursor-pointer"
                                 onClick={handleUserIconClick}
@@ -104,13 +125,12 @@ function HeaderPrincipal({ hideCartIcon = false, showBackButton = false, backBut
                                     <Link href="/perfil" className="block px-4 py-2 text-sm text-white hover:bg-gray-700" onClick={() => setIsDropdownOpen(false)}>
                                         Ver Perfil
                                     </Link>
-                                    <BotonGeneral
+                                    <button
                                         onClick={() => { signOut({ callbackUrl: '/login' }); setIsDropdownOpen(false); }}
-                                        variant="secondary"
-                                        className="w-full text-left"
+                                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700"
                                     >
                                         Cerrar Sesión
-                                    </BotonGeneral>
+                                    </button>
                                 </div>
                             )}
                         </div>

@@ -6,7 +6,7 @@ import BotonGeneral from "@/components/common/botones/BotonGeneral";
 function LoginInfoSection() {
   return (
     <motion.div
-      className="flex flex-1 flex-col bg-gradient-to-r from-[#000000] to-[#1a1a1a] text-[#ffffff] p-8 justify-center text-center"
+      className="flex flex-1 flex-col bg-gradient-to-r from-[#f5f5f5] to-[#f5f5f5] text-[#000000] p-8 justify-center text-center"
       initial={{ x: 50, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.8 }}
