@@ -76,6 +76,9 @@ async function updateEstadoPedido(pedidoId, newEstado) {
         const oldEstado = pedido.estadoPedido; // Obtener el estado antiguo antes de actualizar
 
         pedido.estadoPedido = newEstado;
+        if (newEstado === EstadoPedido.CANCELADO) {
+            pedido.proveedorId = null; // Clear the provider ID when the order is cancelled
+        }
         await pedido.save();
 
         // Enviar notificación si el estado ha cambiado y no es 'ENTREGADO'

@@ -14,20 +14,20 @@ function NewPostSection() {
         <input
           type="text"
           placeholder="¿Qué diseño estás pensando hoy?"
-          className="flex-grow p-3 rounded-full text-white placeholder-[#AAAAAA] focus:outline-none focus:ring-2"
+          className="flex-grow p-3 rounded-full text-white placeholder-[#ffffff] focus:outline-none focus:ring-2"
           style={{
             backgroundColor: '#1E1E1EEC',
-            border: '1px solid #0A1828',
+            border: '1px solid #000000FF',
             boxShadow: '0 0 0 2px #FFFFFFFF' // optional glow
           }}
         />
       </div>
       <Link
         href="/perfil"
-        className="px-6 py-2 rounded-full text-white font-semibold transition-colors duration-300"
+        className="px-6 py-2 rounded-full text-black font-semibold transition-colors duration-300"
         style={{
-          backgroundColor: '#1A3870FF',
-          hover: '#0A1828' // this won't work inline, needs Tailwind hover: setup
+          backgroundColor: '#f5f5f5',
+          hover: '#ffffff' // this won't work inline, needs Tailwind hover: setup
         }}
       >
         Publicar Diseño

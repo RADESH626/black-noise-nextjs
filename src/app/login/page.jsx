@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { motion } from 'framer-motion';
 import FormLogin from "@/components/layout/general/forms/FormLogin";
 import LoginInfoSection from '@/components/login/LoginInfoSection';
@@ -61,6 +61,16 @@ function Login() {
           animate="visible"
         />
 
+      {/* White overlay */}
+      <motion.div
+        className="fixed inset-0 z-50 pointer-events-none"
+        variants={overlayVariants}
+        initial="hidden"
+        animate="visible"
+      />
+
+      {/* Contenido principal centrado */}
+      <div className="flex flex-1 items-center justify-center p-5 mt-20">
         <motion.div
           className="rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.2)] overflow-hidden text-[#000000]"
           variants={containerVariants}
@@ -69,20 +79,21 @@ function Login() {
         >
           <div className="flex flex-row justify-center">
             <motion.div
-              className="p-10 bg-[#F7F7F7] flex-1 border border-[#D9D9D9] rounded-lg"
+              className="p-10 flex-1 bg-white bg-opacity-90 border border-[#D9D9D9] rounded-lg"
               variants={formSectionVariants}
             >
-              <h2 className="text-3xl font-bold mb-8 text-bn-highlight text-center">Iniciar Sesión</h2>
+              <h2 className="text-3xl font-bold mb-8 text-bn-whoami text-center">Iniciar Sesión</h2>
               <FormLogin />
             </motion.div>
 
             <LoginInfoSection />
           </div>
         </motion.div>
-      </main>
-      {/* Footer */}
+      </div>
+
+      {/* Footer al final */}
       <Footer />
-    </div>
+    </main>
   );
 }
 

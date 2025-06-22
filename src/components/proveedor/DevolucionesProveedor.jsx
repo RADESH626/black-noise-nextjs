@@ -17,6 +17,7 @@ const DevolucionesProveedor = () => {
           throw new Error(`HTTP error! status: ${cancelacionesResponse.status}`);
         }
         const cancelacionesData = await cancelacionesResponse.json();
+        console.log('cancelacionesData:', cancelacionesData);
         setCancelaciones(cancelacionesData);
 
         const devolucionesResponse = await fetch('/api/proveedor/returns');
@@ -25,6 +26,7 @@ const DevolucionesProveedor = () => {
         }
         const devolucionesData = await devolucionesResponse.json();
         setDevoluciones(devolucionesData);
+        console.log('devolucionesData:', devolucionesData);
       } catch (e) {
         setError(e);
       } finally {
@@ -55,7 +57,7 @@ const DevolucionesProveedor = () => {
           {cancelaciones.map((cancelacion) => (
             <li key={cancelacion._id}>
               <p>Pedido ID: {cancelacion._id}</p>
-              <p>Cliente: {cancelacion.userId?.nombre}</p>
+              <p>Cliente: {cancelacion.userId ? cancelacion.userId.nombre : 'N/A'}</p>
               {/* Add more details here */}
             </li>
           ))}

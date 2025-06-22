@@ -1,11 +1,13 @@
 "use client";
 import React from 'react';
 import Footer from '@/components/layout/general/footer/Footer';
+import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
 
 export default function PoliticaPrivacidadPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#000000] via-[#1f2937] to-[#000000] text-[#000000] p-10 flex flex-col">
-      <div className="max-w-4xl mx-auto bg-[#FFFFFFFF]/70 p-8 rounded-lg shadow-lg mt-40 flex-grow">
+    <main className="min-h-screen bg-gradient-to-b from-[#ffffff] via-[#ffffff] to-[#ffffff] text-[#000000] ">
+      <HeaderPrincipal />
+      <div className="max-w-4xl mx-auto bg-[#f5f5f5]/70 p-8 rounded-lg shadow-lg mt-40 flex-grow">
         <h1 className="text-3xl font-bold mb-6 text-center text-[#000000]">Política de Privacidad</h1>
 
         <p className="mb-4">
@@ -44,6 +46,6 @@ export default function PoliticaPrivacidadPage() {
       </div>
 
       <Footer />
-    </main>
-  );
+  </main>
+);
 }
