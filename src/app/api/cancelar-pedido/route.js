@@ -3,8 +3,6 @@ import { sendEmail } from '@/utils/nodemailer';
 import connectDB from '@/utils/DBconection';
 import Pedido from '@/models/Pedido';
 import Usuario from '@/models/Usuario';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 export async function POST(request) {
   try {

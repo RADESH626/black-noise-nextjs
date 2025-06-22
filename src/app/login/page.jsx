@@ -2,10 +2,8 @@
 import { motion } from 'framer-motion';
 import FormLogin from "@/components/layout/general/forms/FormLogin";
 import LoginInfoSection from '@/components/login/LoginInfoSection';
-import HeaderSoloLogo from '@/components/layout/general/HeaderSoloLogo';
+import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
 import Footer from '@/components/layout/general/footer/Footer';
-import BotonGeneral from '@/components/common/botones/BotonGeneral';
-
 
 function Login() {
   const containerVariants = {
@@ -47,12 +45,21 @@ function Login() {
   };
 
   return (
-    <main
-      className="min-h-screen flex flex-col bg-cover bg-center"
-      style={{ backgroundImage: `url("/img/Logos/estesi.jpg")` }} // ✅ Asegúrate que la imagen tenga este nombre exacto sin espacios
-    >
-      {/* Header con solo el logo */}
-      <HeaderSoloLogo />
+    <div className="min-h-screen flex flex-col relative">
+      {/* Header */}
+      <HeaderPrincipal />
+
+      <main
+        className="flex-1 flex items-center justify-center p-5 pt-32 bg-cover bg-center" // pt-32 para bajar contenido
+        style={{}}
+      >
+        {/* White overlay animado */}
+        <motion.div
+          className="fixed inset-0 z-50 pointer-events-none"
+          variants={overlayVariants}
+          initial="hidden"
+          animate="visible"
+        />
 
       {/* White overlay */}
       <motion.div

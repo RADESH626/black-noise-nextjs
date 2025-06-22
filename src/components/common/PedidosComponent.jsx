@@ -88,14 +88,6 @@ const PedidosContent = () => {
 
       if (response.ok) {
         showPopUp('Solicitud de devolución enviada correctamente', 'success');
-        // Refrescar pedidos tras solicitud de devolución
-        const { pedidos: fetchedPedidos, error: fetchError } = await obtenerPedidosPagadosPorUsuarioId(userId);
-        if (fetchError) {
-          setError({ message: fetchError });
-          setPedidos([]);
-        } else {
-          setPedidos(fetchedPedidos || []);
-        }
       } else {
         showPopUp('Error al enviar la solicitud de devolución', 'error');
       }
@@ -320,15 +312,16 @@ const PedidosContent = () => {
                       >
                         Solicitar Devolución
                       </BotonGeneral>
-                    {pedido.estadoPedido === EstadoPedido.PENDIENTE && (
-                      <BotonGeneral
-                        onClick={() => handleCancelarPedido(pedido._id)}
-                        variant="danger"
-                        className="py-2 px-4 text-sm"
-                      >
-                        Cancelar Pedido
-                      </BotonGeneral>
-                    )}
+                      {pedido.estadoPedido === 'PENDIENTE' || pedido.estadoPedido === 'ASIGNADO' ? (
+                        <BotonGeneral
+                          onClick={() => handleCancelarPedido(pedido._id)}
+                          variant="danger"
+                          className="py-2 px-4 text-sm"
+                        >
+                          Cancelar Pedido
+                        </BotonGeneral>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
               )}

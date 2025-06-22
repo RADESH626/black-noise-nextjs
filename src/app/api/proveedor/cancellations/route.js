@@ -2,9 +2,6 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/utils/DBconection';
 import Pedido from '@/models/Pedido';
 
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/utils/authUtils";
-
 export async function GET() {
   try {
     await connectDB();
