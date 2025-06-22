@@ -32,10 +32,10 @@ export const createHandler = (Model, requiredFields = []) => async (request) => 
     }
 };
 
-export const getAllHandler = (Model, populateFields = []) => async () => {
+export const getAllHandler = (Model, populateFields = [], filter = {}) => async () => {
     try {
         await connectDB();
-        let query = Model.find({}, { fue_cancelado: 1 }); // Include fue_cancelado field
+        let query = Model.find(filter, { fue_cancelado: 1 }); // Include fue_cancelado field
 
         if (populateFields.length > 0) {
             populateFields.forEach(field => {
