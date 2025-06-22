@@ -20,7 +20,6 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  metadataBase: new URL('http://localhost:3000'), // O la URL de despliegue de tu aplicación
   title: 'Black Noise | Diseña prendas en 3D',
   description: 'Crea y modifica prendas realistas en 3D para perfeccionar tus ideas antes de producirlas',
   openGraph: {
@@ -30,7 +29,10 @@ export const metadata = {
   },
 };
 
+import connectDB from '@/utils/DBconection';
+
 export default async function RootLayout({ children }) {
+  await connectDB();
   return (
     <html lang="es" className={`${geistSans.variable} ${geistMono.variable}`}>
       <head>

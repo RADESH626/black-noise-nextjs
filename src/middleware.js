@@ -1,12 +1,8 @@
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt"; // Import getToken
-import connectDB from '@/utils/DBconection'; // Importar la función de conexión a la DB
 
 export async function middleware(req) {
   const pathname = req.nextUrl.pathname;
-
-  // Conectar a la base de datos al inicio del middleware
-  await connectDB();
 
   // Define paths that do NOT require authentication
   const publicPaths = ["/", "/login", "/registro","/api/auth"];
