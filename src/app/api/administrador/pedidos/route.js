@@ -5,6 +5,7 @@ import { createHandler, getAllHandler } from '@/utils/crudHandler';
 import { handleError, ValidationError } from '@/utils/errorHandler';
 import { validateRequiredFields } from '@/utils/validation';
 import { withAuthorization } from '@/utils/authMiddleware';
+<<<<<<< HEAD
 import { NextRequest } from 'next/server';
 
 export const GET = withAuthorization(async (request) => {
@@ -20,6 +21,10 @@ export const GET = withAuthorization(async (request) => {
 
     return getAllHandler(Pedido, ['userId', 'proveedorId', 'items.designId'], filter)();
 }, 'ADMINISTRADOR');
+=======
+
+export const GET = withAuthorization(getAllHandler(Pedido), 'ADMINISTRADOR');
+>>>>>>> f416d78 (pantalla de carga)
 
 export const POST = withAuthorization(async (request) => {
     try {

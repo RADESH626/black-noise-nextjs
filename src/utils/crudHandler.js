@@ -32,10 +32,17 @@ export const createHandler = (Model, requiredFields = []) => async (request) => 
     }
 };
 
+<<<<<<< HEAD
 export const getAllHandler = (Model, populateFields = [], filter = {}) => async () => {
     try {
         await connectDB();
         let query = Model.find(filter, { fue_cancelado: 1 }); // Include fue_cancelado field
+=======
+export const getAllHandler = (Model, populateFields = []) => async () => {
+    try {
+        await connectDB();
+        let query = Model.find({});
+>>>>>>> f416d78 (pantalla de carga)
 
         if (populateFields.length > 0) {
             populateFields.forEach(field => {
@@ -69,7 +76,11 @@ export const getByIdHandler = (Model, populateFields = []) => async (request, { 
     try {
         await connectDB();
         const { id } = params;
+<<<<<<< HEAD
         let query = Model.findById(id, { fue_cancelado: 1 }); // Include fue_cancelado field
+=======
+        let query = Model.findById(id);
+>>>>>>> f416d78 (pantalla de carga)
 
         if (populateFields.length > 0) {
             populateFields.forEach(field => {

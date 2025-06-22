@@ -130,7 +130,10 @@ function ProveedorPage() {
                         </BotonGeneral>
                     </Link>
                 </div>
+<<<<<<< HEAD
                 <DevolucionesProveedor />
+=======
+>>>>>>> f416d78 (pantalla de carga)
             </div>
         </div>
     );
