@@ -1,110 +1,54 @@
 'use client'
-<<<<<<< HEAD
-=======
 import { useState, useEffect } from 'react';
->>>>>>> f416d78 (pantalla de carga)
 import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
 import Footer from '@/components/layout/general/footer/Footer';
 import HeroSection from '@/components/home/HeroSection';
-import DesignRealClothesSection from '@/components/home/DesignRealClothesSection';
-import AddElementsSection from '@/components/home/AddElementsSection';
+import FeatureSection from '@/components/home/FeatureSection';
 import GarmentTypesSection from '@/components/home/GarmentTypesSection';
-<<<<<<< HEAD
-
-
-function indexPage() {
-  return (
-    <div className='pt-16'>
-      <HeaderPrincipal />
-
-      <main className="flex flex-col justify-between h-full">
-
-        <HeroSection />
-
-        <DesignRealClothesSection
-          imgSrc='/img/Modelos/Modelo 4.jpg'
-          title={['DISEÑA', 'PRENDAS REALES']}
-          description='Selecciona tu talla, el color, corta y crea detalles'
-        />
-
-        <AddElementsSection
-          imgSrc='/img/Modelos/Modelo 3.jpg'
-          title={['AÑADE ELEMENTOS', 'A TUS PRENDAS']}
-          description='Añade parches, taches, estampados y mucho más'
-        />
-
-        <DesignRealClothesSection
-          imgSrc='/img/Modelos/Modelo 5.jpg'
-          title={['DISEÑA', 'PRENDAS REALES']}
-          description='Selecciona tu talla, el color, corta y crea detalles'
-          imageLeft={true}
-        />
-
-        <GarmentTypesSection />
-
-        {/* Footer */}
-        <Footer />
-      </main>
-    </div>
-  )
-}
-
-export default indexPage;
-=======
 import Loader from '@/components/Loader';
 
 function IndexPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const handleLoad = () => setIsLoading(false);
+    
+    if(document.readyState === 'complete') {
       setIsLoading(false);
-    }, 2500);
-
-    return () => clearTimeout(timer);
+    } else {
+      window.addEventListener('load', handleLoad);
+      return () => window.removeEventListener('load', handleLoad);
+    }
   }, []);
 
   return (
-    <div>
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <div className='pt-16'>
-          <HeaderPrincipal />
-
-          <main className="flex flex-col justify-between h-full">
-
-            <HeroSection />
-
-            <DesignRealClothesSection
-              imgSrc='/img/Modelos/Modelo 4.jpg'
-              title={['DISEÑA', 'PRENDAS REALES']}
-              description='Selecciona tu talla, el color, corta y crea detalles'
-            />
-
-            <AddElementsSection
-              imgSrc='/img/Modelos/Modelo 3.jpg'
-              title={['AÑADE ELEMENTOS', 'A TUS PRENDAS']}
-              description='Añade parches, taches, estampados y mucho más'
-            />
-
-            <DesignRealClothesSection
-              imgSrc='/img/Modelos/Modelo 5.jpg'
-              title={['DISEÑA', 'PRENDAS REALES']}
-              description='Selecciona tu talla, el color, corta y crea detalles'
-              imageLeft={true}
-            />
-
-            <GarmentTypesSection />
-
-            {/* Footer */}
-            <Footer />
-          </main>
-        </div>
-      )}
+    <div className="min-h-screen flex flex-col">
+      {isLoading && <Loader />}
+      
+      <HeaderPrincipal />
+      <main className={`flex-grow ${isLoading ? 'hidden' : 'block'}`}>
+        <HeroSection />
+        
+        <FeatureSection
+          imgSrc='/img/Modelos/Modelo 4.jpg'
+          title={['DISEÑA', 'PRENDAS REALES']}
+          description='Selecciona tu talla, el color, corta y crea detalles'
+        />
+        
+        <FeatureSection
+          imgSrc='/img/Modelos/Modelo 3.jpg'
+          title={['AÑADE ELEMENTOS', 'A TUS PRENDAS']}
+          description='Añade parches, taches, estampados y mucho más'
+          imageLeft={true}
+          accentWordIndex={0}
+        />
+        
+        <GarmentTypesSection />
+      </main>
+      
+      <Footer />
     </div>
   );
 }
 
 export default IndexPage;
->>>>>>> f416d78 (pantalla de carga)

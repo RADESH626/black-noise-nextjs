@@ -1,130 +1,67 @@
-"use client"; // Required for onClick events
-
+'use client';
 import Link from 'next/link';
-import { signOut } from 'next-auth/react';
-import { useSession } from 'next-auth/react';
-import { useState, useEffect, useRef } from 'react';
-import Image from 'next/image'; // Import Image for the cart icon
-import IconoPersona from '@/components/common/iconos/IconoPersona';
-import BotonGeneral from '@/components/common/botones/BotonGeneral';
-import CartModal from '@/components/carrito/CartModal'; // Import CartModal
-import { useCart } from '@/context/CartContext'; // Import useCart
-import PendingPaymentsSummary from '@/components/common/PendingPaymentsSummary'; // Import PendingPaymentsSummary
+import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import BotonIniciarSesion from '@/components/common/botones/BotonIniciarSesion';
 
-function HeaderPrincipal({ hideCartIcon = false, showBackButton = false, backButtonHref = '/' }) {
-    const { data: session } = useSession();
-    // console.log("Session object in HeaderPrincipal:", session);
-    const { cartItems, fetchCart, removeItem } = useCart(); // Use cartItems, fetchCart, and removeItem from CartContext
+export default function HeaderPrincipal() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const dropdownRef = useRef(null);
-
-    const [showCartModal, setShowCartModal] = useState(false); // State for cart modal visibility
-
-    const handleUserIconClick = () => {
-        setIsDropdownOpen(!isDropdownOpen);
-        setShowCartModal(false); // Close cart modal if user dropdown opens
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 10) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
     };
 
-    const handleCartIconClick = async () => {
-        await fetchCart(); // Fetch latest cart data when modal is opened
-        setShowCartModal(!showCartModal);
-        setIsDropdownOpen(false); // Close user dropdown if cart modal opens
-    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-    const handleClickOutside = (event) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-            setIsDropdownOpen(false);
-        }
-        // No need for cartModalRef check, dialog handles outside clicks natively
-    };
+  // Determinar si el header debe tener fondo blanco
+  const shouldHaveBackground = isScrolled || isHovered;
 
-    useEffect(() => {
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
+  return (
+    <header 
+      className={`fixed top-0 left-0 right-0 z-50 py-4 px-6 transition-all duration-300 ${
+        shouldHaveBackground 
+          ? 'bg-white shadow-md' 
+          : 'bg-transparent'
+      }`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="max-w-7xl mx-auto flex justify-between items-center">
+        {/* Logo */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Link 
+            href="/" 
+            className={`text-2xl font-bold transition-colors duration-300 ${
+              shouldHaveBackground ? 'text-black' : 'text-white'
+            }`}
+          >
+            BLACK NOISE
+          </Link>
+        </motion.div>
 
-    return (
-        <div>
-            <header className='flex flex-row justify-between items-center p-10 top-0 fixed w-full h-16 z-50 bg-black'>
-
-                <h1 className='font-bold text-3xl hover:text-white transition-colors duration-500 text-white'>
-                    BLACK NOISE
-                </h1>
-
-                <div className='flex flex-row items-center gap-4'>
-                    {/* Pending Payments Icon */}
-                    {session && <PendingPaymentsSummary />}
-
-                    {/* Back Button */}
-                    {showBackButton && (
-                        <Link href={backButtonHref} className="flex items-center gap-2 text-white hover:text-gray-300 transition-colors duration-300">
-                            <span className="text-2xl">←</span>
-                        </Link>
-                    )}
-
-                    {/* Shopping Cart Icon */}
-                    {session && !hideCartIcon && (
-                        <div className="relative cursor-pointer" onClick={handleCartIconClick}>
-                            <Image src="/icons/icono-carrito.svg" alt="Carrito" width={30} height={30} />
-                            {cartItems.length > 0 && (
-                                <span className="absolute -top-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                    {cartItems.length}
-                                </span>
-                            )}
-
-                            <div className="absolute mt-2 top-full right-0  z-50 w-auto ">
-
-                                <CartModal cartItems={cartItems} onClose={() => setShowCartModal(false)} isOpen={showCartModal} onRemoveItem={removeItem} />
-
-                            </div>
-                        </div>
-                    )}
-
-                    {session ? (
-                        <div className='relative flex flex-row items-center justify-center gap-4' ref={dropdownRef}>
-                            <span className='text-white'>
-                                ¡Bienvenido {session?.user?.name || session?.user?.email || 'Usuario'}!
-                            </span>
-                            {/* User Icon to trigger dropdown */}
-                            <div
-                                className="w-8 h-8 rounded-full overflow-hidden cursor-pointer"
-                                onClick={handleUserIconClick}
-                            >
-                                <img
-                                    src={session.user?.image || "/img/perfil/FotoPerfil.webp"}
-                                    alt="Foto de perfil"
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
-                            {isDropdownOpen && (
-                                <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-20 top-full">
-                                    <Link href="/perfil" className="block px-4 py-2 text-sm text-white hover:bg-gray-700" onClick={() => setIsDropdownOpen(false)}>
-                                        Ver Perfil
-                                    </Link>
-                                    <BotonGeneral
-                                        onClick={() => { signOut({ callbackUrl: '/login' }); setIsDropdownOpen(false); }}
-                                        variant="secondary"
-                                        className="w-full text-left"
-                                    >
-                                        Cerrar Sesión
-                                    </BotonGeneral>
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <Link href="/login">
-                            <BotonGeneral>
-                                Iniciar Sesión
-                            </BotonGeneral>
-                        </Link>
-                    )}
-                </div>
-            </header>
-        </div>
-    );
+        {/* Botón Iniciar Sesión */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <BotonIniciarSesion 
+            isDarkMode={!shouldHaveBackground} 
+          />
+        </motion.div>
+      </div>
+    </header>
+  );
 }
-
-export default HeaderPrincipal;

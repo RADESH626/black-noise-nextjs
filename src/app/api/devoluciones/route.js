@@ -7,16 +7,7 @@ export async function POST(request) {
   try {
     const { pedidoId, returnReason } = await request.json();
 
-<<<<<<< HEAD
-    try {
-      await DBconection();
-    } catch (dbError) {
-      console.error("Database connection error:", dbError);
-      return NextResponse.json({ message: 'Error connecting to database' }, { status: 500 });
-    }
-=======
     await DBconection();
->>>>>>> f416d78 (pantalla de carga)
 
     const pedido = await Pedido.findById(pedidoId).populate('proveedorId');
 
@@ -24,17 +15,7 @@ export async function POST(request) {
       return NextResponse.json({ message: 'Pedido no encontrado' }, { status: 404 });
     }
 
-<<<<<<< HEAD
-    let supplierEmail = 'test@example.com'; // Default email
-    if (pedido.proveedorId && pedido.proveedorId.correo) {
-      supplierEmail = pedido.proveedorId.correo;
-    } else {
-      console.error('Proveedor email not found for pedido:', pedidoId);
-      // Optionally, you could return an error here if supplier email is essential
-    }
-=======
     const supplierEmail = pedido.proveedorId.correo;
->>>>>>> f416d78 (pantalla de carga)
 
     await sendEmail({
       to: supplierEmail,

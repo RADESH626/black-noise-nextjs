@@ -16,12 +16,7 @@ function AdminSidebar() { // Remove activeDashboard, onSelectDashboard props
     { id: 'proveedores', label: 'Proveedores', icon: '/icons/icono-persona+.svg', needsInvert: true, href: '/admin/proveedores' }, // Link to /admin/proveedores
     { id: 'pedidos', label: 'Pedidos', icon: '/icons/icono-carrito.svg', needsInvert: true, href: '/admin/pedidos' }, // Assuming /admin/pedidos for orders
     { id: 'ventas', label: 'Ventas', icon: '/icons/icono-bolsa.svg', needsInvert: true, href: '/admin/ventas' }, // Assuming /admin/ventas for sales
-<<<<<<< HEAD
-    { id: 'pagos', label: 'Pagos', icon: '/icons/icono-paypal.svg', href: '/admin/pagos' }, // Assuming /admin/pagos for payments
-    { id: 'devoluciones', label: 'Devoluciones', icon: '/icons/icono-basurero.svg', needsInvert: true, href: '/admin/devoluciones' } // Link to /admin/devoluciones
-=======
     { id: 'pagos', label: 'Pagos', icon: '/icons/icono-paypal.svg', href: '/admin/pagos' } // Assuming /admin/pagos for payments
->>>>>>> f416d78 (pantalla de carga)
   ];
 
   return (
