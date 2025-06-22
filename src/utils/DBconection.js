@@ -2,26 +2,35 @@
 
 import mongoose from 'mongoose';
 import logger from './logger';
+
+console.log('Mongoose object:', mongoose); // Añadir para depuración
 import { getCartModel, getDesignModel, getPagoModel, getPedidoModel, getProveedorModel, getUsuarioModel, getVentaModel } from '@/models';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
-// Cache the connection to avoid multiple connections in development
+if (!MONGODB_URI) {
+  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+}
+
 let cached = global.mongoose;
 
 if (!cached) {
   cached = global.mongoose = { conn: null, promise: null };
 }
 
-export default async function connectDB() {
+async function connectDB() {
   if (cached.conn) {
     logger.info('Using existing database connection');
     return cached.conn;
   }
 
   if (!cached.promise) {
-    mongoose.set('strictQuery', false); // Mover aquí
-    cached.promise = mongoose.connect(MONGODB_URI, {}).then(m => {
+    const opts = {
+      bufferCommands: false,
+      strictQuery: false, // Asegurarse de que strictQuery esté aquí
+    };
+
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then(m => {
       logger.info('Database connected successfully');
       return m;
     }).catch(error => {
@@ -31,7 +40,12 @@ export default async function connectDB() {
     });
   }
 
-  cached.conn = await cached.promise;
+  try {
+    cached.conn = await cached.promise;
+  } catch (e) {
+    cached.promise = null;
+    throw e;
+  }
 
   // Ensure all models are loaded and registered after connection
   await getCartModel();
@@ -44,3 +58,5 @@ export default async function connectDB() {
 
   return cached.conn;
 }
+
+export default connectDB;
