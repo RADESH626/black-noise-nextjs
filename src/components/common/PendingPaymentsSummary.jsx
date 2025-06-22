@@ -8,7 +8,7 @@ import { obtenerPagosPendientesPorUsuario } from '@/app/acciones/PagoActions';
 import { useDialog } from '@/context/DialogContext';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
-function PendingPaymentsSummary() {
+function PendingPaymentsSummary({ headerConFondo }) {
     const { data: session, status } = useSession();
     const { showPopUp } = useDialog();
     const userId = session?.user?.id;
@@ -73,7 +73,7 @@ function PendingPaymentsSummary() {
                     alt="Pagos Pendientes"
                     width={24}
                     height={24}
-                    className="cursor-pointer filter invert"
+                    className={`cursor-pointer transition-transform duration-300 ${headerConFondo ? 'filter invert' : ''}`}
                     ref={iconRef}
                 />
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -91,7 +91,7 @@ function PendingPaymentsSummary() {
                     alt="Pagos Pendientes"
                     width={24}
                     height={24}
-                    className="cursor-pointer filter invert"
+                    className={`cursor-pointer transition-transform duration-300 ${headerConFondo ? 'filter invert' : ''}`}
                     ref={iconRef}
                 />
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -109,7 +109,7 @@ function PendingPaymentsSummary() {
                     alt="Pagos Pendientes"
                     width={24}
                     height={24}
-                    className="cursor-pointer opacity-50 filter invert"
+                    className={`cursor-pointer opacity-50 transition-transform duration-300 ${headerConFondo ? 'filter invert' : ''}`}
                     ref={iconRef}
                 />
             </div>
@@ -123,7 +123,7 @@ function PendingPaymentsSummary() {
                 alt="Pagos Pendientes"
                 width={24}
                 height={24}
-                className="cursor-pointer filter invert"
+                className={`cursor-pointer transition-transform duration-300 ${headerConFondo ? 'filter invert' : ''}`}
                 onClick={() => setShowDropdown(!showDropdown)}
                 ref={iconRef}
             />

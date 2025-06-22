@@ -53,13 +53,6 @@ function Login() {
         className="flex-1 flex items-center justify-center p-5 pt-32 bg-cover bg-center" // pt-32 para bajar contenido
         style={{}}
       >
-        {/* White overlay animado */}
-        <motion.div
-          className="fixed inset-0 z-50 pointer-events-none"
-          variants={overlayVariants}
-          initial="hidden"
-          animate="visible"
-        />
 
       {/* White overlay */}
       <motion.div
