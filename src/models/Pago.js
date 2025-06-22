@@ -1,4 +1,4 @@
-import { Schema, model, models } from 'mongoose'
+import mongoose, { Schema, model, models } from 'mongoose'
 import { MetodoPago } from '@/models/enums/pago/MetodoPago';
 
 const PagoSchema = new Schema({
@@ -51,4 +51,5 @@ const PagoSchema = new Schema({
 })
 
 // Check if the model exists before creating a new one
-export default models.Pago || model('Pago', PagoSchema)
+
+export default mongoose.models.Pago || model('Pago', PagoSchema)

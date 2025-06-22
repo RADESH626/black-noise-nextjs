@@ -67,4 +67,5 @@ const ProveedorSchema = new Schema({
 
 
 // Check if the model exists before creating a new one
-export default models.Proveedor || model('Proveedor', ProveedorSchema)
+
+export default mongoose.models.Proveedor || model('Proveedor', ProveedorSchema)

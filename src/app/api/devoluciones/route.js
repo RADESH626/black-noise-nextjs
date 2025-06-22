@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { sendEmail } from '@/utils/nodemailer';
-import { DBconection } from '@/utils/DBconection';
+import connectDB from '@/utils/DBconection';
 import Pedido from '@/models/Pedido';
 
 export async function POST(request) {
   try {
     const { pedidoId, returnReason } = await request.json();
 
-    await DBconection();
+    await connectDB();
 
     const pedido = await Pedido.findById(pedidoId).populate('proveedorId');
 

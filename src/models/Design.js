@@ -1,4 +1,4 @@
-import { Schema, model, models } from 'mongoose'
+import mongoose, { Schema, model, models } from 'mongoose'
 import { CategoriaProducto } from './enums/CategoriaProducto'
 import { EstadoDesing } from './enums/design/EstadoDesing'
 
@@ -52,4 +52,5 @@ const DesignSchema = new Schema({
 })
 
 // Check if the model exists before creating a new one
-export default models.Design || model('Design', DesignSchema)
+
+export default mongoose.models.Design || model('Design', DesignSchema)

@@ -1,3 +1,4 @@
+"use client";
 import ProfileContent from "@/components/layout/ProfileContent";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -14,30 +15,10 @@ async function ProfilePage() {
 
   const userId = session.user.id;
 
-  console.log(`--- [SERVIDOR] Obteniendo datos para el usuario: ${userId} ---`);
-
-  let initialUserPayments = [];
-  let initialUserDesigns = [];
-
-  if (userId) {
-    const { designs } = await obtenerDesignsPorUsuarioId(userId);
-    if (designs) {
-      initialUserDesigns = designs;
-    }
-
-    const { pagos } = await obtenerPagosPorUsuarioId(userId);
-    if (pagos) {
-      initialUserPayments = pagos;
-    }
-  }
-  
-  console.log('--- [SERVIDOR] FIN DE DEBUGGING ---');
-
   return (
     <PageLayout>
       <ProfileContent
-        initialUserDesigns={initialUserDesigns}
-        initialUserPayments={initialUserPayments}
+        userId={userId}
       />
     </PageLayout>
   );
