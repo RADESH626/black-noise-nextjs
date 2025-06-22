@@ -88,6 +88,14 @@ const PedidosContent = () => {
 
       if (response.ok) {
         showPopUp('Solicitud de devolución enviada correctamente', 'success');
+        // Refrescar pedidos tras solicitud de devolución
+        const { pedidos: fetchedPedidos, error: fetchError } = await obtenerPedidosPagadosPorUsuarioId(userId);
+        if (fetchError) {
+          setError({ message: fetchError });
+          setPedidos([]);
+        } else {
+          setPedidos(fetchedPedidos || []);
+        }
       } else {
         showPopUp('Error al enviar la solicitud de devolución', 'error');
       }
@@ -253,58 +261,68 @@ const PedidosContent = () => {
                       )}
                     </div>
 
-                      {/* Información de los diseños */}
-                      <div className="flex flex-col flex-1 gap-2 bg-gray-500 rounded-md">
-                        <p className="font-medium text-white mb-2 text-center">Diseños:</p>
-                        {console.log('DEBUG - pedido.items:', pedido.items)}
-                        {pedido.items && pedido.items.length > 0 ? (
-                          <div className="flex flex-col p-2 rounded-md gap-4">
-                            {pedido.items.map((item, itemIndex) => (
-                              <div key={itemIndex} className="flex flex-col bg-gray-400 rounded-md p-2">
-                                <div
-                                  className="flex items-center space-x-3 cursor-pointer"
-                                  onClick={() => handleToggleDesignExpand(item.designId?._id?.toString() || `design-${itemIndex}`)}
-                                >
-                                  <div className="flex items-center space-x-2">
-                                    {item.designId?.imagen && (
-                                      <img
-                                      src={item.designId.imagen}
-                                        alt={item.designId.nombreDesing || 'Diseño'}
-                                        className="w-8 h-8 object-cover rounded-full border border-gray-300"
-                                      />
-                                    )}
-                                    <p className="font-semibold">{item.designId?.nombreDesing || 'Diseño Desconocido'}</p>
-                                  </div>
-                                  {console.log('DEBUG - item.designId completo en PedidosComponent (dentro del map):', item.designId)}
-                                  <p className="text-sm text-gray-600">Cantidad: <span className="font-bold text-white">{item.quantity}</span></p>
-                                  <svg
-                                    className={`w-5 h-5 text-gray-600 transform transition-transform duration-200 ${expandedDesigns.has(item.designId?._id?.toString() || `design-${itemIndex}`) ? 'rotate-180' : ''
-                                      }`}
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                                  </svg>
-                                </div>
-                                {expandedDesigns.has(item.designId?._id?.toString() || `design-${itemIndex}`) && (
-                                  <div className="mt-2 text-sm text-gray-700 bg-gray-300 p-2 rounded-md">
-                                    <p><span className="font-medium">Categoría:</span> {item.designId?.categoria || 'N/A'}</p>
-                                    <p><span className="font-medium">Precio Unitario:</span> ${item.designId?.valorDesing ? parseFloat(item.designId.valorDesing).toFixed(2) : '0.00'}</p>
-                                    <p><span className="font-medium">Subtotal por Diseño:</span> ${item.designId?.valorDesing && item.quantity ? (parseFloat(item.designId.valorDesing) * item.quantity).toFixed(2) : '0.00'}</p>
-                                    <p><span className="font-medium">Descripción:</span> {item.designId?.descripcion || 'N/A'}</p>
-                                  </div>
+                    {/* Diseños */}
+                    <div className="flex flex-col flex-1 gap-2 bg-gray-500 rounded-md p-2">
+                      <p className="font-medium text-white mb-2 text-center">Diseños:</p>
+                      {pedido.items?.length > 0 ? (
+                        pedido.items.map((item, idx) => {
+                          const designId = item.designId?._id?.toString() || `design-${idx}`;
+                          const design = item.designId;
+                          return (
+                            <div key={idx} className="flex flex-col bg-gray-400 rounded-md p-2">
+                              <div
+                                className="flex items-center space-x-3 cursor-pointer"
+                                onClick={() => handleToggleDesignExpand(designId)}
+                              >
+                                {design?.imagen && (
+                                  <img
+                                    src={design.imagen}
+                                    alt={design.nombreDesing || 'Diseño'}
+                                    className="w-12 h-12 object-cover rounded-md"
+                                  />
                                 )}
+                                <div className="flex items-center space-x-2">
+                                  {design?.imagen && (
+                                    <img
+                                      src={design.imagen}
+                                      alt={design.nombreDesing || 'Diseño'}
+                                      className="w-8 h-8 object-cover rounded-full border border-gray-300"
+                                    />
+                                  )}
+                                  <p className="font-semibold">{design?.nombreDesing || 'Diseño Desconocido'}</p>
+                                </div>
+                                <p className="text-sm text-gray-600">Cantidad: <span className="font-bold text-white">{item.quantity}</span></p>
+                                <svg
+                                  className={`w-5 h-5 text-gray-600 transform transition-transform duration-200 ${
+                                    expandedDesigns.has(designId) ? 'rotate-180' : ''
+                                  }`}
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
                               </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-gray-600">No hay diseños asociados.</p>
-                        )}
-                      </div>
+                              {expandedDesigns.has(designId) && (
+                                <div className="mt-2 text-sm text-gray-700 bg-gray-300 p-2 rounded-md">
+                                  <p><span className="font-medium">Categoría:</span> {design?.categoria || 'N/A'}</p>
+                                  <p><span className="font-medium">Precio Unitario:</span> ${design?.valorDesing ? parseFloat(design.valorDesing).toFixed(2) : '0.00'}</p>
+                                  <p><span className="font-medium">Subtotal por Diseño:</span> ${design?.valorDesing && item.quantity ? (parseFloat(design.valorDesing) * item.quantity).toFixed(2) : '0.00'}</p>
+                                  <p><span className="font-medium">Descripción:</span> {design?.descripcion || 'N/A'}</p>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <p className="text-gray-600">No hay diseños asociados.</p>
+                      )}
                     </div>
-                    <div className="flex justify-end">
+                  </div>
+
+                  <div className="flex justify-end gap-2">
+                    {pedido.estadoPedido === EstadoPedido.ENTREGADO && (
                       <BotonGeneral
                         onClick={() => handleSolicitarDevolucion(pedido._id)}
                         variant="danger"
@@ -312,16 +330,16 @@ const PedidosContent = () => {
                       >
                         Solicitar Devolución
                       </BotonGeneral>
-                      {pedido.estadoPedido === 'PENDIENTE' || pedido.estadoPedido === 'ASIGNADO' ? (
-                        <BotonGeneral
-                          onClick={() => handleCancelarPedido(pedido._id)}
-                          variant="danger"
-                          className="py-2 px-4 text-sm"
-                        >
-                          Cancelar Pedido
-                        </BotonGeneral>
-                      ) : null}
-                    </div>
+                    )}
+                    {pedido.estadoPedido === EstadoPedido.PENDIENTE && (
+                      <BotonGeneral
+                        onClick={() => handleCancelarPedido(pedido._id)}
+                        variant="danger"
+                        className="py-2 px-4 text-sm"
+                      >
+                        Cancelar Pedido
+                      </BotonGeneral>
+                    )}
                   </div>
                 </div>
               )}
