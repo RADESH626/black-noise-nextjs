@@ -1,7 +1,7 @@
 "use server"
 
 import connectDB from '@/utils/DBconection';
-import Cart from '@/models/Cart';
+import getCartModel from '@/models/Cart';
 import Design from '@/models/Design'; // Import Design model
 import { revalidatePath } from 'next/cache';
 import { getServerSession } from 'next-auth';
@@ -20,6 +20,7 @@ export async function addDesignToCart(userId, designId) {
     }
 
     try {
+        const Cart = await getCartModel(); // Get the Cart model
         // Fetch the design to get its proveedorId
         const design = await Design.findById(actualDesignId).lean();
         if (!design) {
@@ -76,7 +77,7 @@ export async function addDesignToCart(userId, designId) {
     } catch (error) {
         logger.error('ERROR in addDesignToCart:', error);
         return { success: false, message: 'Error adding design to cart: ' + error.message };
-}
+    }
 }
 
 export async function removeDesignFromCart(userId, designId) {
@@ -88,6 +89,7 @@ export async function removeDesignFromCart(userId, designId) {
     }
 
     try {
+        const Cart = await getCartModel(); // Get the Cart model
         let cart = await Cart.findOne({ userId });
 
         if (cart) {
@@ -121,6 +123,7 @@ export async function getCartByUserId(userId) {
     }
 
     try {
+        const Cart = await getCartModel(); // Get the Cart model
         // Populate the 'designId' field within the 'items' array, including imageData, imageMimeType, description, category, and proveedorId
         const cart = await Cart.findOne({ userId }).populate('items.designId', 'nombreDesing valorDesing imageData imageMimeType descripcion categoria proveedorId').lean();
         if (!cart) {
@@ -164,6 +167,7 @@ export async function updateCartItemQuantity(userId, designId, newQuantity) {
     }
 
     try {
+        const Cart = await getCartModel(); // Get the Cart model
         let cart = await Cart.findOne({ userId });
 
         if (!cart) {
@@ -226,6 +230,7 @@ export async function clearUserCart(userId) {
     }
 
     try {
+        const Cart = await getCartModel(); // Get the Cart model
         const result = await Cart.findOneAndUpdate(
             { userId },
             { $set: { items: [] } }, // Clear the 'items' array
@@ -255,6 +260,7 @@ export async function createEmptyCartForUser(userId) {
     }
 
     try {
+        const Cart = await getCartModel(); // Get the Cart model
         let cart = await Cart.findOne({ userId });
 
         if (cart) {

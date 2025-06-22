@@ -6,8 +6,7 @@ let mongoose;
 
 async function getMongoose() {
     if (!mongoose) {
-        const { mongoose: mongooseInstance } = await connectDB();
-        mongoose = mongooseInstance;
+        mongoose = await connectDB();
     }
     return mongoose;
 }

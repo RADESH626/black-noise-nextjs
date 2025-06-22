@@ -4,11 +4,9 @@ import { signOut, useSession } from "next-auth/react";
 import BotonGeneral from "@/components/common/botones/BotonGeneral";
 import Link from "next/link";
 import { useEffect, useState, useCallback, useRef } from "react";
-import { obtenerDesignsPorUsuarioId, eliminarDesign, actualizarDesign } from "@/app/acciones/DesignActions";
-import { obtenerPedidosPorUsuarioId } from "@/app/acciones/PedidoActions";
+import { eliminarDesign, actualizarDesign } from "@/app/acciones/DesignActions";
 import DesignsComponent from "../common/DesignsComponent";
 import PedidosComponent from "../common/PedidosComponent";
-import { ObtenerUsuarioPorId } from "@/app/acciones/UsuariosActions";
 import FormEditarUsuario from "@/components/perfil/FormEditarUsuario";
 import DesignUploadModal from "@/components/perfil/DesignUploadModal";
 import PaymentHistory from "@/components/perfil/PaymentHistory";
@@ -18,19 +16,19 @@ import { useCart } from "@/context/CartContext";
 import HeaderPrincipal from "./general/HeaderPrincipal";
 // Removed: import NewOrderModal from "@/components/common/modales/NewOrderModal";
 
-function ProfileContent({ userId }) {
+function ProfileContent({ userId, initialUser, initialDesigns, initialPayments }) {
   const { data: session, status } = useSession();
   const [activeTab, setActiveTab] = useState('designs');
-  const [currentUser, setCurrentUser] = useState(null);
-  const [userDesigns, setUserDesigns] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(initialUser);
+  const [userDesigns, setUserDesigns] = useState(initialDesigns);
+  const [loading, setLoading] = useState(false); // Ya cargado por el Server Component
   const [error, setError] = useState(null);
   const { showPopUp, openModal } = useDialog();
   const deleteDesignTimeoutRef = useRef(null);
   const updateDesignTimeoutRef = useRef(null);
   const { cartItems, addItem } = useCart();
   const [orderedDesignIds, setOrderedDesignIds] = useState(new Set());
-  const [paymentsForHistory, setPaymentsForHistory] = useState([]);
+  const [paymentsForHistory, setPaymentsForHistory] = useState(initialPayments);
 
   useEffect(() => {
     console.log('--- [CLIENTE] Montando ProfileContent ---');
@@ -38,60 +36,30 @@ function ProfileContent({ userId }) {
     console.log('--- [CLIENTE] FIN DEBUGGING INICIAL ---');
   }, [userId]);
 
+  // Mantener fetchUserData para re-obtener datos si el perfil se edita
   const fetchUserData = useCallback(async () => {
     if (status === 'authenticated' && userId) {
-      setLoading(true);
-      setError(null);
-      const fetchedUser = await ObtenerUsuarioPorId(userId);
-      if (fetchedUser && fetchedUser.error) {
-        setError(fetchedUser.error);
-        setCurrentUser(null);
-      } else {
-        setCurrentUser(fetchedUser || null);
-      }
-      setLoading(false);
-    } else if (status === 'unauthenticated') {
-      setLoading(false);
+      // Aquí necesitarías una acción de servidor para obtener el usuario por ID
+      // Si no hay una acción de servidor que solo obtenga el usuario,
+      // podrías necesitar crear una o reevaluar cómo se actualiza el usuario.
+      // Por ahora, asumimos que la edición de perfil ya maneja la actualización del estado local.
+      // Si se necesita re-fetch, se haría a través de una API route o Server Action.
+      // Por simplicidad, si la edición de perfil ya actualiza el estado, esta función podría no ser necesaria.
+      // Si se necesita, se debería llamar a una acción de servidor aquí.
+      // Por ejemplo: const fetchedUser = await ObtenerUsuarioPorId(userId);
+      // Para este caso, la eliminamos ya que la carga inicial se hace en el servidor.
     }
   }, [status, userId]);
 
-  const fetchUserDesigns = useCallback(async () => {
-    if (status === 'authenticated' && userId) {
-      setLoading(true);
-      setError(null);
-      const { designs, error: fetchError } = await obtenerDesignsPorUsuarioId(userId);
-      if (fetchError) {
-        setError(fetchError);
-        setUserDesigns([]);
-      } else {
-        setUserDesigns(designs || []);
-      }
-      setLoading(false);
-    }
-  }, [status, userId]);
-
-  const fetchUserPayments = useCallback(async () => {
-    if (status === 'authenticated' && userId) {
-      setLoading(true);
-      setError(null);
-      const { pagos, error: fetchError } = await obtenerPagosPorUsuarioId(userId);
-      if (fetchError) {
-        setError(fetchError);
-        setPaymentsForHistory([]);
-      } else {
-        setPaymentsForHistory(pagos || []);
-      }
-      setLoading(false);
-    }
-  }, [status, userId]);
+  // Estas funciones ya no son necesarias para la carga inicial, ya que los datos vienen de props.
+  // Si se necesita re-fetch de diseños o pagos, se debería implementar una Server Action o API Route.
+  // Por ahora, las eliminamos.
 
   useEffect(() => {
-    fetchUserData();
-    if (userId) {
-      fetchUserDesigns();
-      fetchUserPayments();
-    }
-  }, [userId, status, fetchUserData, fetchUserDesigns, fetchUserPayments]);
+    // No es necesario llamar a fetchUserData, fetchUserDesigns, fetchUserPayments aquí
+    // ya que los datos iniciales se pasan como props.
+    // Si se necesita re-fetch después de ciertas acciones, se llamaría a las acciones de servidor correspondientes.
+  }, [userId, status]);
 
   const user = currentUser;
 

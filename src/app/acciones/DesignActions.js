@@ -1,7 +1,7 @@
 "use server"
 
 import connectDB from '@/utils/DBconection';
-import Design from '@/models/Design';
+import getDesignModel from '@/models/Design';
 import Papa from 'papaparse';
 import { revalidatePath } from 'next/cache';
 import { getServerSession } from 'next-auth';
@@ -68,6 +68,7 @@ export async function guardarDesigns(prevState, formData) {
             tallasDisponibles: formData.get('tallasDisponibles') ? formData.get('tallasDisponibles').split(',') : []
         };
 
+        const Design = getDesignModel();
         const newDesign = await Design.create(data);
         console.log('Design saved successfully:', newDesign);
 
@@ -96,6 +97,7 @@ export async function obtenerDesigns() {
     await connectDB();
     console.log('Entering obtenerDesigns.');
     try {
+        const Design = getDesignModel();
         const designs = await Design.find({})
             .populate({
                 path: 'usuarioId',
@@ -171,6 +173,7 @@ export async function obtenerDesignsPorUsuarioId(usuarioId) {
     await connectDB();
     console.log('Entering obtenerDesignsPorUsuarioId with usuarioId:', usuarioId);
     try {
+        const Design = getDesignModel();
         const designs = await Design.find({ usuarioId: usuarioId }).lean();
 
         const formattedDesigns = designs.map(design => {
@@ -201,7 +204,7 @@ export async function obtenerDesignsPorUsuarioId(usuarioId) {
             };
         });
 
-        console.log('Designs obtained by usuarioId successfully and formatted:', formattedDesigns);
+        // console.log('Designs obtained by usuarioId successfully and formatted:', formattedDesigns);
 
         return { designs: JSON.parse(JSON.stringify(formattedDesigns)), error: null };
     } catch (error) {
@@ -216,6 +219,7 @@ export async function encontrarDesignsPorId(id) {
     await connectDB();
     console.log('Entering encontrarDesignsPorId with ID:', id);
     try {
+        const Design = getDesignModel();
         const design = await Design.findById(id).lean();
         console.log('Design found by ID:', design);
         if (!design) {
@@ -285,6 +289,7 @@ export async function actualizarDesign(prevState, formData) {
         if (updateImageData.imageData) {
             console.log(`[actualizarDesign] Buffer length: ${updateImageData.imageData.length}, Hex snippet: ${updateImageData.imageData.toString('hex').substring(0, 60)}...`);
         }
+        const Design = getDesignModel();
         const updatedDesign = await Design.findByIdAndUpdate(id, data, { new: true }).lean();
         console.log('Design updated successfully:', updatedDesign);
 
@@ -313,6 +318,7 @@ export async function eliminarDesign(id) {
     await connectDB();
     console.log('Entering eliminarDesign with ID:', id);
     try {
+        const Design = getDesignModel();
         const deletedDesign = await Design.findByIdAndDelete(id).lean();
         console.log('Design deleted successfully:', deletedDesign);
 
