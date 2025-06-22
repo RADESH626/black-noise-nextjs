@@ -2,7 +2,8 @@
 import { motion } from 'framer-motion';
 import FormLogin from "@/components/layout/general/forms/FormLogin";
 import LoginInfoSection from '@/components/login/LoginInfoSection';
-import Footer from "@/components/layout/general/footer/Footer";
+import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
+import Footer from '@/components/layout/general/footer/Footer';
 
 function Login() {
   const containerVariants = {
@@ -45,9 +46,12 @@ function Login() {
 
   return (
     <div className="min-h-screen flex flex-col relative">
+      {/* Header */}
+      <HeaderPrincipal />
+
       <main
         className="flex-1 flex items-center justify-center p-5 pt-32 bg-cover bg-center" // pt-32 para bajar contenido
-        style={{ backgroundImage: "url('/img/logos/Login 11.jpg')" }}
+        style={{}}
       >
         {/* White overlay animado */}
         <motion.div
@@ -55,8 +59,7 @@ function Login() {
           variants={overlayVariants}
           initial="hidden"
           animate="visible"
-        >
-        </motion.div>
+        />
 
         <motion.div
           className="rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.2)] overflow-hidden text-[#000000]"
