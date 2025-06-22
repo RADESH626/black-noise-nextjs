@@ -177,19 +177,19 @@ function EditDesignPage({ params }) {
   }
 
   return (
-    <div className="p-6 bg-black text-white rounded-lg shadow-lg max-h-[80vh] overflow-y-auto">
+    <div className="p-6 bg-white text-black rounded-lg shadow-lg max-h-[80vh] overflow-y-auto">
 
       <h2 className="text-2xl font-bold mb-6 text-center">Editar Diseño</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         
         {error && (
-          <div className="bg-red-800 text-white p-3 rounded-md text-sm mb-4">
+          <div className="bg-black text-red-500 p-3 rounded-md text-sm mb-4">
             {error}
           </div>
         )}
         <div>
-          <label htmlFor="nombreDesing" className="block text-sm font-medium text-gray-300 mb-1">
+          <label htmlFor="nombreDesing" className="block text-sm font-medium text-black mb-1">
             Nombre del Diseño:
           </label>
           <input
@@ -199,13 +199,13 @@ function EditDesignPage({ params }) {
             value={nombreDesing}
             onChange={(e) => setNombreDesing(e.target.value)}
             required
-            className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:ring-purple-500 focus:border-purple-500"
+            className="w-full p-3 bg-white border border-black rounded-md text-white placeholder-gray-500 focus:ring-white focus:border-white"
             placeholder="Ej: Camiseta Urbana"
           />
         </div>
 
         <div>
-          <label htmlFor="descripcion" className="block text-sm font-medium text-gray-300 mb-1">
+          <label htmlFor="descripcion" className="block text-sm font-medium text-black mb-1">
             Descripción:
           </label>
           <textarea
@@ -214,13 +214,13 @@ function EditDesignPage({ params }) {
             rows="3"
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
-            className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:ring-purple-500 focus:border-purple-500"
+            className="w-full p-3 bg-white border border-black rounded-md text-white placeholder-gray-500 focus:ring-white focus:border-white"
             placeholder="Una breve descripción de tu diseño (opcional)..."
           ></textarea>
         </div>
 
         <div>
-          <label htmlFor="valorDesing" className="block text-sm font-medium text-gray-300 mb-1">
+          <label htmlFor="valorDesing" className="block text-sm font-medium text-black mb-1">
             Precio:
           </label>
           <input
@@ -231,13 +231,13 @@ function EditDesignPage({ params }) {
             value={valorDesing}
             onChange={(e) => setValorDesing(e.target.value)}
             required
-            className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:ring-purple-500 focus:border-purple-500"
+            className="w-full p-3 bg-white border border-black rounded-md text-white placeholder-gray-500 focus:ring-white focus:border-white"
             placeholder="Ej: 25.99"
           />
         </div>
 
         <div>
-          <label htmlFor="categoria" className="block text-sm font-medium text-gray-300 mb-1">
+          <label htmlFor="categoria" className="block text-sm font-medium text-black mb-1">
             Categoría:
           </label>
           <select
@@ -246,7 +246,7 @@ function EditDesignPage({ params }) {
             value={categoria}
             onChange={(e) => setCategoria(e.target.value)}
             required
-            className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:ring-purple-500 focus:border-purple-500"
+            className="w-full p-3 bg-black border border-white rounded-md text-white focus:ring-white focus:border-white"
           >
             <option value="">Selecciona una categoría</option>
             {Object.values(CategoriaProducto).map((category) => (
@@ -258,7 +258,7 @@ function EditDesignPage({ params }) {
         </div>
 
         <div>
-          <label htmlFor="imagenDesing" className="block text-sm font-medium text-gray-300 mb-1">
+          <label htmlFor="imagenDesing" className="block text-sm font-medium text-black mb-1">
             Subir Nueva Imagen:
           </label>
           {displayImage && (
@@ -272,24 +272,24 @@ function EditDesignPage({ params }) {
             id="imagenDesing"
             name="imagenDesing"
             onChange={handleFileChange}
-            className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:ring-purple-500 focus:border-purple-500"
+            className="w-full p-3 bg-black border border-white rounded-md text-white focus:ring-white focus:border-white"
             accept="image/jpeg, image/png, image/webp"
           />
-          <p className="text-xs text-gray-400 mt-1">Deja en blanco para mantener la imagen actual.</p>
+          <p className="text-xs text-red-500 mt-1">Deja en blanco para mantener la imagen actual.</p>
         </div>
 
         <div className="flex justify-end space-x-4 mt-6">
           <button
             type="button"
             onClick={() => router.push("/admin/designs")}
-            className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200 ease-in-out"
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200 ease-in-out"
           >
             Cancelar
           </button>
           <button
             type="submit"
             aria-disabled={loading}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200 ease-in-out"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200 ease-in-out"
             disabled={loading}
           >
             {loading ? "Actualizando..." : "Actualizar Diseño"}

@@ -25,7 +25,7 @@ function IndexPage() {
     <div className="min-h-screen flex flex-col">
       {isLoading && <Loader />}
       
-      {/* <HeaderPrincipal /> */}
+       <HeaderPrincipal /> 
       <main className={`flex-grow ${isLoading ? 'hidden' : 'block'}`}>
         <HeroSection />
         
