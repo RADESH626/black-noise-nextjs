@@ -1,24 +1,47 @@
-import Link from 'next/link';
 import H3Footer from "@/components/common/textos/H/H3Footer";
+import { motion } from 'framer-motion';
 
 function MetodosDePagoFooter() {
+  const metodos = [
+    { name: "Visa", logo: "/img/logos/Logo Visa.jpg", url: "https://www.visa.com/" },
+    { name: "Mastercard", logo: "/img/logos/Logo Mastercard.jpg", url: "https://www.mastercard.com/" },
+    { name: "Paypal", logo: "/img/logos/Logo Paypal.jpg", url: "https://www.paypal.com/" },
+    { name: "American Express", logo: "/img/logos/Logo Aexpress.jpg", url: "https://www.americanexpress.com/" }
+  ];
+
   return (
-<div className='flex flex-col'>
-  <div className="flex flex-row gap-4 items-center">
-    <a href="" target="" rel=" ">
-      <img src="/img/logos/Logo Visa.jpg" alt="Visa" className="h-8 cursor-pointer" />
-    </a>
-     <a href="" target="" rel=" ">
-      <img src="/img/logos/Logo Aexpress.jpg" alt="American Express" className="h-8 cursor-pointer" />
-    </a>
-    <a href="" target="" rel=" ">
-      <img src="/img/logos/Logo Mastercard.jpg" alt="MasterCard" className="h-8 cursor-pointer" />
-    </a>
-    <a href="" target="" rel=" ">
-      <img src="/img/logos/Logo Paypal.jpg" alt="PayPal" className="h-8 cursor-pointer" />
-    </a>    
-  </div>
-  </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      viewport={{ once: true }}
+    >
+      <H3Footer>
+        Métodos de pago
+      </H3Footer>
+      <div className="mt-4 grid grid-cols-1 gap-4">
+        {metodos.map((metodo, index) => (
+          <a 
+            key={index} 
+            href={metodo.url} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 group"
+          >
+            <div className="bg-white p-1 rounded-md">
+              <img 
+                src={metodo.logo} 
+                alt={metodo.name} 
+                className="h-8 w-12 object-contain"
+              />
+            </div>
+            <span className="text-gray-300 group-hover:text-white transition-colors duration-300">
+              {metodo.name}
+            </span>
+          </a>
+        ))}
+      </div>
+    </motion.div>
   )
 }
 

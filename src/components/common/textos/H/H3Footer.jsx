@@ -1,10 +1,15 @@
+import { motion } from 'framer-motion';
 
-function H3Footer({props,children}) {
+export default function H3Footer({ children }) {
   return (
-    <h3 className='text-center text-2xl font-bold text-white' {...props}>
-        {children}
-    </h3>
-  )
+    <motion.h3 
+      className="text-xl font-bold text-white uppercase mb-4 tracking-wider"
+      initial={{ opacity: 0, y: -10 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      viewport={{ once: true }}
+    >
+      {children}
+    </motion.h3>
+  );
 }
-
-export default H3Footer
