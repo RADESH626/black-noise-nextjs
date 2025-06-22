@@ -15,7 +15,13 @@ export async function POST(request) {
       return NextResponse.json({ message: 'Pedido no encontrado' }, { status: 404 });
     }
 
-    const supplierEmail = pedido.proveedorId.correo;
+    let supplierEmail = 'test@example.com'; // Default email
+    if (pedido.proveedorId && pedido.proveedorId.correo) {
+      supplierEmail = pedido.proveedorId.correo;
+    } else {
+      console.error('Proveedor email not found for pedido:', pedidoId);
+      // Optionally, you could return an error here if supplier email is essential
+    }
 
     await sendEmail({
       to: supplierEmail,

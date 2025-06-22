@@ -2,8 +2,7 @@
 import { motion } from 'framer-motion';
 import FormLogin from "@/components/layout/general/forms/FormLogin";
 import LoginInfoSection from '@/components/login/LoginInfoSection';
-import HeaderSoloLogo from '@/components/layout/general/HeaderSoloLogo';
-import Footer from '@/components/layout/general/footer/Footer';
+import Footer from "@/components/layout/general/footer/Footer";
 
 function Login() {
   const containerVariants = {
@@ -46,9 +45,6 @@ function Login() {
 
   return (
     <div className="min-h-screen flex flex-col relative">
-      {/* Header */}
-      <HeaderSoloLogo />
-
       <main
         className="flex-1 flex items-center justify-center p-5 pt-32 bg-cover bg-center" // pt-32 para bajar contenido
         style={{ backgroundImage: "url('/img/logos/Login 11.jpg')" }}
@@ -79,9 +75,8 @@ function Login() {
             <LoginInfoSection />
           </div>
         </motion.div>
-      </main>
-
-      {/* Footer */}
+    </main>
+    {/* Footer */}
       <Footer />
     </div>
   );
