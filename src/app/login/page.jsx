@@ -92,8 +92,9 @@ function Login() {
       </div>
 
       {/* Footer al final */}
-      <Footer />
     </main>
+    <Footer />
+  </div>
   );
 }
 
