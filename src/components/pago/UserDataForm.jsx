@@ -61,7 +61,7 @@ export default function UserDataForm({ onUserDataChange }) {
   };
 
   return (
-    <div className="p-6 rounded shadow-md max-w-md w-full mb-6" style={{ backgroundColor: "#F7F1F1FF" }}>
+    <div className="p-6 rounded shadow-md max-w-md w-full mb-6" style={{ backgroundColor: "#E9E9E9FF" }}>
       <h2 className="text-2xl font-bold mb-4" style={{ color: "#111010FF" }}>Datos del Usuario</h2>
       
       <div className="mb-4 flex items-center">

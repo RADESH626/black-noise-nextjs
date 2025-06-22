@@ -221,11 +221,11 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
   // Removed: const handleCreateNewOrder = () => { setIsNewOrderModalOpen(true); };
 
   return (
-    <div className="mx-auto p-4 md:p-8 bg-black text-white w-screen flex flex-col min-h-screen">
+    <div className="mx-auto p-4 md:p-8 bg-white text-white w-screen flex flex-col min-h-screen">
       {/* User Info Section */}
       <div className="bg-black p-6 md:p-8 rounded-lg shadow-lg mb-8 flex-shrink-0">
         <div className="flex flex-col md:flex-row items-center">
-          <div className="w-32 h-32 md:w-60 md:h-60 bg-gray-700 rounded-lg mb-4 md:mb-0 md:mr-8 ">
+          <div className="w-32 h-32 md:w-60 md:h-60 bg-white rounded-lg mb-4 md:mb-0 md:mr-8 ">
             <img src={user?.profileImageUrl || "/img/perfil/FotoPerfil.webp"} alt="User Image" className="w-full h-full object-cover rounded-lg" />
           </div>
           <div className="flex-grow text-center md:text-left">
@@ -251,10 +251,10 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
 
       {/* nav */}
       <nav className="mb-8 flex-shrink-0">
-        <div className="flex border-b border-gray-700">
-          <button className={`py-3 px-6 text-lg font-medium ${activeTab === 'designs' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`} onClick={() => setActiveTab('designs')}>DISEÑOS</button>
-          <button className={`py-3 px-6 text-lg font-medium ${activeTab === 'orders' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`} onClick={() => setActiveTab('orders')}>PEDIDOS</button>
-          <button className={`py-3 px-6 text-lg font-medium ${activeTab === 'payments' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-gray-500 hover:text-gray-300'} focus:outline-none`} onClick={() => setActiveTab('payments')}>PAGOS</button>
+        <div className="flex border-b border-black">
+          <button className={`py-3 px-6 text-lg font-medium ${activeTab === 'designs' ? 'text-black border-b-2 border-red-400' : 'text-black hover:text-black'} focus:outline-none`} onClick={() => setActiveTab('designs')}>DISEÑOS</button>
+          <button className={`py-3 px-6 text-lg font-medium ${activeTab === 'orders' ? 'text-black border-b-2 border-red-400' : 'text-black hover:text-black'} focus:outline-none`} onClick={() => setActiveTab('orders')}>PEDIDOS</button>
+          <button className={`py-3 px-6 text-lg font-medium ${activeTab === 'payments' ? 'text-black border-b-2 border-red-400' : 'text-black hover:text-black'} focus:outline-none`} onClick={() => setActiveTab('payments')}>PAGOS</button>
         </div>
       </nav>
 
@@ -265,13 +265,13 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
           <>
             {/* Always show the Add Design button */}
             <div className="flex justify-center mb-4">
-              <BotonGeneral onClick={handleAddDesign} variant="primary" className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg transform transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50" aria-label="Agregar nuevo diseño">
-                <img src="/icons/icono +.svg" alt="Agregar" className="w-8 h-8" />
+              <BotonGeneral onClick={handleAddDesign} variant="primary" className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg transform transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-black focus:ring-opacity-50" aria-label="Agregar nuevo diseño">
+                <img src="/icons/icono + 2.svg" alt="Agregar" className="w-8 h-8" />
               </BotonGeneral>
             </div>
 
             {userDesigns.length === 0 ? (
-              <div className="text-center text-gray-400 text-lg mb-4">
+              <div className="text-center text-black text-lg mb-4">
                 No tienes diseños publicados aún.
               </div>
             ) : (

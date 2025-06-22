@@ -19,8 +19,8 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign, handl
         </div>
       ) : (
         userDesigns.map((design) => (
-          <div key={design._id} className="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-            <div className="w-full h-56 bg-gray-700 relative">
+          <div key={design._id} className="bg-black rounded-xl shadow-lg overflow-hidden">
+            <div className="w-full h-56 bg-black relative">
               {design.imagen && design.imagen !== '' ? (
                 <img
                   src={design.imagen}
@@ -80,20 +80,20 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign, handl
                         price: design.valorDesing,
                         imagen: design.imagen,
                       })}
-                      className="bg-purple-700 text-black font-semibold py-2 px-4 rounded-md text-sm hover:bg-purple-800 transition duration-150"
+                      className="bg-green-500 text-white font-semibold py-2 px-4 rounded-md text-sm hover:bg-green-700 transition duration-150"
                     >
                       Agregar al carrito
                     </BotonGeneral>
                   )}
                   <BotonGeneral
                     onClick={() => handleEditDesign(design)}
-                    className="bg-blue-600 text-black font-semibold py-2 px-4 rounded-md text-sm hover:bg-blue-700 transition duration-150"
+                    className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-md text-sm hover:bg-blue-700 transition duration-150"
                   >
                     Editar
                   </BotonGeneral>
                   <BotonGeneral
                     onClick={() => handleDeleteDesign(design._id)}
-                    className="bg-red-600 text-black font-semibold py-2 px-4 rounded-md text-sm hover:bg-red-700 transition duration-150"
+                    className="bg-red-500 text-white font-semibold py-2 px-4 rounded-md text-sm hover:bg-red-700 transition duration-150"
                   >
                     Eliminar
                   </BotonGeneral>

@@ -12,7 +12,7 @@ function PaymentHistory({ payments }) {
   return (
     <div
       style={{
-        backgroundColor: "#000000",
+        backgroundColor: "#f5f5f5",
         padding: "1.5rem",
         borderRadius: "0.5rem",
         boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
@@ -23,25 +23,25 @@ function PaymentHistory({ payments }) {
           fontSize: "1.5rem",
           fontWeight: "bold",
           marginBottom: "1rem",
-          color: "#FFFFFF",
+          color: "#000000FF",
         }}
       >
         Historial de Pagos
       </h2>
       <div style={{ overflowX: "auto" }}>
-        <table style={{ minWidth: "100%", backgroundColor: "#000000" }}>
+        <table style={{ minWidth: "100%", backgroundColor: "#000000FF" }}>
           <thead>
-            <tr style={{ backgroundColor: "#111827" }}>
+            <tr style={{ backgroundColor: "#FFFFFFFF" }}>
               {["Fecha", "Valor", "Método", "Estado", "Pedido ID", "Motivo"].map((text) => (
                 <th
                   key={text}
                   style={{
                     padding: "0.5rem 1rem",
-                    borderBottom: "1px solid #374151",
+                    borderBottom: "1px solid #000000FF",
                     textAlign: "left",
                     fontSize: "0.75rem",
                     fontWeight: "600",
-                    color: "#D1D5DB",
+                    color: "#000000FF",  //NOMBRES 
                     textTransform: "uppercase",
                     letterSpacing: "0.05em",
                   }}
@@ -55,20 +55,20 @@ function PaymentHistory({ payments }) {
             {payments.map((payment) => (
               <tr
                 key={payment._id}
-                style={{ backgroundColor: "#000000" }}
+                style={{ backgroundColor: "#FFFFFFFF" }}
                 onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = "#1F2937";
+                  e.currentTarget.style.backgroundColor = "#FFFFFFFF";
                 }}
                 onMouseOut={(e) => {
-                  e.currentTarget.style.backgroundColor = "#000000";
+                  e.currentTarget.style.backgroundColor = "#FFFFFFFF";
                 }}
               >
                 <td
                   style={{
                     padding: "0.5rem 1rem",
-                    borderBottom: "1px solid #374151",
+                    borderBottom: "1px solid #030303FF",
                     fontSize: "0.875rem",
-                    color: "#E5E7EB",
+                    color: "#000000FF",
                   }}
                 >
                   {new Date(payment.createdAt).toLocaleDateString()}
@@ -76,9 +76,9 @@ function PaymentHistory({ payments }) {
                 <td
                   style={{
                     padding: "0.5rem 1rem",
-                    borderBottom: "1px solid #374151",
+                    borderBottom: "1px solid #000000FF",
                     fontSize: "0.875rem",
-                    color: "#E5E7EB",
+                    color: "#000000FF",
                   }}
                 >
                   ${payment.valorPago.toFixed(2)}
@@ -86,9 +86,9 @@ function PaymentHistory({ payments }) {
                 <td
                   style={{
                     padding: "0.5rem 1rem",
-                    borderBottom: "1px solid #374151",
+                    borderBottom: "1px solid #000000FF",
                     fontSize: "0.875rem",
-                    color: "#E5E7EB",
+                    color: "#000000FF",
                   }}
                 >
                   {payment.metodoPago}
@@ -96,9 +96,9 @@ function PaymentHistory({ payments }) {
                 <td
                   style={{
                     padding: "0.5rem 1rem",
-                    borderBottom: "1px solid #374151",
+                    borderBottom: "1px solid #000000FF",
                     fontSize: "0.875rem",
-                    color: "#E5E7EB",
+                    color: "#000000FF",
                   }}
                 >
                   {payment.estadoTransaccion}
@@ -106,9 +106,9 @@ function PaymentHistory({ payments }) {
                 <td
                   style={{
                     padding: "0.5rem 1rem",
-                    borderBottom: "1px solid #374151",
+                    borderBottom: "1px solid #000000FF",
                     fontSize: "0.875rem",
-                    color: "#E5E7EB",
+                    color: "#000000FF",
                   }}
                 >
                   {payment.pedidoId}
@@ -116,9 +116,9 @@ function PaymentHistory({ payments }) {
                 <td
                   style={{
                     padding: "0.5rem 1rem",
-                    borderBottom: "1px solid #374151",
+                    borderBottom: "1px solid #000000FF",
                     fontSize: "0.875rem",
-                    color: "#E5E7EB",
+                    color: "#000000FF",
                   }}
                 >
                   {payment.motivo || 'N/A'}

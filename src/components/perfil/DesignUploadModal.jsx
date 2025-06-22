@@ -100,16 +100,16 @@ function DesignUploadModal({ onDesignSaved }) {
   };
 
   return (
-    <div className="p-6 rounded-lg shadow-lg max-h-[80vh] overflow-y-auto" style={{ backgroundColor: "#111827", color: "#FFFFFF" }}>
+    <div className="p-6 rounded-lg shadow-lg max-h-[80vh] overflow-y-auto" style={{ backgroundColor: "#000000FF", color: "#FFFFFFFF" }}>
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="p-3 rounded-md text-sm mb-4" style={{ backgroundColor: "#991B1B", color: "#FFFFFF" }}>
+          <div className="p-3 rounded-md text-sm mb-4" style={{ backgroundColor: "#000000FF", color: "#000000FF" }}>
             {error}
           </div>
         )}
 
         <div>
-          <label htmlFor="nombreDesing" className="block text-sm font-medium mb-1" style={{ color: "#D1D5DB" }}>
+          <label htmlFor="nombreDesing" className="block text-sm font-medium mb-1" style={{ color: "#FFFFFFFF" }}>
             Nombre del Diseño:
           </label>
           <input
@@ -121,17 +121,17 @@ function DesignUploadModal({ onDesignSaved }) {
             required
             className="w-full p-3 border rounded-md focus:ring-2 focus:outline-none"
             style={{
-              backgroundColor: "#1F2937",
-              borderColor: "#FFFFFFFF",
-              color: "#FFFFFF",
-              placeholderColor: "#6B7280"
+              backgroundColor: "#FFFFFFFF",
+              borderColor: "#000000FF",
+              color: "#000000FF",
+              placeholderColor: "#000000FF"
             }}
             placeholder="Ej: Camiseta Urbana"
           />
         </div>
 
         <div>
-          <label htmlFor="descripcion" className="block text-sm font-medium mb-1" style={{ color: "#D1D5DB" }}>
+          <label htmlFor="descripcion" className="block text-sm font-medium mb-1" style={{ color: "#FFFFFFFF" }}>
             Descripción:
           </label>
           <textarea
@@ -142,17 +142,17 @@ function DesignUploadModal({ onDesignSaved }) {
             onChange={(e) => setDescripcion(e.target.value)}
             className="w-full p-3 border rounded-md focus:ring-2 focus:outline-none"
             style={{
-              backgroundColor: "#1F2937",
-              borderColor: "#FFFFFFFF",
-              color: "#FFFFFF",
-              placeholderColor: "#6B7280"
+              backgroundColor: "#FFFFFFFF",
+              borderColor: "#000000FF",
+              color: "#000000FF",
+              placeholderColor: "#000000FF"
             }}
             placeholder="Una breve descripción de tu diseño (opcional)..."
           ></textarea>
         </div>
 
         <div>
-          <label htmlFor="valorDesing" className="block text-sm font-medium mb-1" style={{ color: "#D1D5DB" }}>
+          <label htmlFor="valorDesing" className="block text-sm font-medium mb-1" style={{ color: "#FFFFFFFF" }}>
             Precio:
           </label>
           <input
@@ -165,17 +165,17 @@ function DesignUploadModal({ onDesignSaved }) {
             required
             className="w-full p-3 border rounded-md focus:ring-2 focus:outline-none"
             style={{
-              backgroundColor: "#1F2937",
-              borderColor: "#FFFFFFFF",
-              color: "#FFFFFF",
-              placeholderColor: "#6B7280"
+              backgroundColor: "#FFFFFFFF",
+              borderColor: "#000000FF",
+              color: "#000000FF",
+              placeholderColor: "#000000FF"
             }}
             placeholder="Ej: 25.99"
           />
         </div>
 
         <div>
-          <label htmlFor="categoria" className="block text-sm font-medium mb-1" style={{ color: "#D1D5DB" }}>
+          <label htmlFor="categoria" className="block text-sm font-medium mb-1" style={{ color: "#FFFFFFFF" }}>
             Categoría:
           </label>
           <select
@@ -186,9 +186,9 @@ function DesignUploadModal({ onDesignSaved }) {
             required
             className="w-full p-3 border rounded-md focus:ring-2 focus:outline-none"
             style={{
-              backgroundColor: "#1F2937",
-              borderColor: "#FFFFFFFF",
-              color: "#FFFFFF"
+              backgroundColor: "#FFFFFFFF",
+              borderColor: "#000000FF",
+              color: "#000000FF"
             }}
           >
             <option value="">Selecciona una categoría</option>
@@ -201,7 +201,7 @@ function DesignUploadModal({ onDesignSaved }) {
         </div>
 
         <div>
-          <label htmlFor="imagenDesing" className="block text-sm font-medium mb-1" style={{ color: "#D1D5DB" }}>
+          <label htmlFor="imagenDesing" className="block text-sm font-medium mb-1" style={{ color: "#FFFFFFFF" }}>
             Subir Imagen:
           </label>
           <input
@@ -213,9 +213,9 @@ function DesignUploadModal({ onDesignSaved }) {
             accept="image/jpeg, image/png, image/webp"
             className="w-full p-3 border rounded-md focus:ring-2 focus:outline-none"
             style={{
-              backgroundColor: "#1F2937",
-              borderColor: "#FFFFFFFF",
-              color: "#FFFFFF"
+              backgroundColor: "#FFFFFFFF",
+              borderColor: "#000000FF",
+              color: "#000000FF"
             }}
           />
         </div>

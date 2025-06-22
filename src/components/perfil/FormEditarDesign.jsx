@@ -74,7 +74,7 @@ function FormEditarDesign({ designData, onSuccess }) {
     <form
       onSubmit={handleSubmit}
       className="space-y-5"
-      style={{ color: "#FFFFFF", backgroundColor: "#111827", padding: "1.5rem", borderRadius: "0.5rem" }}
+      style={{ color: "#FFFFFFFF", backgroundColor: "#000000FF", padding: "1.5rem", borderRadius: "0.5rem" }}
     >
       <input type="hidden" name="id" value={formData.id} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

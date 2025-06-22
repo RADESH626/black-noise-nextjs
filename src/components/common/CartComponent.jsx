@@ -272,7 +272,7 @@ function CartComponent() {
   }
 
   return (
-    <div className="p-6 md:p-8 shadow-lg h-screen justify-between flex flex-col overflow-hidden" style={{ background: 'linear-gradient(to bottom, #000000, #1f2937, #000000)', color: '#FFFFFF' }}>
+    <div className="p-6 md:p-8 shadow-lg h-screen justify-between flex flex-col overflow-hidden" style={{ background: 'linear-gradient(to bottom, #ffffff, #ffffff, #ffffff)', color: '#000000' }}>
       
       <h2 className="text-2xl font-bold mb-6" style={{ color: "#FFFFFF" }}>Tu Carrito de Compras</h2>
 
@@ -287,7 +287,7 @@ function CartComponent() {
             <div className="flex flex-col items-center justify-center h-full ">
               <div className="flex flex-col items-center justify-center h-full ">
                 <p className="text-center" style={{ color: "#9CA3AF" }}>Tu carrito está vacío.</p>
-                <Link href="/catalogo" className="hover:underline" style={{ color: "#3B82F6" }}>
+                <Link href="/catalogo" className="hover:underline" style={{ color: "#60F63BFF" }}>
                   Volver a la tienda
                 </Link>
               </div>
@@ -311,20 +311,20 @@ function CartComponent() {
       </div>
 
       {cartItems.length > 0 && (
-        <div className="mt-8 pt-4 border-t" style={{ borderColor: "#FFFFFFFF" }}>
-          <div className="flex justify-between items-center text-lg font-semibold mb-2" style={{ color: "#FFFFFF" }}>
+        <div className="mt-8 pt-4 border-t" style={{ borderColor: "#000000FF" }}>
+          <div className="flex justify-between items-center text-lg font-semibold mb-2" style={{ color: "#000000FF" }}>
             <span>Subtotal:</span>
             <span>${getTotal().toFixed(2)}</span>
           </div>
-          <div className="flex justify-between items-center text-xl font-bold mb-6" style={{ color: "#FFFFFF" }}>
+          <div className="flex justify-between items-center text-xl font-bold mb-6" style={{ color: "#000000FF" }}>
             <span>Total a Pagar:</span>
             <span>${totalAPagar.toFixed(2)}</span>
           </div>
           <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
-            <BotonGeneral onClick={handleClearCart} disabled={loadingCart} className="bg-gray-500 hover:bg-gray-600 text-white">
+            <BotonGeneral onClick={handleClearCart} disabled={loadingCart} className="bg-red-500 hover:bg-red-700 text-white">
               Vaciar Carrito
             </BotonGeneral>
-            <BotonGeneral onClick={handleProceedToPayment} disabled={loadingCart} className="bg-gray-500 hover:bg-gray-600 text-white">
+            <BotonGeneral onClick={handleProceedToPayment} disabled={loadingCart} className="bg-blue-500 hover:bg-blue-700 text-white">
               Proceder al Pago
             </BotonGeneral>
           </div>
@@ -332,21 +332,21 @@ function CartComponent() {
       )}
 
       {/* Dialog for Payment Section */}
-      <dialog ref={dialogRef} className="relative p-8 rounded-lg shadow-lg max-w-2xl w-11/12 max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "#FDF9F1", color: "#000000", margin: "auto" }}>
+      <dialog ref={dialogRef} className="relative p-8 rounded-lg shadow-lg max-w-2xl w-11/12 max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "#f5f5f5", color: "#000000FF", margin: "auto" }}>
         <button
           onClick={handleClosePayment}
           className="absolute top-4 right-4 text-2xl font-bold"
-          style={{ color: "#000000" }}
+          style={{ color: "#000000FF" }}
           aria-label="Cerrar"
         >
           &times;
         </button>
-        <h2 className="text-2xl font-bold mb-4" style={{ color: "#111010" }}>Confirmar Pedido y Pago</h2>
+        <h2 className="text-2xl font-bold mb-4" style={{ color: "#000000FF" }}>Confirmar Pedido y Pago</h2>
         
         <UserDataForm onUserDataChange={handleUserDataChange} />
 
-        <div className="p-6 rounded shadow-md w-full mb-6" style={{ backgroundColor: "#F7F1F1" }}>
-          <h3 className="text-xl font-bold mb-4" style={{ color: "#111010" }}>Método de Pago</h3>
+        <div className="p-6 rounded shadow-md w-full mb-6" style={{ backgroundColor: "#E9E9E9FF" }}>
+          <h3 className="text-xl font-bold mb-4" style={{ color: "#000000FF" }}>Método de Pago</h3>
           <div className="grid grid-cols-2 gap-4 mb-4">
             {Object.values(MetodoPago).map((method) => (
               <label key={method} className="flex items-center space-x-2 cursor-pointer">
@@ -369,7 +369,7 @@ function CartComponent() {
               <button
                 type="button"
                 onClick={() => setIsCardModalOpen(true)}
-                style={{ backgroundColor: "#154780", color: "#ffffff" }}
+                style={{ backgroundColor: "#154780", color: "#E9E9E9FF" }}
                 className="w-full font-semibold py-3 rounded hover:bg-blue-700 transition"
               >
                 {cardData ? 'Editar Datos de Tarjeta' : 'Ingresar Datos de Tarjeta'}
@@ -395,7 +395,7 @@ function CartComponent() {
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Ej: 3001234567"
-                style={{ backgroundColor: "#FFFFFF", color: "#000000" }}
+                style={{ backgroundColor: "#E9E9E9FF", color: "#000000" }}
               />
             </div>
           )}
@@ -404,7 +404,7 @@ function CartComponent() {
         <OrderSummary cartItems={cartItems} getTotal={() => getTotal()} />
 
         {paymentError && (
-          <p className="p-3 rounded-md mb-4 text-center" style={{ backgroundColor: "#EF4444", color: "#FFFFFF" }}>
+          <p className="p-3 rounded-md mb-4 text-center" style={{ backgroundColor: "#EF4444", color: "#FFFFFFFF" }}>
             {paymentError.message}
           </p>
         )}
@@ -412,7 +412,7 @@ function CartComponent() {
         <button
           type="button"
           onClick={handleProcessPayment}
-          style={{ backgroundColor: "#154780", color: "#ffffff" }}
+          style={{ backgroundColor: "#154780", color: "#FFFFFFFF" }}
           className="w-full font-semibold py-3 rounded hover:bg-blue-700 transition"
         >
           Confirmar Pedido y Pagar

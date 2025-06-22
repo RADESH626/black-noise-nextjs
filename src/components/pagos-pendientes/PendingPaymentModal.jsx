@@ -80,7 +80,7 @@ export default function PendingPaymentModal({ isOpen, onClose, onPaymentSubmit, 
     };
 
     return (
-        <dialog ref={dialogRef} className="relative p-8 rounded-lg shadow-lg max-w-md w-11/12 max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "#F7F1F1FF", color: "#000000FF", margin: "auto" }}>
+        <dialog ref={dialogRef} className="relative p-8 rounded-lg shadow-lg max-w-md w-11/12 max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "#E9E9E9FF", color: "#000000FF", margin: "auto" }}>
             <button
                 onClick={onClose}
                 className="absolute top-4 right-4 text-black text-2xl font-bold"
