@@ -26,8 +26,18 @@ This functionality allows users to request returns for their orders. The process
         *   Proponer "Rehacer Pedido": Starts the cost negotiation flow.
     *   Proveedor recibe el producto (si aplica) -> Changes the status to "Devolución completada".
 
+## Flujo para Rehacer Pedido:
+1.  **Interfaz de Negociación:** If the supplier chooses "Rehacer Pedido", they must have an interface to configure the new order.
+2.  **Negociación de Costos:** The supplier will be able to adjust the costs of the new order (e.g., free manufacturing, customer pays shipping; or vice versa). The customer must approve these new terms.
+3.  **Nuevo Pedido sin Costo (o costo negociado):** Upon confirmation, the system generates a new order linked to the original with the negotiated costs.
+4.  **Visibilidad para el Proveedor:** The supplier will see this new order in their panel, clearly marked as a "Pedido a Rehacer".
+
 ## Implementation Details
 *   **Modal Component:** Use the existing `src/components/common/modales/Modal.jsx` or create a new modal component for the return request.
 *   **API Endpoint:** Create an API endpoint to handle the return request and send the email notification to the supplier.
 *   **Order Status:** Update the order status in the database.
 *   **Email Notification:** Use the existing email sending functionality or create a new one for the return request notification.
+*   **Interfaz de Negociación:** Create an interface for the supplier to configure the new order.
+*   **Negociación de Costos:** Implement the logic for the supplier to adjust the costs of the new order.
+*   **Nuevo Pedido sin Costo (o costo negociado):** Implement the logic to generate a new order linked to the original with the negotiated costs.
+*   **Visibilidad para el Proveedor:** Update the supplier panel to display the new order clearly marked as a "Pedido a Rehacer".

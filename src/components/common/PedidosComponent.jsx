@@ -30,6 +30,37 @@ const PedidosContent = () => {
     setShowDevolucionModal(true);
   };
 
+  const handleCancelarPedido = async (pedidoId) => {
+    try {
+      const response = await fetch('/api/cancelar-pedido', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pedidoId: pedidoId,
+        }),
+      });
+
+      if (response.ok) {
+        showPopUp('Pedido cancelado correctamente', 'success');
+        // Refresh pedidos after cancellation
+        const { pedidos: fetchedPedidos, error: fetchError } = await obtenerPedidosPagadosPorUsuarioId(userId);
+        if (fetchError) {
+          setError({ message: fetchError });
+          setPedidos([]);
+        } else {
+          setPedidos(fetchedPedidos || []);
+        }
+      } else {
+        showPopUp('Error al cancelar el pedido', 'error');
+      }
+    } catch (error) {
+      console.error('Error al cancelar el pedido:', error);
+      showPopUp('Error al cancelar el pedido', 'error');
+    }
+  };
+
   const handleCloseDevolucionModal = () => {
     setShowDevolucionModal(false);
     setSelectedPedidoId(null);
@@ -303,6 +334,15 @@ const PedidosContent = () => {
                       >
                         Solicitar Devolución
                       </BotonGeneral>
+                      {pedido.estadoPedido === 'PENDIENTE' || pedido.estadoPedido === 'ASIGNADO' ? (
+                        <BotonGeneral
+                          onClick={() => handleCancelarPedido(pedido._id)}
+                          variant="danger"
+                          className="py-2 px-4 text-sm"
+                        >
+                          Cancelar Pedido
+                        </BotonGeneral>
+                      ) : null}
                     </div>
                   </div>
                 )}
