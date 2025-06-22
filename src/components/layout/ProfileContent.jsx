@@ -224,11 +224,11 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
   return (
     <div className="mx-auto p-4 md:p-8 bg-gray-300 text-white w-screen flex flex-col min-h-screen">
       {/* Header */}
-      {/* <HeaderPrincipal /> */}
+      <HeaderPrincipal />
 
 
       {/* User Info Section */}
-      <div className="bg-gray-400 p-6 md:p-8 rounded-lg shadow-lg mb-8 flex-shrink-0 text-black">
+      <div className="bg-gray-400 p-6 md:p-8 rounded-lg shadow-lg mb-8 flex-shrink-0 text-black mt-10">
 
         <div className="flex flex-col md:flex-row items-center">
 

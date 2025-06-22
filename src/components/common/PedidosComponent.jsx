@@ -170,7 +170,7 @@ const PedidosContent = () => {
   );
 
   return (
-    <div className="bg-black text-white font-poppins p-4">
+    <div className="bg-white text-black font-poppins p-4">
       <h2 className="text-center text-2xl font-bold mt-4">Tus Pedidos</h2>
 
       <div className="flex justify-end mb-4">
