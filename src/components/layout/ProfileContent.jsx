@@ -228,14 +228,17 @@ function ProfileContent({ initialOrderedDesignIds = [], initialUserDesigns = [],
 
 
       {/* User Info Section */}
-      <div className="bg-black p-6 md:p-8 rounded-lg shadow-lg mb-8 flex-shrink-0">
+      <div className="bg-gray-400 p-6 md:p-8 rounded-lg shadow-lg mb-8 flex-shrink-0 text-black">
+
         <div className="flex flex-col md:flex-row items-center">
+
           <div className="w-32 h-32 md:w-60 md:h-60 bg-white rounded-lg mb-4 md:mb-0 md:mr-8 ">
+
             <img src={user?.profileImageUrl || "/img/perfil/FotoPerfil.webp"} alt="User Image" className="w-full h-full object-cover rounded-lg" />
           </div>
           <div className="flex-grow text-center md:text-left">
             <h1 className="text-3xl md:text-4xl font-bold mb-1">{user?.Nombre} {user?.primerApellido}</h1>
-            <div className="text-gray-400 mb-3">
+            <div className="mb-3">
               <p>CORREO: {user?.correo}</p>
               <p>NÚMERO DE DOCUMENTO: {user?.numeroDocumento}</p>
               <p>NÚMERO DE TELÉFONO: {user?.numeroTelefono}</p>

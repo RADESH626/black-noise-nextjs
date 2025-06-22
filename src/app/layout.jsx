@@ -46,7 +46,7 @@ export default function RootLayout({ children }) {
               {/* <ClientHeaderLoader /> */}
               {children}
 
-              <DynamicFooterWrapper />
+              {/* <DynamicFooterWrapper /> */}
             </SessionProviderWrapper>
           </DialogProvider>
         </Providers>
