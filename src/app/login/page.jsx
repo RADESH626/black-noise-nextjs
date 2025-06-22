@@ -55,7 +55,8 @@ function Login() {
           variants={overlayVariants}
           initial="hidden"
           animate="visible"
-        />
+        >
+        </motion.div>
 
         <motion.div
           className="rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.2)] overflow-hidden text-[#000000]"
@@ -75,8 +76,8 @@ function Login() {
             <LoginInfoSection />
           </div>
         </motion.div>
-    </main>
-    {/* Footer */}
+      </main>
+      {/* Footer */}
       <Footer />
     </div>
   );
