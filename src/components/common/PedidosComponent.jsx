@@ -249,13 +249,6 @@ const PedidosContent = () => {
                                   className="flex items-center space-x-3 cursor-pointer"
                                   onClick={() => handleToggleDesignExpand(item.designId?._id?.toString() || `design-${itemIndex}`)}
                                 >
-                                  {item.designId?.imagen && (
-                                    <img
-                                      src={item.designId.imagen}
-                                      alt={item.designId.nombreDesing || 'Diseño'}
-                                      className="w-12 h-12 object-cover rounded-md"
-                                    />
-                                  )}
                                   <div className="flex items-center space-x-2">
                                     {item.designId?.imagen && (
                                       <img

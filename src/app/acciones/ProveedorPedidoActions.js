@@ -25,7 +25,7 @@ export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId)
         }
 
         const pedidos = await Pedido.find(query)
-            .populate('items.designId', 'nombreDesing imageData imageMimeType') // Popula nombre, datos binarios y tipo MIME de los diseños dentro de items
+            .populate('items.designId', 'nombreDesing imageData imageMimeType categoria valorDesing descripcion') // Popula nombre, datos binarios, tipo MIME, categoría, valor y descripción de los diseños dentro de items
             .populate('proveedorId', 'nombreEmpresa emailContacto') // Popula algunos campos de Proveedor
             .populate('userId', 'Nombre direccion') // Popula el nombre y la dirección del usuario
             .lean();
@@ -38,14 +38,42 @@ export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId)
         logger.debug('Orders retrieved for supplier ID:', proveedorId, 'count:', pedidos.length);
         
         // Convert to plain JavaScript objects, ensuring ObjectIds are strings
-        const plainPedidos = pedidos.map(p => toPlainObject(p));
+        const processedPedidos = pedidos.map(p => {
+            const tempPedido = { ...p }; // Crear una copia mutable
+            if (tempPedido.items && Array.isArray(tempPedido.items)) {
+                tempPedido.items = tempPedido.items.map(item => {
+                    if (item.designId) {
+                        const imageUrl = item.designId.imageData && item.designId.imageData.buffer instanceof Buffer && item.designId.imageMimeType
+                            ? `data:${item.designId.imageMimeType};base64,${item.designId.imageData.buffer.toString('base64')}`
+                            : null;
+                        
+                        // Crear un nuevo objeto designId con la propiedad 'imagen' y sin imageData/imageMimeType
+                        const newDesignId = {
+                            _id: item.designId._id,
+                            nombreDesing: item.designId.nombreDesing,
+                            valorDesing: item.designId.valorDesing,
+                            categoria: item.designId.categoria,
+                            descripcion: item.designId.descripcion,
+                            imagen: imageUrl, // La imagen como base64
+                        };
+
+                        return { 
+                            ...item, 
+                            designId: newDesignId 
+                        };
+                    }
+                    return item;
+                });
+            }
+            return toPlainObject(tempPedido); // Convertir a objeto plano al final
+        });
 
         // If a specific pedidoId was requested, return the single pedido object
         if (pedidoId) {
-            return { success: true, pedido: plainPedidos[0] };
+            return { success: true, pedido: processedPedidos[0] };
         } else {
             // Otherwise, return the array of all orders for the supplier
-            return { success: true, pedidos: plainPedidos };
+            return { success: true, pedidos: processedPedidos };
         }
     } catch (error) {
         logger.error('ERROR in obtenerPedidosPorProveedorId:', error);
