@@ -30,6 +30,36 @@ const PedidosContent = () => {
     setShowDevolucionModal(true);
   };
 
+  const handleCancelarPedido = async (pedidoId) => {
+    try {
+      const response = await fetch('/api/cancelar-pedido', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pedidoId }),
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response body:', await response.text());
+
+      if (response.ok) {
+        showPopUp('Pedido cancelado correctamente', 'success');
+        // Refrescar pedidos tras cancelar
+        const { pedidos: fetchedPedidos, error: fetchError } = await obtenerPedidosPagadosPorUsuarioId(userId);
+        if (fetchError) {
+          setError({ message: fetchError });
+          setPedidos([]);
+        } else {
+          setPedidos(fetchedPedidos || []);
+        }
+      } else {
+        showPopUp('Error al cancelar el pedido', 'error');
+      }
+    } catch (error) {
+      console.error('Error al cancelar el pedido:', error);
+      showPopUp('Error al cancelar el pedido', 'error');
+    }
+  };
+
   const handleCloseDevolucionModal = () => {
     setShowDevolucionModal(false);
     setSelectedPedidoId(null);
@@ -39,9 +69,7 @@ const PedidosContent = () => {
   };
 
   const handleEnviarSolicitud = async () => {
-    const returnReason = selectedReturnReason === 'Otra' ? otraReason : selectedReturnReason;
-    console.log('Pedido ID:', selectedPedidoId);
-    console.log('Razón de la devolución:', returnReason);
+    const returnReason = selectedReturnReason === 'Otra' ? otraReason.trim() : selectedReturnReason;
 
     if (!returnReason) {
       showPopUp('Por favor, seleccione o especifique la razón de la devolución.', 'error');
@@ -51,17 +79,23 @@ const PedidosContent = () => {
     try {
       const response = await fetch('/api/devoluciones', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           pedidoId: selectedPedidoId,
-          returnReason: returnReason,
+          returnReason,
         }),
       });
 
       if (response.ok) {
         showPopUp('Solicitud de devolución enviada correctamente', 'success');
+        // Refrescar pedidos tras solicitud de devolución
+        const { pedidos: fetchedPedidos, error: fetchError } = await obtenerPedidosPagadosPorUsuarioId(userId);
+        if (fetchError) {
+          setError({ message: fetchError });
+          setPedidos([]);
+        } else {
+          setPedidos(fetchedPedidos || []);
+        }
       } else {
         showPopUp('Error al enviar la solicitud de devolución', 'error');
       }
@@ -97,16 +131,13 @@ const PedidosContent = () => {
 
   const filteredPedidos = showCancelled
     ? pedidos
-    : pedidos.filter(pedido => pedido.estadoPedido !== 'CANCELADO');
+    : pedidos.filter(pedido => pedido.estadoPedido !== EstadoPedido.CANCELADO);
 
   const handleToggleExpand = (pedidoId) => {
     setExpandedOrders(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(pedidoId)) {
-        newSet.delete(pedidoId);
-      } else {
-        newSet.add(pedidoId);
-      }
+      if (newSet.has(pedidoId)) newSet.delete(pedidoId);
+      else newSet.add(pedidoId);
       return newSet;
     });
   };
@@ -114,38 +145,29 @@ const PedidosContent = () => {
   const handleToggleDesignExpand = (designId) => {
     setExpandedDesigns(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(designId)) {
-        newSet.delete(designId);
-      } else {
-        newSet.add(designId);
-      }
+      if (newSet.has(designId)) newSet.delete(designId);
+      else newSet.add(designId);
       return newSet;
     });
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-full flex justify-center items-center text-gray-400">
-        Cargando pedidos...
-      </div>
-    );
-  }
+  if (loading) return (
+    <div className="min-h-full flex justify-center items-center text-gray-400">
+      Cargando pedidos...
+    </div>
+  );
 
-  if (error) {
-    return (
-      <div className="min-h-full flex justify-center items-center text-red-500">
-        Error al cargar pedidos: {error.message}
-      </div>
-    );
-  }
+  if (error) return (
+    <div className="min-h-full flex justify-center items-center text-red-500">
+      Error al cargar pedidos: {error.message}
+    </div>
+  );
 
-  if (pedidos.length === 0) {
-    return (
-      <div className="min-h-full flex justify-center items-center text-gray-400">
-        No hay pedidos aún.
-      </div>
-    );
-  }
+  if (pedidos.length === 0) return (
+    <div className="min-h-full flex justify-center items-center text-gray-400">
+      No hay pedidos aún.
+    </div>
+  );
 
   return (
     <div className="bg-black text-white font-poppins p-4">
@@ -159,83 +181,85 @@ const PedidosContent = () => {
             checked={showCancelled}
             onChange={() => setShowCancelled(!showCancelled)}
           />
-          <div className="relative w-11 h-6 bg-gray-700  dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
-          <span className="ms-3 text-sm font-medium text-gray-300">Mostrar Pedidos Cancelados</span>
+          <div className="relative w-11 h-6 bg-gray-700 rounded-full peer dark:bg-gray-600 peer-checked:bg-purple-600
+            peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:content-[''] after:absolute
+            after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full
+            after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:after:border-white"></div>
+          <span className="ml-3 text-sm font-medium text-gray-300">Mostrar Pedidos Cancelados</span>
         </label>
       </div>
 
       <main className="grid grid-cols-1 gap-6 mt-8">
-        {console.log('DEBUG - filteredPedidos en PedidosComponent:', filteredPedidos)}
-        {filteredPedidos.map((pedido, index) => {
-          return (
-            <motion.div
-              key={pedido._id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className={`bg-gray-800 rounded-xl shadow-lg overflow-hidden ${pedido.estadoPedido === 'CANCELADO' ? 'border-2 border-red-500 opacity-70' : ''}`}
-            >
-              <div className="flex flex-col bg-gray-400 rounded-lg p-4 border border-gray-200 hover:shadow-lg transition-all duration-200 gap-4" suppressHydrationWarning={true}>
-                {/* Sección de Resumen */}
-                <div
-                  className="flex flex-col md:flex-row justify-between items-start md:items-center cursor-pointer"
-                  onClick={() => handleToggleExpand(pedido._id.toString())}
-                >
-                  <h2 className="text-lg font-semibold text-white bg-gray-600 p-2 rounded">Pedido ID: {pedido._id.toString()}</h2>
-                  <div className="flex items-center space-x-2">
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${pedido.estadoPedido === EstadoPedido.PENDIENTE ? 'bg-yellow-100 text-yellow-800' :
-                      pedido.estadoPedido === EstadoPedido.ASIGNADO ? 'bg-blue-100 text-blue-800' :
-                        pedido.estadoPedido === EstadoPedido.EN_PROCESO ? 'bg-purple-100 text-purple-800' :
-                          pedido.estadoPedido === EstadoPedido.LISTO_PARA_RECOGER ? 'bg-green-100 text-green-800' :
-                            pedido.estadoPedido === EstadoPedido.ENVIADO ? 'bg-indigo-100 text-indigo-800' :
-                              pedido.estadoPedido === EstadoPedido.ENTREGADO ? 'bg-teal-100 text-teal-800' :
-                                pedido.estadoPedido === EstadoPedido.CANCELADO ? 'bg-red-100 text-red-800' :
-                                  'bg-gray-100 text-gray-800'
-                      }`}>
-                      {pedido.estadoPedido.replace(/_/g, ' ')}
-                    </span>
+        {filteredPedidos.map((pedido, index) => (
+          <motion.div
+            key={pedido._id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className={`bg-gray-800 rounded-xl shadow-lg overflow-hidden ${pedido.estadoPedido === EstadoPedido.CANCELADO ? 'border-2 border-red-500 opacity-70' : ''}`}
+          >
+            <div className="flex flex-col bg-gray-400 rounded-lg p-4 border border-gray-200 hover:shadow-lg transition-all duration-200 gap-4" suppressHydrationWarning={true}>
+              {/* Sección Resumen */}
+              <div
+                className="flex flex-col md:flex-row justify-between items-start md:items-center cursor-pointer"
+                onClick={() => handleToggleExpand(pedido._id.toString())}
+              >
+                <h2 className="text-lg font-semibold text-white bg-gray-600 p-2 rounded">Pedido ID: {pedido._id.toString()}</h2>
+                <div className="flex items-center space-x-2">
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    pedido.estadoPedido === EstadoPedido.PENDIENTE ? 'bg-yellow-100 text-yellow-800' :
+                    pedido.estadoPedido === EstadoPedido.ASIGNADO ? 'bg-blue-100 text-blue-800' :
+                    pedido.estadoPedido === EstadoPedido.EN_PROCESO ? 'bg-purple-100 text-purple-800' :
+                    pedido.estadoPedido === EstadoPedido.LISTO_PARA_RECOGER ? 'bg-green-100 text-green-800' :
+                    pedido.estadoPedido === EstadoPedido.ENVIADO ? 'bg-indigo-100 text-indigo-800' :
+                    pedido.estadoPedido === EstadoPedido.ENTREGADO ? 'bg-teal-100 text-teal-800' :
+                    pedido.estadoPedido === EstadoPedido.CANCELADO ? 'bg-red-100 text-red-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {pedido.estadoPedido.replace(/_/g, ' ')}
+                  </span>
 
-                    <svg
-                      className={`w-5 h-5 text-gray-600 transform transition-transform duration-200 ${expandedOrders.has(pedido._id.toString()) ? 'rotate-180' : ''
-                        }`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                  </div>
+                  <svg
+                    className={`w-5 h-5 text-gray-600 transform transition-transform duration-200 ${
+                      expandedOrders.has(pedido._id.toString()) ? 'rotate-180' : ''
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
                 </div>
+              </div>
 
-                {/* Sección de Detalles (condicional) */}
-                {console.log('DEBUG - expandedOrders.has(pedido._id.toString()):', expandedOrders.has(pedido._id.toString()))}
-                {expandedOrders.has(pedido._id.toString()) && (
-                  <div className="flex flex-col gap-2">
-                    <div className="flex gap-4">
-                      {/* informacion basica del pedido */}
-                      <div className="flex flex-col gap-2 bg-gray-500 text-white rounded p-2">
-                        <div>
-                          <p className="font-medium">Total:</p>
-                          <p className="text-xl font-bold text-green-500">${pedido.total ? pedido.total.toFixed(2) : '0.00'}</p>
-                        </div>
-                        <div>
-                          <p className="font-medium">Método de Entrega:</p>
-                          <p>{pedido.metodoEntrega || 'N/A'}</p>
-                        </div>
-                        {pedido.fechaPedido && (
-                          <div>
-                            <p className="font-medium">Fecha del Pedido:</p>
-                            <p>{new Date(pedido.fechaPedido).toLocaleDateString()}</p>
-                          </div>
-                        )}
-                        {pedido.costoEnvio !== undefined && (
-                          <div>
-                            <p className="font-medium">Costo de Envío:</p>
-                            <p>${pedido.costoEnvio.toFixed(2)}</p>
-                          </div>
-                        )}
+              {/* Sección detalles (condicional) */}
+              {expandedOrders.has(pedido._id.toString()) && (
+                <div className="flex flex-col gap-2">
+                  <div className="flex gap-4">
+                    {/* Info básica */}
+                    <div className="flex flex-col gap-2 bg-gray-500 text-white rounded p-2">
+                      <div>
+                        <p className="font-medium">Total:</p>
+                        <p className="text-xl font-bold text-green-500">${pedido.total?.toFixed(2) ?? '0.00'}</p>
                       </div>
+                      <div>
+                        <p className="font-medium">Método de Entrega:</p>
+                        <p>{pedido.metodoEntrega || 'N/A'}</p>
+                      </div>
+                      {pedido.fechaPedido && (
+                        <div>
+                          <p className="font-medium">Fecha del Pedido:</p>
+                          <p>{new Date(pedido.fechaPedido).toLocaleDateString()}</p>
+                        </div>
+                      )}
+                      {pedido.costoEnvio !== undefined && (
+                        <div>
+                          <p className="font-medium">Costo de Envío:</p>
+                          <p>${pedido.costoEnvio.toFixed(2)}</p>
+                        </div>
+                      )}
+                    </div>
 
                       {/* Información de los diseños */}
                       <div className="flex flex-col flex-1 gap-2 bg-gray-500 rounded-md">
@@ -296,13 +320,22 @@ const PedidosContent = () => {
                       >
                         Solicitar Devolución
                       </BotonGeneral>
-                    </div>
+                    )}
+                    {pedido.estadoPedido === EstadoPedido.PENDIENTE && (
+                      <BotonGeneral
+                        onClick={() => handleCancelarPedido(pedido._id)}
+                        variant="danger"
+                        className="py-2 px-4 text-sm"
+                      >
+                        Cancelar Pedido
+                      </BotonGeneral>
+                    )}
                   </div>
-                )}
-              </div>
-            </motion.div>
-          );
-        })}
+                </div>
+              )}
+            </div>
+          </motion.div>
+        ))}
       </main>
 
       {showDevolucionModal && (
@@ -312,95 +345,41 @@ const PedidosContent = () => {
         >
           <div>
             <p>¿Cuál es la razón de la devolución para el pedido {selectedPedidoId}?</p>
-            <div className="flex flex-col">
-              <label>
-                <input
-                  type="radio"
-                  name="returnReason"
-                  value="El producto llegó dañado o es defectuoso"
-                  onChange={(e) => {
-                    setSelectedReturnReason(e.target.value);
-                    setShowOtraReason(false);
-                  }}
-                  checked={selectedReturnReason === "El producto llegó dañado o es defectuoso"}
-                />
-                El producto llegó dañado o es defectuoso
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="returnReason"
-                  value="La talla o el tamaño es incorrecto"
-                  onChange={(e) => {
-                    setSelectedReturnReason(e.target.value);
-                    setShowOtraReason(false);
-                  }}
-                  checked={selectedReturnReason === "La talla o el tamaño es incorrecto"}
-                />
-                La talla o el tamaño es incorrecto
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="returnReason"
-                  value="Recibí un artículo equivocado"
-                  onChange={(e) => {
-                    setSelectedReturnReason(e.target.value);
-                    setShowOtraReason(false);
-                  }}
-                  checked={selectedReturnReason === "Recibí un artículo equivocado"}
-                />
-                Recibí un artículo equivocado
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="returnReason"
-                  value="El producto es diferente a la descripción o a las fotos"
-                  onChange={(e) => {
-                    setSelectedReturnReason(e.target.value);
-                    setShowOtraReason(false);
-                  }}
-                  checked={selectedReturnReason === "El producto es diferente a la descripción o a las fotos"}
-                />
-                El producto es diferente a la descripción o a las fotos
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="returnReason"
-                  value="La calidad no es la esperada"
-                  onChange={(e) => {
-                    setSelectedReturnReason(e.target.value);
-                    setShowOtraReason(false);
-                  }}
-                  checked={selectedReturnReason === "La calidad no es la esperada"}
-                />
-                La calidad no es la esperada
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="returnReason"
-                  value="Otra"
-                  onChange={(e) => {
-                    setSelectedReturnReason('Otra');
-                    setShowOtraReason(true);
-                  }}
-                  checked={selectedReturnReason === "Otra"}
-                />
-                Otra
-              </label>
+            <div className="flex flex-col space-y-2 mt-2">
+              {[
+                "El producto llegó dañado o es defectuoso",
+                "La talla o el tamaño es incorrecto",
+                "Recibí un artículo equivocado",
+                "El producto es diferente a la descripción o a las fotos",
+                "La calidad no es la esperada",
+                "Otra",
+              ].map((reason) => (
+                <label key={reason} className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="returnReason"
+                    value={reason}
+                    onChange={(e) => {
+                      setSelectedReturnReason(e.target.value);
+                      setShowOtraReason(e.target.value === 'Otra');
+                    }}
+                    checked={selectedReturnReason === reason}
+                    className="cursor-pointer"
+                  />
+                  <span>{reason}</span>
+                </label>
+              ))}
+
               {showOtraReason && (
                 <textarea
                   placeholder="Por favor, especifique la razón"
-                  className="border border-gray-700 rounded-md p-2 text-black"
+                  className="border border-gray-700 rounded-md p-2 text-black mt-2"
                   value={otraReason}
                   onChange={(e) => setOtraReason(e.target.value)}
                 />
               )}
             </div>
-            <BotonGeneral onClick={handleEnviarSolicitud}>
+            <BotonGeneral onClick={handleEnviarSolicitud} className="mt-4">
               Enviar Solicitud
             </BotonGeneral>
           </div>

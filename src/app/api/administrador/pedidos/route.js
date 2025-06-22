@@ -5,8 +5,21 @@ import { createHandler, getAllHandler } from '@/utils/crudHandler';
 import { handleError, ValidationError } from '@/utils/errorHandler';
 import { validateRequiredFields } from '@/utils/validation';
 import { withAuthorization } from '@/utils/authMiddleware';
+import { NextRequest } from 'next/server';
 
-export const GET = withAuthorization(getAllHandler(Pedido), 'ADMINISTRADOR');
+export const GET = withAuthorization(async (request) => {
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get('status');
+
+    let filter = {};
+    if (status === 'CANCELLED') {
+        filter = { estadoPedido: 'CANCELADO' };
+    } else if (status === 'ACTIVE') {
+        filter = { estadoPedido: { $ne: 'CANCELADO' } };
+    }
+
+    return getAllHandler(Pedido, ['userId', 'proveedorId', 'items.designId'], filter)();
+}, 'ADMINISTRADOR');
 
 export const POST = withAuthorization(async (request) => {
     try {
