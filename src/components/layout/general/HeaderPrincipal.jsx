@@ -54,13 +54,13 @@ export default function HeaderPrincipal() {
 
     return (
         <header
-            className={`fixed top-0 left-0 right-0 z-50 py-4 px-6 transition-all duration-300 ${
+            className={`fixed top-0 left-0 right-0 z-50 py-4 px-6 transition-all duration-300 justify-between  ${
                 headerConFondo ? 'bg-white shadow-md' : 'bg-transparent'
             }`}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            <div className="max-w-7xl mx-auto flex justify-between items-center">
+            <div className="flex justify-between items-center">
                 {/* Logo con animación y color dinámico */}
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
                     <Link href="/" className={`text-2xl font-bold transition-colors duration-300 ${

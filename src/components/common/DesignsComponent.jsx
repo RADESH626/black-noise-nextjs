@@ -19,7 +19,7 @@ function DesignsComponent({ loading, error, userDesigns, handleEditDesign, handl
         </div>
       ) : (
         userDesigns.map((design) => (
-          <div key={design._id} className="bg-black rounded-xl shadow-lg overflow-hidden">
+          <div key={design._id} className="bg-gray-400 rounded-xl shadow-lg overflow-hidden">
             <div className="w-full h-56 bg-black relative">
               {design.imagen && design.imagen !== '' ? (
                 <img
