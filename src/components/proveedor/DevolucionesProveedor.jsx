@@ -74,6 +74,11 @@ const DevolucionesProveedor = () => {
               <p>Pedido ID: {devolucion._id}</p>
               <p>Cliente: {devolucion.userId?.nombre}</p>
               <p>Razón: {devolucion.motivo_devolucion}</p>
+              <p>Estado del Pedido: {devolucion.estadoPedido}</p>
+              <p>Fecha de Solicitud: {devolucion.createdAt}</p>
+              <button onClick={() => handleAprobarDevolucion(devolucion._id)}>Aprobar Devolución</button>
+              <button onClick={() => handleRechazarDevolucion(devolucion._id)}>Rechazar Devolución</button>
+              <button onClick={() => handleRehacerPedido(devolucion._id)}>Rehacer Pedido</button>
               {/* Add more details here */}
             </li>
           ))}
@@ -81,6 +86,81 @@ const DevolucionesProveedor = () => {
       )}
     </div>
   );
+}
+
+const handleAprobarDevolucion = async (pedidoId) => {
+  console.log('Aprobar Devolución', pedidoId);
+  try {
+    const result = await updateEstadoPedido(pedidoId, 'DEVOLUCION_APROBADA');
+    if (result.success) {
+      alert('Devolución aprobada correctamente.');
+      // Refresh the page
+      window.location.reload();
+    } else {
+      alert('Error al aprobar la devolución: ' + result.message);
+    }
+  } catch (error) {
+    console.error('Error al aprobar la devolución:', error);
+    alert('Error al aprobar la devolución: ' + error.message);
+  }
+};
+
+import { useDialog } from '@/context/DialogContext';
+
+const handleRechazarDevolucion = (pedidoId) => {
+  console.log('Rechazar Devolución', pedidoId);
+  const { openModal } = useDialog();
+
+  openModal(
+    'Rechazar Devolución',
+    <div>
+      <p>Por favor, ingrese el motivo del rechazo:</p>
+      <textarea id="motivoRechazo" />
+    </div>,
+    'default',
+    async () => {
+      const motivoRechazo = document.getElementById('motivoRechazo').value;
+      if (motivoRechazo) {
+        try {
+          const response = await fetch(`/api/proveedor/returns/${pedidoId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              estadoPedido: 'DEVOLUCION_RECHAZADA',
+              motivoRechazo: motivoRechazo,
+            }),
+          });
+
+          if (response.ok) {
+            alert('Devolución rechazada correctamente.');
+            window.location.reload();
+          } else {
+            const errorData = await response.json();
+            alert('Error al rechazar la devolución: ' + errorData.message);
+          }
+        } catch (error) {
+          console.error('Error al rechazar la devolución:', error);
+          alert('Error al rechazar la devolución: ' + error.message);
+        }
+      } else {
+        alert('Por favor, ingrese el motivo del rechazo.');
+      }
+    },
+    () => { },
+    true,
+    'Rechazar',
+    'Cancelar'
+  );
+};
+
+import { useRouter } from 'next/navigation';
+
+const handleRehacerPedido = (pedidoId) => {
+  console.log('Rehacer Pedido', pedidoId);
+  const router = useRouter();
+  router.push(`/proveedor/rehacer-pedido/${pedidoId}`);
 };
 
 export default DevolucionesProveedor;

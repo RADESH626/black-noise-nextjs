@@ -19,18 +19,33 @@ This functionality allows users to request returns for their orders. The process
 1.  **Proceso de Revisión Manual:** All return requests must be reviewed by the supplier. The supplier must contact the customer to agree on the details.
 2.  **Notificación por Correo:** An email is sent to the supplier when a return is requested.
 3.  **Cambio de Estado del Pedido (Flujo Sugerido):**
-    *   Usuario solicita devolución -> El sistema cambia el estado a "SOLICITUD_DE_DEVOLUCION".
-    *   Proveedor revisa la solicitud -> El proveedor contacts the customer. From their panel, they can:
-        *   Aprobar Devolución (Reembolso total/parcial): Changes the status to "Devolución aprobada".
-        *   Rechazar Devolución: Changes the status to "Devolución rechazada" and must fill in a mandatory field with the reason.
-        *   Proponer "Rehacer Pedido": Starts the cost negotiation flow.
-    *   Proveedor recibe el producto (si aplica) -> Changes the status to "Devolución completada".
+    *   Usuario solicita devolución -> El sistema cambia el estado a "Solicitud de devolución".
+    *   Proveedor revisa la solicitud -> El proveedor contacta al cliente. Desde su panel, puede:
+        *   Aprobar Devolución (Reembolso total/parcial): Cambia el estado a "Devolución aprobada".
+        *   Rechazar Devolución: Cambia el estado a "Devolución rechazada" y debe rellenar un campo obligatorio con el motivo.
+        *   Proponer "Rehacer Pedido": Inicia el flujo de negociación de costos.
+    *   Proveedor recibe el producto (si aplica) -> Cambia el estado a "Devolución completada".
 
 ## Flujo para Rehacer Pedido:
-1.  **Interfaz de Negociación:** If the supplier chooses "Rehacer Pedido", they must have an interface to configure the new order.
-2.  **Negociación de Costos:** The supplier will be able to adjust the costs of the new order (e.g., free manufacturing, customer pays shipping; or vice versa). The customer must approve these new terms.
-3.  **Nuevo Pedido sin Costo (o costo negociado):** Upon confirmation, the system generates a new order linked to the original with the negotiated costs.
-4.  **Visibilidad para el Proveedor:** The supplier will see this new order in their panel, clearly marked as a "Pedido a Rehacer".
+1.  **Interfaz de Negociación:** If the supplier chooses "Rehacer Pedido", they must have an interface to configure the new order. This interface should:
+    *   Display the original order details.
+    *   Allow the supplier to adjust the costs of the new order.
+
+2.  **Cost Adjustment Options:** The supplier should be able to adjust the following costs:
+    *   Manufacturing cost
+    *   Shipping cost
+    *   Discount
+
+3.  **Customer Approval:** The customer must approve these new terms.
+    *   The system should send a notification to the customer with the new order details and the adjusted costs.
+    *   The customer should be able to approve or reject the new terms.
+
+4.  **Nuevo Pedido sin Costo (o costo negociado):** Upon confirmation, the system generates a new order linked to the original with the negotiated costs. The new order should have a status of "Pedido a Rehacer".
+
+5.  **Visibilidad para el Proveedor:** The supplier will see this new order in their panel, clearly marked as a "Pedido a Rehacer". The supplier should be able to view the details of the new order, including:
+    *   The original order details.
+    *   The adjusted costs.
+    *   The customer's approval status.
 
 ## Implementation Details
 *   **Modal Component:** The `src/components/common/modales/Modal.jsx` component is used for the return request.
