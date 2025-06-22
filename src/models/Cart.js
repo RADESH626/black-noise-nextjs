@@ -1,6 +1,7 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema, model, models } from 'mongoose';
+import connectDB from '@/utils/DBconection';
 
-const CartSchema = new mongoose.Schema({
+const CartSchema = new Schema({
   userId: {
     type: String,
     required: true,
@@ -28,6 +29,7 @@ const CartSchema = new mongoose.Schema({
   ],
 });
 
+// Check if the model exists before creating a new one
 const Cart = mongoose.models.Cart || mongoose.model('Cart', CartSchema);
 
 export default Cart;

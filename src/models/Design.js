@@ -1,6 +1,7 @@
 import mongoose, { Schema, model, models } from 'mongoose'
 import { CategoriaProducto } from './enums/CategoriaProducto'
 import { EstadoDesing } from './enums/design/EstadoDesing'
+import connectDB from '@/utils/DBconection';
 
 const DesignSchema = new Schema({
     usuarioId: {
@@ -52,5 +53,6 @@ const DesignSchema = new Schema({
 })
 
 // Check if the model exists before creating a new one
+const Design = mongoose.models.Design || mongoose.model('Design', DesignSchema);
 
-export default mongoose.models.Design || model('Design', DesignSchema)
+export default Design;

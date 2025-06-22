@@ -1,5 +1,16 @@
 import { Schema, model, models } from 'mongoose'
 import { EstadoPedido } from './enums/PedidoEnums'
+import connectDB from '@/utils/DBconection';
+
+let mongoose;
+
+async function getMongoose() {
+    if (!mongoose) {
+        const { mongoose: mongooseInstance } = await connectDB();
+        mongoose = mongooseInstance;
+    }
+    return mongoose;
+}
 
 const PedidoSchema = new Schema({
     userId: {
@@ -101,5 +112,7 @@ const PedidoSchema = new Schema({
 })
 
 // Check if the model exists before creating a new one, and export the model instance
-const Pedido = models.Pedido || model('Pedido', PedidoSchema);
-export default Pedido;
+export default async function getPedidoModel() {
+    const mongooseInstance = await getMongoose();
+    return mongooseInstance.models.Pedido || model('Pedido', PedidoSchema);
+}

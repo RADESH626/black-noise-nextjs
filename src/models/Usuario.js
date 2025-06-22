@@ -1,6 +1,17 @@
 import { Schema, model, models } from 'mongoose'
 import { TipoDocumentoIdentidad } from './enums/usuario/TipoDocumentoIdentidad';
 import { Rol } from './enums/usuario/Rol';
+import connectDB from '@/utils/DBconection';
+
+let mongoose;
+
+async function getMongoose() {
+    if (!mongoose) {
+        const { mongoose: mongooseInstance } = await connectDB();
+        mongoose = mongooseInstance;
+    }
+    return mongoose;
+}
 
 // Removed the `id` field causing duplicate key errors by ensuring it is not part of the schema.
 // MongoDB already provides a unique `_id` field by default.
@@ -74,4 +85,7 @@ const UsuarioSchema = new Schema({
 )
 
 // Check if the model exists before creating a new one
-export default models.Usuario || model('Usuario', UsuarioSchema)
+export default async function getUsuarioModel() {
+    const mongooseInstance = await getMongoose();
+    return mongooseInstance.models.Usuario || model('Usuario', UsuarioSchema);
+}

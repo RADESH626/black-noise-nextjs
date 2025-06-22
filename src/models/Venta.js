@@ -1,5 +1,16 @@
 import { Schema, model, models } from 'mongoose'
 import { EstadoVenta } from './enums/VentaEnums'
+import connectDB from '@/utils/DBconection';
+
+let mongoose;
+
+async function getMongoose() {
+    if (!mongoose) {
+        const { mongoose: mongooseInstance } = await connectDB();
+        mongoose = mongooseInstance;
+    }
+    return mongoose;
+}
 
 const VentaSchema = new Schema({
     pagoIds: [{
@@ -25,4 +36,7 @@ const VentaSchema = new Schema({
 })
 
 // Check if the model exists before creating a new one
-export default models.Venta || model('Venta', VentaSchema)
+export default async function getVentaModel() {
+    const mongooseInstance = await getMongoose();
+    return mongooseInstance.models.Venta || model('Venta', VentaSchema);
+}

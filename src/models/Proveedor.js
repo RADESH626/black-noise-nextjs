@@ -1,11 +1,22 @@
-import mongoose, { Schema, model, models } from 'mongoose'
+import { Schema, model, models } from 'mongoose'
 import { Disponibilidad } from './enums/proveedor/Disponibilidad'
 import { CategoriaProducto } from './enums/CategoriaProducto'
 import { MetodoPago } from './enums/pago'
+import connectDB from '@/utils/DBconection';
+
+let mongoose;
+
+async function getMongoose() {
+  if (!mongoose) {
+    const { mongoose: mongooseInstance } = await connectDB();
+    mongoose = mongooseInstance;
+  }
+  return mongoose;
+}
 
 const ProveedorSchema = new Schema({
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Usuario',
         required: true,
         unique: true
@@ -68,4 +79,7 @@ const ProveedorSchema = new Schema({
 
 // Check if the model exists before creating a new one
 
-export default mongoose.models.Proveedor || model('Proveedor', ProveedorSchema)
+export default async function getProveedorModel() {
+  const mongooseInstance = await getMongoose();
+  return mongooseInstance.models.Proveedor || model('Proveedor', ProveedorSchema);
+}
