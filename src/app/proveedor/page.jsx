@@ -39,7 +39,7 @@ function ProveedorPage() {
     const { data: pedidos, isLoading: isLoadingPedidos, isError: isErrorPedidos, error: errorPedidos } = useQuery({
         queryKey: ['pedidosProveedor', miPerfil?._id], // Use miPerfil._id for orders query
         queryFn: async () => {
-            const result = await obtenerPedidosPorProveedorId(null, miPerfil._id);
+            const result = await obtenerPedidosPorProveedorId({ proveedorId: miPerfil._id });
             if (result.success) {
                 return result.pedidos;
             } else {

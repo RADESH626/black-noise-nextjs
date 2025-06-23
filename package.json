@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "node server.js",
+  "build": "next build",
+  "start": "NODE_ENV=production node server.js",
     "lint": "next lint"
   },
   "dependencies": {
@@ -15,6 +15,7 @@
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "framer-motion": "^12.18.1",
+    "https": "^1.0.0",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
     "mongodb": "^6.17.0",

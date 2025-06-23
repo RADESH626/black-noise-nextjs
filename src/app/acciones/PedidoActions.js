@@ -47,10 +47,10 @@ async function obtenerPedidos(filters = {}) {
     if (filters.fechaPedidoEnd) {
       query.createdAt = { ...query.createdAt, $lte: new Date(filters.fechaPedidoEnd) };
     }
-    if (filters.pedidoCancelado !== undefined) {
+    if (filters.pedidoCancelado === true || filters.pedidoCancelado === false) {
       query.fue_cancelado = filters.pedidoCancelado;
     }
-    if (filters.pedidoRefabricado !== undefined) {
+    if (filters.pedidoRefabricado === true || filters.pedidoRefabricado === false) {
       query.fue_refabricado = filters.pedidoRefabricado;
     }
 
@@ -73,7 +73,9 @@ async function obtenerPedidos(filters = {}) {
       }
     }
 
+    console.log("PedidoActions: Query de la base de datos", query);
     const pedidos = await PedidoModel.find(query).lean();
+    console.log("PedidoActions: Pedidos obtenidos de la base de datos", pedidos);
 
     const pedidosConUsuario = await Promise.all(
       pedidos.map(async (pedido) => {
@@ -95,6 +97,7 @@ async function obtenerPedidos(filters = {}) {
       })
     );
 
+    console.log("PedidoActions: Pedidos con información de usuario", pedidosConUsuario);
     return { pedidos: pedidosConUsuario.map(p => toPlainObject(p)) };
   } catch (error) {
     console.error('Error al obtener todos los pedidos:', error);

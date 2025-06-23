@@ -22,7 +22,7 @@ export default async function connectDB() {
   if (!cached.promise) {
     mongoose.set('strictQuery', false); // Mover aquí
     cached.promise = mongoose.connect(MONGODB_URI, {}).then(m => {
-      logger.info('Database connected successfully');
+      // logger.info('Database connected successfully');
       return m;
     }).catch(error => {
       logger.error('Error connecting to database:', error);
