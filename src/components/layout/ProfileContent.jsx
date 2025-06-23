@@ -31,6 +31,27 @@ function ProfileContent({ userId, initialUser, initialDesigns, initialPayments }
   const [orderedDesignIds, setOrderedDesignIds] = useState(new Set());
   const [paymentsForHistory, setPaymentsForHistory] = useState(initialPayments);
 
+  const fetchUserDesigns = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Replace this with your actual data fetching logic
+      // For example, you might call an API endpoint to get the user's designs
+      const response = await fetch(`/api/designs?userId=${userId}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setUserDesigns(data);
+    } catch (error) {
+      setError(error);
+      console.error("Failed to fetch user designs:", error);
+      showPopUp("Failed to fetch user designs.", "error");
+    } finally {
+      setLoading(false);
+    }
+  }, [userId, showPopUp]);
+
   useEffect(() => {
     console.log('--- [CLIENTE] Montando ProfileContent ---');
     console.log('[CLIENTE] userId:', userId);
@@ -273,7 +294,7 @@ function ProfileContent({ userId, initialUser, initialDesigns, initialPayments }
                   className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg transform transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-black focus:ring-opacity-50"
                   aria-label="Agregar nuevo diseño"
                 >
-                  <img src="/icons/icono + 2.svg" alt="Agregar" className="w-8 h-8" />
+                  <img src="/icons/icono +.svg" alt="Agregar" className="w-8 h-8" />
                 </BotonGeneral>
               </div>
               {userDesigns.length === 0 ? (

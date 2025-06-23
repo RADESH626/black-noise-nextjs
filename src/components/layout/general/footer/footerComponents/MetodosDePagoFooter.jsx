@@ -3,10 +3,10 @@ import { motion } from 'framer-motion';
 
 function MetodosDePagoFooter() {
   const metodos = [
-    { name: "Visa", logo: "/img/logos/Logo Visa.jpg", url: "https://www.visa.com/" },
-    { name: "Mastercard", logo: "/img/logos/Logo Mastercard.jpg", url: "https://www.mastercard.com/" },
-    { name: "Paypal", logo: "/img/logos/Logo Paypal.jpg", url: "https://www.paypal.com/" },
-    { name: "American Express", logo: "/img/logos/Logo Aexpress.jpg", url: "https://www.americanexpress.com/" }
+    { name: "Visa", logo: "/img/logos/Logo Visa.jpg" },
+    { name: "Mastercard", logo: "/img/logos/Logo Mastercard.jpg",  },
+    { name: "Paypal", logo: "/img/logos/Logo Paypal.jpg",  },
+    { name: "American Express", logo: "/img/logos/Logo Aexpress.jpg", }
   ];
 
   return (
