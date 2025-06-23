@@ -52,7 +52,7 @@ const PagosDashboard = () => {
                 <th className="py-2 px-4 border-b">Valor Pago</th>
                 <th className="py-2 px-4 border-b">Método Pago</th>
                 <th className="py-2 px-4 border-b">Estado Transacción</th>
-                <th className="py-2 px-4 border-b">Fecha Pago</th>
+                <th className="py-2 px-4 border-b">Fecha de Creación</th>
                 <th className="py-2 px-4 border-b">Usuario</th>
                 <th className="py-2 px-4 border-b">Email Usuario</th>
                 <th className="py-2 px-4 border-b">Método Entrega</th>
@@ -66,11 +66,11 @@ const PagosDashboard = () => {
                   <td className="py-2 px-4 border-b">${pago.valorPago ? pago.valorPago.toFixed(2) : 'N/A'}</td>
                   <td className="py-2 px-4 border-b">{pago.metodoPago || 'N/A'}</td>
                   <td className="py-2 px-4 border-b">{pago.estadoTransaccion || 'N/A'}</td>
-                  <td className="py-2 px-4 border-b">{new Date(pago.fechaPago).toLocaleDateString() || 'N/A'}</td>
+                  <td className="py-2 px-4 border-b">{new Date(pago.createdAt).toLocaleDateString() || 'N/A'}</td>
                   <td className="py-2 px-4 border-b">{pago.usuarioId ? `${pago.usuarioId.Nombre} ${pago.usuarioId.primerApellido}` : 'N/A'}</td>
                   <td className="py-2 px-4 border-b">{pago.usuarioId ? pago.usuarioId.correo : 'N/A'}</td>
                   <td className="py-2 px-4 border-b">{pago.pedidoId ? pago.pedidoId.metodoEntrega : 'N/A'}</td>
-                  <td className="py-2 px-4 border-b">{pago.motivoPago || 'N/A'}</td>
+                  <td className="py-2 px-4 border-b">{pago.motivo || 'N/A'}</td>
                 </tr>
               ))}
             </tbody>
