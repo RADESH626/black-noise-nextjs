@@ -146,7 +146,7 @@ const PedidosContent = () => {
 
   if (loading) return (
     <div className="min-h-full flex justify-center items-center text-gray-400">
-      Cargando pedidos...
+      <LoadingSpinner />
     </div>
   );
 

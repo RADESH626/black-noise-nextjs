@@ -2,13 +2,14 @@
 
 import React from 'react';
 import BotonGeneral from './botones/BotonGeneral';
+import LoadingSpinner from './LoadingSpinner';
 
 function DesignsComponent({ loading, error, userDesigns, handleEditDesign, handleDeleteDesign, cartItems, addItem, orderedDesignIds, mode = 'catalog' }) {
 
   return (
     <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {loading ? (
-        <div className="col-span-full text-center text-gray-400">Cargando diseños...</div>
+        <div className="col-span-full text-center text-gray-400"><LoadingSpinner /></div>
       ) : error ? (
         <div className="col-span-full text-red-500 text-center">
           Error al cargar los diseños: {error}

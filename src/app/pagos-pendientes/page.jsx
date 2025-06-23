@@ -85,7 +85,7 @@ function PagosPendientesPage() {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#000000] via-[#0A1828] to-[#000000] text-white">
-                Cargando pagos pendientes...
+                <LoadingSpinner />
             </div>
         );
     }

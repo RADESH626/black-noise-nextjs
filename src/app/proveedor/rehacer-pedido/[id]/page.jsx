@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 const RehacerPedidoPage = ({ params }) => {
   const router = useRouter();
@@ -34,7 +35,7 @@ const RehacerPedidoPage = ({ params }) => {
   }, []);
 
   if (!pedido) {
-    return <div>Cargando...</div>;
+    return <LoadingSpinner />;
   }
 
   const handleSave = async () => {

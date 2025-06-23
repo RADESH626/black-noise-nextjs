@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { obtenerDevolucionesYCancelacionesProveedor } from '@/app/acciones/PedidoActions';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 function SupplierReturnsAndCancellationsPage() {
   const [pedidos, setPedidos] = useState([]); // Cambiado a 'pedidos' para incluir devoluciones y cancelaciones
@@ -30,7 +31,7 @@ function SupplierReturnsAndCancellationsPage() {
   }, []);
 
   if (loading) {
-    return <p>Cargando...</p>;
+    return <LoadingSpinner />;
   }
 
   return (

@@ -111,7 +111,7 @@ const ComunidadDiseños = () => {
 
         <NewPostSection />
 
-        {loadingDesigns && <p className="text-white text-center">Cargando diseños...</p>}
+        {loadingDesigns && <LoadingSpinner />}
         {errorDesigns && <p className="text-red-500 text-center">Error: {error?.message || "No se pudieron cargar los diseños."}</p>}
 
         {!loadingDesigns && !errorDesigns && allDesigns && (
