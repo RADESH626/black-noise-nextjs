@@ -29,6 +29,7 @@ async function guardarPedido(data) {
   try {
     await dbConnect();
     const ProveedorModel = await getModel('Proveedor');
+    const PedidoModel = await getModel('Pedido'); // Obtener el modelo Pedido
 
     // Buscar un proveedor disponible y habilitado con menos pedidos activos
     const proveedorDisponible = await ProveedorModel.findOne({
@@ -40,7 +41,7 @@ async function guardarPedido(data) {
       return { success: false, message: 'No hay proveedores disponibles en este momento para tomar tu pedido.' };
     }
 
-    const nuevoPedido = new Pedido({
+    const nuevoPedido = new PedidoModel({ // Usar PedidoModel como constructor
       ...data,
       proveedorId: proveedorDisponible._id,
       estadoPedido: EstadoPedido.PENDIENTE,
