@@ -200,7 +200,8 @@ export {
   obtenerPedidosPorUsuarioId,
   obtenerPedidosPagadosPorUsuarioId,
   obtenerPedidos,
-  getPedidoById
+  getPedidoById,
+  solicitarDevolucion
 };
 
 async function getPedidoById(id) {
@@ -216,6 +217,63 @@ async function getPedidoById(id) {
   } catch (error) {
     console.error('Error al obtener el pedido:', error);
     return { error: error.message };
+  }
+}
+
+async function solicitarDevolucion(pedidoId, userId, razonDevolucion) {
+  try {
+    await dbConnect();
+    const PedidoModel = await getModel('Pedido');
+    const ProveedorModel = await getModel('Proveedor');
+
+    const pedido = await PedidoModel.findById(pedidoId);
+    if (!pedido) {
+      return { success: false, message: 'Pedido no encontrado.' };
+    }
+
+    // Verificar si el pedido ya está en un estado de devolución o final
+    const estadosNoPermitidosParaDevolucion = [
+      EstadoPedido.SOLICITUD_DEVOLUCION,
+      EstadoPedido.DEVOLUCION_APROBADA,
+      EstadoPedido.DEVOLUCION_RECHAZADA,
+      EstadoPedido.DEVOLUCION_COMPLETADA,
+      EstadoPedido.CANCELADO,
+      EstadoPedido.ENTREGADO // Solo se permite solicitar devolución si ya fue entregado o listo
+    ];
+
+    if (![EstadoPedido.LISTO, EstadoPedido.ENTREGADO].includes(pedido.estadoPedido)) {
+      return { success: false, message: 'La devolución solo puede solicitarse para pedidos LISTOS o ENTREGADOS.' };
+    }
+
+    pedido.estadoPedido = EstadoPedido.SOLICITUD_DEVOLUCION;
+    pedido.motivo_devolucion = razonDevolucion;
+    await pedido.save();
+
+    // Notificar al proveedor asignado
+    if (pedido.proveedorId) {
+      const proveedor = await ProveedorModel.findById(pedido.proveedorId);
+      if (proveedor && proveedor.emailContacto) {
+        const subject = `Nueva Solicitud de Devolución para Pedido #${pedido._id.toString().slice(-6)}`;
+        const htmlContent = `
+          <p>¡Hola ${proveedor.nombreEmpresa}!</p>
+          <p>Se ha recibido una nueva solicitud de devolución para el pedido <strong>#${pedido._id.toString().slice(-6)}</strong>.</p>
+          <p>Motivo de la devolución: ${razonDevolucion}</p>
+          <p>Por favor, revisa los detalles del pedido en tu panel y contacta al cliente para coordinar la devolución.</p>
+        `;
+        await sendEmail(proveedor.emailContacto, subject, htmlContent);
+        console.log(`Notificación de solicitud de devolución enviada a proveedor ${proveedor.emailContacto}`);
+      }
+    }
+
+    // Enviar notificación al usuario
+    await enviarNotificacionCambioEstadoPedido(pedido._id, EstadoPedido.SOLICITUD_DEVOLUCION, pedido.estadoPedido, userId);
+
+    revalidatePath('/perfil'); // Revalidar la página del perfil del usuario
+    revalidatePath('/proveedor/pedidos'); // Revalidar la página de pedidos del proveedor
+    return { success: true, message: 'Solicitud de devolución enviada correctamente.' };
+  } catch (error) {
+    console.error('Error al solicitar devolución:', error);
+    return { success: false, message: 'Error al procesar la solicitud de devolución.', error: error.message };
   }
 }
 
