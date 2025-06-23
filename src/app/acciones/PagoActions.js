@@ -52,6 +52,10 @@ async function obtenerPagos() {
         const pagos = await Pago.find({})
             .populate('usuarioId', 'Nombre primerApellido correo') // Popula algunos campos de Usuario
             .populate('ventaId', '_id') // Popula el ID de Venta
+            .populate({
+                path: 'pedidoId',
+                select: 'metodoEntrega', // Popula solo el campo metodoEntrega del Pedido
+            })
             .lean();
 
         const formattedPagos = pagos.map(pago => ({
@@ -61,6 +65,10 @@ async function obtenerPagos() {
             usuarioId: pago.usuarioId ? {
                 ...pago.usuarioId,
                 _id: pago.usuarioId._id.toString() // Convert userId to string
+            } : null,
+            pedidoId: pago.pedidoId ? {
+                ...pago.pedidoId,
+                _id: pago.pedidoId._id.toString() // Convert pedidoId to string
             } : null,
         }));
 
