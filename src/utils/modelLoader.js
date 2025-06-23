@@ -1,25 +1,53 @@
-// src/utils/modelLoader.js
-import mongoose from 'mongoose';
-import connectDB from './DBconection';
-import '../models'; // Asegura que todos los modelos se registren al importar este archivo
-import logger from './logger'; // Import the logger utility
+import getCartModel from "@/models/Cart";
+import getDesignModel from "@/models/Design";
+import getPagoModel from "@/models/Pago";
+import getPedidoModel from "@/models/Pedido";
+import getProveedorModel from "@/models/Proveedor";
+import getUsuarioModel from "@/models/Usuario";
+import getVentaModel from "@/models/Venta";
+
+const modelCache = {};
 
 export async function getModel(modelName) {
-    logger.debug(`Attempting to get model: ${modelName}`);
-    await connectDB(); // Asegura que la base de datos esté conectada
+  if (modelCache[modelName]) {
+    return modelCache[modelName];
+  }
 
-    if (mongoose.models[modelName]) {
-        logger.debug(`Model '${modelName}' found in mongoose.models. Returning existing model.`);
-        return mongoose.models[modelName];
-    }
+  switch (modelName) {
+    case "Cart":
+      modelCache[modelName] = await getCartModel();
+      break;
+    case "Design":
+      modelCache[modelName] = await getDesignModel();
+      break;
+    case "Pago":
+      modelCache[modelName] = await getPagoModel();
+      break;
+    case "Pedido":
+      modelCache[modelName] = await getPedidoModel();
+      break;
+    case "Proveedor":
+      modelCache[modelName] = await getProveedorModel();
+      break;
+    case "Usuario":
+      modelCache[modelName] = await getUsuarioModel();
+      break;
+    case "Venta":
+      modelCache[modelName] = await getVentaModel();
+      break;
+    default:
+      throw new Error(`Model ${modelName} not found`);
+  }
 
-    logger.debug(`Model '${modelName}' not found in mongoose.models. Attempting to get it via mongoose.model().`);
-    try {
-        const modelInstance = mongoose.model(modelName);
-        logger.debug(`Successfully retrieved model '${modelName}' via mongoose.model().`);
-        return modelInstance;
-    } catch (error) {
-        logger.error(`Error retrieving model '${modelName}': ${error.message}`);
-        throw error; // Re-throw the error to propagate it
-    }
+  return modelCache[modelName];
+}
+
+export async function loadModels() {
+  await getModel("Cart");
+  await getModel("Design");
+  await getModel("Pago");
+  await getModel("Pedido");
+  await getModel("Proveedor");
+  await getModel("Usuario");
+  await getModel("Venta");
 }

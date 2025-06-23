@@ -14,7 +14,7 @@ import { Disponibilidad } from '@/models/enums/proveedor/Disponibilidad';
 async function obtenerPedidos() {
   try {
     await dbConnect();
-    const PedidoModel = await getModel('Pedido');
+    const PedidoModel = await getModel("Pedido");
     const pedidos = await PedidoModel.find({}).lean();
 
     const pedidosConUsuario = await Promise.all(

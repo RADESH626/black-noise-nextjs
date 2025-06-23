@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import Papa from 'papaparse';
 import { transporter } from '@/utils/nodemailer';
 import connectDB from '@/utils/DBconection';
-import getUsuarioModel from '@/models/Usuario';
+
 
 import { signIn } from "next-auth/react";
 import { getServerSession } from "next-auth";
@@ -148,8 +148,8 @@ async function guardarUsuarios(data, enviarCorreo = false) {
 
         await connectDB();
 
-        const Usuario = await getUsuarioModel();
-        const NuevoUsuario = new Usuario(data);
+        const UsuarioModel = await getModel('Usuario');
+        const NuevoUsuario = new UsuarioModel(data);
 
         logger.debug('usuario para guardar en la base de datos:', NuevoUsuario);
 
@@ -220,8 +220,8 @@ async function obtenerUsuarios() {
     try {
         await connectDB();
 
-        const Usuario = await getUsuarioModel();
-        const usuarios = await Usuario.find({}).lean();
+const UsuarioModel = await getModel('Usuario');
+        const usuarios = await UsuarioModel.find({}).lean();
         const plainUsers = usuarios.map(user => {
             const plainUser = toPlainObject(user);
             if (plainUser.imageData && plainUser.imageMimeType) {
@@ -243,8 +243,8 @@ async function obtenerUsuarios() {
 async function obtenerUsuariosHabilitados() {
     try {
         await connectDB();
-        const Usuario = await getUsuarioModel();
-        const usuarios = await Usuario.find({ habilitado: true }).lean();
+const UsuarioModel = await getModel('Usuario');
+        const usuarios = await UsuarioModel.find({ habilitado: true }).lean();
         const plainUsers = usuarios.map(user => {
             const plainUser = toPlainObject(user);
             if (plainUser.imageData && plainUser.imageMimeType) {
@@ -269,8 +269,8 @@ async function ObtenerUsuarioPorId(id) {
         await connectDB();
         // logger.debug('Database connected for ObtenerUsuarioPorId.');
         
-        const Usuario = await getUsuarioModel();
-        const response = await Usuario.findById(id).lean();
+const UsuarioModel = await getModel('Usuario');
+        const response = await UsuarioModel.findById(id).lean();
         // logger.debug('Raw response from DB for ObtenerUsuarioPorId:', response);
 
         if (!response) {
@@ -304,8 +304,8 @@ async function ObtenerUsuarioPorCorreo(email) {
     try {
         logger.info('Iniciando la función ObtenerUsuarioPorCorreo para el correo:', email);
         await connectDB();
-        const Usuario = await getUsuarioModel();
-        const user = await Usuario.findOne({ correo: { $regex: new RegExp(`^${email.trim()}$`, 'i') } }).lean();
+const UsuarioModel = await getModel('Usuario');
+        const user = await UsuarioModel.findOne({ correo: { $regex: new RegExp(`^${email.trim()}$`, 'i') } }).lean();
 
         if (!user) {
             return null; // Return null if user not found, handled by loginAction
@@ -518,8 +518,8 @@ async function FiltrarUsuarios(prevState, formData) {
             query.habilitado = true;
         }
 
-        const Usuario = await getUsuarioModel();
-        const usuariosEncontradosRaw = await Usuario.find(query).lean();
+const UsuarioModel = await getModel('Usuario');
+        const usuariosEncontradosRaw = await UsuarioModel.find(query).lean();
         const usuariosEncontrados = usuariosEncontradosRaw.map(toPlainObject);
 
         return { data: usuariosEncontrados, message: "Búsqueda completada.", success: true };
@@ -539,8 +539,8 @@ async function toggleUsuarioHabilitado(formData) {
 
         await connectDB();
 
-        const Usuario = await getUsuarioModel();
-        const usuario = await Usuario.findById(id);
+const UsuarioModel = await getModel('Usuario');
+        const usuario = await UsuarioModel.findById(id);
 
         if (!usuario) {
             throw new NotFoundError(`No se encontró ningún usuario con el ID ${id}.`);
@@ -548,7 +548,6 @@ async function toggleUsuarioHabilitado(formData) {
 
         const nuevoEstadoHabilitado = !usuario.habilitado;
 
-        const UsuarioModel = await getUsuarioModel();
         const usuarioActualizado = await UsuarioModel.findByIdAndUpdate(
             id,
             { habilitado: nuevoEstadoHabilitado },
@@ -596,7 +595,8 @@ async function EditarUsuario(id, formData) {
         validateRequiredFields(updateData, ['tipoDocumento', 'numeroDocumento', 'Nombre', 'primerApellido', 'fechaNacimiento', 'genero', 'numeroTelefono', 'direccion', 'correo', 'rol']);
         validateEmail(updateData.correo);
 
-        const usuarioActualizado = await Usuario.findByIdAndUpdate(
+        const UsuarioModel = await getModel('Usuario');
+        const usuarioActualizado = await UsuarioModel.findByIdAndUpdate(
             id,
             updateData,
             { new: true, runValidators: true }
@@ -621,8 +621,8 @@ async function EditarUsuario(id, formData) {
 export async function ObtenerTodosLosUsuarios() {
     try {
         await connectDB();
-        const Usuario = await getUsuarioModel();
-        const usuarios = await Usuario.find({}).lean();
+const UsuarioModel = await getModel('Usuario');
+        const usuarios = await UsuarioModel.find({}).lean();
 
         const plainUsers = usuarios.map(toPlainObject);
 

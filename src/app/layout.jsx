@@ -31,9 +31,11 @@ export const metadata = {
 };
 
 import connectDB from '@/utils/DBconection';
+import { loadModels } from '@/utils/modelLoader';
 
 export default async function RootLayout({ children }) {
   await connectDB();
+  await loadModels();
   return (
     <html lang="es" className={`${geistSans.variable} ${geistMono.variable}`}>
       <head>

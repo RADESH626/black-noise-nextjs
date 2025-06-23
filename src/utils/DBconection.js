@@ -34,13 +34,5 @@ export default async function connectDB() {
   cached.conn = await cached.promise;
 
   // Ensure all models are loaded and registered after connection
-  await getCartModel();
-  await getDesignModel();
-  await getPagoModel();
-  await getPedidoModel();
-  await getProveedorModel();
-  await getUsuarioModel();
-  await getVentaModel();
-
   return cached.conn;
 }
