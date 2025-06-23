@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from '@/utils/authOptions';
 import { sendEmail } from '@/utils/nodemailer';
 import connectDB from '@/utils/DBconection';
 import Pedido from '@/models/Pedido';

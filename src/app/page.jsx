@@ -26,7 +26,7 @@ function IndexPage() {
       {isLoading && <Loader />}
 
        <HeaderPrincipal /> 
-      <main className={flex-grow ${isLoading ? 'hidden' : 'block'}}>
+      <main className={`flex-grow ${isLoading ? 'hidden' : 'block'}`}>
         <HeroSection />
 
         <FeatureSection
