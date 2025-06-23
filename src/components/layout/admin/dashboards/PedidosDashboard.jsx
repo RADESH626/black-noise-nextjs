@@ -174,7 +174,7 @@ export default function PedidosDashboard() {
                   {pedido.userEmail || 'N/A'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#50545CFF' }}>
-                  ${typeof pedido.valorPedido === 'number' ? pedido.valorPedido.toFixed(2) : '0.00'}
+                  ${typeof pedido.total === 'number' ? pedido.total.toFixed(2) : '0.00'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#50545CFF' }}>
                   {pedido.estadoPago}

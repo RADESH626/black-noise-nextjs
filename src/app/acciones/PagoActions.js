@@ -192,6 +192,7 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
         const Pago = await getModel('Pago');
         const Venta = await getModel('Venta'); // Asegurarse de que el modelo Venta esté disponible
         const { userId, nombre, correo, direccion, metodoPago: rawMetodoPago, metodoEntrega, total, tarjeta, mes, anio, cvv, numeroTelefono, costoEnvio: paymentDetailsCostEnvio } = paymentDetails;
+        console.log('PagoActions: Total recibido en procesarPagoYCrearPedido:', total);
 
         // Map rawMetodoPago to a valid enum value
         let metodoPago = rawMetodoPago;
@@ -231,6 +232,7 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
             estadoPago: 'PENDIENTE', // Asegurar que el estado inicial sea PENDIENTE
         };
 
+        console.log('PagoActions: nuevoPedidoData.total antes de guardarPedido:', nuevoPedidoData.total);
         logger.debug('Value of nuevoPedidoData:', nuevoPedidoData);
         logger.debug('Type of nuevoPedidoData:', typeof nuevoPedidoData);
 

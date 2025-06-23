@@ -208,13 +208,16 @@ function CartComponent() {
 
     setPaymentError(null);
 
+    const calculatedTotal = getTotal();
+    console.log('CartComponent: Total a enviar a procesarPagoYCrearPedido:', calculatedTotal);
+
     const paymentDetails = {
       userId,
       nombre: userData.nombre,
       correo: userData.correo,
       direccion: userData.direccion,
       metodoPago: selectedPaymentMethod,
-      total: getTotal(),
+      total: calculatedTotal,
       tarjeta: (selectedPaymentMethod === MetodoPago.TARJETA_CREDITO || selectedPaymentMethod === MetodoPago.TARJETA_DEBITO) ? cardData.tarjeta : undefined,
       mes: (selectedPaymentMethod === MetodoPago.TARJETA_CREDITO || selectedPaymentMethod === MetodoPago.TARJETA_DEBITO) ? cardData.mes : undefined,
       anio: (selectedPaymentMethod === MetodoPago.TARJETA_CREDITO || selectedPaymentMethod === MetodoPago.TARJETA_DEBITO) ? cardData.anio : undefined,

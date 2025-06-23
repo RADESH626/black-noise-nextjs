@@ -1,12 +1,12 @@
 "use server"
 
 import Pedido from '@/models/Pedido';
-import Proveedor from '@/models/Proveedor';
 import Usuario from '@/models/Usuario';
 import { transporter } from '@/utils/nodemailer';
 import connectDB from '@/utils/DBconection';
 import logger from '@/utils/logger'; // Import the logger utility
 import { EstadoPedido } from '@/models/enums/PedidoEnums'; // Import EstadoPedido enum
+import { getModel } from '@/utils/modelLoader'; // Import getModel
 
 /**
  * Asigna automáticamente un nuevo pedido al proveedor más adecuado y envía un correo de notificación.
@@ -20,6 +20,7 @@ export async function assignOrderToProvider(order) {
   logger.debug(`Entering assignOrderToProvider for order ID: ${order._id}`);
 
   try {
+    const ProveedorModel = await getModel('Proveedor'); // Obtener el modelo Proveedor
     const orderId = order._id;
 
     // 1. Identificar Requisito: Extraer la especialidad (categoría) del primer item del pedido.
@@ -34,7 +35,7 @@ export async function assignOrderToProvider(order) {
     logger.debug(`Extracted specialty for order ${orderId}: ${specialty}`);
 
     // 2. Filtrar por Capacidad: Buscar proveedores activos, con la especialidad requerida y con menos de 5 pedidos activos.
-    const candidates = await Proveedor.find({
+    const candidates = await ProveedorModel.find({
       habilitado: true, // Usar 'habilitado' en lugar de 'status'
       especialidad: specialty, // Usar 'especialidad' en lugar de 'specialties'
       activeOrders: { $lt: 5 }, // Umbral de capacidad
@@ -61,7 +62,7 @@ export async function assignOrderToProvider(order) {
     logger.debug(`Order ${orderId} updated with provider ${bestProvider._id} and status ASIGNADO.`);
 
     // b. Actualizar al Proveedor
-    await Proveedor.findByIdAndUpdate(bestProvider._id, {
+    await ProveedorModel.findByIdAndUpdate(bestProvider._id, {
       $inc: { activeOrders: 1 }, // Incrementar pedidos activos
       lastAssignedAt: new Date(), // Actualizar fecha de última asignación
     });

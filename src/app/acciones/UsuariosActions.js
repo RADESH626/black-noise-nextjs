@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import Papa from 'papaparse';
 import { transporter } from '@/utils/nodemailer';
 import connectDB from '@/utils/DBconection';
-
+import { getModel } from '@/utils/modelLoader'; // Importar getModel
 
 import { signIn } from "next-auth/react";
 import { getServerSession } from "next-auth";

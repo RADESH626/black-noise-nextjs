@@ -50,14 +50,21 @@ async function guardarPedido(data) {
     const ProveedorModel = await getModel('Proveedor');
     const PedidoModel = await getModel('Pedido'); // Obtener el modelo Pedido
 
-    // Buscar un proveedor disponible y habilitado con menos pedidos activos
+    console.log('PedidoActions: Data recibida en guardarPedido:', data);
+    console.log('PedidoActions: Total en data recibida:', data.total);
+
+    // Definir el límite máximo de pedidos activos por proveedor
+    const MAX_ACTIVE_ORDERS = 5;
+
+    // Buscar un proveedor disponible y habilitado con menos pedidos activos y que no haya alcanzado el límite
     const proveedorDisponible = await ProveedorModel.findOne({
       disponibilidad: Disponibilidad.DISPONIBLE,
       habilitado: true,
+      activeOrders: { $lt: MAX_ACTIVE_ORDERS } // Solo proveedores con menos de MAX_ACTIVE_ORDERS pedidos
     }).sort({ activeOrders: 1, lastAssignedAt: 1 });
 
     if (!proveedorDisponible) {
-      return { success: false, message: 'No hay proveedores disponibles en este momento para tomar tu pedido.' };
+      return { success: false, message: 'No hay proveedores disponibles en este momento para tomar tu pedido. Por favor, inténtalo de nuevo más tarde.' };
     }
 
     const nuevoPedido = new PedidoModel({ // Usar PedidoModel como constructor

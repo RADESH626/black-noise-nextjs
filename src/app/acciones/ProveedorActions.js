@@ -3,7 +3,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import connectDB from "@/utils/DBconection";
-import getProveedorModel from "@/models/Proveedor";
+import { getModel } from "@/utils/modelLoader"; // Import getModel
 import Usuario from "@/models/Usuario"; // Import the Usuario model
 import { revalidatePath } from "next/cache";
 import { Rol } from "@/models/enums/usuario/Rol";
@@ -68,7 +68,8 @@ export async function crearProveedor(prevState, formData) {
     await nuevoUsuario.save();
 
     // Create the new Proveedor entry, linking it to the newly created Usuario
-    const nuevoProveedor = new Proveedor({
+    const ProveedorModel = await getModel('Proveedor');
+    const nuevoProveedor = new ProveedorModel({
       userId: nuevoUsuario._id, // Link to the new user
       nombreEmpresa,
       nit,
@@ -122,8 +123,9 @@ export async function crearProveedor(prevState, formData) {
 export async function generarYGuardarAccessKey(proveedorId, newAccessKey) {
   await connectDB();
   try {
+    const ProveedorModel = await getModel('Proveedor');
     const hashedPassword = await bcrypt.hash(newAccessKey, 10);
-    const proveedor = await Proveedor.findByIdAndUpdate(
+    const proveedor = await ProveedorModel.findByIdAndUpdate(
       proveedorId,
       { accessKey: hashedPassword },
       { new: true }
@@ -185,7 +187,8 @@ export async function actualizarProveedor(prevState, formData) {
       updateData.accessKey = await bcrypt.hash(newAccessKey, 10);
     }
 
-    const updatedProveedor = await Proveedor.findByIdAndUpdate(id, updateData, { new: true });
+    const ProveedorModel = await getModel('Proveedor');
+    const updatedProveedor = await ProveedorModel.findByIdAndUpdate(id, updateData, { new: true });
 
     if (!updatedProveedor) {
       return { message: "Proveedor no encontrado para actualizar.", success: false };
@@ -210,7 +213,8 @@ export async function actualizarProveedor(prevState, formData) {
 export async function obtenerProveedoresHabilitados() {
   await connectDB();
   try {
-    const proveedores = await Proveedor.find({ habilitado: true }).lean();
+    const ProveedorModel = await getModel('Proveedor');
+    const proveedores = await ProveedorModel.find({ habilitado: true }).lean();
     // Deep clone and serialize to ensure all fields are plain objects/primitives
     const serializedProveedores = JSON.parse(JSON.stringify(proveedores));
     return {
@@ -226,7 +230,8 @@ export async function obtenerProveedoresHabilitados() {
 export async function obtenerProveedores() {
   await connectDB();
   try {
-    const proveedores = await Proveedor.find({}).lean();
+    const ProveedorModel = await getModel('Proveedor');
+    const proveedores = await ProveedorModel.find({}).lean();
     return {
       proveedores: proveedores.map(p => ({
         ...p,
@@ -246,7 +251,8 @@ export async function obtenerProveedores() {
 export async function obtenerProveedorPorId(id) {
   await connectDB();
   try {
-    const proveedor = await Proveedor.findById(id).lean();
+    const ProveedorModel = await getModel('Proveedor');
+    const proveedor = await ProveedorModel.findById(id).lean();
     if (!proveedor) {
       return { proveedor: null, success: false, message: "Proveedor no encontrado." };
     }
@@ -274,8 +280,9 @@ export async function eliminarProveedor(prevState, formData) {
 
   await connectDB();
   try {
+    const ProveedorModel = await getModel('Proveedor');
     const id = formData.get("id");
-    const result = await Proveedor.findByIdAndDelete(id);
+    const result = await ProveedorModel.findByIdAndDelete(id);
     if (!result) {
       return { message: "Proveedor no encontrado para eliminar.", success: false };
     }
@@ -296,8 +303,9 @@ export async function obtenerMiPerfilProveedor() {
 
   await connectDB();
   try {
+    const ProveedorModel = await getModel('Proveedor');
     // Assuming the provider's email is stored in the session user object
-    const proveedor = await Proveedor.findOne({ emailContacto: session.user.email }).lean();
+    const proveedor = await ProveedorModel.findOne({ emailContacto: session.user.email }).lean();
 
     if (!proveedor) {
       return { proveedor: null, success: false, message: "Perfil de proveedor no encontrado." };
