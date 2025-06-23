@@ -15,6 +15,7 @@ import UserDataForm from "@/components/pago/UserDataForm";
 import CardDataModal from "@/components/pago/CardDataModal";
 import OrderConfirmationDialogContent from "@/components/pago/OrderConfirmationDialogContent";
 import { MetodoPago } from '@/models/enums/pago/MetodoPago';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 function CartComponent() {
   const router = useRouter();
@@ -30,6 +31,7 @@ function CartComponent() {
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(MetodoPago.TARJETA_CREDITO); // Default to credit card
   const [phoneNumber, setPhoneNumber] = useState(''); // Nuevo estado para el número de teléfono
+  const [showCartLoader, setShowCartLoader] = useState(false); // Nuevo estado para controlar la visibilidad del cargador del carrito
 
   const dialogRef = useRef(null);
 
@@ -46,6 +48,20 @@ function CartComponent() {
       router.push('/catalogo');
     }
   }, [loadingCart, cartItems, router]);
+
+  // Efecto para controlar la visibilidad del cargador del carrito con un retraso
+  useEffect(() => {
+    let timer;
+    if (loadingCart) {
+      timer = setTimeout(() => {
+        setShowCartLoader(true);
+      }, 300); // Muestra el cargador después de 300ms si la carga aún está en curso
+    } else {
+      setShowCartLoader(false);
+      clearTimeout(timer);
+    }
+    return () => clearTimeout(timer);
+  }, [loadingCart]);
 
   const getTotal = () => {
     let subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
@@ -258,26 +274,18 @@ function CartComponent() {
 
   const totalAPagar = getTotal();
 
-  if (loadingCart) {
+  if (loadingCart && showCartLoader) { // Modificado para usar showCartLoader
     return (
       <div className="h-screen flex items-center justify-center" style={{ backgroundColor: "#000000", backgroundImage: "linear-gradient(to bottom, #000000, #1f2937, #000000)", color: "#FFFFFF" }}>
-        Cargando carrito...
-      </div>
-    );
-  }
-
-  if (cartError) {
-    return (
-      <div className="h-screen flex items-center justify-center" style={{ backgroundColor: "#000000", backgroundImage: "linear-gradient(to bottom, #000000, #1f2937, #000000)", color: "#EF4444" }}>
-        Error al cargar el carrito: {cartError.message}
+        cargando
       </div>
     );
   }
 
   return (
-    <div className="p-6 md:p-8 shadow-lg h-screen justify-between flex flex-col overflow-hidden" style={{ background: 'linear-gradient(to bottom, #ffffff, #ffffff, #ffffff)', color: '#000000' }}>
+    <div className="p-6 md:p-8 shadow-lg h-screen justify-between flex flex-col overflow-hidden bg-gray-400" >
       
-      <h2 className="text-2xl font-bold mb-6" style={{ color: "#FFFFFF" }}>Tu Carrito de Compras</h2>
+      <h2 className="text-2xl font-bold m-4  text-white mt-10">Tu Carrito de Compras</h2>
 
       {cartError && (
         <div className="p-3 rounded-md mb-4 text-center" style={{ backgroundColor: "#EF4444", color: "#FFFFFF" }}>
@@ -324,10 +332,10 @@ function CartComponent() {
             <span>${totalAPagar.toFixed(2)}</span>
           </div>
           <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
-            <BotonGeneral onClick={handleClearCart} disabled={loadingCart} className="bg-red-500 hover:bg-red-700 text-white">
+            <BotonGeneral onClick={handleClearCart} disabled={loadingCart} className="bg-gray-800 text-white">
               Vaciar Carrito
             </BotonGeneral>
-            <BotonGeneral onClick={handleProceedToPayment} disabled={loadingCart} className="bg-blue-500 hover:bg-blue-700 text-white">
+            <BotonGeneral onClick={handleProceedToPayment} disabled={loadingCart} className="bg-black text-white">
               Proceder al Pago
             </BotonGeneral>
           </div>
@@ -372,8 +380,7 @@ function CartComponent() {
               <button
                 type="button"
                 onClick={() => setIsCardModalOpen(true)}
-                style={{ backgroundColor: "#154780", color: "#E9E9E9FF" }}
-                className="w-full font-semibold py-3 rounded hover:bg-blue-700 transition"
+                className="w-full font-semibold py-3 rounded transition bg-gray-700 text-white"
               >
                 {cardData ? 'Editar Datos de Tarjeta' : 'Ingresar Datos de Tarjeta'}
               </button>
@@ -415,8 +422,7 @@ function CartComponent() {
         <button
           type="button"
           onClick={handleProcessPayment}
-          style={{ backgroundColor: "#154780", color: "#FFFFFFFF" }}
-          className="w-full font-semibold py-3 rounded hover:bg-blue-700 transition"
+          className="w-full font-semibold py-3 rounded bg-gray-700 transition text-white"
         >
           Confirmar Pedido y Pagar
         </button>

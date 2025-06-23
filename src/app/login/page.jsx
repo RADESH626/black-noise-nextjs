@@ -12,7 +12,7 @@ function Login() {
       opacity: 1,
       rotateY: 0,
       transition: {
-        duration: 0.6,
+        duration: 0.3, // Reducido de 0.6
         ease: "easeInOut",
         when: "beforeChildren",
       }
@@ -25,9 +25,9 @@ function Login() {
       opacity: 1,
       x: 0,
       transition: {
-        duration: 0.35,
+        duration: 0.2, // Reducido de 0.35
         ease: "easeOut",
-        delay: 0.5
+        delay: 0.1 // Reducido de 0.5
       }
     }
   };
@@ -37,8 +37,8 @@ function Login() {
     visible: {
       opacity: 0,
       transition: {
-        delay: 0.2,
-        duration: 0.3,
+        delay: 0, // Reducido de 0.2
+        duration: 0.1, // Reducido de 0.3
         ease: "easeOut",
       }
     }

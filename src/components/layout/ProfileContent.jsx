@@ -236,13 +236,13 @@ function ProfileContent({ userId, initialUser, initialDesigns, initialPayments }
               <p>DIRECCIÓN: {user?.direccion}</p>
             </div>
             <div className="flex flex-col sm:flex-row justify-center md:justify-start space-y-2 sm:space-y-0 sm:space-x-3">
-<BotonGeneral onClick={handleEditProfile} variant="info" className="bg-black rounded-full p-2">
-        EDITAR PERFIL
+              <BotonGeneral onClick={handleEditProfile} variant="info" className="bg-black rounded-full p-2">
+                EDITAR PERFIL
               </BotonGeneral>
               <Link href="/catalogo">
                 <BotonGeneral variant="secondary">VER DISEÑOS DE LA COMUNIDAD</BotonGeneral>
               </Link>
-              <BotonGeneral onClick={() => signOut({ callbackUrl: '/login' })} variant="secondary">
+              <BotonGeneral onClick={() => signOut({ callbackUrl: '/login' })} variant="primary">
                 CERRAR SESIÓN
               </BotonGeneral>
             </div>
@@ -253,25 +253,22 @@ function ProfileContent({ userId, initialUser, initialDesigns, initialPayments }
       <nav className="mb-8 flex-shrink-0">
         <div className="flex border-b border-black">
           <button
-            className={`py-3 px-6 text-lg font-medium ${
-              activeTab === 'designs' ? 'text-black border-b-2 border-red-400' : 'text-black hover:text-black'
-            } focus:outline-none`}
+            className={`py-3 px-6 text-lg font-medium ${activeTab === 'designs' ? 'text-black border-b-2 border-red-400' : 'text-black hover:text-black'
+              } focus:outline-none`}
             onClick={() => setActiveTab('designs')}
           >
             DISEÑOS
           </button>
           <button
-            className={`py-3 px-6 text-lg font-medium ${
-              activeTab === 'orders' ? 'text-black border-b-2 border-red-400' : 'text-black hover:text-black'
-            } focus:outline-none`}
+            className={`py-3 px-6 text-lg font-medium ${activeTab === 'orders' ? 'text-black border-b-2 border-red-400' : 'text-black hover:text-black'
+              } focus:outline-none`}
             onClick={() => setActiveTab('orders')}
           >
             PEDIDOS
           </button>
           <button
-            className={`py-3 px-6 text-lg font-medium ${
-              activeTab === 'payments' ? 'text-black border-b-2 border-red-400' : 'text-black hover:text-black'
-            } focus:outline-none`}
+            className={`py-3 px-6 text-lg font-medium ${activeTab === 'payments' ? 'text-black border-b-2 border-red-400' : 'text-black hover:text-black'
+              } focus:outline-none`}
             onClick={() => setActiveTab('payments')}
           >
             PAGOS
@@ -289,7 +286,7 @@ function ProfileContent({ userId, initialUser, initialDesigns, initialPayments }
             <>
               <div className="flex justify-center mb-4">
                 <BotonGeneral onClick={handleAddDesign} className="bg-black rounded-full p-2">
-                <img src="/icons/icono +.svg" alt="Agregar" className="w-8 h-8" />
+                  <img src="/icons/icono +.svg" alt="Agregar" className="w-8 h-8" />
                 </BotonGeneral>
               </div>
               {userDesigns.length === 0 ? (

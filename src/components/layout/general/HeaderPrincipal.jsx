@@ -14,7 +14,7 @@ import PendingPaymentsSummary from '@/components/common/PendingPaymentsSummary';
 export default function HeaderPrincipal() {
     // --- HOOKS Y ESTADO ---
     const { data: session } = useSession();
-    const { cartItems, fetchCart, removeItem } = useCart();
+    const { cartItems, fetchCart, removeItem, cartError } = useCart();
     
     // Estados para la lógica visual (del Código 2)
     const [isScrolled, setIsScrolled] = useState(false);
@@ -48,7 +48,10 @@ export default function HeaderPrincipal() {
     // --- HANDLERS ---
     const handleUserIconClick = () => setIsDropdownOpen(!isDropdownOpen);
     const handleCartIconClick = async () => {
-        await fetchCart();
+        // Solo cargar el carrito si el modal se va a abrir y no hay ítems cargados o hay un error de carga
+        if (!showCartModal && (cartItems.length === 0 || cartError)) {
+            await fetchCart();
+        }
         setShowCartModal(!showCartModal);
     };
 

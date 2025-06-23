@@ -42,7 +42,7 @@ export default function HeroSection() {
           </motion.p>
           
           <motion.div
-            className="mt-8"
+            className="mt-8 text-black"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.5, ease: 'easeOut' }}

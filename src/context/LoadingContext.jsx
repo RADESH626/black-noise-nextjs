@@ -6,15 +6,7 @@ import Loader from '@/components/Loader';
 const LoadingContext = createContext();
 
 export const LoadingProvider = ({ children }) => {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2500); // Duración del loader, similar al del index
-
-    return () => clearTimeout(timer);
-  }, []);
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <LoadingContext.Provider value={{ isLoading, setIsLoading }}>

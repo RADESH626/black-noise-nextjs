@@ -22,7 +22,7 @@ const CartModal = ({ cartItems, onClose, isOpen, onRemoveItem }) => {
 
       <div className="mt-4 px-4 pb-2">
         <Link href="/carrito">
-          <BotonGeneral variant="secondary" className="w-full py-2">
+          <BotonGeneral  className="w-full py-2 bg-black text-white">
             Ir al Carrito
           </BotonGeneral>
         </Link>

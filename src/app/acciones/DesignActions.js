@@ -352,3 +352,4 @@ export async function eliminarDesign(id) {
         return { success: false, message: 'Error al eliminar el diseño: ' + error.message };
     }
 }
+

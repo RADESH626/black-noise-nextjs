@@ -102,6 +102,7 @@ async function updateEstadoPedido(pedidoId, newEstado) {
     pedido.estadoPedido = newEstado;
     if (newEstado === EstadoPedido.CANCELADO) {
       pedido.proveedorId = null;
+      pedido.fecha_cancelacion = new Date(); // Establecer la fecha de cancelación
     }
     await pedido.save();
 

@@ -35,7 +35,7 @@ export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId)
             return { success: false, message: 'Pedido no encontrado o no pertenece a este proveedor.' };
         }
 
-        logger.debug('Orders retrieved for supplier ID:', proveedorId, 'count:', pedidos.length);
+        // logger.debug('Orders retrieved for supplier ID:', proveedorId, 'count:', pedidos.length);
         
         // Convert to plain JavaScript objects, ensuring ObjectIds are strings
         const processedPedidos = pedidos.map(p => {

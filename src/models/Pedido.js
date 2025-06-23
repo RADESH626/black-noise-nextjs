@@ -101,10 +101,6 @@ const PedidoSchema = new Schema({
     fecha_cancelacion: {
         type: Date,
         required: false
-    },
-    cancellationDate: {
-        type: Date,
-        required: false
     }
 }, {
     timestamps: true

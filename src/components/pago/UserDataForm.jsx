@@ -150,8 +150,7 @@ export default function UserDataForm({ onUserDataChange }) {
           <BotonGeneral
             type="button"
             onClick={handleAutoFillAddress}
-            variant="info"
-            className="mt-2 w-full py-2"
+            className="mt-2 w-full py-2 bg-black text-white"
           >
             Rellenar dirección
           </BotonGeneral>
