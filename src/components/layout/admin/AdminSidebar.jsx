@@ -10,12 +10,12 @@ function AdminSidebar() { // Remove activeDashboard, onSelectDashboard props
   const router = useRouter(); // Initialize useRouter
 
   const navItems = [
-    { id: 'inicio', label: 'Inicio', icon: '/icons/icono-casa.svg', needsInvert: true, href: '/admin' }, // Link to /admin for home
-    { id: 'usuarios', label: 'Usuarios', icon: '/icons/icono-persona.svg', needsInvert: true, href: '/admin/users' }, // Assuming /admin/users for users
+    { id: 'inicio', label: 'Inicio', icon: '/icons/icono Home2.svg', needsInvert: true, href: '/admin' }, // Link to /admin for home
+    { id: 'usuarios', label: 'Usuarios', icon: '/icons/icono User2.svg', needsInvert: true, href: '/admin/users' }, // Assuming /admin/users for users
     { id: 'designs', label: 'Diseños', icon: '/icons/icono-editar.svg', href: '/admin/designs' }, // Assuming /admin/designs for designs
-    { id: 'proveedores', label: 'Proveedores', icon: '/icons/icono-persona+.svg', needsInvert: true, href: '/admin/proveedores' }, // Link to /admin/proveedores
-    { id: 'pedidos', label: 'Pedidos', icon: '/icons/icono-carrito.svg', needsInvert: true, href: '/admin/pedidos' }, // Assuming /admin/pedidos for orders
-    { id: 'ventas', label: 'Ventas', icon: '/icons/icono-bolsa.svg', needsInvert: true, href: '/admin/ventas' }, // Assuming /admin/ventas for sales
+    { id: 'proveedores', label: 'Proveedores', icon: '/icons/icono User3.svg', needsInvert: true, href: '/admin/proveedores' }, // Link to /admin/proveedores
+    { id: 'pedidos', label: 'Pedidos', icon: '/icons/icono Carrito2.svg', needsInvert: true, href: '/admin/pedidos' }, // Assuming /admin/pedidos for orders
+    { id: 'ventas', label: 'Ventas', icon: '/icons/icono Venta2.svg', needsInvert: true, href: '/admin/ventas' }, // Assuming /admin/ventas for sales
     { id: 'pagos', label: 'Pagos', icon: '/icons/icono-paypal.svg', href: '/admin/pagos' } // Assuming /admin/pagos for payments
   ];
 
