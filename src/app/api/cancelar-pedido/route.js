@@ -1,11 +1,6 @@
 import { NextResponse } from 'next/server';
-<<<<<<< HEAD
-import { getServerSession } from "next-auth/next";
-import { authOptions } from '@/utils/authOptions';
-=======
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/utils/authUtils';
->>>>>>> 3e80d3dff3bd75024d5966227a4b9c47f3a64375
 import { sendEmail } from '@/utils/nodemailer';
 import connectDB from '@/utils/DBconection';
 import getPedidoModel from '@/models/Pedido';
