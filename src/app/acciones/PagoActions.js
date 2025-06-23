@@ -42,13 +42,17 @@ async function guardarPago(data) {
     }
 }
 
-// Obtener todos los pagos
-async function obtenerPagos() {
-    logger.debug('Entering obtenerPagos.');
+// Obtener todos los pagos con paginación
+async function obtenerPagos(page = 1, limit = 10) {
+    logger.debug(`Entering obtenerPagos with page: ${page}, limit: ${limit}.`);
     try {
         await connectDB();
         logger.debug('Database connected for obtenerPagos.');
         const Pago = await getModel('Pago');
+
+        const skip = (page - 1) * limit;
+        const totalPagos = await Pago.countDocuments({});
+
         const pagos = await Pago.find({})
             .populate('usuarioId', 'Nombre primerApellido correo') // Popula algunos campos de Usuario
             .populate('ventaId', '_id') // Popula el ID de Venta
@@ -56,6 +60,8 @@ async function obtenerPagos() {
                 path: 'pedidoId',
                 select: 'metodoEntrega', // Popula solo el campo metodoEntrega del Pedido
             })
+            .skip(skip)
+            .limit(limit)
             .lean();
 
         const formattedPagos = pagos.map(pago => ({
@@ -73,7 +79,12 @@ async function obtenerPagos() {
         }));
 
         logger.debug('Payments retrieved from DB and formatted:', formattedPagos.length, 'payments found.');
-        return { pagos: JSON.parse(JSON.stringify(formattedPagos)) };
+        return {
+            pagos: JSON.parse(JSON.stringify(formattedPagos)),
+            totalPagos,
+            currentPage: page,
+            totalPages: Math.ceil(totalPagos / limit)
+        };
     } catch (error) {
         logger.error('ERROR in obtenerPagos:', error);
         return { error: 'Error al obtener los pagos: ' + error.message };
