@@ -181,7 +181,7 @@ const PedidosContent = () => {
             checked={showCancelled}
             onChange={() => setShowCancelled(!showCancelled)}
           />
-          <div className="relative w-11 h-6 bg-gray-700 rounded-full peer dark:bg-gray-600 peer-checked:bg-purple-600
+          <div className="relative w-11 h-6 bg-gray-700 rounded-full peer dark:bg-gray-600 peer-checked:bg-red -500
             peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:content-[''] after:absolute
             after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full
             after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:after:border-white"></div>
@@ -397,7 +397,7 @@ const PedidosContent = () => {
       )}
 
       <hr className="border-white my-6" />
-      <div className="text-sm bg-[#1f2937] p-4 rounded-md">
+      <div className="text-sm  pbg-[#f5f5f5]-4 rounded-md">
         <p className="font-semibold mb-2">RESUMEN DE PEDIDOS:</p>
         <p><span className="font-bold">Total de Pedidos:</span> {filteredPedidos.length}</p>
       </div>

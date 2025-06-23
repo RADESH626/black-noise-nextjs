@@ -13,6 +13,7 @@ import { transporter } from '@/utils/nodemailer'; // Import the centralized tran
 import { toPlainObject } from '@/utils/dbUtils'; // Import toPlainObject
 
 export async function crearProveedor(prevState, formData) {
+  const Proveedor = await getProveedorModel();
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.rol !== Rol.ADMINISTRADOR) {
@@ -121,6 +122,7 @@ export async function crearProveedor(prevState, formData) {
 }
 
 export async function generarYGuardarAccessKey(proveedorId, newAccessKey) {
+  const Proveedor = await getProveedorModel();
   await connectDB();
   try {
     const hashedPassword = await bcrypt.hash(newAccessKey, 10);
@@ -143,6 +145,7 @@ export async function generarYGuardarAccessKey(proveedorId, newAccessKey) {
 }
 
 export async function actualizarProveedor(prevState, formData) {
+  const Proveedor = await getProveedorModel();
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.rol !== Rol.ADMINISTRADOR) {
@@ -210,6 +213,7 @@ export async function actualizarProveedor(prevState, formData) {
 }
 
 export async function obtenerProveedoresHabilitados() {
+  const Proveedor = await getProveedorModel();
   await connectDB();
   const Proveedor = await getProveedorModel(); // Get the Proveedor model
   try {
@@ -230,6 +234,7 @@ export async function obtenerProveedores() {
   await connectDB();
   const Proveedor = await getProveedorModel(); // Get the Proveedor model
   try {
+    const Proveedor = await getProveedorModel();
     const proveedores = await Proveedor.find({}).lean();
     return {
       proveedores: proveedores.map(p => ({
@@ -248,6 +253,7 @@ export async function obtenerProveedores() {
 }
 
 export async function obtenerProveedorPorId(id) {
+  const Proveedor = await getProveedorModel();
   await connectDB();
   const Proveedor = await getProveedorModel(); // Get the Proveedor model
   try {
@@ -271,6 +277,7 @@ export async function obtenerProveedorPorId(id) {
 }
 
 export async function eliminarProveedor(prevState, formData) {
+  const Proveedor = await getProveedorModel();
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.rol !== Rol.ADMINISTRADOR) {
@@ -294,6 +301,7 @@ export async function eliminarProveedor(prevState, formData) {
 }
 
 export async function obtenerMiPerfilProveedor() {
+  const Proveedor = await getProveedorModel();
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user || !session.user.email) {

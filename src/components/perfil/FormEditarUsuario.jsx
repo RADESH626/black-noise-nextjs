@@ -82,6 +82,7 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
   };
 
   return (
+<<<<<<< HEAD
     <form action={handleSubmit} className="space-y-5 text-white">
       {/* Profile Image Preview */}
       <div className="flex flex-col items-center mb-6">
@@ -107,6 +108,9 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
         />
       </div>
 
+=======
+    <form action={formAction} className="space-y-5 text-black">
+>>>>>>> 1cc0e2d11c37ca9224227ba539311bff346a2518
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
           <label htmlFor="tipoDocumento" className="block mb-1 text-sm font-medium text-white">
