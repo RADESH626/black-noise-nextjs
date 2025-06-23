@@ -11,11 +11,54 @@ import Proveedor from '@/models/Proveedor';
 import { toPlainObject } from '@/utils/dbUtils';
 import { Disponibilidad } from '@/models/enums/proveedor/Disponibilidad';
 
-async function obtenerPedidos() {
+async function obtenerPedidos(filters = {}) {
   try {
     await dbConnect();
     const PedidoModel = await getModel("Pedido");
-    const pedidos = await PedidoModel.find({}).lean();
+
+    const { searchText, startDate, endDate, estadoPedido, proveedorId } = filters;
+    const query = {};
+
+    if (searchText) {
+      // Buscar por ID de pedido, o por nombre/email de usuario (requiere populate)
+      // Para buscar por nombre/email de usuario, primero obtenemos los IDs de usuario que coinciden
+      const UsuarioModel = await getModel('Usuario');
+      const matchingUsers = await UsuarioModel.find({
+        $or: [
+          { Nombre: { $regex: searchText, $options: 'i' } },
+          { primerApellido: { $regex: searchText, $options: 'i' } },
+          { correo: { $regex: searchText, $options: 'i' } },
+        ]
+      }).select('_id').lean();
+      const matchingUserIds = matchingUsers.map(user => user._id);
+
+      query.$or = [
+        { _id: { $regex: searchText, $options: 'i' } }, // Buscar por ID de pedido
+        { userId: { $in: matchingUserIds } } // Buscar por IDs de usuario coincidentes
+      ];
+    }
+
+    if (startDate || endDate) {
+      query.createdAt = {};
+      if (startDate) {
+        query.createdAt.$gte = new Date(startDate);
+      }
+      if (endDate) {
+        const endOfDay = new Date(endDate);
+        endOfDay.setHours(23, 59, 59, 999); // Set to end of the day
+        query.createdAt.$lte = endOfDay;
+      }
+    }
+
+    if (estadoPedido) {
+      query.estadoPedido = estadoPedido;
+    }
+
+    if (proveedorId) {
+      query.proveedorId = proveedorId;
+    }
+
+    const pedidos = await PedidoModel.find(query).lean();
 
     const pedidosConUsuario = await Promise.all(
       pedidos.map(async (pedido) => {

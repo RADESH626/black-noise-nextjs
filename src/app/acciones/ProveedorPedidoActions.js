@@ -7,39 +7,74 @@ import { toPlainObject } from '@/utils/dbUtils';
 import { revalidatePath } from 'next/cache'; // Importar revalidatePath
 import mongoose from 'mongoose'; // Importar mongoose
 
-export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId) {
-    logger.debug('Entering obtenerPedidosPorProveedorId with pedidoId:', pedidoId, 'proveedorId:', proveedorId);
+export async function obtenerPedidosPorProveedorId(filters = {}) {
+    logger.debug('Entering obtenerPedidosPorProveedorId with filters:', filters);
     try {
         await connectDB();
         logger.debug('Database connected for obtenerPedidosPorProveedorId.');
 
+        const { pedidoId, proveedorId, searchText, startDate, endDate, estadoPedido } = filters;
+
         if (!proveedorId) {
             return { success: false, message: "ID de proveedor es requerido." };
         }
+
         const Pedido = await getModel('Pedido');
-        // Convertir proveedorId a ObjectId de Mongoose
+        const UsuarioModel = await getModel('Usuario');
+
         const objectIdProveedorId = new mongoose.Types.ObjectId(proveedorId);
         let query = { proveedorId: objectIdProveedorId };
+
         if (pedidoId) {
             query._id = pedidoId;
         }
 
+        if (searchText) {
+            // Buscar por ID de pedido, o por nombre/email de usuario (requiere populate)
+            const matchingUsers = await UsuarioModel.find({
+                $or: [
+                    { Nombre: { $regex: searchText, $options: 'i' } },
+                    { primerApellido: { $regex: searchText, $options: 'i' } },
+                    { correo: { $regex: searchText, $options: 'i' } },
+                ]
+            }).select('_id').lean();
+            const matchingUserIds = matchingUsers.map(user => user._id);
+
+            query.$or = [
+                { _id: { $regex: searchText, $options: 'i' } }, // Buscar por ID de pedido
+                { userId: { $in: matchingUserIds } } // Buscar por IDs de usuario coincidentes
+            ];
+        }
+
+        if (startDate || endDate) {
+            query.createdAt = {};
+            if (startDate) {
+                query.createdAt.$gte = new Date(startDate);
+            }
+            if (endDate) {
+                const endOfDay = new Date(endDate);
+                endOfDay.setHours(23, 59, 59, 999); // Set to end of the day
+                query.createdAt.$lte = endOfDay;
+            }
+        }
+
+        if (estadoPedido) {
+            query.estadoPedido = estadoPedido;
+        }
+
         const pedidos = await Pedido.find(query)
-            .populate('items.designId', 'nombreDesing imageData imageMimeType categoria valorDesing descripcion') // Popula nombre, datos binarios, tipo MIME, categoría, valor y descripción de los diseños dentro de items
-            .populate('proveedorId', 'nombreEmpresa emailContacto') // Popula algunos campos de Proveedor
-            .populate('userId', 'Nombre direccion') // Popula el nombre y la dirección del usuario
+            .populate('items.designId', 'nombreDesing imageData imageMimeType categoria valorDesing descripcion')
+            .populate('proveedorId', 'nombreEmpresa emailContacto')
+            .populate('userId', 'Nombre direccion')
             .lean();
 
         if (pedidoId && pedidos.length === 0) {
             logger.debug('Specific order not found for supplier or does not belong to supplier.');
             return { success: false, message: 'Pedido no encontrado o no pertenece a este proveedor.' };
         }
-
-        // logger.debug('Orders retrieved for supplier ID:', proveedorId, 'count:', pedidos.length);
         
-        // Convert to plain JavaScript objects, ensuring ObjectIds are strings
         const processedPedidos = pedidos.map(p => {
-            const tempPedido = { ...p }; // Crear una copia mutable
+            const tempPedido = { ...p };
             if (tempPedido.items && Array.isArray(tempPedido.items)) {
                 tempPedido.items = tempPedido.items.map(item => {
                     if (item.designId) {
@@ -47,14 +82,13 @@ export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId)
                             ? `data:${item.designId.imageMimeType};base64,${item.designId.imageData.buffer.toString('base64')}`
                             : null;
                         
-                        // Crear un nuevo objeto designId con la propiedad 'imagen' y sin imageData/imageMimeType
                         const newDesignId = {
                             _id: item.designId._id,
                             nombreDesing: item.designId.nombreDesing,
                             valorDesing: item.designId.valorDesing,
                             categoria: item.designId.categoria,
                             descripcion: item.designId.descripcion,
-                            imagen: imageUrl, // La imagen como base64
+                            imagen: imageUrl,
                         };
 
                         return { 
@@ -65,14 +99,12 @@ export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId)
                     return item;
                 });
             }
-            return toPlainObject(tempPedido); // Convertir a objeto plano al final
+            return toPlainObject(tempPedido);
         });
 
-        // If a specific pedidoId was requested, return the single pedido object
         if (pedidoId) {
             return { success: true, pedido: processedPedidos[0] };
         } else {
-            // Otherwise, return the array of all orders for the supplier
             return { success: true, pedidos: processedPedidos };
         }
     } catch (error) {
@@ -80,10 +112,9 @@ export async function obtenerPedidosPorProveedorId(pedidoId = null, proveedorId)
         if (error.message.includes('ECONNRESET')) {
             logger.warn('ECONNRESET error detected, attempting to reconnect...');
             try {
-                await connectDB(); // Attempt to reconnect
+                await connectDB();
                 logger.info('Database reconnected successfully.');
-                // Retry the query
-                return obtenerPedidosPorProveedorId(pedidoId, proveedorId);
+                return obtenerPedidosPorProveedorId(filters);
             } catch (reconnectError) {
                 logger.error('Failed to reconnect to database:', reconnectError);
                 return { success: false, message: 'Error al obtener los pedidos del proveedor tras intentar reconectar: ' + reconnectError.message };

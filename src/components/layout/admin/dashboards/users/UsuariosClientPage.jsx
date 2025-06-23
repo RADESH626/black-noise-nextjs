@@ -8,7 +8,6 @@ import THUsuarios from '@/components/layout/admin/usuarios/THUsuarios';
 import Image from 'next/image';
 import Link from 'next/link';
 import BotonEditar from '@/components/common/botones/BotonEditar';
-import FormBuscarUsuario from '@/components/layout/admin/usuarios/forms/FormBuscarUsuario';
 import ModalAgregarUsuario from '@/components/common/modales/ModalAgregarUsuario';
 import ModalEditarUsuario from '@/components/layout/admin/usuarios/modals/ModalEditarUsuario'; // Import ModalEditarUsuario
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
@@ -16,6 +15,8 @@ import Loader from '@/components/Loader';
 import { useDialog } from '@/context/DialogContext';
 import { useActionState } from 'react'; // For React 19
 import { useFormStatus } from 'react-dom'; // For React 19
+import FilterBar from '@/components/common/FilterBar'; // Import FilterBar
+import BotonExportarPDF from '@/components/common/botones/BotonExportarPDF'; // Import BotonExportarPDF
 
 // Utility function for date formatting
 const formatDate = (dateString) => {
@@ -62,12 +63,13 @@ export default function UsuariosClientPage({ initialUsers }) {
   const [showAddUserModal, setShowAddUserModal] = useState(false);
   const [showEditUserModal, setShowEditUserModal] = useState(false); // State for edit user modal
   const [userToEdit, setUserToEdit] = useState(null); // State to hold user data for editing
+  const [filters, setFilters] = useState({}); // State for filters
   const { showPopUp } = useDialog();
 
-  const fetchAndSetUsers = useCallback(async () => {
+  const fetchAndSetUsers = useCallback(async (currentFilters) => {
     setLoading(true);
     try {
-      const result = await ObtenerTodosLosUsuarios();
+      const result = await ObtenerTodosLosUsuarios(currentFilters); // Pass filters to the server action
       if (result && result.users && Array.isArray(result.users)) {
         setUsers(result.users);
       } else {
@@ -83,16 +85,12 @@ export default function UsuariosClientPage({ initialUsers }) {
   }, []);
 
   useEffect(() => {
-    if (!initialUsers || initialUsers.length === 0) {
-      fetchAndSetUsers();
-    } else {
-      setUsers(initialUsers);
-    }
-  }, [initialUsers, fetchAndSetUsers]);
+    // Initial fetch with current filters
+    fetchAndSetUsers(filters);
+  }, [filters, fetchAndSetUsers]); // Re-fetch when filters change
 
-  const handleSearchSuccess = (filteredUsers) => {
-    setUsers(filteredUsers);
-    setError(null); // Clear any previous errors
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
   };
 
   const handleToggleUserStatus = async (userId, currentStatus) => {
@@ -101,8 +99,8 @@ export default function UsuariosClientPage({ initialUsers }) {
       const result = await toggleUsuarioHabilitado(userId, !currentStatus);
       if (result.success) {
         showPopUp(result.message, 'success');
-        // Re-fetch users to get the updated status
-        fetchAndSetUsers();
+        // Re-fetch users to get the updated status with current filters
+        fetchAndSetUsers(filters);
       } else {
         showPopUp(result.message, 'error');
       }
@@ -113,6 +111,26 @@ export default function UsuariosClientPage({ initialUsers }) {
       setLoading(false);
     }
   };
+
+  // PDF Export Mappers
+  const userTableHeaders = [
+    'Tipo Doc.', 'N° Doc.', 'P. Nombre', 'P. Apellido', 'F. Nacimiento', 'Género', 'Teléfono', 'Dirección',
+    'Correo', 'Rol', 'Estado'
+  ];
+
+  const userTableBodyMapper = (user) => [
+    user.tipoDocumento || 'N/A',
+    user.numeroDocumento || 'N/A',
+    user.primerNombre || 'N/A',
+    user.primerApellido || 'N/A',
+    user.fechaNacimiento ? new Date(user.fechaNacimiento).toLocaleDateString() : 'N/A',
+    user.genero || 'N/A',
+    user.numeroTelefono || 'N/A',
+    user.direccion || 'N/A',
+    user.correo || 'N/A',
+    user.rol || 'N/A',
+    user.habilitado ? "Habilitado" : "Deshabilitado"
+  ];
 
   if (loading && users.length === 0) { // Only show full loading if no users are displayed yet
     return <Loader />;
@@ -126,13 +144,19 @@ export default function UsuariosClientPage({ initialUsers }) {
     <div>
       <div className="flex justify-between items-center mb-4">
         <h4 className='font-bold text-2xl text-black'>Gestión de Usuarios</h4>
-        <BotonGeneral onClick={() => setShowAddUserModal(true)}>
-          Agregar Usuario
-        </BotonGeneral>
+        <div className="flex gap-2">
+            <BotonGeneral onClick={() => setShowAddUserModal(true)}>
+              Agregar Usuario
+            </BotonGeneral>
+            <BotonExportarPDF 
+                data={users} 
+                reportTitle="Reporte de Usuarios" 
+                tableHeaders={userTableHeaders} 
+                tableBodyMapper={userTableBodyMapper} 
+            />
+        </div>
       </div>
-      <div className="my-4 p-4 bg-gray-800 rounded-lg shadow-md">
-        <FormBuscarUsuario onSearchSuccess={handleSearchSuccess} />
-      </div>
+      <FilterBar onFilterChange={handleFilterChange} initialFilters={filters} />
 
 
       {users.length > 0 ? (

@@ -231,52 +231,6 @@ async function enviarCorreoElectronico(to, subject, html) {
     }
 }
 
-//obtener usuarios de la base de datos
-async function obtenerUsuarios() {
-    try {
-        await connectDB();
-
-const UsuarioModel = await getModel('Usuario');
-        const usuarios = await UsuarioModel.find({}).lean();
-        const plainUsers = usuarios.map(user => {
-            const plainUser = toPlainObject(user);
-            if (plainUser.imageData && plainUser.imageMimeType) {
-                plainUser.profileImageUrl = `/api/images/usuario/${plainUser._id}`;
-            } else {
-                plainUser.profileImageUrl = '/img/perfil/FotoPerfil.webp';
-            }
-            return plainUser;
-        });
-        
-        return { usuarios: plainUsers };
-
-    } catch (error) {
-        return handleError(error, 'Error al obtener usuarios');
-    }
-}
-
-//obtener usuarios habilitados de la base de datos
-async function obtenerUsuariosHabilitados() {
-    try {
-        await connectDB();
-const UsuarioModel = await getModel('Usuario');
-        const usuarios = await UsuarioModel.find({ habilitado: true }).lean();
-        const plainUsers = usuarios.map(user => {
-            const plainUser = toPlainObject(user);
-            if (plainUser.imageData && plainUser.imageMimeType) {
-                plainUser.profileImageUrl = `/api/images/usuario/${plainUser._id}`;
-            } else {
-                plainUser.profileImageUrl = '/img/perfil/FotoPerfil.webp';
-            }
-            return plainUser;
-        });
-        
-        return { users: plainUsers };
-
-    } catch (error) {
-        return handleError(error, 'Error al obtener usuarios habilitados');
-    }
-}
 
 //obtener usuario por id
 async function ObtenerUsuarioPorId(id) {
@@ -480,25 +434,20 @@ async function RegistroMasivoUsuario(formData) {
 }
 
 // Función para filtrar usuarios
-async function FiltrarUsuarios(prevState, formData) {
+async function FiltrarUsuarios(filters = {}) {
     try {
-        const textoBusqueda = formData.get('textoBusqueda');
-        const rol = formData.get('rol');
-        const genero = formData.get('generoFiltro');
-        const tipoDocumento = formData.get('tipoDocumentoFiltro');
-        const edad = formData.get('edadFiltro');
-        const incluirDeshabilitados = formData.get('incluirDeshabilitados') === 'true';
+        const { searchText, rol, genero, tipoDocumento, edad, incluirDeshabilitados, startDate, endDate } = filters;
 
         await connectDB();
 
         const query = {};
 
-        if (textoBusqueda) {
+        if (searchText) {
             query.$or = [
-                { primerNombre: { $regex: textoBusqueda, $options: 'i' } },
-                { primerApellido: { $regex: textoBusqueda, $options: 'i' } },
-                { correo: { $regex: textoBusqueda, $options: 'i' } },
-                { numeroDocumento: { $regex: textoBusqueda, $options: 'i' } },
+                { primerNombre: { $regex: searchText, $options: 'i' } },
+                { primerApellido: { $regex: searchText, $options: 'i' } },
+                { correo: { $regex: searchText, $options: 'i' } },
+                { numeroDocumento: { $regex: searchText, $options: 'i' } },
             ];
         }
 
@@ -510,35 +459,55 @@ async function FiltrarUsuarios(prevState, formData) {
             const currentYear = new Date().getFullYear();
             let minBirthYear, maxBirthYear;
 
-            if (edad.includes('-')) {
-                const [minAge, maxAge] = edad.split('-').map(Number);
+            if (String(edad).includes('-')) {
+                const [minAge, maxAge] = String(edad).split('-').map(Number);
                 maxBirthYear = currentYear - minAge;
                 minBirthYear = currentYear - maxAge;
-            } else if (edad.includes('+')) {
-                const minAge = parseInt(edad.replace('+', ''));
+            } else if (String(edad).includes('+')) {
+                const minAge = parseInt(String(edad).replace('+', ''));
                 maxBirthYear = currentYear - minAge;
                 minBirthYear = 0;
             } else {
-                const exactAge = parseInt(edad);
+                const exactAge = parseInt(String(edad));
                 maxBirthYear = currentYear - exactAge;
                 minBirthYear = currentYear - exactAge;
             }
 
-            const startDate = new Date(minBirthYear, 0, 1);
-            const endDate = new Date(maxBirthYear + 1, 0, 1);
+            const birthStartDate = new Date(minBirthYear, 0, 1);
+            const birthEndDate = new Date(maxBirthYear + 1, 0, 1);
 
-            query.fechaNacimiento = { $gte: startDate, $lt: endDate };
+            query.fechaNacimiento = { $gte: birthStartDate, $lt: birthEndDate };
+        }
+
+        if (startDate || endDate) {
+            query.createdAt = {};
+            if (startDate) {
+                query.createdAt.$gte = new Date(startDate);
+            }
+            if (endDate) {
+                const endOfDay = new Date(endDate);
+                endOfDay.setHours(23, 59, 59, 999); // Set to end of the day
+                query.createdAt.$lte = endOfDay;
+            }
         }
 
         if (!incluirDeshabilitados) {
             query.habilitado = true;
         }
 
-const UsuarioModel = await getModel('Usuario');
+        const UsuarioModel = await getModel('Usuario');
         const usuariosEncontradosRaw = await UsuarioModel.find(query).lean();
-        const usuariosEncontrados = usuariosEncontradosRaw.map(toPlainObject);
+        const usuariosEncontrados = usuariosEncontradosRaw.map(user => {
+            const plainUser = toPlainObject(user);
+            if (plainUser.imageData && plainUser.imageMimeType) {
+                plainUser.profileImageUrl = `/api/images/usuario/${plainUser._id}`;
+            } else {
+                plainUser.profileImageUrl = '/img/perfil/FotoPerfil.webp';
+            }
+            return plainUser;
+        });
 
-        return { data: usuariosEncontrados, message: "Búsqueda completada.", success: true };
+        return { users: usuariosEncontrados, message: "Búsqueda completada.", success: true };
     } catch (error) {
         return handleError(error, 'Error al filtrar usuarios');
     }
@@ -633,31 +602,18 @@ async function EditarUsuario(id, formData) {
     }
 }
 
-export async function ObtenerTodosLosUsuarios() {
-    try {
-        await connectDB();
-const UsuarioModel = await getModel('Usuario');
-        const usuarios = await UsuarioModel.find({}).lean();
-
-        const plainUsers = usuarios.map(toPlainObject);
-
-        return { users: plainUsers, success: true };
-
-    } catch (error) {
-        return handleError(error, 'Error al obtener todos los usuarios');
-    }
+export async function ObtenerTodosLosUsuarios(filters = {}) {
+    return await FiltrarUsuarios(filters);
 }
 
 export {
     RegistrarUsuario,
-    obtenerUsuarios,
     RegistroMasivoUsuario,
     ObtenerUsuarioPorId,
     ObtenerUsuarioPorCorreo,
     FiltrarUsuarios,
     toggleUsuarioHabilitado,
     EditarUsuario,
-    obtenerUsuariosHabilitados,
 };
 
 // Server Action para manejar el registro de usuario

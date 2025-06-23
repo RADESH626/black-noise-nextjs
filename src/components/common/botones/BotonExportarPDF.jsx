@@ -3,10 +3,10 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { BotonAccion } from './BotonAccion'; // Importar BotonAccion
 
-function BotonExportarPDF({ usuarios = [], ...props }) {
+function BotonExportarPDF({ data = [], reportTitle = "Reporte", tableHeaders = [], tableBodyMapper = () => [], ...props }) {
     const handleExportPDF = () => {
-        if (!usuarios || usuarios.length === 0) {
-            alert("No hay usuarios para exportar.");
+        if (!data || data.length === 0) {
+            alert(`No hay ${reportTitle.toLowerCase()} para exportar.`);
             return;
         }
 
@@ -14,84 +14,25 @@ function BotonExportarPDF({ usuarios = [], ...props }) {
 
         // Titulo
         doc.setFontSize(18);
-        doc.text("Reporte de Usuarios", 14, 22);
+        doc.text(reportTitle, 14, 22);
 
-        // Calcular Métricas
-        const generos = usuarios.reduce((acc, user) => {
-            acc[user.genero] = (acc[user.genero] || 0) + 1;
-            return acc;
-        }, {});
-        const generoPredominante = Object.keys(generos).reduce((a, b) => generos[a] > generos[b] ? a : b, '');
-
-        const roles = usuarios.reduce((acc, user) => {
-            acc[user.rol] = (acc[user.rol] || 0) + 1;
-            return acc;
-        }, {});
-
-        // Contenido de Métricas
-        doc.setFontSize(12);
-        doc.text("Métricas Generales:", 14, 40);
-        let metricasY = 48;
-        doc.text(`- Número total de usuarios: ${usuarios.length}`, 14, metricasY);
-        metricasY += 8;
-        doc.text(`- Género predominante: ${generoPredominante || 'N/A'} (${generos[generoPredominante] || 0} usuarios)`, 14, metricasY);
-        metricasY += 8;
-        doc.text("- Usuarios por rol:", 14, metricasY);
-        metricasY += 6;
-        Object.entries(roles).forEach(([rol, count]) => {
-            doc.text(`  - ${rol}: ${count}`, 18, metricasY);
-            metricasY += 6;
-        });
-        
-        // Espacio antes de la tabla de usuarios
-        metricasY += 10;
-
-        // Espacio antes de la tabla de usuarios
-        metricasY += 10;
-
-        // Definir columnas y filas para la tabla de usuarios
-        const head = [[
-            'Tipo Doc.', 'N° Doc.', 'P. Nombre', 'P. Apellido', 'F. Nacimiento', 'Género', 'Teléfono', 'Dirección',
-            'Correo', 'Rol', 'Estado'
-        ]];
-
-        const body = usuarios.map(user => [
-            user.tipoDocumento || 'N/A',
-            user.numeroDocumento || 'N/A',
-            user.primerNombre || 'N/A',
-            user.primerApellido || 'N/A',
-            user.fechaNacimiento ? new Date(user.fechaNacimiento).toLocaleDateString() : 'N/A',
-            user.genero || 'N/A',
-            user.numeroTelefono || 'N/A',
-            user.direccion || 'N/A',
-            user.correo || 'N/A',
-            user.rol || 'N/A',
-            user.habilitado ? "Habilitado" : "Deshabilitado"
-        ]);
+        // Definir columnas y filas para la tabla
+        const head = [tableHeaders];
+        const body = data.map(tableBodyMapper);
 
         autoTable(doc, {
-            startY: metricasY,
+            startY: 30, // Ajustar startY ya que no hay métricas
             head: head,
             body: body,
             theme: 'striped',
             headStyles: { fillColor: [22, 160, 133], cellPadding: { top: 3, right: 2, bottom: 3, left: 2 } },
             styles: { fontSize: 7, cellPadding: { top: 3, right: 2, bottom: 3, left: 2 } },
-            columnStyles: {
-                0: { cellWidth: 9 },
-                1: { cellWidth: 18 },
-                2: { cellWidth: 15 },
-                3: { cellWidth: 16 },
-                4: { cellWidth: 16 },
-                5: { cellWidth: 19 },
-                6: { cellWidth: 18 },
-                7: { cellWidth: 18 },
-                8: { cellWidth: 18 },
-                9: { cellWidth: 20 },
-                10: { cellWidth: 20 }
-            }
+            // columnStyles will need to be passed dynamically or calculated based on tableHeaders length
+            // For now, remove specific columnStyles to avoid errors, or make them dynamic if needed.
+            // This will be handled by the calling component.
         });
 
-        doc.save('reporte_usuarios.pdf');
+        doc.save(`${reportTitle.toLowerCase().replace(/\s/g, '_')}.pdf`);
     };
 
     return (

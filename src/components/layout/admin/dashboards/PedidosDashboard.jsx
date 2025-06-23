@@ -1,17 +1,18 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import SeccionHeader from '../secciones/acciones/SeccionHeader';
 import { obtenerPedidos } from '@/app/acciones/PedidoActions';
 import Loader from '@/components/Loader';
+import FilterBar from '@/components/common/FilterBar'; // Import FilterBar
+import BotonExportarPDF from '@/components/common/botones/BotonExportarPDF'; // Import BotonExportarPDF
+import { EstadoPedido } from '@/models/enums/PedidoEnums'; // Import EstadoPedido
 
 export default function PedidosDashboard() {
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [filteredPedidos, setFilteredPedidos] = useState([]);
+  const [filters, setFilters] = useState({}); // State for filters
+  const [filteredPedidos, setFilteredPedidos] = useState([]); // Keep for client-side pagination/filtering if needed
 
   // Paginación
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,46 +31,43 @@ export default function PedidosDashboard() {
     if (currentPage > 1) setCurrentPage(prev => prev - 1);
   };
 
-  useEffect(() => {
-    const fetchPedidos = async () => {
-      setLoading(true);
-      setError(null);
-      const { pedidos: fetchedPedidos, error: fetchError } = await obtenerPedidos();
-      if (fetchError) {
-        setError({ message: fetchError });
-        setPedidos([]);
-      } else {
-        setPedidos(fetchedPedidos || []);
-      }
-      setLoading(false);
-    };
-
-    fetchPedidos();
+  const fetchAndSetPedidos = useCallback(async (currentFilters) => {
+    setLoading(true);
+    setError(null);
+    const { pedidos: fetchedPedidos, error: fetchError } = await obtenerPedidos(currentFilters);
+    if (fetchError) {
+      setError({ message: fetchError });
+      setPedidos([]);
+      setFilteredPedidos([]);
+    } else {
+      setPedidos(fetchedPedidos || []);
+      setFilteredPedidos(fetchedPedidos || []); // Initialize filteredPedidos with fetched data
+    }
+    setLoading(false);
+    setCurrentPage(1); // Reset to page 1 on new fetch
   }, []);
 
   useEffect(() => {
-    const filterPedidos = () => {
-      const filtered = pedidos.filter(pedido => {
-        const userEmail = pedido.userId?.email ? pedido.userId.email.toLowerCase() : '';
-        const pedidoId = pedido._id.toLowerCase();
-        const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    fetchAndSetPedidos(filters);
+  }, [filters, fetchAndSetPedidos]);
 
-        const matchesSearchTerm = userEmail.includes(lowerCaseSearchTerm) || pedidoId.includes(lowerCaseSearchTerm);
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+  };
 
-        const pedidoDate = new Date(pedido.createdAt);
-        const start = startDate ? new Date(startDate) : null;
-        const end = endDate ? new Date(endDate) : null;
+  // PDF Export Mappers
+  const pedidoTableHeaders = [
+    'ID Pedido', 'Nombre Usuario', 'Email Usuario', 'Valor Total', 'Estado Pedido', 'Fecha Pedido'
+  ];
 
-        const matchesDateRange = (!start || pedidoDate >= start) && (!end || pedidoDate <= end);
-
-        return matchesSearchTerm && matchesDateRange;
-      });
-      setFilteredPedidos(filtered);
-      setCurrentPage(1); // Reinicia a la página 1 en cada filtro
-    };
-
-    filterPedidos();
-  }, [pedidos, searchTerm, startDate, endDate]);
+  const pedidoTableBodyMapper = (pedido) => [
+    pedido._id || 'N/A',
+    pedido.userName || 'N/A',
+    pedido.userEmail || 'N/A',
+    `$${typeof pedido.total === 'number' ? pedido.total.toFixed(2) : '0.00'}`,
+    pedido.estadoPedido || 'N/A',
+    pedido.createdAt ? new Date(pedido.createdAt).toLocaleDateString() : 'N/A'
+  ];
 
   if (loading) {
     return <Loader />;
@@ -107,43 +105,38 @@ export default function PedidosDashboard() {
         <h4 className='font-bold text-2xl' style={{ color: '#000000' }}>Gestión de Pedidos</h4>
       </SeccionHeader>
 
-      <div className="mt-4 p-4 rounded-lg shadow-md flex flex-wrap gap-4" style={{ backgroundColor: '#FFFFFF' }}>
-        <input
-          type="text"
-          placeholder="Buscar por usuario o ID de pedido"
-          className="p-2 border rounded-md flex-grow"
-          style={{
-            borderColor: '#FFFFFFFF',
-            backgroundColor: '#272525FF',
-            color: '#FFFFFFFF'
-          }}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <input
-          type="date"
-          className="p-2 border rounded-md"
-          style={{
-            borderColor: '#000000FF',
-            backgroundColor: '#FFFFFFFF',
-            color: '#000000FF'
-          }}
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        />
-        <span className="self-center" style={{ color: '#000000FF' }}>-</span>
-        <input
-          type="date"
-          className="p-2 border rounded-md"
-          style={{
-            borderColor: '#000000FF',
-            backgroundColor: '#FFFFFF',
-            color: '#000000'
-          }}
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
+      <div className="flex justify-end mb-4">
+        <BotonExportarPDF 
+            data={filteredPedidos} 
+            reportTitle="Reporte de Pedidos" 
+            tableHeaders={pedidoTableHeaders} 
+            tableBodyMapper={pedidoTableBodyMapper} 
         />
       </div>
+      <FilterBar 
+        onFilterChange={handleFilterChange} 
+        initialFilters={filters} 
+        additionalFilters={[
+            {
+                name: "estadoPedido",
+                label: "Estado del Pedido:",
+                type: "select",
+                options: [
+                    { value: "", label: "Todos" },
+                    { value: EstadoPedido.PENDIENTE, label: "Pendiente" },
+                    { value: EstadoPedido.EN_FABRICACION, label: "En Fabricación" },
+                    { value: EstadoPedido.LISTO, label: "Listo" },
+                    { value: EstadoPedido.ENVIADO, label: "Enviado" },
+                    { value: EstadoPedido.ENTREGADO, label: "Entregado" },
+                    { value: EstadoPedido.CANCELADO, label: "Cancelado" },
+                    { value: EstadoPedido.SOLICITUD_DEVOLUCION, label: "Solicitud Devolución" },
+                    { value: EstadoPedido.DEVOLUCION_APROBADA, label: "Devolución Aprobada" },
+                    { value: EstadoPedido.DEVOLUCION_RECHAZADA, label: "Devolución Rechazada" },
+                    { value: EstadoPedido.DEVOLUCION_COMPLETADA, label: "Devolución Completada" },
+                ]
+            }
+        ]}
+      />
 
       <div className="overflow-x-auto rounded-lg shadow-md mt-4" style={{ backgroundColor: '#FFFFFF' }}>
         <table className="min-w-full divide-y" style={{ borderColor: '#FFFFFFFF' }}>

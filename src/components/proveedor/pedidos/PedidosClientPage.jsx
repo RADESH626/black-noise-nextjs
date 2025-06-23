@@ -3,15 +3,16 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-// import HeaderProveedor from "@/components/layout/proveedor/HeaderProveedor";
-import { actualizarPedidoPorProveedor } from "@/app/acciones/ProveedorPedidoActions";
+import { actualizarPedidoPorProveedor, obtenerPedidosPorProveedorId } from "@/app/acciones/ProveedorPedidoActions"; // Import obtenerPedidosPorProveedorId
 import { useDialog } from "@/context/DialogContext";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react"; // Import useCallback
 import Loader from '@/components/Loader';
-import { useQueryClient } from "@tanstack/react-query"; // Mantener si se usa para invalidar, aunque la carga inicial no use useQuery
+import { useQueryClient } from "@tanstack/react-query";
 import { EstadoPedido } from "@/models/enums/PedidoEnums";
 import { updateEstadoPedido } from "@/app/acciones/PedidoActions";
-import { motion } from "framer-motion"; // Import motion
+import { motion } from "framer-motion";
+import FilterBar from '@/components/common/FilterBar'; // Import FilterBar
+import BotonExportarPDF from '@/components/common/botones/BotonExportarPDF'; // Import BotonExportarPDF
 
 export default function PedidosClientPage({ initialPedidos }) {
   const { data: session, status } = useSession();
@@ -22,7 +23,7 @@ export default function PedidosClientPage({ initialPedidos }) {
   const [pedidos, setPedidos] = useState(initialPedidos);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showCancelled, setShowCancelled] = useState(false); // Added showCancelled state
+  const [filters, setFilters] = useState({}); // State for filters
   const [editableCostoEnvio, setEditableCostoEnvio] = useState(() => {
     const initialCostoEnvio = {};
     initialPedidos.forEach(pedido => {
@@ -34,15 +35,39 @@ export default function PedidosClientPage({ initialPedidos }) {
   const [expandedOrders, setExpandedOrders] = useState(new Set());
   const [expandedDesigns, setExpandedDesigns] = useState(new Set());
 
-  useEffect(() => {
-    setPedidos(initialPedidos);
+  const fetchAndSetPedidos = useCallback(async (currentFilters) => {
+    setLoading(true);
+    setError(null);
+    if (!session?.user?.proveedorId) {
+        setError("ID de proveedor no disponible.");
+        setLoading(false);
+        return;
+    }
+    const combinedFilters = { ...currentFilters, proveedorId: session.user.proveedorId };
+    const { pedidos: fetchedPedidos, error: fetchError } = await obtenerPedidosPorProveedorId(combinedFilters);
+    if (fetchError) {
+      setError({ message: fetchError });
+      setPedidos([]);
+    } else {
+      setPedidos(fetchedPedidos || []);
+      const newInitialCostoEnvio = {};
+      (fetchedPedidos || []).forEach(pedido => {
+        newInitialCostoEnvio[pedido._id.toString()] = pedido.costoEnvio || 0;
+      });
+      setEditableCostoEnvio(newInitialCostoEnvio);
+    }
     setLoading(false);
-    const newInitialCostoEnvio = {};
-    initialPedidos.forEach(pedido => {
-      newInitialCostoEnvio[pedido._id.toString()] = pedido.costoEnvio || 0;
-    });
-    setEditableCostoEnvio(newInitialCostoEnvio);
-  }, [initialPedidos]);
+  }, [session?.user?.proveedorId]);
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+        fetchAndSetPedidos(filters);
+    }
+  }, [filters, fetchAndSetPedidos, status]);
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+  };
 
   const handleToggleExpand = (pedidoId) => {
     setExpandedOrders(prev => {
@@ -82,14 +107,11 @@ export default function PedidosClientPage({ initialPedidos }) {
       const result = await actualizarPedidoPorProveedor(pedidoId, session.user.proveedorId, { costoEnvio: costo });
       if (result.success) {
         showPopUp("Costo de envío actualizado exitosamente!", "success");
-        // Actualizar el estado local de pedidos para reflejar el cambio sin recargar toda la página
         setPedidos(prevPedidos =>
           prevPedidos.map(pedido =>
             pedido._id.toString() === pedidoId ? { ...pedido, costoEnvio: costo } : pedido
           )
         );
-        // Si se usara React Query para refetching en el cliente, se invalidaría aquí:
-        // queryClient.invalidateQueries(['supplierOrders', session.user.proveedorId]);
       } else {
         showPopUp(result.message || "Error al actualizar el costo de envío.", "error");
       }
@@ -112,37 +134,35 @@ export default function PedidosClientPage({ initialPedidos }) {
         const result = await updateEstadoPedido(pedidoId, newEstado);
         if (result.success) {
           showPopUp("Estado del pedido actualizado exitosamente!", "success");
-          setPedidos(prevPedidos =>
-            prevPedidos.map(pedido =>
-              pedido._id.toString() === pedidoId ? { ...pedido, estadoPedido: newEstado } : pedido
-            )
-          );
+          // Re-fetch with current filters to ensure the list is up-to-date
+          fetchAndSetPedidos(filters);
         } else {
           showPopUp(result.message || "Error al actualizar el estado del pedido.", "error");
-          setPedidos(prevPedidos =>
-            prevPedidos.map(pedido =>
-              pedido._id.toString() === pedidoId ? { ...pedido, estadoPedido: oldEstado } : pedido
-            )
-          );
         }
       } catch (err) {
         console.error("Error al actualizar el estado del pedido:", err);
         showPopUp("Error al actualizar el estado del pedido. Inténtalo de nuevo.", "error");
-        setPedidos(prevPedidos =>
-          prevPedidos.map(pedido =>
-            pedido._id.toString() === pedidoId ? { ...pedido, estadoPedido: oldEstado } : pedido
-          )
-        );
       } finally {
         setIsUpdating(prev => ({ ...prev, [pedidoId]: false }));
       }
-    } else {
-      // Si el usuario cancela, el select se revertirá automáticamente porque el estado local no se actualizó
-      // No es necesario hacer nada aquí, ya que el valor del select no se ha cambiado en el estado.
     }
   }
 
-  if (loading) {
+  // PDF Export Mappers
+  const pedidoTableHeaders = [
+    'ID Pedido', 'Nombre Usuario', 'Email Usuario', 'Valor Total', 'Estado Pedido', 'Fecha Pedido'
+  ];
+
+  const pedidoTableBodyMapper = (pedido) => [
+    pedido._id || 'N/A',
+    pedido.userName || 'N/A',
+    pedido.userEmail || 'N/A',
+    `$${typeof pedido.total === 'number' ? pedido.total.toFixed(2) : '0.00'}`,
+    pedido.estadoPedido || 'N/A',
+    pedido.createdAt ? new Date(pedido.createdAt).toLocaleDateString() : 'N/A'
+  ];
+
+  if (loading || status === 'loading') {
     return <Loader />;
   }
 
@@ -162,33 +182,49 @@ export default function PedidosClientPage({ initialPedidos }) {
     );
   }
 
-  const filteredPedidos = showCancelled
-    ? pedidos
-    : pedidos.filter(pedido => pedido.estadoPedido !== 'CANCELADO');
-
   return (
     <div className="bg-white font-poppins p-4">
 
       <h2 className="text-center text-2xl font-bold mt-4 text-black">Pedidos del Proveedor</h2>
 
-      {/* <div className="flex justify-end mb-4">
-        <label className="inline-flex items-center cursor-pointer">
-          <input
-            type="checkbox"
-            className="sr-only peer"
-            checked={showCancelled}
-            onChange={() => setShowCancelled(!showCancelled)}
-          />
-          <div className="relative w-11 h-6 bg-gray-700  dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
-          <span className="ms-3 text-sm font-medium text-gray-300">Mostrar Pedidos Cancelados</span>
-        </label>
-      </div> */}
+      <div className="flex justify-end mb-4">
+        <BotonExportarPDF 
+            data={pedidos} 
+            reportTitle="Reporte de Pedidos de Proveedor" 
+            tableHeaders={pedidoTableHeaders} 
+            tableBodyMapper={pedidoTableBodyMapper} 
+        />
+      </div>
+      <FilterBar 
+        onFilterChange={handleFilterChange} 
+        initialFilters={filters} 
+        additionalFilters={[
+            {
+                name: "estadoPedido",
+                label: "Estado del Pedido:",
+                type: "select",
+                options: [
+                    { value: "", label: "Todos" },
+                    { value: EstadoPedido.PENDIENTE, label: "Pendiente" },
+                    { value: EstadoPedido.EN_FABRICACION, label: "En Fabricación" },
+                    { value: EstadoPedido.LISTO, label: "Listo" },
+                    { value: EstadoPedido.ENVIADO, label: "Enviado" },
+                    { value: EstadoPedido.ENTREGADO, label: "Entregado" },
+                    { value: EstadoPedido.CANCELADO, label: "Cancelado" },
+                    { value: EstadoPedido.SOLICITUD_DEVOLUCION, label: "Solicitud Devolución" },
+                    { value: EstadoPedido.DEVOLUCION_APROBADA, label: "Devolución Aprobada" },
+                    { value: EstadoPedido.DEVOLUCION_RECHAZADA, label: "Devolución Rechazada" },
+                    { value: EstadoPedido.DEVOLUCION_COMPLETADA, label: "Devolución Completada" },
+                ]
+            }
+        ]}
+      />
 
       <main className="grid grid-cols-1 gap-6 mt-8">
 
         <div className="text-sm bg-[#1f2937] p-4 rounded-md text-white">
           <p className="font-semibold mb-2">RESUMEN DE PEDIDOS:</p>
-          <p><span className="font-bold">Total de Pedidos:</span> {filteredPedidos.length}</p>
+          <p><span className="font-bold">Total de Pedidos:</span> {pedidos.length}</p>
         </div>
 
         {filteredPedidos.map((pedido, index) => (
