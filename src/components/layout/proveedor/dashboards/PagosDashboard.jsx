@@ -1,6 +1,8 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import { obtenerPagos } from '@/app/acciones/PagoActions';
-import Loader from '@/components/Loader'; // Assuming Loader is in common
+import Loader from '@/components/Loader';
 
 const PagosDashboard = () => {
   const [pagos, setPagos] = useState([]);
