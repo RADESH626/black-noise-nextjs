@@ -149,7 +149,7 @@ export default function PagosDashboard() {
         <table className="min-w-full divide-y" style={{ borderColor: '#FFFFFFFF' }}>
           <thead style={{ backgroundColor: '#F9FAFB' }}>
             <tr>
-              {['ID Pago', 'Nombre Usuario', 'Email Usuario', 'Valor Pago', 'Método Pago', 'Estado Transacción', 'Motivo', 'Fecha Pago'].map((title) => (
+              {['ID Pago', 'Nombre Usuario', 'Email Usuario', 'Valor Pago', 'Método Pago', 'Método de Entrega', 'Estado Transacción', 'Motivo', 'Fecha Pago'].map((title) => (
                 <th
                   key={title}
                   scope="col"
@@ -178,6 +178,9 @@ export default function PagosDashboard() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#50545CFF' }}>
                   {pago.metodoPago}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#50545CFF' }}>
+                  {pago.pedidoId?.metodoEntrega || 'N/A'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#50545CFF' }}>
                   {pago.estadoTransaccion}
