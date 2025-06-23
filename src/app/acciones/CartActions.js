@@ -2,7 +2,7 @@
 
 import connectDB from '@/utils/DBconection';
 import getCartModel from '@/models/Cart';
-import Design from '@/models/Design'; // Import Design model
+import getDesignModel from '@/models/Design'; // Import Design model
 import { revalidatePath } from 'next/cache';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
@@ -22,6 +22,7 @@ export async function addDesignToCart(userId, designId) {
     try {
         const Cart = await getCartModel(); // Get the Cart model
         // Fetch the design to get its proveedorId
+        const Design = getDesignModel(); // Get the Design model
         const design = await Design.findById(actualDesignId).lean();
         if (!design) {
             return { success: false, message: 'Design not found.' };

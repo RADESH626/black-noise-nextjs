@@ -620,6 +620,7 @@ async function EditarUsuario(id, formData) {
 export async function ObtenerTodosLosUsuarios() {
     try {
         await connectDB();
+        const Usuario = await getUsuarioModel();
         const usuarios = await Usuario.find({}).lean();
 
         const plainUsers = usuarios.map(toPlainObject);
