@@ -168,10 +168,10 @@ export default function PedidosDashboard() {
                   {pedido._id}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#6B7280' }}>
-                  {pedido.userId ? pedido.userId.nombre : 'N/A'}
+                  {pedido.userName || 'N/A'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#6B7280' }}>
-                  {pedido.userId ? pedido.userId.email : 'N/A'}
+                  {pedido.userEmail || 'N/A'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#50545CFF' }}>
                   ${typeof pedido.valorPedido === 'number' ? pedido.valorPedido.toFixed(2) : '0.00'}

@@ -15,10 +15,29 @@ async function obtenerPedidos() {
   try {
     await dbConnect();
     const PedidoModel = await getModel('Pedido');
-    const pedidos = await PedidoModel.find({})
-      .populate('userId', 'nombre email')
-      .lean();
-    return { pedidos: pedidos.map(p => toPlainObject(p)) };
+    const pedidos = await PedidoModel.find({}).lean();
+
+    const pedidosConUsuario = await Promise.all(
+      pedidos.map(async (pedido) => {
+        if (pedido.userId) {
+          const userResult = await ObtenerUsuarioPorId(pedido.userId);
+          if (userResult && userResult.Nombre && userResult.correo) {
+            return {
+              ...pedido,
+              userName: userResult.Nombre,
+              userEmail: userResult.correo,
+            };
+          } else {
+            console.error(`Error fetching user data for userId: ${pedido.userId}`);
+            return { ...pedido, userName: 'N/A', userEmail: 'N/A' };
+          }
+        } else {
+          return { ...pedido, userName: 'N/A', userEmail: 'N/A' };
+        }
+      })
+    );
+
+    return { pedidos: pedidosConUsuario.map(p => toPlainObject(p)) };
   } catch (error) {
     console.error('Error al obtener todos los pedidos:', error);
     return { error: error.message };
