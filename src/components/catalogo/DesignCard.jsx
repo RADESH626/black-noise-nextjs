@@ -14,7 +14,7 @@ function DesignCard({ diseño, addItem, isInCart }) {
       {/* Social media post header */}
       <div className="flex items-center p-4 pb-2">
         <img
-          src={diseño.userAvatar}
+          src={diseño.userAvatar || '/img/perfil/FotoPerfil.webp'}
           alt="User Avatar"
           className="w-10 h-10 rounded-full mr-3 object-cover"
         />
