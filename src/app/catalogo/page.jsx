@@ -12,6 +12,7 @@ import { useSession } from 'next-auth/react';
 import { useCart } from '@/context/CartContext';
 import { useQuery } from '@tanstack/react-query';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 const ComunidadDiseños = () => {
   const [activo, setActivo] = useState('diseños');

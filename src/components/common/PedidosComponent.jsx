@@ -7,6 +7,7 @@ import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import Modal from '@/components/common/modales/Modal';
 import { EstadoPedido } from "@/models/enums/PedidoEnums";
 import { useDialog } from "@/context/DialogContext";
+import LoadingSpinner from '@/components/Loader';
 
 const PedidosContent = () => {
   const { data: session, status } = useSession();
