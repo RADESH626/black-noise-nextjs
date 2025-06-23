@@ -9,9 +9,10 @@ export function BotonDescargar({ children, onClick, type = 'button', disabled = 
             type={type}
             onClick={onClick}
             disabled={disabled}
-            variant="secondary"
+            variant="primary"
+            textColor="text-black"
             className={`bg-gradient-to-r from-[#FFFFFF] to-[#3656e2] 
-            ${!disabled ? 'hover:from-[#4866ec] hover:to-[#FFFFFF]' : ''} 
+            ${!disabled ? 'hover:from-[#4866ec] hover:to-[#FFFFFF] hover:text-white' : ''} 
             ${className}`}
         >
             {children}
