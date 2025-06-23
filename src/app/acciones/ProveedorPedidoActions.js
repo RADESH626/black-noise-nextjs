@@ -7,7 +7,9 @@ import { toPlainObject } from '@/utils/dbUtils';
 import { revalidatePath } from 'next/cache'; // Importar revalidatePath
 import mongoose from 'mongoose'; // Importar mongoose
 
-export async function obtenerPedidosPorProveedorId(filters = {}) {
+export async function obtenerPedidosPorProveedorId(filters) {
+    // Asegurarse de que filters sea un objeto, incluso si se pasa null o undefined
+    filters = filters || {};
     logger.debug('Entering obtenerPedidosPorProveedorId with filters:', filters);
     try {
         await connectDB();

@@ -35,7 +35,7 @@ export default function VerPedidoProveedorPage({ params }) {
       setLoading(true);
       setError(null);
       try {
-        const result = await obtenerPedidosPorProveedorId(pedidoId, session.user.proveedorId);
+        const result = await obtenerPedidosPorProveedorId({ pedidoId, proveedorId: session.user.proveedorId });
         if (result?.success && result?.pedido) {
           setPedido(result.pedido);
           setCostoEnvio(result.pedido.costoEnvio || 0);

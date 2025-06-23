@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import SeccionHeader from '../secciones/acciones/SeccionHeader';
 import { obtenerPedidos } from '@/app/acciones/PedidoActions';
 import Loader from '@/components/Loader';
@@ -17,20 +17,20 @@ export default function PedidosDashboard() {
   const [totalPages, setTotalPages] = useState(1); // Ahora se obtiene del backend si se implementa paginación en el backend
   const pedidosPerPage = 12; // Mantener el límite por defecto o hacerlo configurable
 
-  const currentFilters = {
-    estadoPedido: searchParams.get('estadoPedido') || '',
-    estadoPago: searchParams.get('estadoPago') || '',
-    metodoEntrega: searchParams.get('metodoEntrega') || '',
-    proveedorId: searchParams.get('proveedorId') || '',
-    usuarioCompradorId: searchParams.get('usuarioCompradorId') || '',
-    valorTotalMin: searchParams.get('valorTotalMin') || '',
-    valorTotalMax: searchParams.get('valorTotalMax') || '',
-    fechaPedidoStart: searchParams.get('fechaPedidoStart') || '',
-    fechaPedidoEnd: searchParams.get('fechaPedidoEnd') || '',
-    pedidoCancelado: searchParams.get('pedidoCancelado') === 'true',
-    pedidoRefabricado: searchParams.get('pedidoRefabricado') === 'true',
-    searchText: searchParams.get('searchText') || '',
-  };
+  const currentFilters = useMemo(() => ({
+    estadoPedido: searchParams.get('estadoPedido') || undefined,
+    estadoPago: searchParams.get('estadoPago') || undefined,
+    metodoEntrega: searchParams.get('metodoEntrega') || undefined,
+    proveedorId: searchParams.get('proveedorId') || undefined,
+    usuarioCompradorId: searchParams.get('usuarioCompradorId') || undefined,
+    valorTotalMin: searchParams.get('valorTotalMin') || undefined,
+    valorTotalMax: searchParams.get('valorTotalMax') || undefined,
+    fechaPedidoStart: searchParams.get('fechaPedidoStart') || undefined,
+    fechaPedidoEnd: searchParams.get('fechaPedidoEnd') || undefined,
+    pedidoCancelado: searchParams.get('pedidoCancelado') === 'true' ? true : (searchParams.get('pedidoCancelado') === 'false' ? false : undefined),
+    pedidoRefabricado: searchParams.get('pedidoRefabricado') === 'true' ? true : (searchParams.get('pedidoRefabricado') === 'false' ? false : undefined),
+    searchText: searchParams.get('searchText') || undefined,
+  }), [searchParams]);
 
   useEffect(() => {
     const fetchPedidos = async () => {
@@ -42,6 +42,12 @@ export default function PedidosDashboard() {
         page: currentPage,
         limit: pedidosPerPage,
       });
+
+      console.log("PedidosDashboard: fetchedPedidos", fetchedPedidos);
+      console.log("PedidosDashboard: totalPedidos", totalPedidos);
+      console.log("PedidosDashboard: fetchedTotalPages", fetchedTotalPages);
+      console.log("PedidosDashboard: fetchError", fetchError);
+
       if (fetchError) {
         setError({ message: fetchError });
         setPedidos([]);

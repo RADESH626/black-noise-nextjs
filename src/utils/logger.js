@@ -1,5 +1,5 @@
 // src/utils/logger.js
-console.log('Logger module loaded.'); // Temporary debug log
+// console.log('Logger module loaded.'); // Temporary debug log
 
 const LOG_LEVELS = {
   DEBUG: 0,
