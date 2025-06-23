@@ -5,6 +5,7 @@ import { useFormStatus } from "react-dom";
 import { useDialog } from "@/context/DialogContext";
 import BotonGeneral from "@/components/common/botones/BotonGeneral"; // Assuming this component exists
 import { updateUserAction } from "@/app/acciones/UsuariosActions"; // Import the server action
+import Image from "next/image"; // Import Image component
 
 // Submit button component with pending state
 function SubmitButton({ customText = "Guardar Cambios" }) {
@@ -41,6 +42,8 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
     correo: userData?.correo || "",
     rol: userData?.rol || "", // Assuming rol can be edited or needs to be passed
   });
+  const [profileImageFile, setProfileImageFile] = useState(null);
+  const [profileImagePreview, setProfileImagePreview] = useState(userData?.profileImageUrl || "/img/perfil/FotoPerfil.webp"); // Default image if none exists
 
   useEffect(() => {
     if (state.message) {
@@ -59,8 +62,51 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
     }));
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProfileImageFile(file);
+      setProfileImagePreview(URL.createObjectURL(file));
+    } else {
+      setProfileImageFile(null);
+      setProfileImagePreview(userData?.profileImageUrl || "/img/perfil/FotoPerfil.webp");
+    }
+  };
+
+  const handleSubmit = (event) => {
+    const data = new FormData(event.target);
+    if (profileImageFile) {
+      data.append('profileImage', profileImageFile);
+    }
+    formAction(data);
+  };
+
   return (
-    <form action={formAction} className="space-y-5 text-black">
+    <form action={handleSubmit} className="space-y-5 text-white">
+      {/* Profile Image Preview */}
+      <div className="flex flex-col items-center mb-6">
+        <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-gray-600 mb-4">
+          <Image
+            src={profileImagePreview}
+            alt="Profile Preview"
+            layout="fill"
+            objectFit="cover"
+            className="rounded-full"
+          />
+        </div>
+        <label htmlFor="profileImage" className="cursor-pointer bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out">
+          Cambiar Imagen de Perfil
+        </label>
+        <input
+          type="file"
+          id="profileImage"
+          name="profileImage"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={handleImageChange}
+          className="hidden"
+        />
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
           <label htmlFor="tipoDocumento" className="block mb-1 text-sm font-medium text-white">

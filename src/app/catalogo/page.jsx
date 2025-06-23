@@ -102,12 +102,12 @@ const ComunidadDiseños = () => {
     <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(to bottom, #FFFFFFFF, #FFFFFFFF, #FFFFFFFF)' }}>
       <HeaderPrincipal />
 
-      <main className="flex-grow p-4 flex flex-col">
-        <CatalogTabs activo={activo} setActivo={setActivo} />
+      <main className="flex-grow p-4 flex flex-col bg-gray-400" >
+        {/* <CatalogTabs activo={activo} setActivo={setActivo} /> */}
 
-        <div className="mb-4 text-center text-xl font-semibold text-black animate-fadeIn">
+        {/* <div className="mb-4 text-center text-xl font-semibold text-black animate-fadeIn">
           DISEÑOS DE LA COMUNIDAD
-        </div>
+        </div> */}
 
         <NewPostSection />
 

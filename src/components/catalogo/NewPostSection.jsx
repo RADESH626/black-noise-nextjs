@@ -4,14 +4,14 @@ import Link from 'next/link';
 
 function NewPostSection() {
   return (
-    <div className="p-4 rounded-2xl shadow-lg mb-6 flex flex-col items-center" style={{ backgroundColor: '#0B0B0B' }}>
+    <div className="p-4 rounded-2xl shadow-lg mb-6 flex flex-col items-center mt-16" style={{ backgroundColor: '#0B0B0B' }}>
       <div className="flex items-center w-full mb-4">
-        <img
+        {/* <img
           src="/img/perfil/FotoPerfil.webp"
           alt="User Avatar"
           className="w-12 h-12 rounded-full mr-4 object-cover"
-        />
-        <input
+        /> */}
+        {/* <input
           type="text"
           placeholder="¿Qué diseño estás pensando hoy?"
           className="flex-grow p-3 rounded-full text-white placeholder-[#ffffff] focus:outline-none focus:ring-2"
@@ -20,7 +20,7 @@ function NewPostSection() {
             border: '1px solid #000000FF',
             boxShadow: '0 0 0 2px #FFFFFFFF' // optional glow
           }}
-        />
+        /> */}
       </div>
       <Link
         href="/perfil"

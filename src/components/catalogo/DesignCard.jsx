@@ -4,7 +4,7 @@ import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 function DesignCard({ diseño, addItem, isInCart }) {
   console.log('Valor de diseño.userAvatar:', diseño.userAvatar);
-  console.log('Valor de diseño.imagen:', diseño.imagen);
+  // console.log('Valor de diseño.imagen:', diseño.imagen);
   // console.log(`DesignCard re-rendered for ${diseño.prenda}, isInCart: ${isInCart}`);
   // console.log('Design data in DesignCard:', JSON.stringify(diseño, null, 2)); // Stringify to see full content
   return (
