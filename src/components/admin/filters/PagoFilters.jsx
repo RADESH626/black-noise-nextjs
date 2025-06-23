@@ -2,16 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import InputSelectGeneral from "@/components/common/inputs/InputSelectGeneral";
+import InputGeneral from "@/components/common/inputs/InputGeneral";
+import BotonGeneral from "@/components/common/botones/BotonGeneral";
 
 const PagoFilters = ({ onApplyFilters, onClearFilters }) => {
     const { register, handleSubmit, reset, setValue, watch } = useForm();
@@ -49,69 +42,69 @@ const PagoFilters = ({ onApplyFilters, onClearFilters }) => {
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 border rounded-lg shadow-sm">
             <div>
-                <Label htmlFor="fechaPagoStart">Fecha del Pago (Desde)</Label>
-                <Input type="date" id="fechaPagoStart" {...register('fechaPagoStart')} />
+                <label htmlFor="fechaPagoStart">Fecha del Pago (Desde)</label>
+                <InputGeneral type="date" id="fechaPagoStart" {...register('fechaPagoStart')} />
             </div>
             <div>
-                <Label htmlFor="fechaPagoEnd">Fecha del Pago (Hasta)</Label>
-                <Input type="date" id="fechaPagoEnd" {...register('fechaPagoEnd')} />
+                <label htmlFor="fechaPagoEnd">Fecha del Pago (Hasta)</label>
+                <InputGeneral type="date" id="fechaPagoEnd" {...register('fechaPagoEnd')} />
             </div>
             <div>
-                <Label htmlFor="metodoPago">Método de Pago</Label>
-                <Select onValueChange={setSelectedMetodoPago} value={selectedMetodoPago}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Selecciona un método" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="">Todos</SelectItem>
-                        <SelectItem value="TARJETA_CREDITO">Tarjeta de Crédito</SelectItem>
-                        <SelectItem value="TARJETA_DEBITO">Tarjeta de Débito</SelectItem>
-                        <SelectItem value="PAYPAL">PayPal</SelectItem>
-                        <SelectItem value="TRANSFERENCIA_BANCARIA">Transferencia Bancaria</SelectItem>
-                        <SelectItem value="NEQUI">Nequi</SelectItem>
-                        <SelectItem value="DAVIPLATA">DaviPlata</SelectItem>
-                        <SelectItem value="EFECTIVO">Efectivo</SelectItem>
-                    </SelectContent>
-                </Select>
+                <label htmlFor="metodoPago">Método de Pago</label>
+                <InputSelectGeneral
+                    id="metodoPago"
+                    defaultValue={selectedMetodoPago}
+                    onChange={(e) => setSelectedMetodoPago(e.target.value)}
+                    options={[
+                        { value: "", label: "Todos" },
+                        { value: "TARJETA_CREDITO", label: "Tarjeta de Crédito" },
+                        { value: "TARJETA_DEBITO", label: "Tarjeta de Débito" },
+                        { value: "PAYPAL", label: "PayPal" },
+                        { value: "TRANSFERENCIA_BANCARIA", label: "Transferencia Bancaria" },
+                        { value: "NEQUI", label: "Nequi" },
+                        { value: "DAVIPLATA", label: "DaviPlata" },
+                        { value: "EFECTIVO", label: "Efectivo" },
+                    ]}
+                />
             </div>
             <div>
-                <Label htmlFor="estadoTransaccion">Estado de Transacción</Label>
-                <Select onValueChange={setSelectedEstadoTransaccion} value={selectedEstadoTransaccion}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Selecciona un estado" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="">Todos</SelectItem>
-                        <SelectItem value="PAGADO">Pagado</SelectItem>
-                        <SelectItem value="PENDIENTE">Pendiente</SelectItem>
-                        <SelectItem value="FALLIDO">Fallido</SelectItem>
-                        <SelectItem value="REEMBOLSADO">Reembolsado</SelectItem>
-                    </SelectContent>
-                </Select>
+                <label htmlFor="estadoTransaccion">Estado de Transacción</label>
+                <InputSelectGeneral
+                    id="estadoTransaccion"
+                    defaultValue={selectedEstadoTransaccion}
+                    onChange={(e) => setSelectedEstadoTransaccion(e.target.value)}
+                    options={[
+                        { value: "", label: "Todos" },
+                        { value: "PAGADO", label: "Pagado" },
+                        { value: "PENDIENTE", label: "Pendiente" },
+                        { value: "FALLIDO", label: "Fallido" },
+                        { value: "REEMBOLSADO", label: "Reembolsado" },
+                    ]}
+                />
             </div>
             <div>
-                <Label htmlFor="usuarioId">Usuario que Realizó el Pago ID</Label>
-                <Input type="text" id="usuarioId" {...register('usuarioId')} placeholder="ID del Usuario" />
+                <label htmlFor="usuarioId">Usuario que Realizó el Pago ID</label>
+                <InputGeneral type="text" id="usuarioId" {...register('usuarioId')} placeholder="ID del Usuario" />
             </div>
             <div>
-                <Label htmlFor="pedidoId">Pedido Asociado ID</Label>
-                <Input type="text" id="pedidoId" {...register('pedidoId')} placeholder="ID del Pedido" />
+                <label htmlFor="pedidoId">Pedido Asociado ID</label>
+                <InputGeneral type="text" id="pedidoId" {...register('pedidoId')} placeholder="ID del Pedido" />
             </div>
             <div>
-                <Label htmlFor="ventaId">Venta Asociada ID</Label>
-                <Input type="text" id="ventaId" {...register('ventaId')} placeholder="ID de la Venta" />
+                <label htmlFor="ventaId">Venta Asociada ID</label>
+                <InputGeneral type="text" id="ventaId" {...register('ventaId')} placeholder="ID de la Venta" />
             </div>
             <div>
-                <Label htmlFor="valorPagoMin">Valor de Pago Mínimo</Label>
-                <Input type="number" id="valorPagoMin" {...register('valorPagoMin')} placeholder="Mínimo" step="0.01" />
+                <label htmlFor="valorPagoMin">Valor de Pago Mínimo</label>
+                <InputGeneral type="number" id="valorPagoMin" {...register('valorPagoMin')} placeholder="Mínimo" step="0.01" />
             </div>
             <div>
-                <Label htmlFor="valorPagoMax">Valor de Pago Máximo</Label>
-                <Input type="number" id="valorPagoMax" {...register('valorPagoMax')} placeholder="Máximo" step="0.01" />
+                <label htmlFor="valorPagoMax">Valor de Pago Máximo</label>
+                <InputGeneral type="number" id="valorPagoMax" {...register('valorPagoMax')} placeholder="Máximo" step="0.01" />
             </div>
             <div className="col-span-full flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={handleClear}>Limpiar Filtros</Button>
-                <Button type="submit">Aplicar Filtros</Button>
+                <BotonGeneral type="button" variant="outline" onClick={handleClear}>Limpiar Filtros</BotonGeneral>
+                <BotonGeneral type="submit">Aplicar Filtros</BotonGeneral>
             </div>
         </form>
     );

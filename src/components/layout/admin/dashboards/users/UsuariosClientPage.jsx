@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { ObtenerTodosLosUsuarios, toggleUsuarioHabilitado } from '@/app/acciones/UsuariosActions.js';
 import Tabla from '@/components/common/tablas/Tabla';
 import TdGeneral from '@/components/common/tablas/TdGeneral';
@@ -68,7 +68,7 @@ export default function UsuariosClientPage() {
   const [userToEdit, setUserToEdit] = useState(null);
   const { showPopUp } = useDialog();
 
-  const currentFilters = {
+  const currentFilters = useMemo(() => ({ // Envolver en useMemo
     searchText: searchParams.get('searchText') || '',
     rol: searchParams.get('rol') || '',
     tipoDocumento: searchParams.get('tipoDocumento') || '',
@@ -78,7 +78,7 @@ export default function UsuariosClientPage() {
     fechaNacimientoEnd: searchParams.get('fechaNacimientoEnd') || '',
     fechaRegistroStart: searchParams.get('fechaRegistroStart') || '',
     fechaRegistroEnd: searchParams.get('fechaRegistroEnd') || '',
-  };
+  }), [searchParams]); // Dependencia de searchParams
 
   const fetchAndSetUsers = useCallback(async () => {
     setLoading(true);
@@ -112,12 +112,10 @@ export default function UsuariosClientPage() {
       }
     });
     router.push(`/admin/users?${params.toString()}`);
-    router.refresh(); // Forzar la revalidación de datos del servidor
   }, [router, searchParams]);
 
   const handleClearFilters = useCallback(() => {
     router.push('/admin/users');
-    router.refresh(); // Forzar la revalidación de datos del servidor
   }, [router]);
 
   const handleToggleUserStatus = async (userId, currentStatus) => {
@@ -127,7 +125,7 @@ export default function UsuariosClientPage() {
       if (result.success) {
         showPopUp(result.message, 'success');
         // Re-fetch users to get the updated status with current filters
-        fetchAndSetUsers(filters);
+        fetchAndSetUsers(); // Corregido: llamar sin argumentos
       } else {
         showPopUp(result.message, 'error');
       }

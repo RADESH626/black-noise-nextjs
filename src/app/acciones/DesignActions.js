@@ -93,37 +93,47 @@ export async function guardarDesigns(prevState, formData) {
 }
 
 // Function to get all designs
-export async function obtenerDesigns(filters = {}) {
+export async function obtenerDesigns(searchParams = {}) {
     await connectDB();
-    console.log('Entering obtenerDesigns with filters:', filters);
+    // console.log('Entering obtenerDesigns with searchParams:', searchParams);
     try {
         const Design = getDesignModel();
         let query = {};
 
-        // Apply filters
-        if (filters.fechaCreacionStart) {
-            query.createdAt = { ...query.createdAt, $gte: new Date(filters.fechaCreacionStart) };
+        // Extraer y normalizar filtros de searchParams de forma explícita
+        const fechaCreacionStart = searchParams.hasOwnProperty('fechaCreacionStart') ? searchParams.fechaCreacionStart : undefined;
+        const fechaCreacionEnd = searchParams.hasOwnProperty('fechaCreacionEnd') ? searchParams.fechaCreacionEnd : undefined;
+        const categoria = searchParams.hasOwnProperty('categoria') ? searchParams.categoria : undefined;
+        const estadoDesing = searchParams.hasOwnProperty('estadoDesing') ? searchParams.estadoDesing : undefined;
+        const disenadorUsuarioId = searchParams.hasOwnProperty('disenadorUsuarioId') ? searchParams.disenadorUsuarioId : undefined;
+        const precioMin = searchParams.hasOwnProperty('precioMin') ? searchParams.precioMin : undefined;
+        const precioMax = searchParams.hasOwnProperty('precioMax') ? searchParams.precioMax : undefined;
+        const tallasDisponibles = searchParams.hasOwnProperty('tallasDisponibles') && searchParams.tallasDisponibles ? searchParams.tallasDisponibles.split(',') : [];
+
+        // Aplicar filtros
+        if (fechaCreacionStart) {
+            query.createdAt = { ...query.createdAt, $gte: new Date(fechaCreacionStart) };
         }
-        if (filters.fechaCreacionEnd) {
-            query.createdAt = { ...query.createdAt, $lte: new Date(filters.fechaCreacionEnd) };
+        if (fechaCreacionEnd) {
+            query.createdAt = { ...query.createdAt, $lte: new Date(fechaCreacionEnd) };
         }
-        if (filters.categoria) {
-            query.categoria = filters.categoria;
+        if (categoria) {
+            query.categoria = categoria;
         }
-        if (filters.estadoDesing) {
-            query.estadoDesing = filters.estadoDesing;
+        if (estadoDesing) {
+            query.estadoDesing = estadoDesing;
         }
-        if (filters.disenadorUsuarioId) {
-            query.usuarioId = filters.disenadorUsuarioId;
+        if (disenadorUsuarioId) {
+            query.usuarioId = disenadorUsuarioId;
         }
-        if (filters.precioMin) {
-            query.valorDesing = { ...query.valorDesing, $gte: parseFloat(filters.precioMin) };
+        if (precioMin) {
+            query.valorDesing = { ...query.valorDesing, $gte: parseFloat(precioMin) };
         }
-        if (filters.precioMax) {
-            query.valorDesing = { ...query.valorDesing, $lte: parseFloat(filters.precioMax) };
+        if (precioMax) {
+            query.valorDesing = { ...query.valorDesing, $lte: parseFloat(precioMax) };
         }
-        if (filters.tallasDisponibles && filters.tallasDisponibles.length > 0) {
-            query.tallasDisponibles = { $in: filters.tallasDisponibles };
+        if (tallasDisponibles && tallasDisponibles.length > 0) {
+            query.tallasDisponibles = { $in: tallasDisponibles };
         }
 
         const designs = await Design.find(query)

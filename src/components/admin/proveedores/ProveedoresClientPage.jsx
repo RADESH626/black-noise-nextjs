@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Tabla from '@/components/common/tablas/Tabla';
@@ -17,14 +17,31 @@ import AddSupplierModal from '@/components/admin/proveedores/AddSupplierModal';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import ProveedorFilters from '@/components/admin/filters/ProveedorFilters'; // Importar el componente de filtros
 
-const ProveedoresClientPage = ({ initialProveedores, currentFilters }) => {
+const ProveedoresClientPage = ({ initialProveedores, initialSearchParams }) => {
     const { data: session, status } = useSession();
     const router = useRouter();
-    const searchParams = useSearchParams();
+    const clientSearchParams = useSearchParams(); // Usar un nombre diferente para evitar confusión
     const { openModal, closeModal } = useDialog();
     const [proveedores, setProveedores] = useState(initialProveedores);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+
+    // Usar initialSearchParams para la primera renderización, luego clientSearchParams
+    const currentSearchParams = initialSearchParams || clientSearchParams;
+
+    const memoizedCurrentFilters = useMemo(() => {
+        const params = new URLSearchParams(currentSearchParams);
+        return {
+            disponibilidad: params.get('disponibilidad') || '',
+            especialidad: params.get('especialidad') || '', // Ahora es un solo valor
+            metodosPagoAceptados: params.get('metodosPagoAceptados') || '', // Ahora es un solo valor
+            habilitado: params.get('habilitado') === 'true' ? true : (params.get('habilitado') === 'false' ? false : undefined),
+            ordenesActivasMin: params.get('ordenesActivasMin') || '',
+            ordenesActivasMax: params.get('ordenesActivasMax') || '',
+            fechaUltimaAsignacionStart: params.get('fechaUltimaAsignacionStart') || '',
+            fechaUltimaAsignacionEnd: params.get('fechaUltimaAsignacionEnd') || '',
+        };
+    }, [currentSearchParams]);
 
     useEffect(() => {
         if (status === 'loading') return;
@@ -39,31 +56,27 @@ const ProveedoresClientPage = ({ initialProveedores, currentFilters }) => {
     }, [initialProveedores]);
 
     const handleApplyFilters = useCallback((filters) => {
-        const params = new URLSearchParams(searchParams);
+        const params = new URLSearchParams(); // Crear un nuevo URLSearchParams
         Object.keys(filters).forEach(key => {
-            if (Array.isArray(filters[key])) {
-                params.delete(key); // Clear existing array params
-                filters[key].forEach(item => params.append(key, item));
-            } else if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
+            if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '' && filters[key] !== 'Todos') {
                 params.set(key, filters[key]);
             } else {
                 params.delete(key);
             }
         });
         router.push(`/admin/proveedores?${params.toString()}`);
-        router.refresh();
-    }, [router, searchParams]);
+    }, [router]);
 
     const handleClearFilters = useCallback(() => {
         router.push('/admin/proveedores');
-        router.refresh();
+        // router.refresh(); // Eliminar esta línea
     }, [router]);
 
     const fetchProveedores = async () => {
         setLoading(true);
         setError(null);
         try {
-            const result = await obtenerProveedores(currentFilters); // Re-fetch with current filters
+            const result = await obtenerProveedores(memoizedCurrentFilters); // Usar memoizedCurrentFilters
             if (result.success) {
                 setProveedores(result.proveedores);
             } else {
@@ -113,7 +126,7 @@ const ProveedoresClientPage = ({ initialProveedores, currentFilters }) => {
             </div>
 
             <div className="mb-6">
-                <ProveedorFilters onApplyFilters={handleApplyFilters} onClearFilters={handleClearFilters} initialFilters={currentFilters} />
+                <ProveedorFilters onApplyFilters={handleApplyFilters} onClearFilters={handleClearFilters} initialFilters={memoizedCurrentFilters} />
             </div>
 
             {proveedores.length === 0 ? (
