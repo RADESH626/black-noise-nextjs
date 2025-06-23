@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import SeccionHeader from '../secciones/acciones/SeccionHeader';
 import { obtenerPedidos } from '@/app/acciones/PedidoActions';
+import Loader from '@/components/Loader';
 
 export default function PedidosDashboard() {
   const [pedidos, setPedidos] = useState([]);
@@ -53,16 +54,7 @@ export default function PedidosDashboard() {
   }, [pedidos, searchTerm, startDate, endDate]);
 
   if (loading) {
-    return (
-      <>
-        <SeccionHeader>
-          <h4 className='font-bold text-2xl' style={{ color: '#000000' }}>Gestión de Pedidos</h4>
-        </SeccionHeader>
-        <div className="min-h-full flex justify-center items-center" style={{ color: '#9CA3AF' }}>
-          Cargando pedidos...
-        </div>
-      </>
-    );
+    return <Loader />;
   }
 
   if (error) {

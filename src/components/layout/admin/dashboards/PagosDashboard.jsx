@@ -6,6 +6,7 @@ import SeccionHeader from '../secciones/acciones/SeccionHeader';
 import { obtenerPagos } from '@/app/acciones/PagoActions.js';
 import FormFiltrarPagos from './pagos/FormFiltrarPagos';
 import BotonAgregarPagos from '../../../common/botones/BotonAgregarPagos';
+import Loader from '@/components/Loader';
 
 function PagosDashboard() {
     const [pagos, setPagos] = useState([]);
@@ -34,7 +35,7 @@ function PagosDashboard() {
     }, []);
 
     if (loading) {
-        return <p>Cargando pagos...</p>;
+        return <Loader />;
     }
 
     if (error) {

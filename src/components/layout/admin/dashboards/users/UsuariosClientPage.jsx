@@ -12,6 +12,7 @@ import FormBuscarUsuario from '@/components/layout/admin/usuarios/forms/FormBusc
 import ModalAgregarUsuario from '@/components/common/modales/ModalAgregarUsuario';
 import ModalEditarUsuario from '@/components/layout/admin/usuarios/modals/ModalEditarUsuario'; // Import ModalEditarUsuario
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+import Loader from '@/components/Loader';
 import { useDialog } from '@/context/DialogContext';
 import { useActionState } from 'react'; // For React 19
 import { useFormStatus } from 'react-dom'; // For React 19
@@ -114,7 +115,7 @@ export default function UsuariosClientPage({ initialUsers }) {
   };
 
   if (loading && users.length === 0) { // Only show full loading if no users are displayed yet
-    return <p>Cargando usuarios...</p>;
+    return <Loader />;
   }
 
   if (error) {

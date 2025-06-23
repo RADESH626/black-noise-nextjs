@@ -6,6 +6,7 @@ import SeccionHeader from '../secciones/acciones/SeccionHeader';
 import { obtenerVentas } from '@/app/acciones/VentaActions.js';
 import FormFiltrarVentas from './ventas/FormFiltrarVentas';
 import BotonAgregarVentas from '../../../common/botones/BotonAgregarVentas';
+import Loader from '@/components/Loader';
 
 function VentasDashboard() {
     const [ventas, setVentas] = useState([]);
@@ -34,7 +35,7 @@ function VentasDashboard() {
     }, []);
 
     if (loading) {
-        return <p>Cargando ventas...</p>;
+        return <Loader />;
     }
 
     if (error) {
