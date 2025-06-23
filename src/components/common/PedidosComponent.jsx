@@ -397,7 +397,7 @@ const PedidosContent = () => {
       )}
 
       <hr className="border-white my-6" />
-      <div className="text-sm bg-[#1f2937] p-4 rounded-md">
+      <div className="text-sm  pbg-[#f5f5f5]-4 rounded-md">
         <p className="font-semibold mb-2">RESUMEN DE PEDIDOS:</p>
         <p><span className="font-bold">Total de Pedidos:</span> {filteredPedidos.length}</p>
       </div>

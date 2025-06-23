@@ -60,7 +60,7 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
   };
 
   return (
-    <form action={formAction} className="space-y-5 text-white">
+    <form action={formAction} className="space-y-5 text-black">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
           <label htmlFor="tipoDocumento" className="block mb-1 text-sm font-medium text-white">

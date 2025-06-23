@@ -229,7 +229,7 @@ function ProfileContent({ userId, initialUser, initialDesigns, initialPayments }
           </div>
           <div className="flex-grow text-center md:text-left">
             <h1 className="text-3xl md:text-4xl font-bold mb-1">{user?.Nombre} {user?.primerApellido}</h1>
-            <div className="text-gray-400 mb-3">
+            <div className="text-black mb-3">
               <p>CORREO: {user?.correo}</p>
               <p>NÚMERO DE DOCUMENTO: {user?.numeroDocumento}</p>
               <p>NÚMERO DE TELÉFONO: {user?.numeroTelefono}</p>
