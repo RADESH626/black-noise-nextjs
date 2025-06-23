@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
-import { obtenerPedidosPagadosPorUsuarioId } from "@/app/acciones/PedidoActions";
+import { obtenerPedidosPagadosPorUsuarioId, solicitarDevolucion } from "@/app/acciones/PedidoActions";
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import Modal from '@/components/common/modales/Modal';
 import { EstadoPedido } from "@/models/enums/PedidoEnums";
@@ -77,16 +77,9 @@ const PedidosContent = () => {
     }
 
     try {
-      const response = await fetch('/api/devoluciones', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pedidoId: selectedPedidoId,
-          returnReason,
-        }),
-      });
+      const result = await solicitarDevolucion(selectedPedidoId, userId, returnReason);
 
-      if (response.ok) {
+      if (result.success) {
         showPopUp('Solicitud de devolución enviada correctamente', 'success');
         // Refrescar pedidos tras solicitud de devolución
         const { pedidos: fetchedPedidos, error: fetchError } = await obtenerPedidosPagadosPorUsuarioId(userId);
@@ -97,7 +90,7 @@ const PedidosContent = () => {
           setPedidos(fetchedPedidos || []);
         }
       } else {
-        showPopUp('Error al enviar la solicitud de devolución', 'error');
+        showPopUp(result.message || 'Error al enviar la solicitud de devolución', 'error');
       }
     } catch (error) {
       console.error('Error al enviar la solicitud de devolución:', error);
