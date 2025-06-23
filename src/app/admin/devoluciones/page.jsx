@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
+import Loader from '@/components/Loader';
 
 const DevolucionesAdminPage = () => {
   const [pedidos, setPedidos] = useState([]);
@@ -33,7 +34,7 @@ const DevolucionesAdminPage = () => {
   }, []);
 
   if (loading) {
-    return <div>Cargando devoluciones...</div>;
+    return <Loader />;
   }
 
   if (error) {

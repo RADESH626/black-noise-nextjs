@@ -6,6 +6,7 @@ import SeccionAcciones from '../secciones/acciones/SeccionAcciones';
 import SeccionHeader from '../secciones/acciones/SeccionHeader';
 import { obtenerSolicitudesProveedor } from '@/app/acciones/SolicitudProveedorActions.js';
 import FormFiltrarSolicitudesProveedor from './solicitudes-proveedor/FormFiltrarSolicitudesProveedor';
+import Loader from '@/components/Loader';
 
 function SolicitudesProveedorDashboard() {
     const [solicitudes, setSolicitudes] = useState([]);
@@ -34,7 +35,7 @@ function SolicitudesProveedorDashboard() {
     }, []);
 
     if (loading) {
-        return <p>Cargando solicitudes...</p>;
+        return <Loader />;
     }
 
     if (error) {

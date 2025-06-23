@@ -21,6 +21,7 @@ export async function crearProveedor(prevState, formData) {
   }
 
   await connectDB();
+  const Proveedor = await getProveedorModel(); // Get the Proveedor model
 
   try {
     // Extract user-related fields
@@ -152,6 +153,7 @@ export async function actualizarProveedor(prevState, formData) {
   }
 
   await connectDB();
+  const Proveedor = await getProveedorModel(); // Get the Proveedor model
 
   try {
     const id = formData.get("id");
@@ -213,6 +215,7 @@ export async function actualizarProveedor(prevState, formData) {
 export async function obtenerProveedoresHabilitados() {
   const Proveedor = await getProveedorModel();
   await connectDB();
+  const Proveedor = await getProveedorModel(); // Get the Proveedor model
   try {
     const proveedores = await Proveedor.find({ habilitado: true }).lean();
     // Deep clone and serialize to ensure all fields are plain objects/primitives
@@ -229,6 +232,7 @@ export async function obtenerProveedoresHabilitados() {
 
 export async function obtenerProveedores() {
   await connectDB();
+  const Proveedor = await getProveedorModel(); // Get the Proveedor model
   try {
     const Proveedor = await getProveedorModel();
     const proveedores = await Proveedor.find({}).lean();
@@ -251,6 +255,7 @@ export async function obtenerProveedores() {
 export async function obtenerProveedorPorId(id) {
   const Proveedor = await getProveedorModel();
   await connectDB();
+  const Proveedor = await getProveedorModel(); // Get the Proveedor model
   try {
     const proveedor = await Proveedor.findById(id).lean();
     if (!proveedor) {
@@ -280,6 +285,7 @@ export async function eliminarProveedor(prevState, formData) {
   }
 
   await connectDB();
+  const Proveedor = await getProveedorModel(); // Get the Proveedor model
   try {
     const id = formData.get("id");
     const result = await Proveedor.findByIdAndDelete(id);
@@ -303,6 +309,7 @@ export async function obtenerMiPerfilProveedor() {
   }
 
   await connectDB();
+  const Proveedor = await getProveedorModel(); // Get the Proveedor model
   try {
     // Assuming the provider's email is stored in the session user object
     const proveedor = await Proveedor.findOne({ emailContacto: session.user.email }).lean();

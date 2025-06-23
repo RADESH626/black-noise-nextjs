@@ -185,7 +185,7 @@ Para el almacenamiento de archivos binarios como imágenes, se prioriza el uso d
     *   **Carga Inicial:** Para páginas que muestran grandes volúmenes de datos (ej. catálogos), se implementará **paginación** o **infinite scrolling** para cargar solo un subconjunto inicial de datos.
     *   **Pre-renderizado:** Se considerará el uso de **Server-Side Rendering (SSR)** o **Static Site Generation (SSG)** de Next.js para la carga inicial de páginas con datos críticos, mejorando el rendimiento percibido.
     *   **Caché Robusto:** Se utilizarán librerías de gestión de estado del servidor como **React Query (TanStack Query)** para manejar el caché de datos en el cliente, la revalidación en segundo plano y la sincronización, reduciendo significativamente las solicitudes repetidas al servidor y acelerando las cargas posteriores de la página.
-    *   **Indicadores de Carga:** Se mostrarán "loading skeletons" o spinners mientras los datos iniciales se están cargando.
+*   **Indicadores de Carga:** Se mostrarán "loading skeletons" o el componente `Loader` global mientras los datos iniciales se están cargando.
 *   **Beneficios:**
     *   **Mejora de UX:** La interfaz de usuario se siente más rápida y reactiva.
     *   **Reducción de Carga del Servidor:** Menos solicitudes al servidor por cambios iterativos.

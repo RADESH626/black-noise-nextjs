@@ -1,7 +1,8 @@
-'use client';
+"use client";
 import React, { useEffect, useState } from "react";
 import SeccionHeader from '../secciones/acciones/SeccionHeader';
 import { obtenerPedidos } from '@/app/acciones/PedidoActions';
+import Loader from '@/components/Loader';
 
 export default function PedidosDashboard() {
   const [pedidos, setPedidos] = useState([]);
@@ -11,6 +12,23 @@ export default function PedidosDashboard() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [filteredPedidos, setFilteredPedidos] = useState([]);
+
+  // Paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const pedidosPerPage = 12;
+
+  const indexOfLastPedido = currentPage * pedidosPerPage;
+  const indexOfFirstPedido = indexOfLastPedido - pedidosPerPage;
+  const currentPedidos = filteredPedidos.slice(indexOfFirstPedido, indexOfLastPedido);
+  const totalPages = Math.ceil(filteredPedidos.length / pedidosPerPage);
+
+  const nextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
+  };
+
+  const prevPage = () => {
+    if (currentPage > 1) setCurrentPage(prev => prev - 1);
+  };
 
   useEffect(() => {
     const fetchPedidos = async () => {
@@ -47,22 +65,14 @@ export default function PedidosDashboard() {
         return matchesSearchTerm && matchesDateRange;
       });
       setFilteredPedidos(filtered);
+      setCurrentPage(1); // Reinicia a la página 1 en cada filtro
     };
 
     filterPedidos();
   }, [pedidos, searchTerm, startDate, endDate]);
 
   if (loading) {
-    return (
-      <>
-        <SeccionHeader>
-          <h4 className='font-bold text-2xl' style={{ color: '#000000' }}>Gestión de Pedidos</h4>
-        </SeccionHeader>
-        <div className="min-h-full flex justify-center items-center" style={{ color: '#9CA3AF' }}>
-          Cargando pedidos...
-        </div>
-      </>
-    );
+    return <Loader />;
   }
 
   if (error) {
@@ -152,7 +162,7 @@ export default function PedidosDashboard() {
             </tr>
           </thead>
           <tbody style={{ backgroundColor: '#FFFFFFFF', borderColor: '#E5E7EBFF' }}>
-            {filteredPedidos.map((pedido) => (
+            {currentPedidos.map((pedido) => (
               <tr key={pedido._id} style={{ borderBottom: '1px solid #000000FF' }}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: '#111827' }}>
                   {pedido._id}
@@ -177,6 +187,27 @@ export default function PedidosDashboard() {
           </tbody>
         </table>
       </div>
-    </>
-  );
+
+      {/* Paginación */}
+      <div className="flex justify-center items-center mt-6 space-x-4">
+        <button
+          onClick={prevPage}
+          disabled={currentPage === 1}
+          className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded disabled:opacity-50"
+        >
+          Anterior
+        </button>
+        <span className="text-gray-700 font-medium">
+          Página {currentPage} de {totalPages}
+        </span>
+        <button
+          onClick={nextPage}
+          disabled={currentPage === totalPages}
+          className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded disabled:opacity-50"
+        >
+          Siguiente
+        </button>
+      </div>
+    </>
+  );
 }

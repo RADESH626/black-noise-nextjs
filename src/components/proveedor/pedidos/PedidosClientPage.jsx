@@ -7,6 +7,7 @@ import Link from "next/link";
 import { actualizarPedidoPorProveedor } from "@/app/acciones/ProveedorPedidoActions";
 import { useDialog } from "@/context/DialogContext";
 import { useState, useEffect } from "react";
+import Loader from '@/components/Loader';
 import { useQueryClient } from "@tanstack/react-query"; // Mantener si se usa para invalidar, aunque la carga inicial no use useQuery
 import { EstadoPedido } from "@/models/enums/PedidoEnums";
 import { updateEstadoPedido } from "@/app/acciones/PedidoActions";
@@ -142,11 +143,7 @@ export default function PedidosClientPage({ initialPedidos }) {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-full flex justify-center items-center text-gray-400">
-        Cargando pedidos...
-      </div>
-    );
+    return <Loader />;
   }
 
   if (error) {
@@ -360,12 +357,6 @@ export default function PedidosClientPage({ initialPedidos }) {
           </motion.div>
         ))}
       </main>
-
-      {/* <hr className="border-white my-6" /> */}
-      {/* <div className="text-sm bg-[#1f2937] p-4 rounded-md">
-        <p className="font-semibold mb-2">RESUMEN DE PEDIDOS:</p>
-        <p><span className="font-bold">Total de Pedidos:</span> {filteredPedidos.length}</p>
-      </div> */}
     </div>
   );
 }

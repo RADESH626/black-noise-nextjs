@@ -2,6 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useDialog } from '@/context/DialogContext';
 import FormEditarUsuario from '@/components/layout/admin/usuarios/forms/FormEditarUsuario'; // Will create this next
+import Loader from '@/components/Loader';
 
 function ModalEditarUsuario({ isOpen, onClose, onUserUpdated, userData }) {
     const dialogRef = useRef(null);
@@ -60,7 +61,7 @@ function ModalEditarUsuario({ isOpen, onClose, onUserUpdated, userData }) {
                             {userData ? (
                                 <FormEditarUsuario initialData={userData} onSuccess={handleSuccess} />
                             ) : (
-                                <p className="text-white">Cargando datos del usuario...</p>
+                                <Loader />
                             )}
                         </div>
                     </div>

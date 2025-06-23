@@ -8,6 +8,7 @@ import FormFiltrarProveedores from './proveedores/FormFiltrarProveedores'; // Ke
 import ListaProveedores from './proveedores/ListaProveedores';
 import BotonAgregarProveedores from '@/components/common/botones/BotonAgregarProveedores';
 import FormularioAgregarProveedor from '@/components/layout/admin/dashboards/proveedores/FormularioAgregarProveedor';
+import Loader from '@/components/Loader';
 
 function GestionProveedoresDashboard() {
     const [proveedores, setProveedores] = useState([]);
@@ -49,7 +50,7 @@ function GestionProveedoresDashboard() {
     };
 
     if (loading) {
-        return <p>Cargando proveedores...</p>;
+        return <Loader />;
     }
 
     if (error) {

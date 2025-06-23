@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useFormState } from 'react-dom';
 import { actualizarFotoPerfilUsuarioPorAdmin } from '@/app/acciones/AdminActions';
 import Image from 'next/image';
+import Loader from '@/components/Loader';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import { useSession } from 'next-auth/react';
@@ -96,6 +97,10 @@ export default function UsersClientPage({ initialUsers }) {
 
     const displayPicture = optimisticProfilePicture || currentProfilePicture;
 
+    if (isLoading) {
+        return <Loader />;
+    }
+
     // Placeholder for user selection logic
     const handleUserSelect = (e) => {
         const userId = e.target.value;
@@ -180,7 +185,7 @@ export default function UsersClientPage({ initialUsers }) {
                             variant="primary"
                             disabled={!file || isLoading}
                         >
-                            {isLoading ? 'Actualizando...' : 'Actualizar Foto de Perfil'}
+                            Actualizar Foto de Perfil
                         </BotonGeneral>
                     </form>
                 </div>

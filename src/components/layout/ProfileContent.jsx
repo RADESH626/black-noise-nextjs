@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { eliminarDesign, actualizarDesign } from "@/app/acciones/DesignActions";
 import DesignsComponent from "../common/DesignsComponent";
+import Loader from '@/components/Loader';
 import PedidosComponent from "../common/PedidosComponent";
 import FormEditarUsuario from "@/components/perfil/FormEditarUsuario";
 import DesignUploadModal from "@/components/perfil/DesignUploadModal";
@@ -281,7 +282,7 @@ function ProfileContent({ userId, initialUser, initialDesigns, initialPayments }
       <div className="flex-grow overflow-y-auto">
         {activeTab === 'designs' && (
           loading ? (
-            <p>Cargando diseños...</p>
+            <Loader />
           ) : error ? (
             <p>Error: {error}</p>
           ) : (
@@ -314,7 +315,7 @@ function ProfileContent({ userId, initialUser, initialDesigns, initialPayments }
             {userId ? (
               <PedidosComponent userId={userId} />
             ) : (
-              <p>Cargando pedidos...</p>
+              <Loader />
             )}
           </>
         )}

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Loader from '@/components/Loader';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import { Rol } from '@/models/enums/usuario/Rol';
@@ -62,11 +63,7 @@ const DesignsClientPage = ({ initialDesigns }) => {
     };
 
     if (loading) {
-        return (
-            <div className="flex justify-center items-center h-screen">
-                <LoadingSpinner />
-            </div>
-        );
+        return <Loader />;
     }
 
     if (error) {

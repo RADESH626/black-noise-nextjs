@@ -7,6 +7,7 @@ import Tabla from '@/components/common/tablas/Tabla';
 import TablaHeader from '@/components/common/tablas/TablaHeader';
 import TdGeneral from '@/components/common/tablas/TdGeneral';
 import Thgeneral from '@/components/common/tablas/Thgeneral';
+import Loader from '@/components/Loader';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import { Rol } from '@/models/enums/usuario/Rol';
@@ -66,11 +67,7 @@ const ProveedoresClientPage = ({ initialProveedores }) => {
 
     // If initialProveedores is empty and not loading, display no data message
     if (loading) {
-        return (
-            <div className="flex justify-center items-center h-screen">
-                <LoadingSpinner />
-            </div>
-        );
+        return <Loader />;
     }
 
     if (error) {
