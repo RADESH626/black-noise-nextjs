@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import Loader from '@/components/Loader';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { crearProveedor } from '@/app/acciones/ProveedorActions'; // Import the server action
 import { useSession } from 'next-auth/react'; // Import useSession
@@ -145,7 +146,7 @@ const AddSupplierModal = ({ onSuccess, onModalClose }) => { // Removed isOpen, o
 
     return (
         <>
-            {loading && <LoadingSpinner />}
+            {loading && <Loader />}
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 {/* User Information Fields */}
@@ -363,7 +364,7 @@ const AddSupplierModal = ({ onSuccess, onModalClose }) => { // Removed isOpen, o
                         variant="primary"
                         disabled={loading}
                     >
-                        {loading ? 'Agregando...' : 'Agregar Proveedor'}
+                        Agregar Proveedor
                     </BotonGeneral>
                     <BotonGeneral
                         type="button"

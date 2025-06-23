@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { obtenerPagosPorUsuarioId } from '@/app/acciones/PagoActions';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+import Loader from '@/components/Loader';
 
 const PagosComponent = ({ userId }) => {
   const [pagos, setPagos] = useState([]);
@@ -37,7 +38,7 @@ const PagosComponent = ({ userId }) => {
   }, [userId]);
 
   if (loading) {
-    return <div className="text-center py-4">Cargando historial de compras...</div>;
+    return <Loader />;
   }
 
   if (error) {

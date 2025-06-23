@@ -13,6 +13,7 @@ import { useActionState } from 'react'; // For React 19
 import { useFormStatus } from 'react-dom'; // For React 19
 import { MetodoPago } from '@/models/enums/pago/MetodoPago';
 import BotonGeneral from '@/components/common/botones/BotonGeneral'; // Import BotonGeneral
+import Loader from '@/components/Loader';
 
 const PAYMENT_METHODS = Object.values(MetodoPago);
 const PAYMENT_METHOD_DISPLAY_NAMES = {
@@ -105,7 +106,7 @@ export default function ListaProveedores({ initialProviders }) {
   };
 
   if (loading && allProviders.length === 0) {
-    return <p>Cargando proveedores...</p>;
+    return <Loader />;
   }
 
   if (error) {

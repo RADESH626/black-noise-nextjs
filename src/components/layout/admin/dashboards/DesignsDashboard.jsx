@@ -7,6 +7,7 @@ import { obtenerDesigns } from '@/app/acciones/DesignActions.js';
 import FormFiltrarDesigns from './designs/FormFiltrarDesigns';
 import DesignsTable from './designs/DesignsTable'; // Import DesignsTable
 import BotonAgregarDesigns from '../../../common/botones/BotonAgregarDesigns';
+import Loader from '@/components/Loader';
 
 function DesignsDashboard() { // Remove async keyword
     const [designs, setDesigns] = useState([]);
@@ -35,7 +36,7 @@ function DesignsDashboard() { // Remove async keyword
     }, []); // Empty dependency array means this runs once on mount
 
     if (loading) {
-        return <p>Cargando diseños...</p>;
+        return <Loader />;
     }
 
     if (error) {

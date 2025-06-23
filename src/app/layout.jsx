@@ -5,6 +5,7 @@ import SessionProviderWrapper from './SessionProviderWrapper';
 import { Providers } from './providers';
 import ClientHeaderLoader from './ClientHeaderLoader';
 import DynamicFooterWrapper from '@/components/layout/DynamicFooterWrapper';
+import { LoadingProvider } from '@/context/LoadingContext'; // Importar LoadingProvider
 
 // Configuración optimizada de fuentes
 const geistSans = Geist({
@@ -46,10 +47,10 @@ export default async function RootLayout({ children }) {
         <Providers>
           <DialogProvider>
             <SessionProviderWrapper>
-              {/* <ClientHeaderLoader /> */}
-              {children}
+              <LoadingProvider> {/* Envolver con LoadingProvider */}
+                {children}
 
-              {/* <DynamicFooterWrapper /> */}
+              </LoadingProvider>
             </SessionProviderWrapper>
           </DialogProvider>
         </Providers>
