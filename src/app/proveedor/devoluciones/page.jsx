@@ -1,27 +1,26 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { obtenerDevolucionesYCancelacionesProveedor } from '@/app/acciones/PedidoActions';
 
 function SupplierReturnsAndCancellationsPage() {
-  const [returns, setReturns] = useState([]);
-  const [cancellations, setCancellations] = useState([]);
+  const [pedidos, setPedidos] = useState([]); // Cambiado a 'pedidos' para incluir devoluciones y cancelaciones
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Fetch returns data
-        const returnsResponse = await fetch('/api/proveedor/returns');
-        const returnsData = await returnsResponse.json();
-        setReturns(returnsData);
-
-        // Fetch cancellations data
-        const cancellationsResponse = await fetch('/api/proveedor/cancellations');
-        const cancellationsData = await cancellationsResponse.json();
-        setCancellations(cancellationsData);
+        const result = await obtenerDevolucionesYCancelacionesProveedor();
+        if (result.success) {
+          setPedidos(result.data);
+        } else {
+          console.error('Error al obtener devoluciones y cancelaciones:', result.error);
+          setPedidos([]); // Asegurarse de que el estado esté vacío en caso de error
+        }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error inesperado al obtener datos:', error);
+        setPedidos([]);
       } finally {
         setLoading(false);
       }
@@ -31,7 +30,7 @@ function SupplierReturnsAndCancellationsPage() {
   }, []);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <p>Cargando...</p>;
   }
 
   return (
@@ -39,30 +38,32 @@ function SupplierReturnsAndCancellationsPage() {
       <h1 className="text-2xl font-bold mb-4">Devoluciones y Cancelaciones</h1>
 
       <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-2">Devoluciones</h2>
-        {returns.length > 0 ? (
+        <h2 className="text-xl font-semibold mb-2">Listado de Peticiones</h2>
+        {pedidos.length > 0 ? (
           <table className="table-auto w-full">
             <thead>
               <tr>
-                <th className="px-4 py-2">Order ID</th>
-                <th className="px-4 py-2">User ID</th>
-                <th className="px-4 py-2">Reason</th>
-                <th className="px-4 py-2">Cancellation Date</th>
+                <th className="px-4 py-2">ID de Pedido</th>
+                <th className="px-4 py-2">Correo del Usuario</th>
+                <th className="px-4 py-2">Motivo</th>
+                <th className="px-4 py-2">Fecha de Petición</th>
+                <th className="px-4 py-2">Estado</th>
               </tr>
             </thead>
             <tbody>
-              {returns.map((item) => (
+              {pedidos.map((item) => (
                 <tr key={item._id} className="hover:bg-gray-200">
-                  <td className="border px-4 py-2">{item.orderId}</td>
-                  <td className="border px-4 py-2">{item.userId}</td>
-                  <td className="border px-4 py-2">{item.motivo_devolucion}</td>
-                  <td className="border px-4 py-2">{item.fecha_cancelacion ? new Date(item.fecha_cancelacion).toLocaleDateString() : 'N/A'}</td>
+                  <td className="border px-4 py-2">{item._id}</td>
+                  <td className="border px-4 py-2">{item.userEmail}</td>
+                  <td className="border px-4 py-2">{item.motivo_devolucion || 'N/A'}</td>
+                  <td className="border px-4 py-2">{item.fecha_cancelacion ? new Date(item.fecha_cancelacion).toLocaleDateString('es-ES') : 'N/A'}</td>
+                  <td className="border px-4 py-2">{item.estadoPedido}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         ) : (
-          <p>No hay devoluciones o cancelaciones.</p>
+          <p>No hay peticiones de devoluciones o cancelaciones.</p>
         )}
       </section>
 
