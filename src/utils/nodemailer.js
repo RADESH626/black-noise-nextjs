@@ -15,6 +15,9 @@ export const transporter = nodemailer.createTransport({
 // Función para enviar correos electrónicos
 export const sendEmail = async ({ to, subject, html }) => {
   try {
+    if (!to || to.length === 0) {
+      throw new Error('No recipients defined for email.');
+    }
     await transporter.sendMail({
       from: process.env.EMAIL_USER, // Remitente
       to,         // Lista de destinatarios
