@@ -39,7 +39,7 @@ function InputPassword(props) {
           transform
           -translate-y-1/2
           bg-bn-accent
-          text-white
+          text-black
           text-xs
           px-2
           py-1
