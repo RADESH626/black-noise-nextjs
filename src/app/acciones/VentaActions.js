@@ -44,13 +44,35 @@ async function guardarVenta(data) {
 }
 
 // Obtener todas las ventas
-async function obtenerVentas() {
-    logger.debug('Entering obtenerVentas.');
+async function obtenerVentas(filters = {}) {
+    logger.debug('Entering obtenerVentas with filters:', filters);
     try {
         await connectDB();
         logger.debug('Database connected for obtenerVentas.');
         const Venta = await getVentaModel();
-        const ventas = await Venta.find({})
+        let query = {};
+
+        // Apply filters
+        if (filters.estadoVenta) {
+            query.estadoVenta = filters.estadoVenta;
+        }
+        if (filters.pedidoAsociadoId) {
+            query.pedidoId = filters.pedidoAsociadoId;
+        }
+        if (filters.valorVentaMin) {
+            query.valorVenta = { ...query.valorVenta, $gte: parseFloat(filters.valorVentaMin) };
+        }
+        if (filters.valorVentaMax) {
+            query.valorVenta = { ...query.valorVenta, $lte: parseFloat(filters.valorVentaMax) };
+        }
+        if (filters.fechaVentaStart) {
+            query.fechaVenta = { ...query.fechaVenta, $gte: new Date(filters.fechaVentaStart) };
+        }
+        if (filters.fechaVentaEnd) {
+            query.fechaVenta = { ...query.fechaVenta, $lte: new Date(filters.fechaVentaEnd) };
+        }
+
+        const ventas = await Venta.find(query)
             .populate('pagoIds', 'valorPago metodoPago estadoPago') 
             .populate({
                 path: 'pedidoId',

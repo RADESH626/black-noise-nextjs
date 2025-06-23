@@ -43,22 +43,53 @@ async function guardarPago(data) {
 }
 
 // Obtener todos los pagos con paginación
-async function obtenerPagos(page = 1, limit = 10) {
-    logger.debug(`Entering obtenerPagos with page: ${page}, limit: ${limit}.`);
+async function obtenerPagos(page = 1, limit = 10, filters = {}) {
+    logger.debug(`Entering obtenerPagos with page: ${page}, limit: ${limit}, filters:`, filters);
     try {
         await connectDB();
         logger.debug('Database connected for obtenerPagos.');
         const Pago = await getModel('Pago');
 
-        const skip = (page - 1) * limit;
-        const totalPagos = await Pago.countDocuments({});
+        let query = {};
 
-        const pagos = await Pago.find({})
-            .populate('usuarioId', 'Nombre primerApellido correo') // Popula algunos campos de Usuario
-            .populate('ventaId', '_id') // Popula el ID de Venta
+        // Apply filters
+        if (filters.metodoPago) {
+            query.metodoPago = filters.metodoPago;
+        }
+        if (filters.estadoTransaccion) {
+            query.estadoTransaccion = filters.estadoTransaccion;
+        }
+        if (filters.usuarioId) {
+            query.usuarioId = filters.usuarioId;
+        }
+        if (filters.pedidoId) {
+            query.pedidoId = filters.pedidoId;
+        }
+        if (filters.ventaId) {
+            query.ventaId = filters.ventaId;
+        }
+        if (filters.valorPagoMin) {
+            query.valorPago = { ...query.valorPago, $gte: parseFloat(filters.valorPagoMin) };
+        }
+        if (filters.valorPagoMax) {
+            query.valorPago = { ...query.valorPago, $lte: parseFloat(filters.valorPagoMax) };
+        }
+        if (filters.fechaPagoStart) {
+            query.createdAt = { ...query.createdAt, $gte: new Date(filters.fechaPagoStart) };
+        }
+        if (filters.fechaPagoEnd) {
+            query.createdAt = { ...query.createdAt, $lte: new Date(filters.fechaPagoEnd) };
+        }
+
+        const skip = (page - 1) * limit;
+        const totalPagos = await Pago.countDocuments(query);
+
+        const pagos = await Pago.find(query)
+            .populate('usuarioId', 'Nombre primerApellido correo')
+            .populate('ventaId', '_id')
             .populate({
                 path: 'pedidoId',
-                select: 'metodoEntrega', // Popula solo el campo metodoEntrega del Pedido
+                select: 'metodoEntrega',
             })
             .skip(skip)
             .limit(limit)
@@ -67,14 +98,14 @@ async function obtenerPagos(page = 1, limit = 10) {
         const formattedPagos = pagos.map(pago => ({
             ...pago,
             _id: pago._id.toString(),
-            ventaId: pago.ventaId ? pago.ventaId.toString() : null, // Convert ventaId to string if populated
+            ventaId: pago.ventaId ? pago.ventaId.toString() : null,
             usuarioId: pago.usuarioId ? {
                 ...pago.usuarioId,
-                _id: pago.usuarioId._id.toString() // Convert userId to string
+                _id: pago.usuarioId._id.toString()
             } : null,
             pedidoId: pago.pedidoId ? {
                 ...pago.pedidoId,
-                _id: pago.pedidoId._id.toString() // Convert pedidoId to string
+                _id: pago.pedidoId._id.toString()
             } : null,
         }));
 

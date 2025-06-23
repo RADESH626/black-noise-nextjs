@@ -3,14 +3,26 @@ import DesignsClientPage from '@/components/admin/designs/DesignsClientPage';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import { Suspense } from 'react';
+import DesignFilters from '@/components/admin/filters/DesignFilters';
 
-export default async function AdminDesignsPage() {
+export default async function AdminDesignsPage({ searchParams }) {
+    const filters = {
+        fechaCreacionStart: searchParams.fechaCreacionStart,
+        fechaCreacionEnd: searchParams.fechaCreacionEnd,
+        categoria: searchParams.categoria,
+        estadoDesing: searchParams.estadoDesing,
+        disenadorUsuarioId: searchParams.disenadorUsuarioId,
+        precioMin: searchParams.precioMin,
+        precioMax: searchParams.precioMax,
+        tallasDisponibles: searchParams.tallasDisponibles ? searchParams.tallasDisponibles.split(',') : [],
+    };
+
     let designs = [];
     let error = null;
 
     try {
-        const result = await obtenerDesigns();
-        if (result.data) { // obtenerDesigns returns { data: [...] } or { error: ... }
+        const result = await obtenerDesigns(filters);
+        if (result.data) {
             designs = result.data;
         } else {
             error = result.error || 'Error al cargar la lista de diseños.';
@@ -21,12 +33,12 @@ export default async function AdminDesignsPage() {
     }
 
     if (error) {
-        return <ErrorMessage message={error} />; // Render ErrorMessage directly
+        return <ErrorMessage message={error} />;
     }
 
     return (
-        <Suspense fallback={<LoadingSpinner />}> {/* Render LoadingSpinner directly */}
-            <DesignsClientPage initialDesigns={designs} />
+        <Suspense fallback={<LoadingSpinner />}>
+            <DesignsClientPage initialDesigns={designs} currentFilters={filters} />
         </Suspense>
     );
 }

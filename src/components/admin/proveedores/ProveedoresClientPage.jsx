@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Tabla from '@/components/common/tablas/Tabla';
 import TablaHeader from '@/components/common/tablas/TablaHeader';
 import TdGeneral from '@/components/common/tablas/TdGeneral';
@@ -11,35 +11,59 @@ import Loader from '@/components/Loader';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import { Rol } from '@/models/enums/usuario/Rol';
-import { obtenerProveedores } from '@/app/acciones/ProveedorActions'; // Import the new action
-import { useDialog } from '@/context/DialogContext'; // Import useDialog
-import AddSupplierModal from '@/components/admin/proveedores/AddSupplierModal'; // Import AddSupplierModal
+import { obtenerProveedores } from '@/app/acciones/ProveedorActions';
+import { useDialog } from '@/context/DialogContext';
+import AddSupplierModal from '@/components/admin/proveedores/AddSupplierModal';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+import ProveedorFilters from '@/components/admin/filters/ProveedorFilters'; // Importar el componente de filtros
 
-const ProveedoresClientPage = ({ initialProveedores }) => {
+const ProveedoresClientPage = ({ initialProveedores, currentFilters }) => {
     const { data: session, status } = useSession();
     const router = useRouter();
-    const { openModal, closeModal } = useDialog(); // Use dialog context
+    const searchParams = useSearchParams();
+    const { openModal, closeModal } = useDialog();
     const [proveedores, setProveedores] = useState(initialProveedores);
-    const [loading, setLoading] = useState(false); // Initial loading handled by Server Component
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        // This useEffect is primarily for session management and re-fetching after mutations
         if (status === 'loading') return;
-
         if (!session || session.user.rol !== Rol.ADMINISTRADOR) {
             router.push('/login');
             return;
         }
-        // No initial fetch here, as it's done by the Server Component
     }, [session, status, router]);
+
+    useEffect(() => {
+        setProveedores(initialProveedores);
+    }, [initialProveedores]);
+
+    const handleApplyFilters = useCallback((filters) => {
+        const params = new URLSearchParams(searchParams);
+        Object.keys(filters).forEach(key => {
+            if (Array.isArray(filters[key])) {
+                params.delete(key); // Clear existing array params
+                filters[key].forEach(item => params.append(key, item));
+            } else if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
+                params.set(key, filters[key]);
+            } else {
+                params.delete(key);
+            }
+        });
+        router.push(`/admin/proveedores?${params.toString()}`);
+        router.refresh();
+    }, [router, searchParams]);
+
+    const handleClearFilters = useCallback(() => {
+        router.push('/admin/proveedores');
+        router.refresh();
+    }, [router]);
 
     const fetchProveedores = async () => {
         setLoading(true);
         setError(null);
         try {
-            const result = await obtenerProveedores(); // Call the server action
+            const result = await obtenerProveedores(currentFilters); // Re-fetch with current filters
             if (result.success) {
                 setProveedores(result.proveedores);
             } else {
@@ -55,17 +79,15 @@ const ProveedoresClientPage = ({ initialProveedores }) => {
 
     const handleOpenModal = () => {
         openModal(
-            // "Agregar Nuevo Proveedor",
             <AddSupplierModal onSuccess={handleSupplierAdded} onModalClose={closeModal} />
         );
     };
 
     const handleSupplierAdded = () => {
-        fetchProveedores(); // Re-fetch suppliers after a new one is added
-        closeModal(); // Close the modal after successful addition
+        fetchProveedores();
+        closeModal();
     };
 
-    // If initialProveedores is empty and not loading, display no data message
     if (loading) {
         return <Loader />;
     }
@@ -89,8 +111,13 @@ const ProveedoresClientPage = ({ initialProveedores }) => {
                     Agregar Proveedor
                 </BotonGeneral>
             </div>
+
+            <div className="mb-6">
+                <ProveedorFilters onApplyFilters={handleApplyFilters} onClearFilters={handleClearFilters} initialFilters={currentFilters} />
+            </div>
+
             {proveedores.length === 0 ? (
-                <p className="text-gray-600">No hay proveedores registrados.</p>
+                <p className="text-gray-600">No hay proveedores registrados que coincidan con los filtros.</p>
             ) : (
                 <div className="overflow-x-auto bg-white shadow-md rounded-lg">
                     <Tabla>

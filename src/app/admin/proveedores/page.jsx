@@ -3,15 +3,25 @@ import ProveedoresClientPage from '@/components/admin/proveedores/ProveedoresCli
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import { Suspense } from 'react';
-import { useDialog } from '@/context/DialogContext'; // Import useDialog
-import AddSupplierModal from '@/components/admin/proveedores/AddSupplierModal'; // Import AddSupplierModal
+import ProveedorFilters from '@/components/admin/filters/ProveedorFilters'; // Importar el componente de filtros
 
-export default async function AdminProveedoresPage() {
+export default async function AdminProveedoresPage({ searchParams }) {
+    const filters = {
+        disponibilidad: searchParams.disponibilidad,
+        especialidad: searchParams.especialidad ? searchParams.especialidad.split(',') : [],
+        metodosPagoAceptados: searchParams.metodosPagoAceptados ? searchParams.metodosPagoAceptados.split(',') : [],
+        habilitado: searchParams.habilitado === 'true' ? true : (searchParams.habilitado === 'false' ? false : undefined),
+        ordenesActivasMin: searchParams.ordenesActivasMin,
+        ordenesActivasMax: searchParams.ordenesActivasMax,
+        fechaUltimaAsignacionStart: searchParams.fechaUltimaAsignacionStart,
+        fechaUltimaAsignacionEnd: searchParams.fechaUltimaAsignacionEnd,
+    };
+
     let proveedores = [];
     let error = null;
 
     try {
-        const result = await obtenerProveedores();
+        const result = await obtenerProveedores(filters);
         if (result.success) {
             proveedores = result.proveedores;
         } else {
@@ -23,12 +33,12 @@ export default async function AdminProveedoresPage() {
     }
 
     if (error) {
-        return <ErrorMessage message={error} />; // Render ErrorMessage directly
+        return <ErrorMessage message={error} />;
     }
 
     return (
-        <Suspense fallback={<LoadingSpinner />}> {/* Render LoadingSpinner directly */}
-            <ProveedoresClientPage initialProveedores={proveedores} />
+        <Suspense fallback={<LoadingSpinner />}>
+            <ProveedoresClientPage initialProveedores={proveedores} currentFilters={filters} />
         </Suspense>
     );
 }

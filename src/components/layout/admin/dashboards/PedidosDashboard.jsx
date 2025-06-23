@@ -3,56 +3,88 @@ import React, { useEffect, useState, useCallback } from "react";
 import SeccionHeader from '../secciones/acciones/SeccionHeader';
 import { obtenerPedidos } from '@/app/acciones/PedidoActions';
 import Loader from '@/components/Loader';
-import FilterBar from '@/components/common/FilterBar'; // Import FilterBar
 import BotonExportarPDF from '@/components/common/botones/BotonExportarPDF'; // Import BotonExportarPDF
-import { EstadoPedido } from '@/models/enums/PedidoEnums'; // Import EstadoPedido
+import PedidoFilters from '@/components/admin/filters/PedidoFilters'; // Importar el componente de filtros
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function PedidosDashboard() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filters, setFilters] = useState({}); // State for filters
-  const [filteredPedidos, setFilteredPedidos] = useState([]); // Keep for client-side pagination/filtering if needed
-
-  // Paginación
   const [currentPage, setCurrentPage] = useState(1);
-  const pedidosPerPage = 12;
+  const [totalPages, setTotalPages] = useState(1); // Ahora se obtiene del backend si se implementa paginación en el backend
+  const pedidosPerPage = 12; // Mantener el límite por defecto o hacerlo configurable
 
-  const indexOfLastPedido = currentPage * pedidosPerPage;
-  const indexOfFirstPedido = indexOfLastPedido - pedidosPerPage;
-  const currentPedidos = filteredPedidos.slice(indexOfFirstPedido, indexOfLastPedido);
-  const totalPages = Math.ceil(filteredPedidos.length / pedidosPerPage);
+  const currentFilters = {
+    estadoPedido: searchParams.get('estadoPedido') || '',
+    estadoPago: searchParams.get('estadoPago') || '',
+    metodoEntrega: searchParams.get('metodoEntrega') || '',
+    proveedorId: searchParams.get('proveedorId') || '',
+    usuarioCompradorId: searchParams.get('usuarioCompradorId') || '',
+    valorTotalMin: searchParams.get('valorTotalMin') || '',
+    valorTotalMax: searchParams.get('valorTotalMax') || '',
+    fechaPedidoStart: searchParams.get('fechaPedidoStart') || '',
+    fechaPedidoEnd: searchParams.get('fechaPedidoEnd') || '',
+    pedidoCancelado: searchParams.get('pedidoCancelado') === 'true',
+    pedidoRefabricado: searchParams.get('pedidoRefabricado') === 'true',
+    searchText: searchParams.get('searchText') || '',
+  };
+
+  useEffect(() => {
+    const fetchPedidos = async () => {
+      setLoading(true);
+      setError(null);
+      // Pasar los filtros y la paginación a la acción del servidor
+      const { pedidos: fetchedPedidos, totalPedidos, totalPages: fetchedTotalPages, error: fetchError } = await obtenerPedidos({
+        ...currentFilters,
+        page: currentPage,
+        limit: pedidosPerPage,
+      });
+      if (fetchError) {
+        setError({ message: fetchError });
+        setPedidos([]);
+        setTotalPages(1);
+      } else {
+        setPedidos(fetchedPedidos || []);
+        // Si el backend no devuelve totalPages, calcularlo aquí
+        setTotalPages(fetchedTotalPages || Math.ceil((fetchedPedidos?.length || 0) / pedidosPerPage));
+      }
+      setLoading(false);
+    };
+
+    fetchPedidos();
+  }, [currentPage, currentFilters, pedidosPerPage]);
+
+  const handleApplyFilters = useCallback((filters) => {
+    const params = new URLSearchParams(searchParams);
+    Object.keys(filters).forEach(key => {
+      if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
+        params.set(key, filters[key]);
+      } else {
+        params.delete(key);
+      }
+    });
+    router.push(`/admin/pedidos?${params.toString()}`);
+    setCurrentPage(1); // Reiniciar a la primera página al aplicar filtros
+  }, [router, searchParams]);
+
+  const handleClearFilters = useCallback(() => {
+    router.push('/admin/pedidos');
+    setCurrentPage(1); // Reiniciar a la primera página al limpiar filtros
+  }, [router]);
 
   const nextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
+    if (currentPage < totalPages) {
+      setCurrentPage(prev => prev + 1);
+    }
   };
 
   const prevPage = () => {
-    if (currentPage > 1) setCurrentPage(prev => prev - 1);
-  };
-
-  const fetchAndSetPedidos = useCallback(async (currentFilters) => {
-    setLoading(true);
-    setError(null);
-    const { pedidos: fetchedPedidos, error: fetchError } = await obtenerPedidos(currentFilters);
-    if (fetchError) {
-      setError({ message: fetchError });
-      setPedidos([]);
-      setFilteredPedidos([]);
-    } else {
-      setPedidos(fetchedPedidos || []);
-      setFilteredPedidos(fetchedPedidos || []); // Initialize filteredPedidos with fetched data
+    if (currentPage > 1) {
+      setCurrentPage(prev => prev - 1);
     }
-    setLoading(false);
-    setCurrentPage(1); // Reset to page 1 on new fetch
-  }, []);
-
-  useEffect(() => {
-    fetchAndSetPedidos(filters);
-  }, [filters, fetchAndSetPedidos]);
-
-  const handleFilterChange = (newFilters) => {
-    setFilters(newFilters);
   };
 
   // PDF Export Mappers
@@ -107,36 +139,13 @@ export default function PedidosDashboard() {
 
       <div className="flex justify-end mb-4">
         <BotonExportarPDF 
-            data={filteredPedidos} 
+            data={pedidos} // Usar 'pedidos' directamente ya que el filtrado es en el servidor
             reportTitle="Reporte de Pedidos" 
             tableHeaders={pedidoTableHeaders} 
             tableBodyMapper={pedidoTableBodyMapper} 
         />
       </div>
-      <FilterBar 
-        onFilterChange={handleFilterChange} 
-        initialFilters={filters} 
-        additionalFilters={[
-            {
-                name: "estadoPedido",
-                label: "Estado del Pedido:",
-                type: "select",
-                options: [
-                    { value: "", label: "Todos" },
-                    { value: EstadoPedido.PENDIENTE, label: "Pendiente" },
-                    { value: EstadoPedido.EN_FABRICACION, label: "En Fabricación" },
-                    { value: EstadoPedido.LISTO, label: "Listo" },
-                    { value: EstadoPedido.ENVIADO, label: "Enviado" },
-                    { value: EstadoPedido.ENTREGADO, label: "Entregado" },
-                    { value: EstadoPedido.CANCELADO, label: "Cancelado" },
-                    { value: EstadoPedido.SOLICITUD_DEVOLUCION, label: "Solicitud Devolución" },
-                    { value: EstadoPedido.DEVOLUCION_APROBADA, label: "Devolución Aprobada" },
-                    { value: EstadoPedido.DEVOLUCION_RECHAZADA, label: "Devolución Rechazada" },
-                    { value: EstadoPedido.DEVOLUCION_COMPLETADA, label: "Devolución Completada" },
-                ]
-            }
-        ]}
-      />
+      <PedidoFilters onApplyFilters={handleApplyFilters} onClearFilters={handleClearFilters} initialFilters={currentFilters} />
 
       <div className="overflow-x-auto rounded-lg shadow-md mt-4" style={{ backgroundColor: '#FFFFFF' }}>
         <table className="min-w-full divide-y" style={{ borderColor: '#FFFFFFFF' }}>
@@ -155,7 +164,7 @@ export default function PedidosDashboard() {
             </tr>
           </thead>
           <tbody style={{ backgroundColor: '#FFFFFFFF', borderColor: '#E5E7EBFF' }}>
-            {currentPedidos.map((pedido) => (
+            {pedidos.map((pedido) => ( // Usar 'pedidos' directamente ya que el filtrado es en el servidor
               <tr key={pedido._id} style={{ borderBottom: '1px solid #000000FF' }}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: '#111827' }}>
                   {pedido._id}
@@ -170,7 +179,7 @@ export default function PedidosDashboard() {
                   ${typeof pedido.total === 'number' ? pedido.total.toFixed(2) : '0.00'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#50545CFF' }}>
-                  {pedido.estadoPago}
+                  {pedido.estadoPedido}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#50545CFF' }}>
                   {pedido.createdAt ? new Date(pedido.createdAt).toLocaleDateString() : 'N/A'}

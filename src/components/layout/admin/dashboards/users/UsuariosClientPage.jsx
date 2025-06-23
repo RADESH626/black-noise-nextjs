@@ -9,14 +9,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import BotonEditar from '@/components/common/botones/BotonEditar';
 import ModalAgregarUsuario from '@/components/common/modales/ModalAgregarUsuario';
-import ModalEditarUsuario from '@/components/layout/admin/usuarios/modals/ModalEditarUsuario'; // Import ModalEditarUsuario
+import ModalEditarUsuario from '@/components/layout/admin/usuarios/modals/ModalEditarUsuario';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import Loader from '@/components/Loader';
 import { useDialog } from '@/context/DialogContext';
-import { useActionState } from 'react'; // For React 19
-import { useFormStatus } from 'react-dom'; // For React 19
-import FilterBar from '@/components/common/FilterBar'; // Import FilterBar
-import BotonExportarPDF from '@/components/common/botones/BotonExportarPDF'; // Import BotonExportarPDF
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
+import BotonExportarPDF from '@/components/common/botones/BotonExportarPDF';
+import UserFilters from '@/components/admin/filters/UserFilters'; // Importar el componente de filtros
+import { useRouter, useSearchParams } from 'next/navigation';
 
 // Utility function for date formatting
 const formatDate = (dateString) => {
@@ -56,20 +57,33 @@ function ToggleUserStatusForm({ userId, currentStatus, onStatusChanged }) {
     );
 }
 
-export default function UsuariosClientPage({ initialUsers }) {
-  const [users, setUsers] = useState(initialUsers || []);
-  const [loading, setLoading] = useState(false);
+export default function UsuariosClientPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAddUserModal, setShowAddUserModal] = useState(false);
-  const [showEditUserModal, setShowEditUserModal] = useState(false); // State for edit user modal
-  const [userToEdit, setUserToEdit] = useState(null); // State to hold user data for editing
-  const [filters, setFilters] = useState({}); // State for filters
+  const [showEditUserModal, setShowEditUserModal] = useState(false);
+  const [userToEdit, setUserToEdit] = useState(null);
   const { showPopUp } = useDialog();
 
-  const fetchAndSetUsers = useCallback(async (currentFilters) => {
+  const currentFilters = {
+    searchText: searchParams.get('searchText') || '',
+    rol: searchParams.get('rol') || '',
+    tipoDocumento: searchParams.get('tipoDocumento') || '',
+    genero: searchParams.get('genero') || '',
+    habilitado: searchParams.get('habilitado') === 'true' ? true : (searchParams.get('habilitado') === 'false' ? false : undefined),
+    fechaNacimientoStart: searchParams.get('fechaNacimientoStart') || '',
+    fechaNacimientoEnd: searchParams.get('fechaNacimientoEnd') || '',
+    fechaRegistroStart: searchParams.get('fechaRegistroStart') || '',
+    fechaRegistroEnd: searchParams.get('fechaRegistroEnd') || '',
+  };
+
+  const fetchAndSetUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const result = await ObtenerTodosLosUsuarios(currentFilters); // Pass filters to the server action
+      const result = await ObtenerTodosLosUsuarios(currentFilters);
       if (result && result.users && Array.isArray(result.users)) {
         setUsers(result.users);
       } else {
@@ -82,16 +96,29 @@ export default function UsuariosClientPage({ initialUsers }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [currentFilters]);
 
   useEffect(() => {
-    // Initial fetch with current filters
-    fetchAndSetUsers(filters);
-  }, [filters, fetchAndSetUsers]); // Re-fetch when filters change
+    fetchAndSetUsers();
+  }, [fetchAndSetUsers]);
 
-  const handleFilterChange = (newFilters) => {
-    setFilters(newFilters);
-  };
+  const handleApplyFilters = useCallback((filters) => {
+    const params = new URLSearchParams(searchParams);
+    Object.keys(filters).forEach(key => {
+      if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
+        params.set(key, filters[key]);
+      } else {
+        params.delete(key);
+      }
+    });
+    router.push(`/admin/users?${params.toString()}`);
+    router.refresh(); // Forzar la revalidación de datos del servidor
+  }, [router, searchParams]);
+
+  const handleClearFilters = useCallback(() => {
+    router.push('/admin/users');
+    router.refresh(); // Forzar la revalidación de datos del servidor
+  }, [router]);
 
   const handleToggleUserStatus = async (userId, currentStatus) => {
     setLoading(true);
@@ -156,8 +183,9 @@ export default function UsuariosClientPage({ initialUsers }) {
             />
         </div>
       </div>
-      <FilterBar onFilterChange={handleFilterChange} initialFilters={filters} />
-
+      <div className="mb-6">
+        <UserFilters onApplyFilters={handleApplyFilters} onClearFilters={handleClearFilters} initialFilters={currentFilters} />
+      </div>
 
       {users.length > 0 ? (
         <div className="overflow-y-auto max-h-[calc(100vh-300px)]">
@@ -167,7 +195,7 @@ export default function UsuariosClientPage({ initialUsers }) {
                 {loading ? (
                     <tr><TdGeneral colSpan="6" className="text-center py-4">Actualizando...</TdGeneral></tr>
                 ) : users.length === 0 ? (
-                    <tr><TdGeneral colSpan="6" className="text-center py-4">No se encontraron usuarios.</TdGeneral></tr>
+                    <tr><TdGeneral colSpan="6" className="text-center py-4">No se encontraron usuarios que coincidan con los filtros.</TdGeneral></tr>
                 ) : (
                     users.map((user) => (
                         <tr key={user._id} className="hover:bg-gray-200">
@@ -185,7 +213,7 @@ export default function UsuariosClientPage({ initialUsers }) {
                             <TdGeneral>
                                 <div className="flex items-center space-x-3">
                                     <Image
-                                        src={user.fotoPerfil || '/img/perfil/FotoPerfil.webp'}
+                                        src={user.profileImageUrl || '/img/perfil/FotoPerfil.webp'} // Use profileImageUrl
                                         alt={`Foto de ${user.Nombre}`}
                                         width={40}
                                         height={40}
@@ -238,7 +266,7 @@ export default function UsuariosClientPage({ initialUsers }) {
           </Tabla>
         </div>
       ) : (
-        <p>No hay usuarios para mostrar.</p>
+        <p>No hay usuarios para mostrar que coincidan con los filtros.</p>
       )}
 
       <ModalAgregarUsuario 

@@ -15,47 +15,62 @@ async function obtenerPedidos(filters = {}) {
   try {
     await dbConnect();
     const PedidoModel = await getModel("Pedido");
+    const UsuarioModel = await getModel('Usuario');
 
-    const { searchText, startDate, endDate, estadoPedido, proveedorId } = filters;
     const query = {};
 
-    if (searchText) {
-      // Buscar por ID de pedido, o por nombre/email de usuario (requiere populate)
-      // Para buscar por nombre/email de usuario, primero obtenemos los IDs de usuario que coinciden
-      const UsuarioModel = await getModel('Usuario');
+    // Filtros específicos para Pedido
+    if (filters.estadoPedido) {
+      query.estadoPedido = filters.estadoPedido;
+    }
+    if (filters.estadoPago) {
+      query.estadoPago = filters.estadoPago;
+    }
+    if (filters.metodoEntrega) {
+      query.metodoEntrega = filters.metodoEntrega;
+    }
+    if (filters.proveedorId) {
+      query.proveedorId = filters.proveedorId;
+    }
+    if (filters.usuarioCompradorId) {
+      query.userId = filters.usuarioCompradorId;
+    }
+    if (filters.valorTotalMin) {
+      query.total = { ...query.total, $gte: parseFloat(filters.valorTotalMin) };
+    }
+    if (filters.valorTotalMax) {
+      query.total = { ...query.total, $lte: parseFloat(filters.valorTotalMax) };
+    }
+    if (filters.fechaPedidoStart) {
+      query.createdAt = { ...query.createdAt, $gte: new Date(filters.fechaPedidoStart) };
+    }
+    if (filters.fechaPedidoEnd) {
+      query.createdAt = { ...query.createdAt, $lte: new Date(filters.fechaPedidoEnd) };
+    }
+    if (filters.pedidoCancelado !== undefined) {
+      query.fue_cancelado = filters.pedidoCancelado;
+    }
+    if (filters.pedidoRefabricado !== undefined) {
+      query.fue_refabricado = filters.pedidoRefabricado;
+    }
+
+    // Si hay searchText y no se especificó un usuarioCompradorId directo, buscar por nombre/email de usuario
+    if (filters.searchText && !filters.usuarioCompradorId) {
       const matchingUsers = await UsuarioModel.find({
         $or: [
-          { Nombre: { $regex: searchText, $options: 'i' } },
-          { primerApellido: { $regex: searchText, $options: 'i' } },
-          { correo: { $regex: searchText, $options: 'i' } },
+          { Nombre: { $regex: filters.searchText, $options: 'i' } },
+          { primerApellido: { $regex: filters.searchText, $options: 'i' } },
+          { correo: { $regex: filters.searchText, $options: 'i' } },
         ]
       }).select('_id').lean();
       const matchingUserIds = matchingUsers.map(user => user._id);
 
-      query.$or = [
-        { _id: { $regex: searchText, $options: 'i' } }, // Buscar por ID de pedido
-        { userId: { $in: matchingUserIds } } // Buscar por IDs de usuario coincidentes
-      ];
-    }
-
-    if (startDate || endDate) {
-      query.createdAt = {};
-      if (startDate) {
-        query.createdAt.$gte = new Date(startDate);
+      // Combinar con la query existente si ya hay un userId
+      if (query.userId) {
+        query.userId = { $in: [...(Array.isArray(query.userId.$in) ? query.userId.$in : [query.userId]), ...matchingUserIds] };
+      } else {
+        query.userId = { $in: matchingUserIds };
       }
-      if (endDate) {
-        const endOfDay = new Date(endDate);
-        endOfDay.setHours(23, 59, 59, 999); // Set to end of the day
-        query.createdAt.$lte = endOfDay;
-      }
-    }
-
-    if (estadoPedido) {
-      query.estadoPedido = estadoPedido;
-    }
-
-    if (proveedorId) {
-      query.proveedorId = proveedorId;
     }
 
     const pedidos = await PedidoModel.find(query).lean();

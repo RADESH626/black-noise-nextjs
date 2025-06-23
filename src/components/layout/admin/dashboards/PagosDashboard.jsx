@@ -1,75 +1,81 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import SeccionHeader from '@/components/layout/admin/secciones/acciones/SeccionHeader';
 import { obtenerPagos } from '@/app/acciones/PagoActions';
 import Loader from '@/components/Loader';
+import PagoFilters from '@/components/admin/filters/PagoFilters'; // Importar el componente de filtros
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function PagosDashboard() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [pagos, setPagos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [filteredPagos, setFilteredPagos] = useState([]);
-
-  // Paginación
   const [currentPage, setCurrentPage] = useState(1);
-  const pagosPerPage = 12;
+  const [totalPages, setTotalPages] = useState(1);
+  const pagosPerPage = 12; // Mantener el límite por defecto o hacerlo configurable
 
-  const indexOfLastPago = currentPage * pagosPerPage;
-  const indexOfFirstPago = indexOfLastPago - pagosPerPage;
-  const currentPagos = filteredPagos.slice(indexOfFirstPago, indexOfLastPago);
-  const totalPages = Math.ceil(filteredPagos.length / pagosPerPage);
-
-  const nextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
-  };
-
-  const prevPage = () => {
-    if (currentPage > 1) setCurrentPage(prev => prev - 1);
+  const currentFilters = {
+    metodoPago: searchParams.get('metodoPago') || '',
+    estadoTransaccion: searchParams.get('estadoTransaccion') || '',
+    usuarioId: searchParams.get('usuarioId') || '',
+    pedidoId: searchParams.get('pedidoId') || '',
+    ventaId: searchParams.get('ventaId') || '',
+    valorPagoMin: searchParams.get('valorPagoMin') || '',
+    valorPagoMax: searchParams.get('valorPagoMax') || '',
+    fechaPagoStart: searchParams.get('fechaPagoStart') || '',
+    fechaPagoEnd: searchParams.get('fechaPagoEnd') || '',
   };
 
   useEffect(() => {
     const fetchPagos = async () => {
       setLoading(true);
       setError(null);
-      const { pagos: fetchedPagos, error: fetchError } = await obtenerPagos();
+      const { pagos: fetchedPagos, totalPagos, totalPages: fetchedTotalPages, error: fetchError } = await obtenerPagos(currentPage, pagosPerPage, currentFilters);
       if (fetchError) {
         setError({ message: fetchError });
         setPagos([]);
+        setTotalPages(1);
       } else {
         setPagos(fetchedPagos || []);
+        setTotalPages(fetchedTotalPages || 1);
       }
       setLoading(false);
     };
 
     fetchPagos();
-  }, []);
+  }, [currentPage, currentFilters, pagosPerPage]); // Dependencias actualizadas
 
-  useEffect(() => {
-    const filterPagos = () => {
-      const filtered = pagos.filter(pago => {
-        const userEmail = pago.usuarioId?.correo ? pago.usuarioId.correo.toLowerCase() : '';
-        const pagoId = pago._id.toLowerCase();
-        const lowerCaseSearchTerm = searchTerm.toLowerCase();
+  const handleApplyFilters = useCallback((filters) => {
+    const params = new URLSearchParams();
+    Object.keys(filters).forEach(key => {
+      if (filters[key]) {
+        params.set(key, filters[key]);
+      } else {
+        params.delete(key);
+      }
+    });
+    router.push(`/admin/pagos?${params.toString()}`);
+    setCurrentPage(1); // Reiniciar a la primera página al aplicar filtros
+  }, [router]);
 
-        const matchesSearchTerm = userEmail.includes(lowerCaseSearchTerm) || pagoId.includes(lowerCaseSearchTerm);
+  const handleClearFilters = useCallback(() => {
+    router.push('/admin/pagos');
+    setCurrentPage(1); // Reiniciar a la primera página al limpiar filtros
+  }, [router]);
 
-        const pagoDate = new Date(pago.createdAt);
-        const start = startDate ? new Date(startDate) : null;
-        const end = endDate ? new Date(endDate) : null;
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
 
-        const matchesDateRange = (!start || pagoDate >= start) && (!end || pagoDate <= end);
-
-        return matchesSearchTerm && matchesDateRange;
-      });
-      setFilteredPagos(filtered);
-      setCurrentPage(1); // Reinicia a la página 1 en cada filtro
-    };
-
-    filterPagos();
-  }, [pagos, searchTerm, startDate, endDate]);
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
 
   if (loading) {
     return <Loader />;
@@ -107,42 +113,8 @@ export default function PagosDashboard() {
         <h4 className='font-bold text-2xl' style={{ color: '#000000' }}>Gestión de Pagos</h4>
       </SeccionHeader>
 
-      <div className="mt-4 p-4 rounded-lg shadow-md flex flex-wrap gap-4" style={{ backgroundColor: '#FFFFFF' }}>
-        <input
-          type="text"
-          placeholder="Buscar por usuario o ID de pago"
-          className="p-2 border rounded-md flex-grow"
-          style={{
-            borderColor: '#FFFFFFFF',
-            backgroundColor: '#272525FF',
-            color: '#FFFFFFFF'
-          }}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <input
-          type="date"
-          className="p-2 border rounded-md"
-          style={{
-            borderColor: '#000000FF',
-            backgroundColor: '#FFFFFFFF',
-            color: '#000000FF'
-          }}
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        />
-        <span className="self-center" style={{ color: '#000000FF' }}>-</span>
-        <input
-          type="date"
-          className="p-2 border rounded-md"
-          style={{
-            borderColor: '#000000FF',
-            backgroundColor: '#FFFFFF',
-            color: '#000000'
-          }}
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-        />
+      <div className="mb-6">
+        <PagoFilters onApplyFilters={handleApplyFilters} onClearFilters={handleClearFilters} initialFilters={currentFilters} />
       </div>
 
       <div className="overflow-x-auto rounded-lg shadow-md mt-4" style={{ backgroundColor: '#FFFFFF' }}>
@@ -162,7 +134,7 @@ export default function PagosDashboard() {
             </tr>
           </thead>
           <tbody style={{ backgroundColor: '#FFFFFFFF', borderColor: '#E5E7EBFF' }}>
-            {currentPagos.map((pago) => (
+            {pagos.map((pago) => ( // Usar 'pagos' directamente ya que el filtrado es en el servidor
               <tr key={pago._id} style={{ borderBottom: '1px solid #000000FF' }}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: '#111827' }}>
                   {pago._id}

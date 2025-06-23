@@ -93,12 +93,40 @@ export async function guardarDesigns(prevState, formData) {
 }
 
 // Function to get all designs
-export async function obtenerDesigns() {
+export async function obtenerDesigns(filters = {}) {
     await connectDB();
-    console.log('Entering obtenerDesigns.');
+    console.log('Entering obtenerDesigns with filters:', filters);
     try {
         const Design = getDesignModel();
-        const designs = await Design.find({})
+        let query = {};
+
+        // Apply filters
+        if (filters.fechaCreacionStart) {
+            query.createdAt = { ...query.createdAt, $gte: new Date(filters.fechaCreacionStart) };
+        }
+        if (filters.fechaCreacionEnd) {
+            query.createdAt = { ...query.createdAt, $lte: new Date(filters.fechaCreacionEnd) };
+        }
+        if (filters.categoria) {
+            query.categoria = filters.categoria;
+        }
+        if (filters.estadoDesing) {
+            query.estadoDesing = filters.estadoDesing;
+        }
+        if (filters.disenadorUsuarioId) {
+            query.usuarioId = filters.disenadorUsuarioId;
+        }
+        if (filters.precioMin) {
+            query.valorDesing = { ...query.valorDesing, $gte: parseFloat(filters.precioMin) };
+        }
+        if (filters.precioMax) {
+            query.valorDesing = { ...query.valorDesing, $lte: parseFloat(filters.precioMax) };
+        }
+        if (filters.tallasDisponibles && filters.tallasDisponibles.length > 0) {
+            query.tallasDisponibles = { $in: filters.tallasDisponibles };
+        }
+
+        const designs = await Design.find(query)
             .populate({
                 path: 'usuarioId',
                 select: 'Nombre primerApellido imageData imageMimeType'
@@ -106,31 +134,8 @@ export async function obtenerDesigns() {
             .lean();
 
         const formattedDesigns = designs.map(design => {
-            // Log para depuración: Verificar los datos de usuario después de populate
-            // console.log(`[obtenerDesigns] Design ID: ${design._id}`);
-            if (design.usuarioId) {
-                // console.log(`[obtenerDesigns] Usuario ID: ${design.usuarioId._id}`);
-                // // console.log(`[obtenerDesigns] Usuario Nombre: ${design.usuarioId.Nombre}`);
-                // // console.log(`[obtenerDesigns] Usuario imageData existe: ${!!design.usuarioId.imageData}`);
-                // // console.log(`[obtenerDesigns] Usuario imageMimeType: ${design.usuarioId.imageMimeType}`);
-                if (design.usuarioId.imageData && design.usuarioId.imageData.buffer instanceof Buffer) {
-                    // console.log(`[obtenerDesigns] Usuario imageData buffer length: ${design.usuarioId.imageData.buffer.length}`);
-                }
-            } else {
-                // console.log(`[obtenerDesigns] Usuario ID es null para el diseño ${design._id}`);
-            }
-
-            // Log para depuración: Verificar los datos de imagen del diseño
-            // console.log(`[obtenerDesigns] Design imageData existe: ${!!design.imageData}`);
-            // console.log(`[obtenerDesigns] Design imageMimeType: ${design.imageMimeType}`);
-            if (design.imageData && design.imageData.buffer instanceof Buffer) {
-                // console.log(`[obtenerDesigns] Design imageData buffer length: ${design.imageData.buffer.length}`);
-            }
-
-            // Create a mutable copy of the design object and convert _id to string
             const processedDesign = { ...design, _id: design._id.toString() };
 
-            // Remove imageData and imageMimeType as they are not plain objects
             delete processedDesign.imageData;
             delete processedDesign.imageMimeType;
 
@@ -138,38 +143,15 @@ export async function obtenerDesigns() {
                 ? `data:${design.imageMimeType};base64,${design.imageData.buffer.toString('base64')}`
                 : null;
 
-            // Create a new plain object to ensure no Mongoose objects are passed
-            const plainDesign = {
-                _id: design._id.toString(),
-                usuarioId: design.usuarioId ? {
-                    _id: design.usuarioId._id.toString(),
-                    Nombre: design.usuarioId.Nombre,
-                    primerApellido: design.usuarioId.primerApellido,
-                    // Do NOT include imageData or imageMimeType here, as they are handled by userAvatar
-                } : null,
-                nombreDesing: design.nombreDesing,
-                descripcion: design.descripcion,
-                valorDesing: design.valorDesing,
-                categoria: design.categoria,
-                estadoDesing: design.estadoDesing,
-                coloresDisponibles: design.coloresDisponibles,
-                tallasDisponibles: design.tallasDisponibles,
-                createdAt: design.createdAt.toISOString(), // Convert Date to ISO string
-                updatedAt: design.updatedAt.toISOString(), // Convert Date to ISO string
-                // Exclude imageData and imageMimeType from the top level if they are Buffers
-            };
-
-            const userAvatar = design.usuarioId && design.usuarioId.imageData && design.usuarioId.imageData.buffer instanceof Buffer && design.usuarioId.imageMimeType
-                ? `data:${design.usuarioId.imageMimeType};base64,${design.usuarioId.imageData.buffer.toString('base64')}`
-                : null; // Provide the user avatar as a data URL
-
-            // Create a plain object for usuarioId
             const processedUsuario = design.usuarioId ? {
                 _id: design.usuarioId._id.toString(),
                 Nombre: design.usuarioId.Nombre,
                 primerApellido: design.usuarioId.primerApellido,
-                // imageData and imageMimeType are not included as they are handled by userAvatar
             } : null;
+
+            const userAvatar = design.usuarioId && design.usuarioId.imageData && design.usuarioId.imageData.buffer instanceof Buffer && design.usuarioId.imageMimeType
+                ? `data:${design.usuarioId.imageMimeType};base64,${design.usuarioId.imageData.buffer.toString('base64')}`
+                : null;
 
             return {
                 ...processedDesign,
@@ -178,7 +160,7 @@ export async function obtenerDesigns() {
                 usuario: processedUsuario ? `${processedUsuario.Nombre} ${processedUsuario.primerApellido}` : 'Usuario Desconocido',
                 userAvatar: userAvatar,
                 imagen: designImageUrl,
-                usuarioId: processedUsuario, // Include the processed usuarioId object
+                usuarioId: processedUsuario,
             };
         });
 
@@ -352,4 +334,3 @@ export async function eliminarDesign(id) {
         return { success: false, message: 'Error al eliminar el diseño: ' + error.message };
     }
 }
-

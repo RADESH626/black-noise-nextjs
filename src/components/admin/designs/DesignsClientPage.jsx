@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Loader from '@/components/Loader';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
@@ -10,10 +10,12 @@ import ErrorMessage from '@/components/common/ErrorMessage';
 import { Rol } from '@/models/enums/usuario/Rol';
 import { eliminarDesign } from '@/app/acciones/DesignActions';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
+import DesignFilters from '@/components/admin/filters/DesignFilters'; // Importar el componente de filtros
 
-const DesignsClientPage = ({ initialDesigns }) => {
+const DesignsClientPage = ({ initialDesigns, currentFilters }) => {
     const { data: session, status } = useSession();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [designs, setDesigns] = useState(initialDesigns);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -28,6 +30,28 @@ const DesignsClientPage = ({ initialDesigns }) => {
             router.push('/login');
         }
     }, [session, status, router]);
+
+    useEffect(() => {
+        setDesigns(initialDesigns);
+    }, [initialDesigns]);
+
+    const handleApplyFilters = useCallback((filters) => {
+        const params = new URLSearchParams(searchParams);
+        Object.keys(filters).forEach(key => {
+            if (filters[key]) {
+                params.set(key, filters[key]);
+            } else {
+                params.delete(key);
+            }
+        });
+        router.push(`/admin/designs?${params.toString()}`);
+        router.refresh(); // Forzar la revalidación de datos del servidor
+    }, [router, searchParams]);
+
+    const handleClearFilters = useCallback(() => {
+        router.push('/admin/designs');
+        router.refresh(); // Forzar la revalidación de datos del servidor
+    }, [router]);
 
     const handleDeleteDesign = async (designId) => {
         if (!confirm('¿Estás seguro de que quieres eliminar este diseño?')) return;
@@ -86,16 +110,20 @@ const DesignsClientPage = ({ initialDesigns }) => {
                 </BotonGeneral>
             </div>
 
+            <div className="mb-6">
+                <DesignFilters onApplyFilters={handleApplyFilters} onClearFilters={handleClearFilters} initialFilters={currentFilters} />
+            </div>
+
             {designs.length === 0 ? (
-                <p className="text-gray-600">No hay diseños registrados.</p>
+                <p className="text-gray-600">No hay diseños registrados que coincidan con los filtros.</p>
             ) : (
                 <>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {currentDesigns.map((design) => (
                             <div key={design._id} className="bg-white shadow-md rounded-lg overflow-hidden">
-                                {design.imageBase64 && (
+                                {design.imagen && ( // Use 'imagen' prop from formattedDesigns
                                     <Image
-                                        src={design.imageBase64}
+                                        src={design.imagen}
                                         alt={design.nombreDesing}
                                         width={300}
                                         height={200}

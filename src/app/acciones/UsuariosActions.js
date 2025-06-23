@@ -239,7 +239,7 @@ async function ObtenerUsuarioPorId(id) {
         await connectDB();
         // logger.debug('Database connected for ObtenerUsuarioPorId.');
         
-const UsuarioModel = await getModel('Usuario');
+        const UsuarioModel = await getModel('Usuario');
         const response = await UsuarioModel.findById(id).lean();
         // logger.debug('Raw response from DB for ObtenerUsuarioPorId:', response);
 
@@ -274,7 +274,7 @@ async function ObtenerUsuarioPorCorreo(email) {
     try {
         logger.info('Iniciando la función ObtenerUsuarioPorCorreo para el correo:', email);
         await connectDB();
-const UsuarioModel = await getModel('Usuario');
+        const UsuarioModel = await getModel('Usuario');
         const user = await UsuarioModel.findOne({ correo: { $regex: new RegExp(`^${email.trim()}$`, 'i') } }).lean();
 
         if (!user) {
@@ -436,66 +436,47 @@ async function RegistroMasivoUsuario(formData) {
 // Función para filtrar usuarios
 async function FiltrarUsuarios(filters = {}) {
     try {
-        const { searchText, rol, genero, tipoDocumento, edad, incluirDeshabilitados, startDate, endDate } = filters;
-
         await connectDB();
+        const UsuarioModel = await getModel('Usuario');
 
         const query = {};
 
-        if (searchText) {
+        // Apply filters
+        if (filters.rol) {
+            query.rol = filters.rol;
+        }
+        if (filters.tipoDocumento) {
+            query.tipoDocumento = filters.tipoDocumento;
+        }
+        if (filters.genero) {
+            query.genero = filters.genero;
+        }
+        if (filters.habilitado !== undefined) {
+            query.habilitado = filters.habilitado;
+        }
+        if (filters.fechaNacimientoStart) {
+            query.fechaNacimiento = { ...query.fechaNacimiento, $gte: new Date(filters.fechaNacimientoStart) };
+        }
+        if (filters.fechaNacimientoEnd) {
+            query.fechaNacimiento = { ...query.fechaNacimiento, $lte: new Date(filters.fechaNacimientoEnd) };
+        }
+        if (filters.fechaRegistroStart) {
+            query.createdAt = { ...query.createdAt, $gte: new Date(filters.fechaRegistroStart) };
+        }
+        if (filters.fechaRegistroEnd) {
+            query.createdAt = { ...query.createdAt, $lte: new Date(filters.fechaRegistroEnd) };
+        }
+
+        // Search text for name, email, document number
+        if (filters.searchText) {
             query.$or = [
-                { primerNombre: { $regex: searchText, $options: 'i' } },
-                { primerApellido: { $regex: searchText, $options: 'i' } },
-                { correo: { $regex: searchText, $options: 'i' } },
-                { numeroDocumento: { $regex: searchText, $options: 'i' } },
+                { Nombre: { $regex: filters.searchText, $options: 'i' } },
+                { primerApellido: { $regex: filters.searchText, $options: 'i' } },
+                { correo: { $regex: filters.searchText, $options: 'i' } },
+                { numeroDocumento: { $regex: filters.searchText, $options: 'i' } },
             ];
         }
 
-        if (rol) query.rol = rol;
-        if (genero) query.genero = genero;
-        if (tipoDocumento) query.tipoDocumento = tipoDocumento;
-
-        if (edad) { 
-            const currentYear = new Date().getFullYear();
-            let minBirthYear, maxBirthYear;
-
-            if (String(edad).includes('-')) {
-                const [minAge, maxAge] = String(edad).split('-').map(Number);
-                maxBirthYear = currentYear - minAge;
-                minBirthYear = currentYear - maxAge;
-            } else if (String(edad).includes('+')) {
-                const minAge = parseInt(String(edad).replace('+', ''));
-                maxBirthYear = currentYear - minAge;
-                minBirthYear = 0;
-            } else {
-                const exactAge = parseInt(String(edad));
-                maxBirthYear = currentYear - exactAge;
-                minBirthYear = currentYear - exactAge;
-            }
-
-            const birthStartDate = new Date(minBirthYear, 0, 1);
-            const birthEndDate = new Date(maxBirthYear + 1, 0, 1);
-
-            query.fechaNacimiento = { $gte: birthStartDate, $lt: birthEndDate };
-        }
-
-        if (startDate || endDate) {
-            query.createdAt = {};
-            if (startDate) {
-                query.createdAt.$gte = new Date(startDate);
-            }
-            if (endDate) {
-                const endOfDay = new Date(endDate);
-                endOfDay.setHours(23, 59, 59, 999); // Set to end of the day
-                query.createdAt.$lte = endOfDay;
-            }
-        }
-
-        if (!incluirDeshabilitados) {
-            query.habilitado = true;
-        }
-
-        const UsuarioModel = await getModel('Usuario');
         const usuariosEncontradosRaw = await UsuarioModel.find(query).lean();
         const usuariosEncontrados = usuariosEncontradosRaw.map(user => {
             const plainUser = toPlainObject(user);

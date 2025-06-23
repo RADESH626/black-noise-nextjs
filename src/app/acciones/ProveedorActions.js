@@ -227,16 +227,44 @@ export async function obtenerProveedoresHabilitados() {
   }
 }
 
-export async function obtenerProveedores() {
+export async function obtenerProveedores(filters = {}) {
   await connectDB();
   try {
     const ProveedorModel = await getModel('Proveedor');
-    const proveedores = await ProveedorModel.find({}).lean();
+    let query = {};
+
+    // Apply filters
+    if (filters.disponibilidad) {
+      query.disponibilidad = filters.disponibilidad;
+    }
+    if (filters.especialidad && filters.especialidad.length > 0) {
+      query.especialidad = { $in: filters.especialidad };
+    }
+    if (filters.metodosPagoAceptados && filters.metodosPagoAceptados.length > 0) {
+      query.metodosPagoAceptados = { $in: filters.metodosPagoAceptados };
+    }
+    if (filters.habilitado !== undefined) {
+      query.habilitado = filters.habilitado;
+    }
+    if (filters.ordenesActivasMin) {
+      query.activeOrders = { ...query.activeOrders, $gte: parseInt(filters.ordenesActivasMin) };
+    }
+    if (filters.ordenesActivasMax) {
+      query.activeOrders = { ...query.activeOrders, $lte: parseInt(filters.ordenesActivasMax) };
+    }
+    if (filters.fechaUltimaAsignacionStart) {
+      query.lastAssignedAt = { ...query.lastAssignedAt, $gte: new Date(filters.fechaUltimaAsignacionStart) };
+    }
+    if (filters.fechaUltimaAsignacionEnd) {
+      query.lastAssignedAt = { ...query.lastAssignedAt, $lte: new Date(filters.fechaUltimaAsignacionEnd) };
+    }
+
+    const proveedores = await ProveedorModel.find(query).lean();
     return {
       proveedores: proveedores.map(p => ({
         ...p,
         _id: p._id.toString(),
-        userId: p.userId ? p.userId.toString() : null, // Convert userId to string
+        userId: p.userId ? p.userId.toString() : null,
         createdAt: p.createdAt ? new Date(p.createdAt).toISOString() : null,
         updatedAt: p.updatedAt ? new Date(p.updatedAt).toISOString() : null,
       })),
