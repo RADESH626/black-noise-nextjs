@@ -287,7 +287,7 @@ async function solicitarDevolucion(pedidoId, userId, razonDevolucion) {
           <p>Motivo de la devoluciรณn: ${razonDevolucion}</p>
           <p>Por favor, revisa los detalles del pedido en tu panel y contacta al cliente para coordinar la devoluciรณn.</p>
         `;
-        await sendEmail(proveedor.emailContacto, subject, htmlContent);
+        await sendEmail({ to: proveedor.emailContacto, subject, html: htmlContent });
         console.log(`Notificaciรณn de solicitud de devoluciรณn enviada a proveedor ${proveedor.emailContacto}`);
       }
     }
@@ -404,7 +404,7 @@ async function enviarNotificacionCambioEstadoPedido(pedidoId, newEstado, oldEsta
     }
 
     if (subject && htmlContent) {
-      await sendEmail(user.correo, subject, htmlContent);
+      await sendEmail({ to: user.correo, subject, html: htmlContent });
       console.log(`Notificaciรณn de estado de pedido enviada a ${user.correo} para pedido ${pedidoId}`);
     }
   } catch (error) {
