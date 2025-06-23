@@ -64,8 +64,8 @@ async function guardarPedido(data) {
 async function updateEstadoPedido(pedidoId, newEstado) {
   try {
     await dbConnect();
-    const pedido = await Pedido.findById(pedidoId);
-
+    const PedidoModel = await getModel('Pedido');
+    const pedido = await PedidoModel.findById(pedidoId);
     if (!pedido) {
       return { success: false, message: 'Pedido no encontrado.' };
     }
@@ -84,7 +84,8 @@ async function updateEstadoPedido(pedidoId, newEstado) {
     // Si el pedido tenía un proveedor asignado y el estado cambia a uno de los estados finales
     // y el estado anterior NO estaba en los estados finales (para evitar doble decremento)
     if (pedido.proveedorId && finalStates.includes(newEstado) && !finalStates.includes(oldEstado)) {
-      const proveedor = await Proveedor.findById(pedido.proveedorId);
+      const ProveedorModel = await getModel('Proveedor');
+      const proveedor = await ProveedorModel.findById(pedido.proveedorId);
       if (proveedor && proveedor.activeOrders > 0) {
         proveedor.activeOrders -= 1;
         await proveedor.save();

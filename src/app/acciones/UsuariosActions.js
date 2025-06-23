@@ -263,14 +263,14 @@ async function obtenerUsuariosHabilitados() {
 
 //obtener usuario por id
 async function ObtenerUsuarioPorId(id) {
-    logger.debug('Entering ObtenerUsuarioPorId with ID:', id);
+    // logger.debug('Entering ObtenerUsuarioPorId with ID:', id);
     try {
         await connectDB();
-        logger.debug('Database connected for ObtenerUsuarioPorId.');
+        // logger.debug('Database connected for ObtenerUsuarioPorId.');
         
         const Usuario = await getUsuarioModel();
         const response = await Usuario.findById(id).lean();
-        logger.debug('Raw response from DB for ObtenerUsuarioPorId:', response);
+        // logger.debug('Raw response from DB for ObtenerUsuarioPorId:', response);
 
         if (!response) {
             throw new NotFoundError(`User not found with ID: ${id}`);
@@ -288,7 +288,7 @@ async function ObtenerUsuarioPorId(id) {
         } else {
             plainUser.profileImageUrl = '/img/perfil/FotoPerfil.webp';
         }
-        logger.debug('Exiting ObtenerUsuarioPorId with plain user:', plainUser);
+        // logger.debug('Exiting ObtenerUsuarioPorId with plain user:', plainUser);
         return plainUser;
     } catch (error) {
         if (error instanceof NotFoundError) {

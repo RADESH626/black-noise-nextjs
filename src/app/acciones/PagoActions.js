@@ -152,7 +152,7 @@ async function obtenerPagosPorUsuarioId(usuarioId) {
     logger.debug('Entering obtenerPagosPorUsuarioId with usuarioId:', usuarioId);
     try {
         await connectDB();
-        logger.debug('Database connected for obtenerPagosPorUsuarioId.');
+        // logger.debug('Database connected for obtenerPagosPorUsuarioId.');
         const Pago = await getModel('Pago');
         const pagos = await Pago.find({ usuarioId })
             .populate('usuarioId', 'Nombre primerApellido correo') // Popula algunos campos de Usuario
@@ -169,7 +169,7 @@ async function obtenerPagosPorUsuarioId(usuarioId) {
             } : null,
         }));
 
-        logger.debug('Payments retrieved for user ID and formatted:', usuarioId, 'count:', formattedPagos.length);
+        // logger.debug('Payments retrieved for user ID and formatted:', usuarioId, 'count:', formattedPagos.length);
         return { success: true, pagos: JSON.parse(JSON.stringify(formattedPagos)) };
     } catch (error) {
         logger.error('ERROR in obtenerPagosPorUsuarioId:', error);
@@ -468,7 +468,7 @@ async function obtenerPagosPendientesPorUsuario(userId) {
             costoEnvio: { $gt: 0 }, // Costo de envío mayor que 0
             estadoPago: 'PENDIENTE' // Estado de pago pendiente
         };
-        logger.debug('Query for pending payments:', query);
+        // logger.debug('Query for pending payments:', query);
 
         const pedidosPendientes = await Pedido.find(query)
             .populate('proveedorId', 'nombreEmpresa correo telefono') // Popula información del proveedor
@@ -491,7 +491,7 @@ async function obtenerPagosPendientesPorUsuario(userId) {
             paymentId: pedido.paymentId ? pedido.paymentId.toString() : null,
         }));
 
-        logger.debug('Pending payments retrieved for user ID and formatted:', userId, 'count:', formattedPedidos.length, 'Formatted data:', formattedPedidos);
+        // logger.debug('Pending payments retrieved for user ID and formatted:', userId, 'count:', formattedPedidos.length, 'Formatted data:', formattedPedidos);
         return { success: true, pedidos: JSON.parse(JSON.stringify(formattedPedidos)) };
     } catch (error) {
         logger.error('ERROR in obtenerPagosPendientesPorUsuario:', error);

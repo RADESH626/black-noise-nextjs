@@ -116,7 +116,7 @@ export async function removeDesignFromCart(userId, designId) {
 
 export async function getCartByUserId(userId) {
     await connectDB();
-    logger.debug(`Entering getCartByUserId for userId: ${userId}`);
+    // logger.debug(`Entering getCartByUserId for userId: ${userId}`);
 
     if (!userId) {
         return { cart: null, error: 'User ID is required.' };

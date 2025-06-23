@@ -15,7 +15,7 @@ if (!cached) {
 
 export default async function connectDB() {
   if (cached.conn) {
-    logger.info('Using existing database connection');
+    // logger.info('Using existing database connection');
     return cached.conn;
   }
 
