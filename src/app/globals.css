@@ -1,0 +1,206 @@
+@import "tailwindcss";
+
+:root {
+  --color-primary: #000000; /* Black */
+  --color-secondary: #f4f4f4; /* Light grey */
+  --color-accent1: #ff007f; /* Vibrant pink/magenta */
+  --color-accent2: #00f0ff; /* Bright cyan */
+
+  /* Gradientes para botones */
+  --gradient-primary: #000000; /* Negro sólido para el botón primario */
+  --gradient-secondary: linear-gradient(to right, #a0a0a0, #ffffff); /* Gris más claro a blanco */
+  --gradient-danger: linear-gradient(to right, #dc3545, #c82333); /* Rojo oscuro a rojo más claro */
+  --gradient-success: linear-gradient(to right, #28a745, #218838); /* Verde oscuro a verde más claro */
+  --gradient-info: linear-gradient(to right, #17a2b8, #138496); /* Azul oscuro a azul más claro */
+
+  --color-neutral-100: #ffffff; /* White */
+  --color-neutral-200: #e0e0e0; /* Lighter grey */
+  --color-neutral-300: #c0c0c0; /* Medium grey */
+  --color-neutral-400: #808080; /* Darker grey */
+  --color-neutral-500: #555555; /* Even darker grey */
+  --color-neutral-600: #333333; /* Dark grey */
+  --color-neutral-700: #222222; /* Very dark grey */
+  --color-neutral-800: #111111; /* Almost black */
+  --color-neutral-900: #000000; /* Black */
+
+  /* Clases de gradiente personalizadas */
+  .btn-gradient-primary {
+      background-image: var(--gradient-primary);
+  }
+
+  .btn-gradient-danger {
+      background-image: var(--gradient-danger);
+  }
+
+  .btn-gradient-success {
+      background-image: var(--gradient-success);
+  }
+
+  .btn-gradient-info {
+      background-image: var(--gradient-info);
+  }
+
+.btn-gradient-gray-to-white {
+    background-image: linear-gradient(to right, #a0a0a0, #ffffff);
+}
+}
+
+html, body {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+@keyframes slideDown {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.animate-slideDown {
+    animation: slideDown 0.5s ease-out forwards;
+}
+
+@keyframes slideUp {
+    0% {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.animate-slideUp {
+    animation: slideUp 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.2s ease-out forwards;
+}
+
+dialog::backdrop {
+    background-color: transparent; /* No backdrop unless explicitly requested */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Agrega esto en tu archivo globals.css */
+
+/* Asegurar que la imagen de fondo cubra todo el viewport */
+.relative > .absolute > .object-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Ajustes para pantallas muy grandes */
+@media (min-width: 1920px) {
+  .relative > .absolute > .object-cover {
+    object-position: center 25%;
+  }
+}
+
+/* Textos más grandes para todas las secciones */
+.text-4xl { font-size: 2rem; }
+.text-5xl { font-size: 2.5rem; }
+.text-6xl { font-size: 3rem; }
+
+@media (min-width: 768px) {
+  .text-4xl { font-size: 2.25rem; }
+  .text-5xl { font-size: 3rem; }
+  .text-6xl { font-size: 3.75rem; }
+}
+
+button {
+  transition: all 0.3s ease;
+}
+
+/* Estilo para el botón azul */
+.bg-blue-600 {
+  background-color: #2563eb;
+}
+.bg-blue-600:hover {
+  background-color: #1d4ed8;
+}
+header.bg-transparent {
+  background-color: transparent !important;
+}
+.pt-16 {
+  padding-top: 4rem; /* Ajusta según la altura de tu header */
+}
+
+header {
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.text-gray-900 {
+  color: #111827;
+}
+
+.text-gray-700 {
+  color: #374151;
+}
+
+/* Ajustar color de acento */
+.text-blue-600 {
+  color: #2563eb;
+}
+
+/* Botón con mejor contraste */
+.bg-gray-900 {
+  background-color: #111827;
+}
+.bg-gray-900:hover {
+  background-color: #000;
+}
+
+/* Footer styles */
+.bg-gray-900 {
+  background-color: #111827;
+}
+
+.border-gray-700 {
+  border-color: #374151;
+}
+
+.text-gray-300 {
+  color: #d1d5db;
+}
+
+.text-gray-400 {
+  color: #9ca3af;
+}
+
+.hover\:text-white:hover {
+  color: #fff;
+}
+
+.transition-colors {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
