@@ -1,5 +1,5 @@
 import { MongoClient } from 'mongodb';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 export default async function handler(req, res) {
   // Configuración CORS
