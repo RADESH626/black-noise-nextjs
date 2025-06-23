@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import { obtenerPagos } from '@/app/acciones/PagoActions';
 import Loader from '@/components/Loader'; // Assuming Loader is in common
@@ -54,6 +56,7 @@ const PagosDashboard = () => {
                 <th className="py-2 px-4 border-b">Usuario</th>
                 <th className="py-2 px-4 border-b">Email Usuario</th>
                 <th className="py-2 px-4 border-b">Método Entrega</th>
+                <th className="py-2 px-4 border-b">Motivo Pago</th>
               </tr>
             </thead>
             <tbody>
@@ -67,6 +70,7 @@ const PagosDashboard = () => {
                   <td className="py-2 px-4 border-b">{pago.usuarioId ? `${pago.usuarioId.Nombre} ${pago.usuarioId.primerApellido}` : 'N/A'}</td>
                   <td className="py-2 px-4 border-b">{pago.usuarioId ? pago.usuarioId.correo : 'N/A'}</td>
                   <td className="py-2 px-4 border-b">{pago.pedidoId ? pago.pedidoId.metodoEntrega : 'N/A'}</td>
+                  <td className="py-2 px-4 border-b">{pago.motivoPago || 'N/A'}</td>
                 </tr>
               ))}
             </tbody>
