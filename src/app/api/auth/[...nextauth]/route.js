@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { ObtenerUsuarioPorCorreo } from "@/app/acciones/UsuariosActions";
-import Proveedor from "@/models/Proveedor"; // Import Proveedor model
+import getProveedorModel from "@/models/Proveedor"; // Import Proveedor model
 import connectDB from "@/utils/DBconection"; // Import connectDB
 import logger from '@/utils/logger';
 import { Rol } from "@/models/enums/usuario/Rol"; // Import Rol enum
@@ -31,7 +31,7 @@ export const authOptions = {
           logger.info('Result of ObtenerUsuarioPorCorreo:', user);
           
           if (user) {
-            logger.info('User found. Comparing password for user:', credentials.email);
+            logger.info('User found. Comparing password for user:', user.email);
             const isValid = await bcrypt.compare(credentials.password, user.password);
             logger.info('Password comparison result for user:', isValid);
 
@@ -52,6 +52,7 @@ export const authOptions = {
               // If the user is a PROVEEDOR, fetch the corresponding Proveedor document
               if (user.rol === Rol.PROVEEDOR) {
                 logger.info('User is a PROVEEDOR. Attempting to find associated Proveedor document.');
+                const Proveedor = await getProveedorModel(); // Obtener el modelo Proveedor
                 const proveedor = await Proveedor.findOne({ userId: user._id }).lean();
                 if (proveedor) {
                   logger.info('Associated Proveedor found:', proveedor._id);

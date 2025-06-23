@@ -322,7 +322,7 @@ const PedidosContent = () => {
                   </div>
 
                   <div className="flex justify-end gap-2">
-                    {pedido.estadoPedido === EstadoPedido.ENTREGADO && (
+                    {(pedido.estadoPedido === EstadoPedido.ENTREGADO || pedido.estadoPedido === EstadoPedido.LISTO) && (
                       <BotonGeneral
                         onClick={() => handleSolicitarDevolucion(pedido._id)}
                         variant="danger"

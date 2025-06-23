@@ -13,7 +13,7 @@ export const transporter = nodemailer.createTransport({
 });
 
 // Función para enviar correos electrónicos
-export const sendEmail = async (to, subject, html) => {
+export const sendEmail = async ({ to, subject, html }) => {
   try {
     await transporter.sendMail({
       from: process.env.EMAIL_USER, // Remitente

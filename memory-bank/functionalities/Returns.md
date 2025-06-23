@@ -56,3 +56,6 @@ This functionality allows users to request returns for their orders. The process
 *   **Negociación de Costos:** Implement the logic for the supplier to adjust the costs of the new order.
 *   **Nuevo Pedido sin Costo (o costo negociado):** Implement the logic to generate a new order linked to the original with the negotiated costs.
 *   **Visibilidad para el Proveedor:** Update the supplier panel to display the new order clearly marked as a "Pedido a Rehacer".
+
+## Estados de Pedido para Solicitud de Devolución
+La solicitud de devolución ahora está disponible para pedidos en estado `LISTO` y `ENTREGADO`.

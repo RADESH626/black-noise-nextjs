@@ -12,7 +12,7 @@ function IndexPage() {
 
   useEffect(() => {
     const handleLoad = () => setIsLoading(false);
-    
+
     if(document.readyState === 'complete') {
       setIsLoading(false);
     } else {
@@ -24,21 +24,17 @@ function IndexPage() {
   return (
     <div className="min-h-screen flex flex-col">
       {isLoading && <Loader />}
-      
-<<<<<<< HEAD
+
        <HeaderPrincipal /> 
-=======
-      <HeaderPrincipal />
->>>>>>> d046bfc7c367ace4354ea44e6ab48165259b2111
-      <main className={`flex-grow ${isLoading ? 'hidden' : 'block'}`}>
+      <main className={flex-grow ${isLoading ? 'hidden' : 'block'}}>
         <HeroSection />
-        
+
         <FeatureSection
           imgSrc='/img/Modelos/Modelo 4.jpg'
           title={['DISEÑA', 'PRENDAS REALES']}
           description='Selecciona tu talla, el color, corta y crea detalles'
         />
-        
+
         <FeatureSection
           imgSrc='/img/Modelos/Modelo 3.jpg'
           title={['AÑADE ELEMENTOS', 'A TUS PRENDAS']}
@@ -46,10 +42,10 @@ function IndexPage() {
           imageLeft={true}
           accentWordIndex={0}
         />
-        
+
         <GarmentTypesSection />
       </main>
-      
+
       <Footer />
     </div>
   );
