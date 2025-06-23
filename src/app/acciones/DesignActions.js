@@ -106,6 +106,27 @@ export async function obtenerDesigns() {
             .lean();
 
         const formattedDesigns = designs.map(design => {
+            // Log para depuración: Verificar los datos de usuario después de populate
+            console.log(`[obtenerDesigns] Design ID: ${design._id}`);
+            if (design.usuarioId) {
+                console.log(`[obtenerDesigns] Usuario ID: ${design.usuarioId._id}`);
+                console.log(`[obtenerDesigns] Usuario Nombre: ${design.usuarioId.Nombre}`);
+                console.log(`[obtenerDesigns] Usuario imageData existe: ${!!design.usuarioId.imageData}`);
+                console.log(`[obtenerDesigns] Usuario imageMimeType: ${design.usuarioId.imageMimeType}`);
+                if (design.usuarioId.imageData && design.usuarioId.imageData.buffer instanceof Buffer) {
+                    console.log(`[obtenerDesigns] Usuario imageData buffer length: ${design.usuarioId.imageData.buffer.length}`);
+                }
+            } else {
+                console.log(`[obtenerDesigns] Usuario ID es null para el diseño ${design._id}`);
+            }
+
+            // Log para depuración: Verificar los datos de imagen del diseño
+            console.log(`[obtenerDesigns] Design imageData existe: ${!!design.imageData}`);
+            console.log(`[obtenerDesigns] Design imageMimeType: ${design.imageMimeType}`);
+            if (design.imageData && design.imageData.buffer instanceof Buffer) {
+                console.log(`[obtenerDesigns] Design imageData buffer length: ${design.imageData.buffer.length}`);
+            }
+
             // Create a mutable copy of the design object and convert _id to string
             const processedDesign = { ...design, _id: design._id.toString() };
 

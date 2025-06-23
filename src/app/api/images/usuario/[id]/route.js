@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/utils/DBconection';
-import Usuario from '@/models/Usuario';
+import getUsuarioModel from '@/models/Usuario';
 
 export async function GET(request, { params }) {
     await connectDB();
-    const { id } = params;
+    const id = params.id; // Acceder directamente a params.id
 
     try {
+        const Usuario = await getUsuarioModel(); // Get the Mongoose model
         const user = await Usuario.findById(id).lean();
 
         if (!user || !user.imageData || !user.imageMimeType) {

@@ -5,7 +5,7 @@ export const handleError = (error, message = 'An unexpected error occurred', sta
     logger.error(message, error);
     const errorResponse = {
         success: false,
-        message: error.message || message,
+        message: (error instanceof Error) ? error.message : message, // Asegura que siempre haya un mensaje
         statusCode: error.statusCode || status,
         details: error.details || null,
     };

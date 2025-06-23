@@ -16,6 +16,8 @@ import { validateRequiredFields, validateEmail, validatePassword } from '@/utils
 import Proveedor from '@/models/Proveedor'; // Import Proveedor model
 import logger from '@/utils/logger';
 import { createEmptyCartForUser } from './CartActions'; // Import the cart creation function
+import fs from 'fs';
+import path from 'path';
 
 // Server Action para manejar el login
 export async function loginAction(prevState, formData) {
@@ -79,7 +81,6 @@ export async function loginAction(prevState, formData) {
             isSupplier: true,
             userRole: 'PROVEEDOR', // Explicitly set userRole for supplier
             proveedorId: proveedor._id.toString(),
-            readyForSignIn: true,
             profileImageUrl: "/img/proveedores/IMAGEN-SOLICITUD-PROVEEDOR.jpg" // Default image for suppliers
           }
         };
@@ -138,12 +139,27 @@ export async function addSingleUserAction(prevState, formData) {
 // Función para guardar usuarios en la base de datos
 async function guardarUsuarios(data, enviarCorreo = false) {
     try {
-        // Si no se proporciona fotoPerfil o está vacía, usa la imagen por defecto
-        if (!data.fotoPerfil) {
-            data.fotoPerfil = '/img/perfil/FotoPerfil.webp'; // Use static path
-        } 
+        // Si no se proporciona imageData o imageMimeType, y se usa la foto de perfil por defecto,
+        // cargamos la imagen por defecto y la convertimos a Buffer y MimeType.
+        if (!data.imageData && !data.imageMimeType) {
+            const defaultImagePath = './public/img/perfil/FotoPerfil.webp';
+            try {
+                const defaultImageBuffer = fs.readFileSync(path.resolve(defaultImagePath));
+                data.imageData = defaultImageBuffer;
+                data.imageMimeType = 'image/webp'; // Asumiendo que FotoPerfil.webp es siempre webp
+                console.log(`[guardarUsuarios] Asignada imagen por defecto: Buffer length ${defaultImageBuffer.length}`);
+            } catch (readError) {
+                console.error(`[guardarUsuarios] Error al leer la imagen por defecto: ${readError.message}`);
+                // Si falla la lectura, se procede sin imagen o con los valores originales
+            }
+        }
 
         logger.debug('datos de usuario obtenidos:', data);
+        console.log(`[guardarUsuarios] imageData antes de guardar: ${data.imageData ? 'Existe' : 'No existe'}`);
+        console.log(`[guardarUsuarios] imageMimeType antes de guardar: ${data.imageMimeType}`);
+        if (data.imageData instanceof Buffer) {
+            console.log(`[guardarUsuarios] imageData es un Buffer con longitud: ${data.imageData.length}`);
+        }
 
         await connectDB();
 
@@ -571,45 +587,45 @@ async function EditarUsuario(id, formData) {
     try {
         await connectDB();
 
-        const updateData = {
-            tipoDocumento: formData.get('tipoDocumento'),
-            numeroDocumento: formData.get('numeroDocumento'),
-            primerApellido: formData.get('primerApellido'),
-            segundoApellido: formData.get('segundoApellido'),
-            fechaNacimiento: formData.get('fechaNacimiento'),
-            genero: formData.get('genero'),
-            numeroTelefono: formData.get('numeroTelefono'),
-            direccion: formData.get('direccion'),
-            correo: formData.get('correo'),
-            rol: formData.get('rol'),
-        };
+        const Usuario = await getUsuarioModel();
+        const usuarioExistente = await Usuario.findById(id);
 
-        // Concatenate names to form the 'Nombre' field for the Usuario model
-        const primerNombre = formData.get('primerNombre');
-        const segundoNombre = formData.get('segundoNombre');
-        const primerApellido = formData.get('primerApellido');
-        const segundoApellido = formData.get('segundoApellido');
-
-        updateData.Nombre = primerNombre; // Add only the first name to updateData
-
-        validateRequiredFields(updateData, ['tipoDocumento', 'numeroDocumento', 'Nombre', 'primerApellido', 'fechaNacimiento', 'genero', 'numeroTelefono', 'direccion', 'correo', 'rol']);
-        validateEmail(updateData.correo);
-
-        const usuarioActualizado = await Usuario.findByIdAndUpdate(
-            id,
-            updateData,
-            { new: true, runValidators: true }
-        ).lean();
-
-        if (!usuarioActualizado) {
+        if (!usuarioExistente) {
             throw new NotFoundError(`No se encontró ningún usuario con el ID ${id}.`);
         }
+
+        // Actualizar solo los campos que se proporcionan en formData
+        for (const [key, value] of formData.entries()) {
+            // Excluir el archivo de imagen y el ID, ya que se manejan por separado o no son parte de la actualización directa
+            if (key !== 'profileImage' && key !== 'id') {
+                // Asegurarse de que el campo exista en el esquema antes de intentar asignarlo
+                if (usuarioExistente.schema.paths[key]) {
+                    usuarioExistente[key] = value;
+                }
+            }
+        }
+
+        // Handle image upload
+        const imageFile = formData.get('profileImage');
+        if (imageFile && imageFile instanceof File && imageFile.size > 0) {
+            const bytes = await imageFile.arrayBuffer();
+            usuarioExistente.imageData = Buffer.from(bytes);
+            usuarioExistente.imageMimeType = imageFile.type;
+        }
+
+        // Validar el correo solo si se proporciona y es diferente al actual
+        if (formData.has('correo') && usuarioExistente.correo !== formData.get('correo')) {
+            validateEmail(formData.get('correo'));
+        }
+
+        const usuarioActualizado = await usuarioExistente.save(); // Guardar el documento completo
 
         const plainUser = toPlainObject(usuarioActualizado);
 
         return { success: true, message: 'Usuario actualizado exitosamente.', data: plainUser };
 
     } catch (error) {
+        console.error('ERROR en EditarUsuario:', error); // Añadir log para depuración
         if (error instanceof ValidationError || error instanceof NotFoundError) {
             return handleError(error, error.message, error.statusCode);
         }
