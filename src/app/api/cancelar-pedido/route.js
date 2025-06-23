@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/utils/authUtils';
 import { sendEmail } from '@/utils/nodemailer';
 import connectDB from '@/utils/DBconection';
-import Pedido from '@/models/Pedido';
+import getPedidoModel from '@/models/Pedido';
 import Usuario from '@/models/Usuario';
-
 export async function POST(request) {
   try {
     const { pedidoId } = await request.json();
@@ -18,6 +19,7 @@ export async function POST(request) {
     }
 
     await connectDB();
+    const Pedido = await getPedidoModel();
 
     const pedido = await Pedido.findById(pedidoId).populate('userId');
     console.log('pedido:', pedido);
