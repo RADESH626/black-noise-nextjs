@@ -24,11 +24,15 @@ function InputSelectGeneral({ children, options, placeholder, defaultValue, ...r
       )}
       
       {options ? (
-        options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))
+        options.map((option) => {
+          const value = typeof option === 'object' ? option.value : option;
+          const label = typeof option === 'object' ? option.label : option;
+          return (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          );
+        })
       ) : (
         children
       )}

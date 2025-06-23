@@ -6,22 +6,11 @@ import { Suspense } from 'react';
 import DesignFilters from '@/components/admin/filters/DesignFilters';
 
 export default async function AdminDesignsPage({ searchParams }) {
-    const filters = {
-        fechaCreacionStart: searchParams.fechaCreacionStart,
-        fechaCreacionEnd: searchParams.fechaCreacionEnd,
-        categoria: searchParams.categoria,
-        estadoDesing: searchParams.estadoDesing,
-        disenadorUsuarioId: searchParams.disenadorUsuarioId,
-        precioMin: searchParams.precioMin,
-        precioMax: searchParams.precioMax,
-        tallasDisponibles: searchParams.tallasDisponibles ? searchParams.tallasDisponibles.split(',') : [],
-    };
-
     let designs = [];
     let error = null;
 
     try {
-        const result = await obtenerDesigns(filters);
+        const result = await obtenerDesigns(searchParams); // Pasar searchParams directamente
         if (result.data) {
             designs = result.data;
         } else {
@@ -38,7 +27,7 @@ export default async function AdminDesignsPage({ searchParams }) {
 
     return (
         <Suspense fallback={<LoadingSpinner />}>
-            <DesignsClientPage initialDesigns={designs} currentFilters={filters} />
+            <DesignsClientPage initialDesigns={designs} initialSearchParams={searchParams} />
         </Suspense>
     );
 }

@@ -2,17 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import InputGeneral from "@/components/common/inputs/InputGeneral";
+import BotonGeneral from "@/components/common/botones/BotonGeneral";
+import InputCheckBox from "@/components/common/inputs/InputCheckBox";
+import InputSelectGeneral from "@/components/common/inputs/InputSelectGeneral";
 
 const UserFilters = ({ onApplyFilters, onClearFilters }) => {
     const { register, handleSubmit, reset, setValue, watch } = useForm();
@@ -64,80 +57,70 @@ const UserFilters = ({ onApplyFilters, onClearFilters }) => {
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 border rounded-lg shadow-sm">
             <div>
-                <Label htmlFor="searchText">Buscar (Nombre, Correo, Documento)</Label>
-                <Input type="text" id="searchText" {...register('searchText')} placeholder="Buscar..." />
+                <label htmlFor="searchText">Buscar (Nombre, Correo, Documento)</label>
+                <InputGeneral type="text" id="searchText" {...register('searchText')} placeholder="Buscar..." />
             </div>
             <div>
-                <Label htmlFor="rol">Rol</Label>
-                <Select onValueChange={setSelectedRol} value={selectedRol}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Selecciona un rol" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="">Todos</SelectItem>
-                        <SelectItem value="ADMINISTRADOR">Administrador</SelectItem>
-                        <SelectItem value="CLIENTE">Cliente</SelectItem>
-                        <SelectItem value="DISEÑADOR">Diseñador</SelectItem>
-                        <SelectItem value="PROVEEDOR">Proveedor</SelectItem>
-                    </SelectContent>
-                </Select>
+                <label htmlFor="rol">Rol</label>
+                <InputSelectGeneral
+                    id="rol"
+                    {...register('rol')}
+                    defaultValue={selectedRol}
+                    onChange={(e) => setSelectedRol(e.target.value)}
+                    options={["", "ADMINISTRADOR", "CLIENTE", "DISEÑADOR", "PROVEEDOR"]}
+                    placeholder="Selecciona un rol"
+                />
             </div>
             <div>
-                <Label htmlFor="tipoDocumento">Tipo de Documento</Label>
-                <Select onValueChange={setSelectedTipoDocumento} value={selectedTipoDocumento}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Selecciona tipo de documento" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="">Todos</SelectItem>
-                        <SelectItem value="CC">Cédula de Ciudadanía</SelectItem>
-                        <SelectItem value="TI">Tarjeta de Identidad</SelectItem>
-                        <SelectItem value="CE">Cédula de Extranjería</SelectItem>
-                        <SelectItem value="PASAPORTE">Pasaporte</SelectItem>
-                    </SelectContent>
-                </Select>
+                <label htmlFor="tipoDocumento">Tipo de Documento</label>
+                <InputSelectGeneral
+                    id="tipoDocumento"
+                    {...register('tipoDocumento')}
+                    defaultValue={selectedTipoDocumento}
+                    onChange={(e) => setSelectedTipoDocumento(e.target.value)}
+                    options={["", "CC", "TI", "CE", "PASAPORTE"]}
+                    placeholder="Selecciona tipo de documento"
+                />
             </div>
             <div>
-                <Label htmlFor="genero">Género</Label>
-                <Select onValueChange={setSelectedGenero} value={selectedGenero}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Selecciona género" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="">Todos</SelectItem>
-                        <SelectItem value="MASCULINO">Masculino</SelectItem>
-                        <SelectItem value="FEMENINO">Femenino</SelectItem>
-                        <SelectItem value="OTRO">Otro</SelectItem>
-                    </SelectContent>
-                </Select>
+                <label htmlFor="genero">Género</label>
+                <InputSelectGeneral
+                    id="genero"
+                    {...register('genero')}
+                    defaultValue={selectedGenero}
+                    onChange={(e) => setSelectedGenero(e.target.value)}
+                    options={["", "MASCULINO", "FEMENINO", "OTRO"]}
+                    placeholder="Selecciona género"
+                />
             </div>
             <div className="flex items-center space-x-2">
-                <Checkbox
+                <InputCheckBox
                     id="habilitado"
                     checked={habilitado}
-                    onCheckedChange={setHabilitado}
+                    onChange={(e) => setHabilitado(e.target.checked)}
+                    {...register('habilitado')}
                 />
-                <Label htmlFor="habilitado">Habilitado</Label>
+                <label htmlFor="habilitado">Habilitado</label>
             </div>
             <div>
-                <Label htmlFor="fechaNacimientoStart">Fecha de Nacimiento (Desde)</Label>
-                <Input type="date" id="fechaNacimientoStart" {...register('fechaNacimientoStart')} />
+                <label htmlFor="fechaNacimientoStart">Fecha de Nacimiento (Desde)</label>
+                <InputGeneral type="date" id="fechaNacimientoStart" {...register('fechaNacimientoStart')} />
             </div>
             <div>
-                <Label htmlFor="fechaNacimientoEnd">Fecha de Nacimiento (Hasta)</Label>
-                <Input type="date" id="fechaNacimientoEnd" {...register('fechaNacimientoEnd')} />
+                <label htmlFor="fechaNacimientoEnd">Fecha de Nacimiento (Hasta)</label>
+                <InputGeneral type="date" id="fechaNacimientoEnd" {...register('fechaNacimientoEnd')} />
             </div>
             <div>
-                <Label htmlFor="fechaRegistroStart">Fecha de Registro (Desde)</Label>
-                <Input type="date" id="fechaRegistroStart" {...register('fechaRegistroStart')} />
+                <label htmlFor="fechaRegistroStart">Fecha de Registro (Desde)</label>
+                <InputGeneral type="date" id="fechaRegistroStart" {...register('fechaRegistroStart')} />
             </div>
             <div>
-                <Label htmlFor="fechaRegistroEnd">Fecha de Registro (Hasta)</Label>
-                <Input type="date" id="fechaRegistroEnd" {...register('fechaRegistroEnd')} />
+                <label htmlFor="fechaRegistroEnd">Fecha de Registro (Hasta)</label>
+                <InputGeneral type="date" id="fechaRegistroEnd" {...register('fechaRegistroEnd')} />
             </div>
             <div className="col-span-full flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={handleClear}>Limpiar Filtros</Button>
-                <Button type="submit">Aplicar Filtros</Button>
+                <BotonGeneral type="button" variant="outline" onClick={handleClear}>Limpiar Filtros</BotonGeneral>
+                <BotonGeneral type="submit">Aplicar Filtros</BotonGeneral>
             </div>
         </form>
     );

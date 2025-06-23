@@ -6,22 +6,11 @@ import { Suspense } from 'react';
 import ProveedorFilters from '@/components/admin/filters/ProveedorFilters'; // Importar el componente de filtros
 
 export default async function AdminProveedoresPage({ searchParams }) {
-    const filters = {
-        disponibilidad: searchParams.disponibilidad,
-        especialidad: searchParams.especialidad ? searchParams.especialidad.split(',') : [],
-        metodosPagoAceptados: searchParams.metodosPagoAceptados ? searchParams.metodosPagoAceptados.split(',') : [],
-        habilitado: searchParams.habilitado === 'true' ? true : (searchParams.habilitado === 'false' ? false : undefined),
-        ordenesActivasMin: searchParams.ordenesActivasMin,
-        ordenesActivasMax: searchParams.ordenesActivasMax,
-        fechaUltimaAsignacionStart: searchParams.fechaUltimaAsignacionStart,
-        fechaUltimaAsignacionEnd: searchParams.fechaUltimaAsignacionEnd,
-    };
-
     let proveedores = [];
     let error = null;
 
     try {
-        const result = await obtenerProveedores(filters);
+        const result = await obtenerProveedores(searchParams); // Pasar searchParams directamente
         if (result.success) {
             proveedores = result.proveedores;
         } else {
@@ -38,7 +27,7 @@ export default async function AdminProveedoresPage({ searchParams }) {
 
     return (
         <Suspense fallback={<LoadingSpinner />}>
-            <ProveedoresClientPage initialProveedores={proveedores} currentFilters={filters} />
+            <ProveedoresClientPage initialProveedores={proveedores} initialSearchParams={searchParams} />
         </Suspense>
     );
 }
