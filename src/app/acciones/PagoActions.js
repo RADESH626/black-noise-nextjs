@@ -457,10 +457,10 @@ async function registrarPagoEnvioSimulado(pedidoId, paymentData) {
 
 // Obtener pagos pendientes por usuario ID
 async function obtenerPagosPendientesPorUsuario(userId) {
-    logger.debug('Entering obtenerPagosPendientesPorUsuario with userId:', userId);
+    // logger.debug('Entering obtenerPagosPendientesPorUsuario with userId:', userId);
     try {
         await connectDB();
-        logger.debug('Database connected for obtenerPagosPendientesPorUsuario.');
+        // logger.debug('Database connected for obtenerPagosPendientesPorUsuario.');
         const Pedido = await getModel('Pedido');
         
         const query = {

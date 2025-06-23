@@ -1,7 +1,7 @@
 "use server"
 
 import connectDB from '@/utils/DBconection';
-import Venta from '@/models/Venta';
+import getVentaModel from '@/models/Venta';
 import Pago from '@/models/Pago';     // Necesario para popular
 import Pedido from '@/models/Pedido'; // Necesario para popular
 import { revalidatePath } from 'next/cache';
@@ -29,6 +29,7 @@ async function guardarVenta(data) {
             logger.debug('detallesVenta was empty, initialized as empty array.');
         }
 
+        const Venta = await getVentaModel();
         const nuevaVenta = new Venta(data);
         logger.debug('New Venta instance created:', nuevaVenta);
         const ventaGuardada = await nuevaVenta.save();
@@ -48,6 +49,7 @@ async function obtenerVentas() {
     try {
         await connectDB();
         logger.debug('Database connected for obtenerVentas.');
+        const Venta = await getVentaModel();
         const ventas = await Venta.find({})
             .populate('pagoIds', 'valorPago metodoPago estadoPago') 
             .populate({
@@ -70,6 +72,7 @@ async function ObtenerVentaPorId(id) {
     try {
         await connectDB();
         logger.debug('Database connected for ObtenerVentaPorId.');
+        const Venta = await getVentaModel();
         const venta = await Venta.findById(id)
             .populate('pagoIds', 'valorPago metodoPago estadoPago createdAt')
             .populate({
@@ -123,7 +126,7 @@ async function EditarVenta(id, data) {
         // delete updateData.comisionAplicacion;
         // delete updateData.valorVenta;
         logger.debug('Update data prepared:', updateData);
-
+        const Venta = await getVentaModel();
         const ventaActualizada = await Venta.findByIdAndUpdate(id, updateData, { new: true }).lean();
         logger.debug('Sale updated in DB:', ventaActualizada);
         if (!ventaActualizada) {
