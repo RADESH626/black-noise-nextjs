@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Loader from '@/components/Loader';
-import { crearDesign } from "@/app/acciones/DesignActions"; // Assuming a create action exists
+import { guardarDesigns } from "@/app/acciones/DesignActions"; // Assuming a create action exists
 import { useDialog } from "@/context/DialogContext"; // Assuming dialog context is used
 import { CategoriaProducto } from "@/models/enums/CategoriaProducto"; // Import CategoriaProducto
 
@@ -61,7 +61,7 @@ function AddDesignPage() {
     }
 
     try {
-      const result = await crearDesign(null, formData);
+      const result = await guardarDesigns(null, formData);
 
       if (result?.success) {
         showPopUp("Diseño agregado exitosamente", "success");

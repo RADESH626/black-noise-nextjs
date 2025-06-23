@@ -8,6 +8,7 @@ import { useDialog } from '@/context/DialogContext';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import { useRouter } from 'next/navigation';
 import PendingPaymentModal from '@/components/pagos-pendientes/PendingPaymentModal'; // Importar el nuevo modal
+import Loader from '@/components/Loader'; // Importar el componente Loader
 
 function PagosPendientesPage() {
     const { data: session, status } = useSession();
@@ -85,7 +86,7 @@ function PagosPendientesPage() {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#000000] via-[#0A1828] to-[#000000] text-white">
-                <LoadingSpinner />
+                <Loader />
             </div>
         );
     }

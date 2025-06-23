@@ -230,8 +230,69 @@ export {
   obtenerPedidos,
   getPedidoById,
   solicitarDevolucion,
-  obtenerDevolucionesYCancelacionesProveedor
+  obtenerDevolucionesYCancelacionesProveedor,
+  cancelarPedido
 };
+
+async function cancelarPedido(pedidoId, razonCancelacion) {
+  try {
+    await dbConnect();
+    const PedidoModel = await getModel('Pedido');
+    const ProveedorModel = await getModel('Proveedor');
+
+    const pedido = await PedidoModel.findById(pedidoId);
+    if (!pedido) {
+      return { success: false, message: 'Pedido no encontrado.' };
+    }
+
+    // Verificar si el pedido ya está en un estado final o de cancelación
+    const estadosNoPermitidosParaCancelacion = [
+      EstadoPedido.CANCELADO,
+      EstadoPedido.ENTREGADO,
+      EstadoPedido.DEVOLUCION_APROBADA,
+      EstadoPedido.DEVOLUCION_RECHAZADA,
+      EstadoPedido.DEVOLUCION_COMPLETADA,
+    ];
+
+    if (estadosNoPermitidosParaCancelacion.includes(pedido.estadoPedido)) {
+      return { success: false, message: `El pedido ya está en estado "${pedido.estadoPedido.replace(/_/g, ' ')}" y no puede ser cancelado.` };
+    }
+
+    const oldEstado = pedido.estadoPedido;
+
+    pedido.estadoPedido = EstadoPedido.CANCELADO;
+    pedido.fue_cancelado = true;
+    pedido.fecha_cancelacion = new Date();
+    pedido.razon_cancelacion = razonCancelacion;
+
+    // Si el pedido tenía un proveedor asignado y no estaba ya en un estado final,
+    // decrementar activeOrders del proveedor
+    const finalStates = [EstadoPedido.ENTREGADO, EstadoPedido.CANCELADO, EstadoPedido.LISTO];
+    if (pedido.proveedorId && !finalStates.includes(oldEstado)) {
+      const proveedor = await ProveedorModel.findById(pedido.proveedorId);
+      if (proveedor && proveedor.activeOrders > 0) {
+        proveedor.activeOrders -= 1;
+        await proveedor.save();
+        console.log(`Decremented activeOrders for provider ${proveedor._id} due to cancellation. New count: ${proveedor.activeOrders}`);
+      }
+      pedido.proveedorId = null; // Desvincular el proveedor del pedido cancelado
+    }
+
+    await pedido.save();
+
+    // Enviar notificación al usuario
+    await enviarNotificacionCambioEstadoPedido(pedido._id, EstadoPedido.CANCELADO, oldEstado, pedido.userId, razonCancelacion);
+
+    revalidatePath('/perfil');
+    revalidatePath('/proveedor/pedidos');
+    revalidatePath('/admin/pedidos'); // Revalidar también para el admin
+
+    return { success: true, message: 'Pedido cancelado exitosamente.' };
+  } catch (error) {
+    console.error('Error al cancelar el pedido:', error);
+    return { success: false, message: 'Error al cancelar el pedido.', error: error.message };
+  }
+}
 
 async function obtenerDevolucionesYCancelacionesProveedor() {
   try {
@@ -336,14 +397,14 @@ async function solicitarDevolucion(pedidoId, userId, razonDevolucion) {
   }
 }
 
-async function enviarNotificacionCambioEstadoPedido(pedidoId, newEstado, oldEstado, userId) {
+async function enviarNotificacionCambioEstadoPedido(pedidoId, newEstado, oldEstado, userId, razon = null) {
   try {
     await dbConnect();
 
     const userResult = await ObtenerUsuarioPorId(userId);
 
     if (!userResult || userResult.error || !userResult.correo) {
-      console.error(`Error al obtener usuario o email para userId: ${userId}. No se pudo enviar notificaciรณn. Detalle: ${userResult ? (userResult.error || 'Usuario no encontrado o correo vacรญo') : 'Resultado nulo'}`);
+      console.error(`Error al obtener usuario o email para userId: ${userId}. No se pudo enviar notificación. Detalle: ${userResult ? (userResult.error || 'Usuario no encontrado o correo vacío') : 'Resultado nulo'}`);
       return;
     }
     const user = userResult;
@@ -383,50 +444,51 @@ async function enviarNotificacionCambioEstadoPedido(pedidoId, newEstado, oldEsta
                 htmlContent = `
                     <p>Hola ${userName}!</p>
                     <p>Queremos confirmarte que tu pedido <strong>#${pedidoId.toString().slice(-6)}</strong> ha sido cancelado.</p>
+                    ${razon ? `<p>Razón de la cancelación: ${razon}</p>` : ''}
                     <p>Si tienes alguna pregunta, no dudes en contactarnos.</p>
                     <p>Gracias por tu comprensión.</p>
                 `;
                 break;
             case EstadoPedido.SOLICITUD_CANCELACION:
-                subject = `Solicitud de Cancelaciรณn Recibida - Black Noise`;
+                subject = `Solicitud de Cancelación Recibida - Black Noise`;
                 htmlContent = `
-                    <p>ยกHola ${userName}!</p>
-                    <p>Hemos recibido tu solicitud de cancelaciรณn para el pedido <strong>#${pedidoId.toString().slice(-6)}</strong>.</p>
-                    <p>Un proveedor se pondrรก en contacto contigo pronto para coordinar los detalles.</p>
+                    <p>¡Hola ${userName}!</p>
+                    <p>Hemos recibido tu solicitud de cancelación para el pedido <strong>#${pedidoId.toString().slice(-6)}</strong>.</p>
+                    <p>Un proveedor se pondrá en contacto contigo pronto para coordinar los detalles.</p>
                     <p>Gracias por tu paciencia.</p>
                 `;
                 break;
             case EstadoPedido.ENTREGADO:
-                subject = `ยกTu pedido ha sido entregado! - Black Noise`;
+                subject = `¡Tu pedido ha sido entregado! - Black Noise`;
                 htmlContent = `
-                    <p>ยกHola ${userName}!</p>
-                    <p>ยกExcelentes noticias! Tu pedido <strong>#${pedidoId.toString().slice(-6)}</strong> ha sido marcado como ENTREGADO.</p>
-                    <p>Esperamos que disfrutes de tu compra. ยกGracias por elegir Black Noise!</p>
+                    <p>¡Hola ${userName}!</p>
+                    <p>¡Excelentes noticias! Tu pedido <strong>#${pedidoId.toString().slice(-6)}</strong> ha sido marcado como ENTREGADO.</p>
+                    <p>Esperamos que disfrutes de tu compra. ¡Gracias por elegir Black Noise!</p>
                 `;
                 break;
             case EstadoPedido.SOLICITUD_DEVOLUCION:
-                subject = `Solicitud de Devoluciรณn Recibida - Black Noise`;
+                subject = `Solicitud de Devolución Recibida - Black Noise`;
                 htmlContent = `
-                    <p>ยกHola ${userName}!</p>
-                    <p>Hemos recibido tu solicitud de devoluciรณn para el pedido <strong>#${pedidoId.toString().slice(-6)}</strong>.</p>
-                    <p>Un proveedor se pondrรก en contacto contigo pronto para coordinar los detalles.</p>
+                    <p>¡Hola ${userName}!</p>
+                    <p>Hemos recibido tu solicitud de devolución para el pedido <strong>#${pedidoId.toString().slice(-6)}</strong>.</p>
+                    <p>Un proveedor se pondrá en contacto contigo pronto para coordinar los detalles.</p>
                     <p>Gracias por tu paciencia.</p>
                 `;
                 break;
             case EstadoPedido.DEVOLUCION_APROBADA:
-                subject = `Devoluciรณn Aprobada - Black Noise`;
+                subject = `Devolución Aprobada - Black Noise`;
                 htmlContent = `
-                    <p>ยกHola ${userName}!</p>
-                    <p>Tu solicitud de devoluciรณn para el pedido <strong>#${pedidoId.toString().slice(-6)}</strong> ha sido aprobada.</p>
-                    <p>Por favor, sigue las instrucciones del proveedor para completar el proceso de devoluciรณn.</p>
+                    <p>¡Hola ${userName}!</p>
+                    <p>Tu solicitud de devolución para el pedido <strong>#${pedidoId.toString().slice(-6)}</strong> ha sido aprobada.</p>
+                    <p>Por favor, sigue las instrucciones del proveedor para completar el proceso de devolución.</p>
                 `;
                 break;
             case EstadoPedido.DEVOLUCION_RECHAZADA:
-                subject = `Devoluciรณn Rechazada - Black Noise`;
+                subject = `Devolución Rechazada - Black Noise`;
                 htmlContent = `
-                    <p>ยกHola ${userName}!</p>
-                    <p>Tu solicitud de devoluciรณn para el pedido <strong>#${pedidoId.toString().slice(-6)}</strong> ha sido rechazada.</p>
-                    <p>Motivo: [Aquรญ irรก el motivo del rechazo].</p>
+                    <p>¡Hola ${userName}!</p>
+                    <p>Tu solicitud de devolución para el pedido <strong>#${pedidoId.toString().slice(-6)}</strong> ha sido rechazada.</p>
+                    <p>Motivo: [Aquí irá el motivo del rechazo].</p>
                     <p>Si tienes alguna pregunta, no dudes en contactarnos.</p>
                 `;
                 break;
@@ -437,9 +499,9 @@ async function enviarNotificacionCambioEstadoPedido(pedidoId, newEstado, oldEsta
 
     if (subject && htmlContent) {
       await sendEmail({ to: user.correo, subject, html: htmlContent });
-      console.log(`Notificaciรณn de estado de pedido enviada a ${user.correo} para pedido ${pedidoId}`);
+      console.log(`Notificación de estado de pedido enviada a ${user.correo} para pedido ${pedidoId}`);
     }
   } catch (error) {
-    console.error(`Error al enviar notificaciรณn de cambio de estado para pedido ${pedidoId}: ${error}`);
+    console.error(`Error al enviar notificación de cambio de estado para pedido ${pedidoId}: ${error}`);
   }
 }

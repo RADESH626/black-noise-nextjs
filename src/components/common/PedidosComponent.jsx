@@ -31,18 +31,48 @@ const PedidosContent = () => {
     setShowDevolucionModal(true);
   };
 
-  const handleCancelarPedido = async (pedidoId) => {
+  const { showDialog } = useDialog();
+  const [cancelReason, setCancelReason] = useState('');
+
+  const handleCancelarPedido = (pedidoId) => {
+    setSelectedPedidoId(pedidoId);
+    showDialog({
+      title: "Cancelar Pedido",
+      content: (
+        <div>
+          <p className="mb-4">Por favor, especifique la razón de la cancelación para el pedido {pedidoId}:</p>
+          <textarea
+            placeholder="Escriba aquí la razón de la cancelación..."
+            className="border border-gray-700 rounded-md p-2 text-black w-full h-24"
+            value={cancelReason}
+            onChange={(e) => setCancelReason(e.target.value)}
+          />
+        </div>
+      ),
+      type: "confirm",
+      onConfirm: () => handleConfirmCancelacion(pedidoId),
+      onCancel: () => {
+        setCancelReason('');
+        setSelectedPedidoId(null);
+      },
+      confirmBtnText: "Confirmar Cancelación",
+      cancelBtnText: "Volver"
+    });
+  };
+
+  const handleConfirmCancelacion = async (pedidoId) => {
+    if (!cancelReason.trim()) {
+      showPopUp('Por favor, especifique la razón de la cancelación.', 'error');
+      return;
+    }
+
     try {
-      const response = await fetch('/api/cancelar-pedido', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pedidoId }),
-      });
+      // Aquí se llamará a la acción del servidor en PedidoActions.js
+      // Necesitamos importar la acción primero
+      const { cancelarPedido } = await import('@/app/acciones/PedidoActions');
+      const result = await cancelarPedido(pedidoId, cancelReason.trim());
 
-      console.log('Response status:', response.status);
-      console.log('Response body:', await response.text());
-
-      if (response.ok) {
+      if (result.success) {
         showPopUp('Pedido cancelado correctamente', 'success');
         // Refrescar pedidos tras cancelar
         const { pedidos: fetchedPedidos, error: fetchError } = await obtenerPedidosPagadosPorUsuarioId(userId);
@@ -53,11 +83,14 @@ const PedidosContent = () => {
           setPedidos(fetchedPedidos || []);
         }
       } else {
-        showPopUp('Error al cancelar el pedido', 'error');
+        showPopUp(result.message || 'Error al cancelar el pedido', 'error');
       }
     } catch (error) {
       console.error('Error al cancelar el pedido:', error);
       showPopUp('Error al cancelar el pedido', 'error');
+    } finally {
+      setCancelReason('');
+      setSelectedPedidoId(null);
     }
   };
 
