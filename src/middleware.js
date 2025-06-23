@@ -35,7 +35,11 @@ export async function middleware(req) {
   }
 
   // Allow access if authenticated and no specific redirection is needed
-  return NextResponse.next();
+  const res = NextResponse.next();
+  res.headers.set('Access-Control-Allow-Origin', '*');
+  res.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+  return res;
 }
 
 export const config = {

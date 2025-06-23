@@ -2,39 +2,32 @@
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import InputGeneral from "@/components/common/inputs/InputGeneral";
+import BotonGeneral from "@/components/common/botones/BotonGeneral";
+import InputCheckBox from "@/components/common/inputs/InputCheckBox";
+import InputSelectGeneral from "@/components/common/inputs/InputSelectGeneral";
 
 const ProveedorFilters = ({ onApplyFilters, onClearFilters }) => {
     const { register, handleSubmit, reset, setValue, watch } = useForm();
     const [selectedDisponibilidad, setSelectedDisponibilidad] = useState('');
-    const [selectedEspecialidades, setSelectedEspecialidades] = useState([]);
-    const [selectedMetodosPago, setSelectedMetodosPago] = useState([]);
+    const [selectedEspecialidad, setSelectedEspecialidad] = useState('');
+    const [selectedMetodoPago, setSelectedMetodoPago] = useState('');
     const [habilitado, setHabilitado] = useState(false);
 
-    const especialidadOptions = ['Ropa', 'Accesorios', 'Calzado', 'Joyeria']; // Example specialties
-    const metodoPagoOptions = ['TARJETA_CREDITO', 'TARJETA_DEBITO', 'PAYPAL', 'TRANSFERENCIA_BANCARIA', 'NEQUI', 'DAVIPLATA', 'EFECTIVO']; // Example payment methods
+    const especialidadOptions = ['Todos', 'Ropa', 'Accesorios', 'Calzado', 'Joyeria']; // Example specialties
+    const metodoPagoOptions = ['Todos', 'TARJETA_CREDITO', 'TARJETA_DEBITO', 'PAYPAL', 'TRANSFERENCIA_BANCARIA', 'NEQUI', 'DAVIPLATA', 'EFECTIVO']; // Example payment methods
 
     useEffect(() => {
         setValue('disponibilidad', selectedDisponibilidad);
     }, [selectedDisponibilidad, setValue]);
 
     useEffect(() => {
-        setValue('especialidad', selectedEspecialidades.join(','));
-    }, [selectedEspecialidades, setValue]);
+        setValue('especialidad', selectedEspecialidad);
+    }, [selectedEspecialidad, setValue]);
 
     useEffect(() => {
-        setValue('metodosPagoAceptados', selectedMetodosPago.join(','));
-    }, [selectedMetodosPago, setValue]);
+        setValue('metodosPagoAceptados', selectedMetodoPago);
+    }, [selectedMetodoPago, setValue]);
 
     useEffect(() => {
         setValue('habilitado', habilitado);
@@ -44,8 +37,8 @@ const ProveedorFilters = ({ onApplyFilters, onClearFilters }) => {
         const filters = {
             ...data,
             disponibilidad: selectedDisponibilidad,
-            especialidad: selectedEspecialidades,
-            metodosPagoAceptados: selectedMetodosPago,
+            especialidad: selectedEspecialidad === 'Todos' ? undefined : selectedEspecialidad,
+            metodosPagoAceptados: selectedMetodoPago === 'Todos' ? undefined : selectedMetodoPago,
             habilitado: habilitado,
             ordenesActivasMin: data.ordenesActivasMin || undefined,
             ordenesActivasMax: data.ordenesActivasMax || undefined,
@@ -58,96 +51,74 @@ const ProveedorFilters = ({ onApplyFilters, onClearFilters }) => {
     const handleClear = () => {
         reset();
         setSelectedDisponibilidad('');
-        setSelectedEspecialidades([]);
-        setSelectedMetodosPago([]);
+        setSelectedEspecialidad('');
+        setSelectedMetodoPago('');
         setHabilitado(false);
         onClearFilters();
-    };
-
-    const handleEspecialidadChange = (especialidad) => {
-        setSelectedEspecialidades(prev =>
-            prev.includes(especialidad) ? prev.filter(e => e !== especialidad) : [...prev, especialidad]
-        );
-    };
-
-    const handleMetodoPagoChange = (metodo) => {
-        setSelectedMetodosPago(prev =>
-            prev.includes(metodo) ? prev.filter(m => m !== metodo) : [...prev, metodo]
-        );
     };
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 border rounded-lg shadow-sm">
             <div>
-                <Label htmlFor="disponibilidad">Disponibilidad</Label>
-                <Select onValueChange={setSelectedDisponibilidad} value={selectedDisponibilidad}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Selecciona disponibilidad" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="">Todas</SelectItem>
-                        <SelectItem value="DISPONIBLE">Disponible</SelectItem>
-                        <SelectItem value="NO_DISPONIBLE">No Disponible</SelectItem>
-                    </SelectContent>
-                </Select>
+                <label htmlFor="disponibilidad">Disponibilidad</label>
+                <InputSelectGeneral
+                    id="disponibilidad"
+                    {...register('disponibilidad')}
+                    defaultValue={selectedDisponibilidad}
+                    onChange={(e) => setSelectedDisponibilidad(e.target.value)}
+                    options={["", "DISPONIBLE", "NO_DISPONIBLE"]}
+                    placeholder="Selecciona disponibilidad"
+                />
             </div>
-            <div className="col-span-full">
-                <Label>Especialidad</Label>
-                <div className="flex flex-wrap gap-2 mt-2">
-                    {especialidadOptions.map(esp => (
-                        <Button
-                            key={esp}
-                            type="button"
-                            variant={selectedEspecialidades.includes(esp) ? 'default' : 'outline'}
-                            onClick={() => handleEspecialidadChange(esp)}
-                        >
-                            {esp}
-                        </Button>
-                    ))}
-                </div>
+            <div>
+                <label htmlFor="especialidad">Especialidad</label>
+                <InputSelectGeneral
+                    id="especialidad"
+                    {...register('especialidad')}
+                    defaultValue={selectedEspecialidad}
+                    onChange={(e) => setSelectedEspecialidad(e.target.value)}
+                    options={especialidadOptions}
+                    placeholder="Selecciona una especialidad"
+                />
             </div>
-            <div className="col-span-full">
-                <Label>Métodos de Pago Aceptados</Label>
-                <div className="flex flex-wrap gap-2 mt-2">
-                    {metodoPagoOptions.map(metodo => (
-                        <Button
-                            key={metodo}
-                            type="button"
-                            variant={selectedMetodosPago.includes(metodo) ? 'default' : 'outline'}
-                            onClick={() => handleMetodoPagoChange(metodo)}
-                        >
-                            {metodo.replace(/_/g, ' ')}
-                        </Button>
-                    ))}
-                </div>
+            <div>
+                <label htmlFor="metodosPagoAceptados">Métodos de Pago Aceptados</label>
+                <InputSelectGeneral
+                    id="metodosPagoAceptados"
+                    {...register('metodosPagoAceptados')}
+                    defaultValue={selectedMetodoPago}
+                    onChange={(e) => setSelectedMetodoPago(e.target.value)}
+                    options={metodoPagoOptions.map(metodo => ({ value: metodo, label: metodo.replace(/_/g, ' ') }))}
+                    placeholder="Selecciona un método de pago"
+                />
             </div>
             <div className="flex items-center space-x-2">
-                <Checkbox
+                <InputCheckBox
                     id="habilitado"
                     checked={habilitado}
-                    onCheckedChange={setHabilitado}
+                    onChange={(e) => setHabilitado(e.target.checked)}
                 />
-                <Label htmlFor="habilitado">Habilitado</Label>
+                <label htmlFor="habilitado">Habilitado</label>
             </div>
             <div>
-                <Label htmlFor="ordenesActivasMin">Órdenes Activas Mínimo</Label>
-                <Input type="number" id="ordenesActivasMin" {...register('ordenesActivasMin')} placeholder="Mínimo" />
+                <label htmlFor="ordenesActivasMin">Órdenes Activas Mínimo</label>
+                <InputGeneral type="number" id="ordenesActivasMin" {...register('ordenesActivasMin')} placeholder="Mínimo" />
             </div>
             <div>
-                <Label htmlFor="ordenesActivasMax">Órdenes Activas Máximo</Label>
-                <Input type="number" id="ordenesActivasMax" {...register('ordenesActivasMax')} placeholder="Máximo" />
+                <label htmlFor="ordenesActivasMax">Órdenes Activas Máximo</label>
+                <InputGeneral type="number" id="ordenesActivasMax" {...register('ordenesActivasMax')} placeholder="Máximo" />
             </div>
             <div>
-                <Label htmlFor="fechaUltimaAsignacionStart">Fecha Última Asignación (Desde)</Label>
-                <Input type="date" id="fechaUltimaAsignacionStart" {...register('fechaUltimaAsignacionStart')} />
+                <label htmlFor="fechaUltimaAsignacionStart">Fecha Última Asignación (Desde)</label>
+                <InputGeneral type="date" id="fechaUltimaAsignacionStart" {...register('fechaUltimaAsignacionStart')} />
             </div>
             <div>
-                <Label htmlFor="fechaUltimaAsignacionEnd">Fecha Última Asignación (Hasta)</Label>
-                <Input type="date" id="fechaUltimaAsignacionEnd" {...register('fechaUltimaAsignacionEnd')} />
+                <label htmlFor="fechaUltimaAsignacionEnd">Fecha Última Asignacion (Hasta)</label>
+                <InputGeneral type="date" id="fechaUltimaAsignacionEnd" {...register('fechaUltimaAsignacionEnd')} />
             </div>
             <div className="col-span-full flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={handleClear}>Limpiar Filtros</Button>
-                <Button type="submit">Aplicar Filtros</Button>
+                <BotonGeneral type="button" variant="outline" onClick={handleClear}>Limpiar Filtros</BotonGeneral>
+                <BotonGeneral type="submit">Aplicar Filtros</BotonGeneral>
             </div>
         </form>
     );

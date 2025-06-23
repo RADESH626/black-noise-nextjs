@@ -174,6 +174,24 @@ export default function PedidosClientPage({ initialPedidos }) {
     );
   }
 
+  const filteredPedidos = pedidos.filter(pedido => {
+    // Aplicar lógica de filtrado basada en el estado `filters`
+    // Por ahora, solo se aplica el filtro de estadoPedido
+    if (filters.estadoPedido && filters.estadoPedido !== "" && pedido.estadoPedido !== filters.estadoPedido) {
+        return false;
+    }
+    // Aquí se pueden añadir más lógicas de filtrado si es necesario
+    return true;
+  });
+
+  if (filteredPedidos.length === 0 && Object.keys(filters).length > 0) {
+    return (
+      <div className="min-h-full flex justify-center items-center text-gray-400">
+        No hay pedidos que coincidan con los filtros aplicados.
+      </div>
+    );
+  }
+
   if (pedidos.length === 0) {
     return (
       <div className="min-h-full flex justify-center items-center text-gray-400">

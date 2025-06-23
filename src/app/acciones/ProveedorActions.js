@@ -227,36 +227,46 @@ export async function obtenerProveedoresHabilitados() {
   }
 }
 
-export async function obtenerProveedores(filters = {}) {
+export async function obtenerProveedores(searchParams = {}) {
   await connectDB();
   try {
     const ProveedorModel = await getModel('Proveedor');
     let query = {};
 
-    // Apply filters
-    if (filters.disponibilidad) {
-      query.disponibilidad = filters.disponibilidad;
+    // Extraer y normalizar filtros de searchParams de forma explícita
+    const disponibilidad = searchParams.hasOwnProperty('disponibilidad') ? searchParams.disponibilidad : undefined;
+    const especialidad = searchParams.hasOwnProperty('especialidad') ? (searchParams.especialidad === 'Todos' ? undefined : searchParams.especialidad) : undefined;
+    const metodosPagoAceptados = searchParams.hasOwnProperty('metodosPagoAceptados') ? (searchParams.metodosPagoAceptados === 'Todos' ? undefined : searchParams.metodosPagoAceptados) : undefined;
+    const habilitado = searchParams.hasOwnProperty('habilitado') ? (searchParams.habilitado === 'true' ? true : (searchParams.habilitado === 'false' ? false : undefined)) : undefined;
+    const ordenesActivasMin = searchParams.hasOwnProperty('ordenesActivasMin') ? searchParams.ordenesActivasMin : undefined;
+    const ordenesActivasMax = searchParams.hasOwnProperty('ordenesActivasMax') ? searchParams.ordenesActivasMax : undefined;
+    const fechaUltimaAsignacionStart = searchParams.hasOwnProperty('fechaUltimaAsignacionStart') ? searchParams.fechaUltimaAsignacionStart : undefined;
+    const fechaUltimaAsignacionEnd = searchParams.hasOwnProperty('fechaUltimaAsignacionEnd') ? searchParams.fechaUltimaAsignacionEnd : undefined;
+
+    // Aplicar filtros
+    if (disponibilidad) {
+      query.disponibilidad = disponibilidad;
     }
-    if (filters.especialidad && filters.especialidad.length > 0) {
-      query.especialidad = { $in: filters.especialidad };
+    if (especialidad) {
+      query.especialidad = especialidad;
     }
-    if (filters.metodosPagoAceptados && filters.metodosPagoAceptados.length > 0) {
-      query.metodosPagoAceptados = { $in: filters.metodosPagoAceptados };
+    if (metodosPagoAceptados) {
+      query.metodosPagoAceptados = metodosPagoAceptados;
     }
-    if (filters.habilitado !== undefined) {
-      query.habilitado = filters.habilitado;
+    if (habilitado !== undefined) {
+      query.habilitado = habilitado;
     }
-    if (filters.ordenesActivasMin) {
-      query.activeOrders = { ...query.activeOrders, $gte: parseInt(filters.ordenesActivasMin) };
+    if (ordenesActivasMin) {
+      query.activeOrders = { ...query.activeOrders, $gte: parseInt(ordenesActivasMin) };
     }
-    if (filters.ordenesActivasMax) {
-      query.activeOrders = { ...query.activeOrders, $lte: parseInt(filters.ordenesActivasMax) };
+    if (ordenesActivasMax) {
+      query.activeOrders = { ...query.activeOrders, $lte: parseInt(ordenesActivasMax) };
     }
-    if (filters.fechaUltimaAsignacionStart) {
-      query.lastAssignedAt = { ...query.lastAssignedAt, $gte: new Date(filters.fechaUltimaAsignacionStart) };
+    if (fechaUltimaAsignacionStart) {
+      query.lastAssignedAt = { ...query.lastAssignedAt, $gte: new Date(fechaUltimaAsignacionStart) };
     }
-    if (filters.fechaUltimaAsignacionEnd) {
-      query.lastAssignedAt = { ...query.lastAssignedAt, $lte: new Date(filters.fechaUltimaAsignacionEnd) };
+    if (fechaUltimaAsignacionEnd) {
+      query.lastAssignedAt = { ...query.lastAssignedAt, $lte: new Date(fechaUltimaAsignacionEnd) };
     }
 
     const proveedores = await ProveedorModel.find(query).lean();

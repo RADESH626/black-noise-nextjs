@@ -2,16 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import InputGeneral from "@/components/common/inputs/InputGeneral";
+import BotonGeneral from "@/components/common/botones/BotonGeneral";
+import InputSelectGeneral from "@/components/common/inputs/InputSelectGeneral";
 
 const VentaFilters = ({ onApplyFilters, onClearFilters }) => {
     const { register, handleSubmit, reset, setValue, watch } = useForm();
@@ -42,42 +35,39 @@ const VentaFilters = ({ onApplyFilters, onClearFilters }) => {
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 border rounded-lg shadow-sm">
             <div>
-                <Label htmlFor="fechaVentaStart">Fecha de Venta (Desde)</Label>
-                <Input type="date" id="fechaVentaStart" {...register('fechaVentaStart')} />
+                <label htmlFor="fechaVentaStart">Fecha de Venta (Desde)</label>
+                <InputGeneral type="date" id="fechaVentaStart" {...register('fechaVentaStart')} />
             </div>
             <div>
-                <Label htmlFor="fechaVentaEnd">Fecha de Venta (Hasta)</Label>
-                <Input type="date" id="fechaVentaEnd" {...register('fechaVentaEnd')} />
+                <label htmlFor="fechaVentaEnd">Fecha de Venta (Hasta)</label>
+                <InputGeneral type="date" id="fechaVentaEnd" {...register('fechaVentaEnd')} />
             </div>
             <div>
-                <Label htmlFor="estadoVenta">Estado de Venta</Label>
-                <Select onValueChange={setSelectedEstadoVenta} value={selectedEstadoVenta}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Selecciona un estado" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="">Todos</SelectItem>
-                        <SelectItem value="COMPLETADA">Completada</SelectItem>
-                        <SelectItem value="PENDIENTE">Pendiente</SelectItem>
-                        <SelectItem value="CANCELADA">Cancelada</SelectItem>
-                    </SelectContent>
-                </Select>
+                <label htmlFor="estadoVenta">Estado de Venta</label>
+                <InputSelectGeneral
+                    id="estadoVenta"
+                    {...register('estadoVenta')}
+                    defaultValue={selectedEstadoVenta}
+                    onChange={(e) => setSelectedEstadoVenta(e.target.value)}
+                    options={["", "COMPLETADA", "PENDIENTE", "CANCELADA"]}
+                    placeholder="Selecciona un estado"
+                />
             </div>
             <div>
-                <Label htmlFor="pedidoAsociadoId">Pedido Asociado ID</Label>
-                <Input type="text" id="pedidoAsociadoId" {...register('pedidoAsociadoId')} placeholder="ID del Pedido" />
+                <label htmlFor="pedidoAsociadoId">Pedido Asociado ID</label>
+                <InputGeneral type="text" id="pedidoAsociadoId" {...register('pedidoAsociadoId')} placeholder="ID del Pedido" />
             </div>
             <div>
-                <Label htmlFor="valorVentaMin">Valor de Venta Mínimo</Label>
-                <Input type="number" id="valorVentaMin" {...register('valorVentaMin')} placeholder="Mínimo" step="0.01" />
+                <label htmlFor="valorVentaMin">Valor de Venta Mínimo</label>
+                <InputGeneral type="number" id="valorVentaMin" {...register('valorVentaMin')} placeholder="Mínimo" step="0.01" />
             </div>
             <div>
-                <Label htmlFor="valorVentaMax">Valor de Venta Máximo</Label>
-                <Input type="number" id="valorVentaMax" {...register('valorVentaMax')} placeholder="Máximo" step="0.01" />
+                <label htmlFor="valorVentaMax">Valor de Venta Máximo</label>
+                <InputGeneral type="number" id="valorVentaMax" {...register('valorVentaMax')} placeholder="Máximo" step="0.01" />
             </div>
             <div className="col-span-full flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={handleClear}>Limpiar Filtros</Button>
-                <Button type="submit">Aplicar Filtros</Button>
+                <BotonGeneral type="button" variant="outline" onClick={handleClear}>Limpiar Filtros</BotonGeneral>
+                <BotonGeneral type="submit">Aplicar Filtros</BotonGeneral>
             </div>
         </form>
     );

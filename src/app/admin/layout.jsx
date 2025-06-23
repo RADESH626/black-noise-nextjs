@@ -8,7 +8,7 @@ function AdminLayoutContent({ children }) {
 
       <AdminSidebar />
 
-      <main className="w-full h-full">
+      <main className="flex flex-col flex-1 overflow-y-auto">
 
         {children}
 

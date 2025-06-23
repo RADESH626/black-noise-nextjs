@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import SeccionHeader from '../secciones/acciones/SeccionHeader';
 import { obtenerVentas } from '@/app/acciones/VentaActions.js';
@@ -16,14 +16,14 @@ function VentasDashboard() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const currentFilters = {
+    const currentFilters = useMemo(() => ({ // Envolver en useMemo
         estadoVenta: searchParams.get('estadoVenta') || '',
         pedidoAsociadoId: searchParams.get('pedidoAsociadoId') || '',
         valorVentaMin: searchParams.get('valorVentaMin') || '',
         valorVentaMax: searchParams.get('valorVentaMax') || '',
         fechaVentaStart: searchParams.get('fechaVentaStart') || '',
         fechaVentaEnd: searchParams.get('fechaVentaEnd') || '',
-    };
+    }), [searchParams]); // Dependencia de searchParams
 
     const fetchVentas = useCallback(async () => {
         try {
@@ -57,12 +57,12 @@ function VentasDashboard() {
             }
         });
         router.push(`/admin/ventas?${params.toString()}`);
-        router.refresh(); // Forzar la revalidación de datos del servidor
+        // router.refresh(); // Eliminar esta línea
     }, [router, searchParams]);
 
     const handleClearFilters = useCallback(() => {
         router.push('/admin/ventas');
-        router.refresh(); // Forzar la revalidación de datos del servidor
+        // router.refresh(); // Eliminar esta línea
     }, [router]);
 
     if (loading) {

@@ -16,7 +16,7 @@ export default function PagosDashboard() {
   const [totalPages, setTotalPages] = useState(1);
   const pagosPerPage = 12; // Mantener el límite por defecto o hacerlo configurable
 
-  const currentFilters = {
+  const currentFilters = React.useMemo(() => ({
     metodoPago: searchParams.get('metodoPago') || '',
     estadoTransaccion: searchParams.get('estadoTransaccion') || '',
     usuarioId: searchParams.get('usuarioId') || '',
@@ -26,7 +26,17 @@ export default function PagosDashboard() {
     valorPagoMax: searchParams.get('valorPagoMax') || '',
     fechaPagoStart: searchParams.get('fechaPagoStart') || '',
     fechaPagoEnd: searchParams.get('fechaPagoEnd') || '',
-  };
+  }), [
+    searchParams.get('metodoPago'),
+    searchParams.get('estadoTransaccion'),
+    searchParams.get('usuarioId'),
+    searchParams.get('pedidoId'),
+    searchParams.get('ventaId'),
+    searchParams.get('valorPagoMin'),
+    searchParams.get('valorPagoMax'),
+    searchParams.get('fechaPagoStart'),
+    searchParams.get('fechaPagoEnd'),
+  ]);
 
   useEffect(() => {
     const fetchPagos = async () => {
