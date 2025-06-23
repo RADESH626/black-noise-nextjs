@@ -19,7 +19,7 @@ export default async function AdminProveedorPedidosPage() {
 
     try {
         console.log("session.user.proveedorId before calling obtenerPedidosPorProveedorId:", session.user.proveedorId);
-        const result = await obtenerPedidosPorProveedorId(null, session.user.proveedorId); // Pass null for pedidoId, and proveedorId as the second argument
+        const result = await obtenerPedidosPorProveedorId({ proveedorId: session.user.proveedorId });
 
         if (result.success) {
             pedidos = result.pedidos;
