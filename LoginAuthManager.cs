@@ -16,12 +16,7 @@ public class LoginAuthManager : MonoBehaviour
     public GameObject loadingIndicator;
 
     [Header("API Configuration")]
-    // Configuración automática para desarrollo y producción
-#if UNITY_EDITOR
-    private string apiUrl = "http://localhost:3000/api/auth/login"; // Desarrollo local
-#else
-    private string apiUrl = "https://4.228.49.46:3000/api/auth/login"; // Producción
-#endif
+    public string apiUrl = "http://localhost:3000/api/auth/login"; // Desarrollo local
 
     void Start()
     {
