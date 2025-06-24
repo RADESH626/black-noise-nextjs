@@ -11,6 +11,7 @@ import { Rol } from '@/models/enums/usuario/Rol';
 import { eliminarDesign } from '@/app/acciones/DesignActions';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import DesignFilters from '@/components/admin/filters/DesignFilters'; // Importar el componente de filtros
+import BotonExportarPDF from '@/components/common/botones/BotonExportarPDF'; // Importar BotonExportarPDF
 
 const DesignsClientPage = ({ initialDesigns, currentFilters }) => {
     const { data: session, status } = useSession();
@@ -101,6 +102,28 @@ const DesignsClientPage = ({ initialDesigns, currentFilters }) => {
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-3xl font-bold mb-6 text-gray-800">Gestión de Diseños</h1>
+
+            <div className="mb-4 flex justify-end">
+                <BotonExportarPDF
+                    data={designs}
+                    reportTitle="Reporte de Diseños"
+                    tableHeaders={[
+                        'ID Diseño', 'Nombre Diseño', 'Descripción', 'Valor Diseño', 'Categoría',
+                        'Estado', 'Diseñador', 'Fecha Creación'
+                    ]}
+                    tableBodyMapper={(design) => [
+                        design._id,
+                        design.nombreDesing,
+                        design.descripcion,
+                        `$${typeof design.valorDesing === 'number' ? design.valorDesing.toFixed(2) : '0.00'}`,
+                        design.categoria,
+                        design.estadoDesing,
+                        design.usuarioId ? `${design.usuarioId.Nombre} ${design.usuarioId.primerApellido}` : 'N/A',
+                        design.createdAt ? new Date(design.createdAt).toLocaleDateString() : 'N/A',
+                    ]}
+                    className="py-2 px-4"
+                />
+            </div>
 
             <div className="mb-6">
                 <DesignFilters onApplyFilters={handleApplyFilters} onClearFilters={handleClearFilters} initialFilters={currentFilters} />
