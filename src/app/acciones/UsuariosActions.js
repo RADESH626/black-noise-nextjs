@@ -496,24 +496,30 @@ async function FiltrarUsuarios(filters = {}) {
 }
 
 // Función para cambiar el estado de habilitado de un usuario
-async function toggleUsuarioHabilitado(formData) {
+async function toggleUsuarioHabilitado(prevState, formData) { // Added prevState as first argument for useActionState compatibility
     try {
         const id = formData.get('id');
+        logger.info(`toggleUsuarioHabilitado: Iniciado para ID: ${id}`);
 
         if (!id) {
+            logger.error('toggleUsuarioHabilitado: ID de usuario no proporcionado.');
             throw new ValidationError('ID de usuario no proporcionado para cambiar el estado.');
         }
 
         await connectDB();
+        logger.info('toggleUsuarioHabilitado: Conexión a DB establecida.');
 
-const UsuarioModel = await getModel('Usuario');
+        const UsuarioModel = await getModel('Usuario');
         const usuario = await UsuarioModel.findById(id);
 
         if (!usuario) {
+            logger.error(`toggleUsuarioHabilitado: No se encontró ningún usuario con el ID ${id}.`);
             throw new NotFoundError(`No se encontró ningún usuario con el ID ${id}.`);
         }
 
+        logger.info(`toggleUsuarioHabilitado: Usuario encontrado. Estado actual: ${usuario.habilitado}`);
         const nuevoEstadoHabilitado = !usuario.habilitado;
+        logger.info(`toggleUsuarioHabilitado: Nuevo estado calculado: ${nuevoEstadoHabilitado}`);
 
         const usuarioActualizado = await UsuarioModel.findByIdAndUpdate(
             id,
@@ -521,11 +527,14 @@ const UsuarioModel = await getModel('Usuario');
             { new: true }
         ).lean();
 
+        logger.info(`toggleUsuarioHabilitado: Usuario actualizado en DB. Nuevo estado: ${usuarioActualizado.habilitado}`);
         revalidatePath('/admin/usuarios');
+        logger.info('toggleUsuarioHabilitado: revalidatePath ejecutado.');
 
         return { success: true, message: `Usuario ${nuevoEstadoHabilitado ? 'habilitado' : 'deshabilitado'} exitosamente.`, data: toPlainObject(usuarioActualizado) };
 
     } catch (error) {
+        logger.error(`toggleUsuarioHabilitado: Error capturado: ${error.message}`);
         if (error instanceof ValidationError || error instanceof NotFoundError) {
             return handleError(error, error.message, error.statusCode);
         }

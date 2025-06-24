@@ -124,7 +124,7 @@ export async function crearProveedor(prevState, formData) {
     const hashedAccessKey = await bcrypt.hash(generatedAccessKey, 10);
 
     // Create a new Usuario entry
-    const nuevoUsuario = new Usuario({
+    const nuevoUsuario = new UsuarioModel({ // Use UsuarioModel here
       Nombre: nombre,
       primerApellido: primerApellido,
       numeroDocumento: numeroDocumento,

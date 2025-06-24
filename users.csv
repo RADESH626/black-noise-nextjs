@@ -1,0 +1,4 @@
+nombre,apellido,email,password,rol
+Usuario1,Apellido1,usuario1@example.com,password123,cliente
+Usuario2,Apellido2,usuario2@example.com,password456,cliente
+Usuario3,Apellido3,usuario3@example.com,password789,proveedor
