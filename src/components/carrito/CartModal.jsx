@@ -38,7 +38,7 @@ const CartModal = ({ cartItems, onClose, isOpen, onRemoveItem }) => {
 
                   <Image
                     src={item.imageData ? `data:${item.imageMimeType};base64,${item.imageData}` : '/img/placeholder.jpg'}
-                    alt={item.nombre}
+                    alt={item.nombre || 'Imagen del producto'}
                     width={60}
                     height={60}
                     className=""
