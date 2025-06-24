@@ -16,6 +16,7 @@ import FilterBar from '@/components/common/FilterBar'; // Import FilterBar
 import BotonExportarPDF from '@/components/common/botones/BotonExportarPDF'; // Import BotonExportarPDF
 import PedidoCard from '@/components/common/PedidoCard'; // Importar PedidoCard
 import { useSearchParams } from 'next/navigation'; // Importar useSearchParams
+import logger from '@/utils/logger'; // Importar el logger
 
 export default function PedidosClientPage({ initialPedidos }) {
   const { data: session, status } = useSession();
@@ -38,6 +39,17 @@ export default function PedidosClientPage({ initialPedidos }) {
   const [isUpdating, setIsUpdating] = useState({});
   const [expandedOrders, setExpandedOrders] = useState(new Set());
   const [expandedDesigns, setExpandedDesigns] = useState(new Set());
+
+  // Sincronizar editableCostoEnvio con los pedidos actualizados
+  useEffect(() => {
+    setEditableCostoEnvio(prev => {
+      const newCostoEnvio = { ...prev };
+      pedidos.forEach(pedido => {
+        newCostoEnvio[pedido._id.toString()] = pedido.costoEnvio || 0;
+      });
+      return newCostoEnvio;
+    });
+  }, [pedidos]); // Dependencia de 'pedidos'
 
   // Inicializar filtros desde searchParams
   const currentFilters = useMemo(() => ({
@@ -131,14 +143,21 @@ export default function PedidosClientPage({ initialPedidos }) {
     setIsUpdating(prev => ({ ...prev, [pedidoId]: true }));
     try {
       const costo = editableCostoEnvio[pedidoId];
+      logger.debug(`[PedidosClientPage] Intentando actualizar costo de envío para pedido ${pedidoId} a: ${costo}`);
       const result = await actualizarPedidoPorProveedor(pedidoId, session.user.proveedorId, { costoEnvio: costo });
+      logger.debug(`[PedidosClientPage] Resultado de actualizarPedidoPorProveedor:`, result);
       if (result.success) {
         showPopUp("Costo de envío actualizado exitosamente!", "success");
-        setPedidos(prevPedidos =>
-          prevPedidos.map(pedido =>
-            pedido._id.toString() === pedidoId ? { ...pedido, costoEnvio: costo } : pedido
-          )
-        );
+        // Actualizar el estado con el pedido completo devuelto por el servidor
+        setPedidos(prevPedidos => {
+          const updatedPedidos = prevPedidos.map(pedido =>
+            pedido._id.toString() === pedidoId ? result.pedido : pedido
+          );
+          logger.debug(`[PedidosClientPage] Estado 'pedidos' actualizado. Nuevo pedido:`, result.pedido);
+          return updatedPedidos;
+        });
+        // Opcional: re-fetch completo si la actualización local no es suficiente por alguna razón
+        // fetchAndSetPedidos(currentFilters);
       } else {
         showPopUp(result.message || "Error al actualizar el costo de envío.", "error");
       }
@@ -158,7 +177,9 @@ export default function PedidosClientPage({ initialPedidos }) {
     if (confirmed) {
       setIsUpdating(prev => ({ ...prev, [pedidoId]: true }));
       try {
+        logger.debug(`[PedidosClientPage] Intentando cambiar estado de pedido ${pedidoId} de ${oldEstado} a: ${newEstado}`);
         const result = await updateEstadoPedido(pedidoId, newEstado);
+        logger.debug(`[PedidosClientPage] Resultado de updateEstadoPedido:`, result);
         if (result.success) {
           showPopUp("Estado del pedido actualizado exitosamente!", "success");
           // Re-fetch with current filters to ensure the list is up-to-date
@@ -167,7 +188,7 @@ export default function PedidosClientPage({ initialPedidos }) {
           showPopUp(result.message || "Error al actualizar el estado del pedido.", "error");
         }
       } catch (err) {
-        console.error("Error al actualizar el estado del pedido:", err);
+        logger.error("Error al actualizar el estado del pedido:", err);
         showPopUp("Error al actualizar el estado del pedido. Inténtalo de nuevo.", "error");
       } finally {
         setIsUpdating(prev => ({ ...prev, [pedidoId]: false }));
@@ -337,19 +358,30 @@ export default function PedidosClientPage({ initialPedidos }) {
           <p><span className="font-bold">Total de Pedidos:</span> {pedidos.length}</p>
         </div>
 
-        {filteredPedidos.map((pedido, index) => (
-          <PedidoCard 
-            key={pedido._id} 
-            pedido={pedido} 
-            userRole="supplier" 
-            onUpdateCostoEnvio={(id, costo) => handleUpdateCostoEnvio(id, costo)}
-            onEstadoPedidoChange={(id, newEstado, oldEstado) => handleEstadoPedidoChange(id, newEstado, oldEstado)}
-            expandedOrders={expandedOrders}
-            handleToggleExpand={handleToggleExpand}
-            expandedDesigns={expandedDesigns}
-            handleToggleDesignExpand={handleToggleDesignExpand}
-          />
-        ))}
+        {filteredPedidos.map((pedido, index) => {
+          // Crear una copia del pedido y sobrescribir el costoEnvio con el valor editable del padre
+          const currentPedido = { 
+            ...pedido, 
+            costoEnvio: editableCostoEnvio[pedido._id.toString()] !== undefined 
+                          ? editableCostoEnvio[pedido._id.toString()] 
+                          : pedido.costoEnvio 
+          };
+
+          return (
+            <PedidoCard 
+              key={pedido._id} 
+              pedido={currentPedido} // Pasar el pedido con el costoEnvio actualizado
+              userRole="supplier" 
+              onUpdateCostoEnvio={(id, costo) => handleUpdateCostoEnvio(id, costo)}
+              onCostoEnvioInputChange={handleCostoEnvioChange} // Pasar la función de cambio del input
+              onEstadoPedidoChange={(id, newEstado, oldEstado) => handleEstadoPedidoChange(id, newEstado, oldEstado)}
+              expandedOrders={expandedOrders}
+              handleToggleExpand={handleToggleExpand}
+              expandedDesigns={expandedDesigns}
+              handleToggleDesignExpand={handleToggleDesignExpand}
+            />
+          );
+        })}
       </main>
     </div>
   );

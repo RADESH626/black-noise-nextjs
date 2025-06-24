@@ -44,7 +44,8 @@ function FormEditarUsuario({ initialData, onSuccess }) {
     }, [state, showPopUp, onSuccess]);
 
     return (
-        <form action={formAction} className="space-y-5 text-white">
+        <form action={formAction} className="space-y-5 text-black">
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="relative">
                     <InputTipoDocumentoIdentidad 

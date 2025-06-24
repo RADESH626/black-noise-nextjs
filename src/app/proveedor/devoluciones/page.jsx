@@ -56,8 +56,8 @@ function SupplierReturnsAndCancellationsPage() {
                 <tr key={item._id} className="hover:bg-gray-200">
                   <td className="border px-4 py-2">{item._id}</td>
                   <td className="border px-4 py-2">{item.userEmail}</td>
-                  <td className="border px-4 py-2">{item.motivo_devolucion || 'N/A'}</td>
-                  <td className="border px-4 py-2">{item.fecha_cancelacion ? new Date(item.fecha_cancelacion).toLocaleDateString('es-ES') : 'N/A'}</td>
+                  <td className="border px-4 py-2">{item.motivo_devolucion || item.razon_cancelacion || 'N/A'}</td>
+                  <td className="border px-4 py-2">{item.fechaPeticion ? new Date(item.fechaPeticion).toLocaleDateString('es-ES') : 'N/A'}</td>
                   <td className="border px-4 py-2">{item.estadoPedido}</td>
                 </tr>
               ))}

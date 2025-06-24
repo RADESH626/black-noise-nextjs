@@ -78,7 +78,7 @@ async function obtenerPedidos(filters = {}) {
     const pedidos = await PedidoModel.find(query)
       .populate('items.designId', 'nombreDesing imageData imageMimeType categoria valorDesing descripcion')
       .populate('proveedorId', 'nombreEmpresa emailContacto')
-      .populate('userId', 'Nombre direccion')
+      .populate('userId', 'Nombre correo direccion') // Añadir 'correo' y 'direccion'
       .lean();
     logger.debug("PedidoActions: Pedidos obtenidos de la base de datos", pedidos);
 
@@ -224,7 +224,7 @@ async function obtenerPedidosPorUsuarioId(userId) {
     const pedidos = await PedidoModel.find({ userId: userId })
       .populate('items.designId', 'nombreDesing imageData imageMimeType categoria valorDesing descripcion')
       .populate('proveedorId', 'nombreEmpresa emailContacto')
-      .populate('userId', 'Nombre direccion')
+      .populate('userId', 'Nombre correo direccion') // Añadir 'correo' y 'direccion'
       .lean();
     const processedPedidos = pedidos.map(p => {
       const tempPedido = { ...p };
@@ -269,7 +269,7 @@ async function obtenerPedidosPagadosPorUsuarioId(userId) {
     const pedidos = await PedidoModel.find({ userId: userId, estadoPago: 'PAGADO' }) // Filtrar por estadoPago: 'PAGADO'
       .populate('items.designId', 'nombreDesing imageData imageMimeType categoria valorDesing descripcion')
       .populate('proveedorId', 'nombreEmpresa emailContacto')
-      .populate('userId', 'Nombre direccion')
+      .populate('userId', 'Nombre correo direccion') // Añadir 'correo' y 'direccion'
       .lean();
     logger.debug(`PedidoActions: Se encontraron ${pedidos.length} pedidos para el usuario ${userId}`);
     const processedPedidos = pedidos.map(p => {
@@ -400,10 +400,9 @@ async function obtenerDevolucionesYCancelacionesProveedor() {
       estadoPedido: { $in: ['CANCELADO', 'SOLICITUD_DEVOLUCION', 'DEVOLUCION_APROBADA', 'DEVUELTO'] }
     })
       .populate('userId', 'correo') // Populate userId and select only the 'correo' field
-      .sort({ fecha_cancelacion: -1, _id: -1 }) // Sort by fecha_cancelacion and then _id
       .lean();
 
-    // Map to plain objects and add userEmail directly
+    // Map to plain objects and add userEmail directly, and determine the correct "request date"
     const processedPedidos = pedidos.map(pedido => {
       const plainPedido = toPlainObject(pedido);
       if (pedido.userId && pedido.userId.correo) {
@@ -411,7 +410,26 @@ async function obtenerDevolucionesYCancelacionesProveedor() {
       } else {
         plainPedido.userEmail = 'N/A'; // Fallback if email is not found
       }
+
+      // Determinar la fecha de petición correcta
+      if (pedido.estadoPedido === EstadoPedido.SOLICITUD_DEVOLUCION ||
+          pedido.estadoPedido === EstadoPedido.DEVOLUCION_APROBADA ||
+          pedido.estadoPedido === EstadoPedido.DEVOLUCION_RECHAZADA ||
+          pedido.estadoPedido === EstadoPedido.DEVOLUCION_COMPLETADA) {
+        plainPedido.fechaPeticion = pedido.fecha_solicitud_devolucion || pedido.createdAt;
+      } else if (pedido.estadoPedido === EstadoPedido.CANCELADO) {
+        plainPedido.fechaPeticion = pedido.fecha_cancelacion || pedido.createdAt;
+      } else {
+        plainPedido.fechaPeticion = pedido.createdAt; // Fallback general
+      }
       return plainPedido;
+    });
+
+    // Ordenar los pedidos procesados por la fecha de petición en orden descendente
+    processedPedidos.sort((a, b) => {
+      const dateA = a.fechaPeticion ? new Date(a.fechaPeticion).getTime() : 0;
+      const dateB = b.fechaPeticion ? new Date(b.fechaPeticion).getTime() : 0;
+      return dateB - dateA;
     });
 
     return { success: true, data: processedPedidos };
@@ -464,6 +482,7 @@ async function solicitarDevolucion(pedidoId, userId, razonDevolucion) {
 
     pedido.estadoPedido = EstadoPedido.SOLICITUD_DEVOLUCION;
     pedido.motivo_devolucion = razonDevolucion;
+    pedido.fecha_solicitud_devolucion = new Date(); // Añadir la fecha de solicitud de devolución
     await pedido.save();
 
     // Notificar al proveedor asignado

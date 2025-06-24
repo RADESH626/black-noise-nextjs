@@ -7,7 +7,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { eliminarDesign, actualizarDesign } from "@/app/acciones/DesignActions";
 import DesignsComponent from "../common/DesignsComponent";
 import Loader from '@/components/Loader';
-import PedidosClientePage from "../perfil/pedidos/PedidosClientePage"; // Importar el nuevo componente
+import PedidosComponent from "../common/PedidosComponent"; // Importar el componente PedidosComponent
 import FormEditarUsuario from "@/components/perfil/FormEditarUsuario";
 import DesignUploadModal from "@/components/perfil/DesignUploadModal";
 import PaymentHistory from "@/components/perfil/PaymentHistory";
@@ -283,9 +283,8 @@ function ProfileContent({ userId, initialUser, initialDesigns, initialPayments, 
         )}
         {activeTab === 'orders' && (
           <>
-            {userId && console.log('DEBUG - Renderizando PedidosClientePage con userId:', userId)}
             {userId ? (
-              <PedidosClientePage initialPedidos={initialPedidos} /> 
+              <PedidosComponent initialPedidos={initialPedidos} /> 
             ) : (
               <Loader />
             )}

@@ -9,6 +9,7 @@ import { useState, useEffect, useCallback } from "react";
 import Loader from '@/components/Loader';
 import { EstadoPedido } from "@/models/enums/PedidoEnums";
 import { motion } from "framer-motion";
+import { cancelarPedido } from "@/app/acciones/PedidoActions";
 
 export default function PedidosClientePage({ initialPedidos }) {
   const { data: session, status } = useSession();
@@ -21,6 +22,44 @@ export default function PedidosClientePage({ initialPedidos }) {
   const [showCancelled, setShowCancelled] = useState(false); // Para mostrar/ocultar pedidos cancelados
   const [expandedOrders, setExpandedOrders] = useState(new Set());
   const [expandedDesigns, setExpandedDesigns] = useState(new Set());
+
+  const handleCancelOrder = async (pedidoId) => {
+    showPopUp({
+      title: "¿Estás seguro de que quieres cancelar este pedido?",
+      message: "Esta acción no se puede deshacer. Por favor, proporciona una razón para la cancelación.",
+      type: "confirm",
+      input: {
+        type: "textarea",
+        placeholder: "Razón de la cancelación (opcional)",
+      },
+      onConfirm: async (razon) => {
+        setLoading(true);
+        const { success, message, error } = await cancelarPedido(pedidoId, razon);
+        if (success) {
+          showPopUp({
+            title: "Pedido Cancelado",
+            message: message,
+            type: "success",
+          });
+          fetchAndSetPedidos(); // Refrescar la lista de pedidos
+        } else {
+          showPopUp({
+            title: "Error al Cancelar Pedido",
+            message: error || message || "Ocurrió un error desconocido.",
+            type: "error",
+          });
+        }
+        setLoading(false);
+      },
+      onCancel: () => {
+        showPopUp({
+          title: "Cancelación Anulada",
+          message: "La cancelación del pedido ha sido anulada.",
+          type: "info",
+        });
+      },
+    });
+  };
 
   const fetchAndSetPedidos = useCallback(async () => {
     setLoading(true);
@@ -250,6 +289,19 @@ export default function PedidosClientePage({ initialPedidos }) {
                       )}
                     </div>
                   </div>
+                  {pedido.estadoPedido === EstadoPedido.PENDIENTE && (
+                    <div className="flex justify-end mt-4">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation(); // Evitar que se colapse el pedido al hacer clic en el botón
+                          handleCancelOrder(pedido._id.toString());
+                        }}
+                        className="bg-gray-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out"
+                      >
+                        Cancelar Pedido
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -258,7 +310,7 @@ export default function PedidosClientePage({ initialPedidos }) {
       </main>
 
       <hr className="border-white my-6" />
-      <div className="text-sm  pbg-[#f5f5f5]-4 rounded-md">
+      <div className="text-sm  text-black rounded-md">
         <p className="font-semibold mb-2">RESUMEN DE PEDIDOS:</p>
         <p><span className="font-bold">Total de Pedidos:</span> {filteredPedidos.length}</p>
       </div>

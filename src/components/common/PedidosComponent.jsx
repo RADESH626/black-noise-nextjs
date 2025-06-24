@@ -28,6 +28,32 @@ const PedidosContent = () => {
   const [expandedOrders, setExpandedOrders] = useState(new Set());
   const [expandedDesigns, setExpandedDesigns] = useState(new Set());
 
+  const filteredPedidos = pedidos.filter(pedido => showCancelled || pedido.estado !== EstadoPedido.CANCELADO);
+
+  const handleToggleExpand = (pedidoId) => {
+    setExpandedOrders(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(pedidoId)) {
+        newSet.delete(pedidoId);
+      } else {
+        newSet.add(pedidoId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleToggleDesignExpand = (designId) => {
+    setExpandedDesigns(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(designId)) {
+        newSet.delete(designId);
+      } else {
+        newSet.add(designId);
+      }
+      return newSet;
+    });
+  };
+
   const handleSolicitarDevolucion = (pedidoId) => {
     setSelectedPedidoId(pedidoId);
     setShowDevolucionModal(true);
@@ -69,14 +95,11 @@ const PedidosContent = () => {
     }
 
     try {
-      // Aquí se llamará a la acción del servidor en PedidoActions.js
-      // Necesitamos importar la acción primero
       const { cancelarPedido } = await import('@/app/acciones/PedidoActions');
       const result = await cancelarPedido(pedidoId, cancelReason.trim());
 
       if (result.success) {
         showPopUp('Pedido cancelado correctamente', 'success');
-        // Refrescar pedidos tras cancelar
         const { pedidos: fetchedPedidos, error: fetchError } = await obtenerPedidosPagadosPorUsuarioId(userId);
         if (fetchError) {
           setError({ message: fetchError });
@@ -117,7 +140,6 @@ const PedidosContent = () => {
 
       if (result.success) {
         showPopUp('Solicitud de devolución enviada correctamente', 'success');
-        // Refrescar pedidos tras solicitud de devolución
         const { pedidos: fetchedPedidos, error: fetchError } = await obtenerPedidosPagadosPorUsuarioId(userId);
         if (fetchError) {
           setError({ message: fetchError });
@@ -206,17 +228,69 @@ const PedidosContent = () => {
             key={pedido._id}
             pedido={pedido}
             userRole="client"
-            onSolicitarDevolucion={(id, reason) => handleSolicitarDevolucion(id, reason)}
+            onSolicitarDevolucion={handleSolicitarDevolucion}
             onCancelarPedido={(id, reason) => handleCancelarPedido(id, reason)}
+            expandedOrders={expandedOrders}
+            handleToggleExpand={handleToggleExpand}
+            expandedDesigns={expandedDesigns}
+            handleToggleDesignExpand={handleToggleDesignExpand}
           />
         ))}
       </main>
 
-      <hr className="border-white my-6" />
-      <div className="text-sm  pbg-[#f5f5f5]-4 rounded-md">
+      <hr className="border-white my-6 text-black" />
+      <div className="text-sm rounded-md">
         <p className="font-semibold mb-2">RESUMEN DE PEDIDOS:</p>
         <p><span className="font-bold">Total de Pedidos:</span> {filteredPedidos.length}</p>
       </div>
+
+      {showDevolucionModal && (
+        <Modal
+          title="Solicitar Devolución"
+          onClose={handleCloseDevolucionModal}
+        >
+          <div>
+            <p>¿Cuál es la razón de la devolución para el pedido {selectedPedidoId}?</p>
+            <div className="flex flex-col space-y-2 mt-2">
+              {[
+                "El producto llegó dañado o es defectuoso",
+                "La talla o el tamaño es incorrecto",
+                "Recibí un artículo equivocado",
+                "El producto es diferente a la descripción o a las fotos",
+                "La calidad no es la esperada",
+                "Otra",
+              ].map((reason) => (
+                <label key={reason} className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="returnReason"
+                    value={reason}
+                    onChange={(e) => {
+                      setSelectedReturnReason(e.target.value);
+                      setShowOtraReason(e.target.value === 'Otra');
+                    }}
+                    checked={selectedReturnReason === reason}
+                    className="cursor-pointer"
+                  />
+                  <span>{reason}</span>
+                </label>
+              ))}
+
+              {showOtraReason && (
+                <textarea
+                  placeholder="Por favor, especifique la razón"
+                  className="border border-gray-700 rounded-md p-2 text-black mt-2"
+                  value={otraReason}
+                  onChange={(e) => setOtraReason(e.target.value)}
+                />
+              )}
+            </div>
+            <BotonGeneral onClick={handleEnviarSolicitud} className="mt-4">
+              Enviar Solicitud
+            </BotonGeneral>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };
