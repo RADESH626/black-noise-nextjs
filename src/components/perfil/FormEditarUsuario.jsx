@@ -49,7 +49,7 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
     if (state.message) {
       showPopUp(state.message, state.success ? "success" : "error");
       if (state.success && onSuccess) {
-        onSuccess();
+        onSuccess(state.data); // Pass the updated user data
       }
     }
   }, [state, showPopUp, onSuccess]);
