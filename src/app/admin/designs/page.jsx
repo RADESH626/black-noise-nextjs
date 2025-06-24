@@ -5,6 +5,8 @@ import ErrorMessage from '@/components/common/ErrorMessage';
 import { Suspense } from 'react';
 import DesignFilters from '@/components/admin/filters/DesignFilters';
 
+export const dynamic = 'force-dynamic'; // Forzar renderizado dinámico para usar searchParams
+
 export default async function AdminDesignsPage({ searchParams }) {
     let designs = [];
     let error = null;
