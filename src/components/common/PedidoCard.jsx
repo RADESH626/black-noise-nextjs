@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { EstadoPedido } from "@/models/enums/PedidoEnums";
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
@@ -12,6 +12,7 @@ export default function PedidoCard({
   pedido, 
   userRole, 
   onUpdateCostoEnvio, 
+  onCostoEnvioInputChange, // Nueva prop
   onEstadoPedidoChange, 
   onSolicitarDevolucion, 
   onCancelarPedido,
@@ -24,43 +25,27 @@ export default function PedidoCard({
   const currentExpandedOrders = expandedOrders instanceof Set ? expandedOrders : new Set();
   const currentExpandedDesigns = propExpandedDesigns instanceof Set ? propExpandedDesigns : new Set();
 
-  logger.debug("PedidoCard: Renderizando para pedido:", pedido._id);
   if (pedido.items && pedido.items.length > 0) {
     pedido.items.forEach((item, index) => {
-      logger.debug(`PedidoCard: Item ${index} - designId:`, item.designId?._id);
-      logger.debug(`PedidoCard: Item ${index} - designId.imagen:`, item.designId?.imagen ? 'PRESENTE' : 'AUSENTE');
       if (!item.designId?.imagen) {
-        logger.debug(`PedidoCard: Detalles de designId sin imagen en cliente:`, {
-          _id: item.designId?._id,
-          nombreDesing: item.designId?.nombreDesing,
-          imagenValue: item.designId?.imagen // Mostrar el valor exacto, que debería ser null/undefined
-        });
       }
     });
   }
 
   const { showPopUp, showConfirmDialog, showDialog } = useDialog();
-  const [editableCostoEnvio, setEditableCostoEnvio] = useState(pedido.costoEnvio || 0);
   const [isUpdating, setIsUpdating] = useState(false);
-  // const [expandedOrders, setExpandedOrders] = useState(new Set()); // Eliminado, ahora es una prop
-  // const [expandedDesigns, setExpandedDesigns] = new Set(); // Eliminado, ahora es una prop
   const [cancelReason, setCancelReason] = useState('');
-  const [showOtraReason, setShowOtraReason] = useState(false);
-  const [selectedReturnReason, setSelectedReturnReason] = useState('');
-  const [otraReason, setOtraReason] = useState('');
-  const [showDevolucionModal, setShowDevolucionModal] = useState(false);
 
-  // handleToggleExpand y handleToggleDesignExpand ahora se reciben como props, no se definen aquí.
-  // Se asume que las funciones pasadas desde el padre manejarán la lógica de actualización del Set.
-
+  // handleCostoEnvioChangeInternal ahora llama a la prop del padre
   const handleCostoEnvioChangeInternal = (value) => {
-    setEditableCostoEnvio(parseFloat(value) || 0);
+    onCostoEnvioInputChange(pedido._id.toString(), parseFloat(value) || 0);
   };
 
   const handleUpdateCostoEnvioInternal = async () => {
     setIsUpdating(true);
     try {
-      await onUpdateCostoEnvio(pedido._id.toString(), editableCostoEnvio);
+      // onUpdateCostoEnvio ahora usa el valor de pedido.costoEnvio que ya fue actualizado por el padre
+      await onUpdateCostoEnvio(pedido._id.toString(), pedido.costoEnvio);
     } finally {
       setIsUpdating(false);
     }
@@ -78,32 +63,6 @@ export default function PedidoCard({
       } finally {
         setIsUpdating(false);
       }
-    }
-  };
-
-  const handleSolicitarDevolucionInternal = () => {
-    setShowDevolucionModal(true);
-  };
-
-  const handleCloseDevolucionModal = () => {
-    setShowDevolucionModal(false);
-    setSelectedReturnReason('');
-    setOtraReason('');
-    setShowOtraReason(false);
-  };
-
-  const handleEnviarSolicitudInternal = async () => {
-    const returnReason = selectedReturnReason === 'Otra' ? otraReason.trim() : selectedReturnReason;
-
-    if (!returnReason) {
-      showPopUp('Por favor, seleccione o especifique la razón de la devolución.', 'error');
-      return;
-    }
-
-    try {
-      await onSolicitarDevolucion(pedido._id, returnReason);
-    } finally {
-      handleCloseDevolucionModal();
     }
   };
 
@@ -188,7 +147,7 @@ export default function PedidoCard({
             <div className="flex gap-4">
               {/* informacion basica del pedido */}
               <div className="flex flex-col gap-2 bg-gray-500 text-white rounded p-2">
-                {userRole === 'admin' && pedido.proveedorId?.nombreEmpresa && (
+                {pedido.proveedorId?.nombreEmpresa && (
                   <div>
                     <p className="font-medium">Proveedor:</p>
                     <p>{pedido.proveedorId.nombreEmpresa}</p>
@@ -200,10 +159,18 @@ export default function PedidoCard({
                     <p>{pedido.userId.Nombre}</p>
                   </div>
                 )}
-                {(userRole === 'admin' || userRole === 'supplier') && pedido.userId?.direccion && (
+                {pedido.metodoEntrega === 'DOMICILIO' && pedido.direccionEnvio && (
                   <div>
-                    <p className="font-medium">Dirección:</p>
-                    <p>{pedido.userId.direccion}</p>
+                    <p className="font-medium">Dirección de Envío:</p>
+                    <p>{pedido.direccionEnvio}</p>
+                  </div>
+                )}
+                {pedido.destinatario?.nombre && (
+                  <div>
+                    <p className="font-medium">Destinatario:</p>
+                    <p>{pedido.destinatario.nombre}</p>
+                    <p>{pedido.destinatario.correo}</p>
+                    {pedido.destinatario.direccion && <p>{pedido.destinatario.direccion}</p>}
                   </div>
                 )}
                 <div>
@@ -224,6 +191,54 @@ export default function PedidoCard({
                   <div>
                     <p className="font-medium">Costo de Envío:</p>
                     <p>${pedido.costoEnvio.toFixed(2)}</p>
+                  </div>
+                )}
+                {pedido.motivo_devolucion && (
+                  <div>
+                    <p className="font-medium">Motivo Devolución:</p>
+                    <p>{pedido.motivo_devolucion}</p>
+                  </div>
+                )}
+                {pedido.motivo_rechazo_devolucion && (
+                  <div>
+                    <p className="font-medium">Motivo Rechazo Devolución:</p>
+                    <p>{pedido.motivo_rechazo_devolucion}</p>
+                  </div>
+                )}
+                {pedido.es_pedido_refabricado && (
+                  <div>
+                    <p className="font-medium">Pedido Refabricado:</p>
+                    <p>Sí</p>
+                  </div>
+                )}
+                {pedido.pedido_original_id && (
+                  <div>
+                    <p className="font-medium">ID Pedido Original:</p>
+                    <p>{pedido.pedido_original_id.toString()}</p>
+                  </div>
+                )}
+                {pedido.costos_negociados !== undefined && (
+                  <div>
+                    <p className="font-medium">Costos Negociados:</p>
+                    <p>${pedido.costos_negociados.toFixed(2)}</p>
+                  </div>
+                )}
+                {pedido.fue_cancelado && (
+                  <div>
+                    <p className="font-medium">Fue Cancelado:</p>
+                    <p>Sí</p>
+                  </div>
+                )}
+                {pedido.fecha_cancelacion && (
+                  <div>
+                    <p className="font-medium">Fecha Cancelación:</p>
+                    <p>{new Date(pedido.fecha_cancelacion).toLocaleDateString()}</p>
+                  </div>
+                )}
+                {pedido.razon_cancelacion && (
+                  <div>
+                    <p className="font-medium">Razón Cancelación:</p>
+                    <p>{pedido.razon_cancelacion}</p>
                   </div>
                 )}
               </div>
@@ -290,15 +305,15 @@ export default function PedidoCard({
                   type="number"
                   min={0}
                   max={100}
-                  value={editableCostoEnvio}
+                  value={pedido.costoEnvio || 0} // Leer directamente de la prop
                   onChange={(e) => handleCostoEnvioChangeInternal(e.target.value)}
                   className="w-24 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Costo"
                 />
                 <button
                   onClick={handleUpdateCostoEnvioInternal}
-                  disabled={isUpdating || editableCostoEnvio === pedido.costoEnvio}
-                  className={`bg-green-500 hover:bg-green-600 text-black font-bold py-2 px-4 rounded-md text-sm transition-colors duration-200 ${isUpdating || editableCostoEnvio === pedido.costoEnvio ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  disabled={isUpdating} // Solo deshabilitar si se está actualizando
+                  className={`bg-green-500 hover:bg-green-600 text-black font-bold py-2 px-4 rounded-md text-sm transition-colors duration-200 ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   {isUpdating ? 'Guardando...' : 'Guardar'}
                 </button>
@@ -325,16 +340,18 @@ export default function PedidoCard({
 
             {userRole === 'client' && (
               <div className="flex justify-end gap-2">
-                {(pedido.estadoPedido === EstadoPedido.ENTREGADO || pedido.estadoPedido === EstadoPedido.LISTO) && (
+                {(pedido.estadoPedido.trim().toUpperCase() === EstadoPedido.ENTREGADO ||
+                  pedido.estadoPedido.trim().toUpperCase() === EstadoPedido.LISTO ||
+                  pedido.estadoPedido.trim().toUpperCase() === EstadoPedido.LISTO_PARA_RECOGER) && (
                   <BotonGeneral
-                    onClick={handleSolicitarDevolucionInternal}
+                    onClick={() => onSolicitarDevolucion(pedido._id.toString())}
                     variant="danger"
                     className="py-2 px-4 text-sm"
                   >
                     Solicitar Devolución
                   </BotonGeneral>
                 )}
-                {pedido.estadoPedido === EstadoPedido.PENDIENTE && (
+                {pedido.estadoPedido.trim().toUpperCase() === EstadoPedido.PENDIENTE && (
                   <BotonGeneral
                     onClick={handleCancelarPedidoInternal}
                     variant="danger"
@@ -348,54 +365,6 @@ export default function PedidoCard({
           </div>
         )}
       </div>
-
-      {showDevolucionModal && (
-        <Modal
-          title="Solicitar Devolución"
-          onClose={handleCloseDevolucionModal}
-        >
-          <div>
-            <p>¿Cuál es la razón de la devolución para el pedido {pedido._id}?</p>
-            <div className="flex flex-col space-y-2 mt-2">
-              {[
-                "El producto llegó dañado o es defectuoso",
-                "La talla o el tamaño es incorrecto",
-                "Recibí un artículo equivocado",
-                "El producto es diferente a la descripción o a las fotos",
-                "La calidad no es la esperada",
-                "Otra",
-              ].map((reason) => (
-                <label key={reason} className="flex items-center space-x-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="returnReason"
-                    value={reason}
-                    onChange={(e) => {
-                      setSelectedReturnReason(e.target.value);
-                      setShowOtraReason(e.target.value === 'Otra');
-                    }}
-                    checked={selectedReturnReason === reason}
-                    className="cursor-pointer"
-                  />
-                  <span>{reason}</span>
-                </label>
-              ))}
-
-              {showOtraReason && (
-                <textarea
-                  placeholder="Por favor, especifique la razón"
-                  className="border border-gray-700 rounded-md p-2 text-black mt-2"
-                  value={otraReason}
-                  onChange={(e) => setOtraReason(e.target.value)}
-                />
-              )}
-            </div>
-            <BotonGeneral onClick={handleEnviarSolicitudInternal} className="mt-4">
-              Enviar Solicitud
-            </BotonGeneral>
-          </div>
-        </Modal>
-      )}
     </motion.div>
   );
 }

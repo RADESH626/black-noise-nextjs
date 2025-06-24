@@ -247,6 +247,7 @@ export async function actualizarPedidoPorProveedor(pedidoId, proveedorId, update
             } else { // Si el costo de envío es 0, el estado de pago debe ser PAGADO
                 allowedUpdates.estadoPago = 'PAGADO';
             }
+            logger.debug(`Costo de envío recibido: ${updateData.costoEnvio}, Nuevo total calculado: ${newTotal}, Estado de pago establecido: ${allowedUpdates.estadoPago}`);
         }
         // Add other fields a supplier is allowed to update here
 
@@ -254,6 +255,7 @@ export async function actualizarPedidoPorProveedor(pedidoId, proveedorId, update
             return { success: false, message: "No hay campos válidos para actualizar." };
         }
 
+        logger.debug('Allowed updates before findByIdAndUpdate:', allowedUpdates);
         const pedidoActualizado = await Pedido.findByIdAndUpdate(pedidoId, allowedUpdates, { new: true }).lean();
 
         if (!pedidoActualizado) {
@@ -264,7 +266,8 @@ export async function actualizarPedidoPorProveedor(pedidoId, proveedorId, update
         // Revalidar rutas relevantes
         revalidatePath('/perfil'); // Para que el usuario vea el total actualizado
         revalidatePath('/pagos-pendientes'); // Para que el usuario vea el total actualizado en pagos pendientes
-        revalidatePath(`/proveedor/pedidos/${pedidoId}`); // Para que el proveedor vea el total actualizado
+        revalidatePath('/proveedor/pedidos'); // Para que la lista de pedidos del proveedor se actualice
+        revalidatePath(`/proveedor/pedidos/${pedidoId}`); // Para que el proveedor vea el total actualizado en la página de detalle
 
         logger.debug('Order updated by supplier in DB:', pedidoActualizado);
         return { success: true, pedido: toPlainObject(pedidoActualizado) };

@@ -82,7 +82,7 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
   };
 
   return (
-    <form action={handleSubmit} className="space-y-5 text-white">
+    <form action={handleSubmit} className="space-y-5 text-black">
       {/* Profile Image Preview */}
       <div className="flex flex-col items-center mb-6">
         <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-gray-600 mb-4">
@@ -109,7 +109,7 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
-          <label htmlFor="tipoDocumento" className="block mb-1 text-sm font-medium text-white">
+          <label htmlFor="tipoDocumento" className="block mb-1 text-sm font-medium ">
             Tipo de Documento
           </label>
           <select
@@ -129,7 +129,7 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
         </div>
 
         <div className="relative">
-          <label htmlFor="numeroDocumento" className="block mb-1 text-sm font-medium text-white">
+          <label htmlFor="numeroDocumento" className="block mb-1 text-sm font-medium ">
             Número de Documento
           </label>
           <input
@@ -144,7 +144,7 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
         </div>
 
         <div className="relative">
-          <label htmlFor="primerNombre" className="block mb-1 text-sm font-medium text-white">
+          <label htmlFor="primerNombre" className="block mb-1 text-sm font-medium ">
             Primer Nombre
           </label>
           <input
@@ -159,7 +159,7 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
         </div>
 
         <div className="relative">
-          <label htmlFor="segundoNombre" className="block mb-1 text-sm font-medium text-white">
+          <label htmlFor="segundoNombre" className="block mb-1 text-sm font-medium">
             Segundo Nombre
           </label>
           <input
@@ -173,7 +173,7 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
         </div>
 
         <div className="relative">
-          <label htmlFor="primerApellido" className="block mb-1 text-sm font-medium text-white">
+          <label htmlFor="primerApellido" className="block mb-1 text-sm font-medium ">
             Primer Apellido
           </label>
           <input
@@ -188,7 +188,7 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
         </div>
 
         <div className="relative">
-          <label htmlFor="segundoApellido" className="block mb-1 text-sm font-medium text-white">
+          <label htmlFor="segundoApellido" className="block mb-1 text-sm font-medium ">
             Segundo Apellido
           </label>
           <input
@@ -203,7 +203,7 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
         </div>
 
         <div className="relative">
-          <label htmlFor="fechaNacimiento" className="block mb-1 text-sm font-medium text-white">
+          <label htmlFor="fechaNacimiento" className="block mb-1 text-sm font-medium ">
             Fecha de Nacimiento
           </label>
           <input
@@ -218,7 +218,7 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
         </div>
 
         <div className="relative">
-          <label htmlFor="genero" className="block mb-1 text-sm font-medium text-white">
+          <label htmlFor="genero" className="block mb-1 text-sm font-medium ">
             Género
           </label>
           <select
@@ -237,7 +237,7 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
         </div>
 
         <div className="relative">
-          <label htmlFor="numeroTelefono" className="block mb-1 text-sm font-medium text-white">
+          <label htmlFor="numeroTelefono" className="block mb-1 text-sm font-medium ">
             Número de Teléfono
           </label>
           <input
@@ -252,7 +252,7 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
         </div>
 
         <div className="relative md:col-span-2">
-          <label htmlFor="direccion" className="block mb-1 text-sm font-medium text-white">
+          <label htmlFor="direccion" className="block mb-1 text-sm font-medium ">
             Dirección
           </label>
           <input
@@ -267,7 +267,7 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
         </div>
 
         <div className="relative">
-          <label htmlFor="correo" className="block mb-1 text-sm font-medium text-white">
+          <label htmlFor="correo" className="block mb-1 text-sm font-medium">
             Correo Electrónico
           </label>
           <input
