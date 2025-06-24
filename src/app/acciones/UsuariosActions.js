@@ -538,8 +538,8 @@ async function EditarUsuario(id, formData) {
     try {
         await connectDB();
 
-        const Usuario = await getUsuarioModel();
-        const usuarioExistente = await Usuario.findById(id);
+        const UsuarioModel = await getModel('Usuario');
+        const usuarioExistente = await UsuarioModel.findById(id);
 
         if (!usuarioExistente) {
             throw new NotFoundError(`No se encontró ningún usuario con el ID ${id}.`);

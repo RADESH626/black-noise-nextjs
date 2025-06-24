@@ -12,7 +12,7 @@ import InputGenero from '@/components/common/inputs/InputGenero';
 import InputTelefono from '@/components/common/inputs/InputTelefono';
 import InputEmail from '@/components/common/inputs/InputEmail';
 import InputRol from '@/components/common/inputs/InputRol';
-import { EditarUsuario } from '@/app/acciones/UsuariosActions'; // Import the Server Action
+import { updateUserAction } from '@/app/acciones/UsuariosActions'; // Import the Server Action
 
 // Submit button component with pending state
 function SubmitButton() {
@@ -32,7 +32,7 @@ const initialState = {
 
 function FormEditarUsuario({ initialData, onSuccess }) {
     const { showPopUp } = useDialog();
-    const [state, formAction] = useActionState(EditarUsuario.bind(null, initialData._id), initialState);
+    const [state, formAction] = useActionState(updateUserAction.bind(null, initialData._id), initialState);
 
     useEffect(() => {
         if (state.message) {
