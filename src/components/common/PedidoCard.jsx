@@ -32,7 +32,7 @@ export default function PedidoCard({
     });
   }
 
-  const { showPopUp, showConfirmDialog, showDialog } = useDialog();
+  const { showPopUp, showConfirmDialog, openModal } = useDialog();
   const [isUpdating, setIsUpdating] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
 
@@ -67,9 +67,9 @@ export default function PedidoCard({
   };
 
   const handleCancelarPedidoInternal = () => {
-    showDialog({
-      title: "Cancelar Pedido",
-      content: (
+    openModal(
+      "Cancelar Pedido",
+      (
         <div>
           <p className="mb-4">Por favor, especifique la razón de la cancelación para el pedido {pedido._id}:</p>
           <textarea
@@ -80,12 +80,13 @@ export default function PedidoCard({
           />
         </div>
       ),
-      type: "confirm",
-      onConfirm: () => handleConfirmCancelacionInternal(),
-      onCancel: () => setCancelReason(''),
-      confirmBtnText: "Confirmar Cancelación",
-      cancelBtnText: "Volver"
-    });
+      'default', // El tipo 'confirm' no es necesario si showActions es true
+      () => handleConfirmCancelacionInternal(),
+      () => setCancelReason(''),
+      true, // showActions
+      "Confirmar Cancelación",
+      "Volver"
+    );
   };
 
   const handleConfirmCancelacionInternal = async () => {
