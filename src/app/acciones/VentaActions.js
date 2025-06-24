@@ -6,6 +6,67 @@ import Pago from '@/models/Pago';     // Necesario para popular
 import Pedido from '@/models/Pedido'; // Necesario para popular
 import { revalidatePath } from 'next/cache';
 import logger from '@/utils/logger';
+import Papa from 'papaparse'; // Import papaparse
+
+// Function to export sales to CSV
+async function exportarVentasCSV(filters = {}) {
+    logger.debug('Entering exportarVentasCSV with filters:', filters);
+    try {
+        await connectDB();
+        logger.debug('Database connected for exportarVentasCSV.');
+        const Venta = await getVentaModel();
+        let query = {};
+
+        if (filters.estadoVenta) {
+            query.estadoVenta = filters.estadoVenta;
+        }
+        if (filters.pedidoAsociadoId) {
+            query.pedidoId = filters.pedidoAsociadoId;
+        }
+        if (filters.valorVentaMin) {
+            query.valorVenta = { ...query.valorVenta, $gte: parseFloat(filters.valorVentaMin) };
+        }
+        if (filters.valorVentaMax) {
+            query.valorVenta = { ...query.valorVenta, $lte: parseFloat(filters.valorVentaMax) };
+        }
+        if (filters.fechaVentaStart) {
+            query.fechaVenta = { ...query.fechaVenta, $gte: new Date(filters.fechaVentaStart) };
+        }
+        if (filters.fechaVentaEnd) {
+            query.fechaVenta = { ...query.fechaVenta, $lte: new Date(filters.fechaVentaEnd) };
+        }
+
+        const ventas = await Venta.find(query)
+            .populate('pagoIds', 'valorPago metodoPago estadoPago')
+            .populate({
+                path: 'pedidoId',
+                select: 'valorPedido estadoPedido proveedorId',
+                populate: { path: 'proveedorId', select: 'nombreEmpresa' }
+            })
+            .lean();
+
+        const csvData = ventas.map(venta => ({
+            'ID Venta': venta._id.toString(),
+            'Valor Venta': venta.valorVenta,
+            'Estado Venta': venta.estadoVenta,
+            'Fecha Venta': venta.createdAt ? new Date(venta.createdAt).toLocaleDateString() : 'N/A',
+            'ID Pedido Asociado': venta.pedidoId ? venta.pedidoId._id.toString() : 'N/A',
+            'Valor Pedido': venta.pedidoId ? venta.pedidoId.valorPedido : 'N/A',
+            'Estado Pedido': venta.pedidoId ? venta.pedidoId.estadoPedido : 'N/A',
+            'Proveedor Pedido': venta.pedidoId && venta.pedidoId.proveedorId ? venta.pedidoId.proveedorId.nombreEmpresa : 'N/A',
+            'Pagos Asociados IDs': venta.pagoIds && venta.pagoIds.length > 0 ? venta.pagoIds.map(p => p._id.toString()).join(', ') : 'N/A',
+            'Pagos Asociados Valores': venta.pagoIds && venta.pagoIds.length > 0 ? venta.pagoIds.map(p => p.valorPago).join(', ') : 'N/A',
+            'Pagos Asociados Métodos': venta.pagoIds && venta.pagoIds.length > 0 ? venta.pagoIds.map(p => p.metodoPago).join(', ') : 'N/A',
+            'Pagos Asociados Estados': venta.pagoIds && venta.pagoIds.length > 0 ? venta.pagoIds.map(p => p.estadoPago).join(', ') : 'N/A',
+        }));
+
+        const csv = Papa.unparse(csvData);
+        return { success: true, csv, message: 'CSV de ventas generado exitosamente.' };
+    } catch (error) {
+        logger.error('ERROR in exportarVentasCSV:', error);
+        return { success: false, error: 'Error al generar el CSV de ventas: ' + error.message };
+    }
+}
 
 // Crear una nueva venta
 async function guardarVenta(data) {

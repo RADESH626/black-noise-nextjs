@@ -3,7 +3,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { BotonAccion } from './BotonAccion'; // Importar BotonAccion
 
-function BotonExportarPDF({ data = [], reportTitle = "Reporte", tableHeaders = [], tableBodyMapper = () => [], ...props }) {
+function BotonExportarPDF({ data = [], reportTitle = "Reporte", tableHeaders = [], tableBodyMapper = () => [], columnWidths = {}, ...props }) {
     const handleExportPDF = () => {
         if (!data || data.length === 0) {
             alert(`No hay ${reportTitle.toLowerCase()} para exportar.`);
@@ -28,8 +28,7 @@ function BotonExportarPDF({ data = [], reportTitle = "Reporte", tableHeaders = [
             headStyles: { fillColor: [22, 160, 133], cellPadding: { top: 3, right: 2, bottom: 3, left: 2 } },
             styles: { fontSize: 7, cellPadding: { top: 3, right: 2, bottom: 3, left: 2 } },
             // columnStyles will need to be passed dynamically or calculated based on tableHeaders length
-            // For now, remove specific columnStyles to avoid errors, or make them dynamic if needed.
-            // This will be handled by the calling component.
+            columnStyles: columnWidths, // Aplicar los anchos de columna dinámicamente
         });
 
         doc.save(`${reportTitle.toLowerCase().replace(/\s/g, '_')}.pdf`);

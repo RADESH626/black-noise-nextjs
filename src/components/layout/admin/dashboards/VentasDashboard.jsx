@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import SeccionHeader from '../secciones/acciones/SeccionHeader';
 import { obtenerVentas } from '@/app/acciones/VentaActions.js';
@@ -8,6 +7,9 @@ import BotonAgregarVentas from '../../../common/botones/BotonAgregarVentas';
 import Loader from '@/components/Loader';
 import VentaFilters from '@/components/admin/filters/VentaFilters'; // Importar el componente de filtros
 import { useRouter, useSearchParams } from 'next/navigation';
+import BotonGeneral from '@/components/common/botones/BotonGeneral'; // Importar BotonGeneral
+import BotonExportarPDF from '@/components/common/botones/BotonExportarPDF'; // Importar BotonExportarPDF
+import { useState, useEffect, useCallback, useMemo } from 'react'; // Asegurarse de que estos hooks estén importados
 
 function VentasDashboard() {
     const router = useRouter();
@@ -82,6 +84,43 @@ function VentasDashboard() {
                     <BotonAgregarVentas />
                 </Link> */}
             </SeccionHeader>
+
+            <div className="mb-4 flex justify-end">
+                <BotonExportarPDF
+                    data={ventas}
+                    reportTitle="Reporte de Ventas"
+                    tableHeaders={[
+                        'ID Venta', 'Valor Venta', 'Estado Venta', 'Fecha Venta',
+                        'ID Pedido', 'Valor Pedido', 'Estado Pedido', 'Proveedor Pedido',
+                        'Pagos Asociados (Método, Valor, Estado)'
+                    ]}
+                    tableBodyMapper={(venta) => [
+                        venta._id,
+                        `$${typeof venta.valorVenta === 'number' ? venta.valorVenta.toFixed(2) : '0.00'}`,
+                        venta.estadoVenta,
+                        venta.createdAt ? new Date(venta.createdAt).toLocaleDateString() : 'N/A',
+                        venta.pedidoId ? venta.pedidoId._id : 'N/A',
+                        venta.pedidoId ? `$${typeof venta.pedidoId.valorPedido === 'number' ? venta.pedidoId.valorPedido.toFixed(2) : '0.00'}` : 'N/A',
+                        venta.pedidoId ? venta.pedidoId.estadoPedido : 'N/A',
+                        venta.pedidoId && venta.pedidoId.proveedorId ? venta.pedidoId.proveedorId.nombreProveedor : 'N/A',
+                        venta.pagoIds && venta.pagoIds.length > 0
+                            ? venta.pagoIds.map(p => `${p.metodoPago} ($${typeof p.valorPago === 'number' ? p.valorPago.toFixed(2) : '0.00'}) - ${p.estadoPago}`).join('\n')
+                            : 'N/A',
+                    ]}
+                    columnWidths={{
+                        0: { cellWidth: 40 },    // ID Venta (ajustado para IDs cortos)
+                        1: { cellWidth: 18 },    // Valor Venta
+                        2: { cellWidth: 25 },    // Estado Venta
+                        3: { cellWidth: 15 },    // Fecha Venta
+                        4: { cellWidth: 40 },    // ID Pedido
+                        5: { cellWidth: 15 },    // Valor Pedido
+                        6: { cellWidth: 25 },    // Estado Pedido
+                        7: { cellWidth: 35 },    // Proveedor Pedido
+                        8: { cellWidth: 60 },    // Pagos Asociados (Método, Valor, Estado)
+                    }}
+                    className="py-2 px-4"
+                />
+            </div>
 
             <div className="mb-6">
                 <VentaFilters onApplyFilters={handleApplyFilters} onClearFilters={handleClearFilters} initialFilters={currentFilters} />

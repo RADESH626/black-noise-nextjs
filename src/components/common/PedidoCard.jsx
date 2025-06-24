@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { EstadoPedido } from "@/models/enums/PedidoEnums";
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
@@ -35,6 +35,8 @@ export default function PedidoCard({
   const { showPopUp, showConfirmDialog, openModal } = useDialog();
   const [isUpdating, setIsUpdating] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
+  const cancelReasonRef = useRef(null); // Ref para el textarea
+  const [modalKey, setModalKey] = useState(0); // Nuevo estado para forzar re-render del modal
 
   // handleCostoEnvioChangeInternal ahora llama a la prop del padre
   const handleCostoEnvioChangeInternal = (value) => {
@@ -67,25 +69,35 @@ export default function PedidoCard({
   };
 
   const handleCancelarPedidoInternal = () => {
+    setModalKey(prevKey => prevKey + 1); // Incrementar la key para forzar re-render
     openModal(
       "Cancelar Pedido",
       (
         <div>
           <p className="mb-4">Por favor, especifique la razón de la cancelación para el pedido {pedido._id}:</p>
           <textarea
+            key={modalKey} // Añadir key para forzar re-render
+            ref={cancelReasonRef} // Asignar el ref
             placeholder="Escriba aquí la razón de la cancelación..."
-            className="border border-gray-700 rounded-md p-2 text-black w-full h-24"
+            className="border border-gray-700 rounded-md p-2 w-full h-24" // Clases originales sin z-index
+            style={{ color: 'black', backgroundColor: 'white' }} // Forzar color de texto y fondo
             value={cancelReason}
             onChange={(e) => setCancelReason(e.target.value)}
+            tabIndex={0} // Asegura que sea enfocable
           />
         </div>
       ),
-      'default', // El tipo 'confirm' no es necesario si showActions es true
+      'default',
       () => handleConfirmCancelacionInternal(),
       () => setCancelReason(''),
-      true, // showActions
+      true,
       "Confirmar Cancelación",
-      "Volver"
+      "Volver",
+      () => { // onOpenedCallback para enfocar el textarea después de abrir el modal
+        if (cancelReasonRef.current) {
+          cancelReasonRef.current.focus();
+        }
+      }
     );
   };
 

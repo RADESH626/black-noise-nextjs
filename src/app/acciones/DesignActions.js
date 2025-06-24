@@ -9,6 +9,75 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Assuming th
 import logger from '@/utils/logger';
 import { Rol } from '@/models/enums/usuario/Rol';
 
+// Function to export designs to CSV
+export async function exportarDesignsCSV(searchParams = {}) {
+    await connectDB();
+    try {
+        const Design = getDesignModel();
+        let query = {};
+
+        const fechaCreacionStart = searchParams.hasOwnProperty('fechaCreacionStart') ? searchParams.fechaCreacionStart : undefined;
+        const fechaCreacionEnd = searchParams.hasOwnProperty('fechaCreacionEnd') ? searchParams.fechaCreacionEnd : undefined;
+        const categoria = searchParams.hasOwnProperty('categoria') ? searchParams.categoria : undefined;
+        const estadoDesing = searchParams.hasOwnProperty('estadoDesing') ? searchParams.estadoDesing : undefined;
+        const disenadorUsuarioId = searchParams.hasOwnProperty('disenadorUsuarioId') ? searchParams.disenadorUsuarioId : undefined;
+        const precioMin = searchParams.hasOwnProperty('precioMin') ? searchParams.precioMin : undefined;
+        const precioMax = searchParams.hasOwnProperty('precioMax') ? searchParams.precioMax : undefined;
+        const tallasDisponibles = searchParams.hasOwnProperty('tallasDisponibles') && searchParams.tallasDisponibles ? searchParams.tallasDisponibles.split(',') : [];
+
+        if (fechaCreacionStart) {
+            query.createdAt = { ...query.createdAt, $gte: new Date(fechaCreacionStart) };
+        }
+        if (fechaCreacionEnd) {
+            query.createdAt = { ...query.createdAt, $lte: new Date(fechaCreacionEnd) };
+        }
+        if (categoria) {
+            query.categoria = categoria;
+        }
+        if (estadoDesing) {
+            query.estadoDesing = estadoDesing;
+        }
+        if (disenadorUsuarioId) {
+            query.usuarioId = disenadorUsuarioId;
+        }
+        if (precioMin) {
+            query.valorDesing = { ...query.valorDesing, $gte: parseFloat(precioMin) };
+        }
+        if (precioMax) {
+            query.valorDesing = { ...query.valorDesing, $lte: parseFloat(precioMax) };
+        }
+        if (tallasDisponibles && tallasDisponibles.length > 0) {
+            query.tallasDisponibles = { $in: tallasDisponibles };
+        }
+
+        const designs = await Design.find(query)
+            .populate({
+                path: 'usuarioId',
+                select: 'Nombre primerApellido'
+            })
+            .lean();
+
+        const csvData = designs.map(design => ({
+            ID: design._id.toString(),
+            'Nombre Diseño': design.nombreDesing,
+            Descripción: design.descripcion,
+            'Valor Diseño': design.valorDesing,
+            Categoría: design.categoria,
+            Estado: design.estadoDesing,
+            'Colores Disponibles': design.coloresDisponibles.join(', '),
+            'Tallas Disponibles': design.tallasDisponibles.join(', '),
+            'Diseñador Nombre': design.usuarioId ? `${design.usuarioId.Nombre} ${design.usuarioId.primerApellido}` : 'N/A',
+            'Fecha Creación': design.createdAt ? new Date(design.createdAt).toLocaleDateString() : 'N/A',
+        }));
+
+        const csv = Papa.unparse(csvData);
+        return { success: true, csv, message: 'CSV de diseños generado exitosamente.' };
+    } catch (error) {
+        logger.error('ERROR in exportarDesignsCSV:', error);
+        return { success: false, error: 'Error al generar el CSV de diseños: ' + error.message };
+    }
+}
+
 // Function to save a single design
 export async function guardarDesigns(prevState, formData) {
     await connectDB();

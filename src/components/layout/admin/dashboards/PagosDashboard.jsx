@@ -5,6 +5,8 @@ import { obtenerPagos } from '@/app/acciones/PagoActions';
 import Loader from '@/components/Loader';
 import PagoFilters from '@/components/admin/filters/PagoFilters'; // Importar el componente de filtros
 import { useRouter, useSearchParams } from 'next/navigation';
+import BotonGeneral from '@/components/common/botones/BotonGeneral'; // Importar BotonGeneral
+import BotonExportarPDF from '@/components/common/botones/BotonExportarPDF'; // Importar BotonExportarPDF
 
 export default function PagosDashboard() {
   const router = useRouter();
@@ -110,6 +112,43 @@ export default function PagosDashboard() {
         <SeccionHeader>
           <h4 className='font-bold text-2xl' style={{ color: '#000000' }}>Gestión de Pagos</h4>
         </SeccionHeader>
+        <div className="mb-4 flex justify-end">
+            <BotonExportarPDF
+                data={pagos}
+                reportTitle="Reporte de Pagos"
+                tableHeaders={[
+                    'ID Pago', 'Valor Pago', 'Método Pago', 'Estado Transacción', 'Motivo', 'Fecha Pago',
+                    'Usuario (Nombre, Email)', 'Venta Asociada (ID, Valor, Estado)', 'Pedido Asociado (ID, Entrega, Estado, Total)'
+                ]}
+                tableBodyMapper={(pago) => [
+                    pago._id,
+                    `$${typeof pago.valorPago === 'number' ? pago.valorPago.toFixed(2) : '0.00'}`,
+                    pago.metodoPago,
+                    pago.estadoTransaccion,
+                    pago.motivo || 'N/A',
+                    pago.createdAt ? new Date(pago.createdAt).toLocaleDateString() : 'N/A',
+                    pago.usuarioId ? `${pago.usuarioId.Nombre} ${pago.usuarioId.primerApellido} (${pago.usuarioId.correo})` : 'N/A',
+                    pago.ventaId
+                        ? `ID: ${pago.ventaId._id}\nValor: $${typeof pago.ventaId.valorVenta === 'number' ? pago.ventaId.valorVenta.toFixed(2) : '0.00'}\nEstado: ${pago.ventaId.estadoVenta}`
+                        : 'N/A',
+                    pago.pedidoId
+                        ? `ID: ${pago.pedidoId._id}\nEntrega: ${pago.pedidoId.metodoEntrega}\nEstado: ${pago.pedidoId.estadoPedido}\nTotal: $${typeof pago.pedidoId.total === 'number' ? pago.pedidoId.total.toFixed(2) : '0.00'}`
+                        : 'N/A',
+                ]}
+                columnWidths={{
+                    0: { cellWidth: 40 },    // ID Pago
+                    1: { cellWidth: 25 },    // Valor Pago
+                    2: { cellWidth: 25 },    // Método Pago
+                    3: { cellWidth: 25 },    // Estado Transacción
+                    4: { cellWidth: 25 },    // Motivo
+                    5: { cellWidth: 25 },    // Fecha Pago
+                    6: { cellWidth: 60 },    // Usuario (Nombre, Email)
+                    7: { cellWidth: 60 },    // Venta Asociada (ID, Valor, Estado)
+                    8: { cellWidth: 60 },    // Pedido Asociado (ID, Entrega, Estado, Total)
+                }}
+                className="py-2 px-4"
+            />
+        </div>
         <div className="min-h-full flex justify-center items-center" style={{ color: '#9CA3AF' }}>
           No hay pagos para mostrar.
         </div>
@@ -122,6 +161,44 @@ export default function PagosDashboard() {
       <SeccionHeader>
         <h4 className='font-bold text-2xl' style={{ color: '#000000' }}>Gestión de Pagos</h4>
       </SeccionHeader>
+
+      <div className="mb-4 flex justify-end">
+          <BotonExportarPDF
+              data={pagos}
+              reportTitle="Reporte de Pagos"
+              tableHeaders={[
+                  'ID Pago', 'Valor Pago', 'Método Pago', 'Estado Transacción', 'Motivo', 'Fecha Pago',
+                  'Usuario (Nombre, Email)', 'Venta Asociada (ID, Valor, Estado)', 'Pedido Asociado (ID, Entrega, Estado, Total)'
+              ]}
+              tableBodyMapper={(pago) => [
+                  pago._id,
+                  `$${typeof pago.valorPago === 'number' ? pago.valorPago.toFixed(2) : '0.00'}`,
+                  pago.metodoPago,
+                  pago.estadoTransaccion,
+                  pago.motivo || 'N/A',
+                  pago.createdAt ? new Date(pago.createdAt).toLocaleDateString() : 'N/A',
+                  pago.usuarioId ? `${pago.usuarioId.Nombre} ${pago.usuarioId.primerApellido} (${pago.usuarioId.correo})` : 'N/A',
+                  pago.ventaId
+                      ? `ID: ${pago.ventaId._id}\nValor: $${typeof pago.ventaId.valorVenta === 'number' ? pago.ventaId.valorVenta.toFixed(2) : '0.00'}\nEstado: ${pago.ventaId.estadoVenta}`
+                      : 'N/A',
+                  pago.pedidoId
+                      ? `ID: ${pago.pedidoId._id}\nEntrega: ${pago.pedidoId.metodoEntrega}\nEstado: ${pago.pedidoId.estadoPedido}\nTotal: $${typeof pago.pedidoId.total === 'number' ? pago.pedidoId.total.toFixed(2) : '0.00'}`
+                      : 'N/A',
+              ]}
+              columnWidths={{
+                  0: { cellWidth: 30 },    // ID Pago
+                  1: { cellWidth: 25 },    // Valor Pago
+                  2: { cellWidth: 25 },    // Método Pago
+                  3: { cellWidth: 15 },    // Estado Transacción
+                  4: { cellWidth: 25 },    // Motivo
+                  5: { cellWidth: 15 },    // Fecha Pago
+                  6: { cellWidth: 60 },    // Usuario (Nombre, Email)
+                  7: { cellWidth: 60 },    // Venta Asociada (ID, Valor, Estado)
+                  8: { cellWidth: 60 },    // Pedido Asociado (ID, Entrega, Estado, Total)
+              }}
+              className="py-2 px-4"
+          />
+      </div>
 
       <div className="mb-6">
         <PagoFilters onApplyFilters={handleApplyFilters} onClearFilters={handleClearFilters} initialFilters={currentFilters} />

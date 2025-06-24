@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
-const Modal = ({ title, children, onClose, isOpen, type = 'default', onConfirm, onCancel, confirmText = 'Confirmar', cancelText = 'Cancelar', showActions = false }) => {
+const Modal = ({ title, children, onClose, isOpen, type = 'default', onConfirm, onCancel, confirmText = 'Confirmar', cancelText = 'Cancelar', showActions = false, onOpened }) => {
   const dialogRef = useRef(null);
 
   const modalClasses = {
@@ -24,6 +24,12 @@ const Modal = ({ title, children, onClose, isOpen, type = 'default', onConfirm, 
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    if (isOpen && dialogRef.current && onOpened) {
+      onOpened();
+    }
+  }, [isOpen, onOpened]);
+
   return (
     <dialog
       ref={dialogRef}
@@ -31,7 +37,7 @@ const Modal = ({ title, children, onClose, isOpen, type = 'default', onConfirm, 
     >
       <div className={`relative p-6 rounded-lg shadow-xl max-w-2xl w-11/12 md:w-2/3 lg:w-1/2 bg-white text-black max-h-[90vh] overflow-y-auto`}>
         <h2 className="text-2xl font-bold mb-4 border-b border-gray-200 pb-2">{title}</h2>
-        <div className="modal-content">
+        <div className="modal-content relative z-10"> {/* Añadido relative z-10 */}
           {children}
         </div>
         <button
