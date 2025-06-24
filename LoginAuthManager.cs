@@ -202,16 +202,8 @@ public class LoginAuthManager : MonoBehaviour
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             return true;
 #else
-                // Validación estricta en producción
-                try
-                {
-                    var certificate = new X509Certificate2(certificateData);
-                    return certificate.Verify();
-                }
-                catch
-                {
-                    return false;
-                }
+            // Deshabilitar la validación del certificado en producción
+            return true;
 #endif
         }
     }
