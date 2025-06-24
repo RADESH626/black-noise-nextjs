@@ -68,48 +68,20 @@ export default function PedidoCard({
     }
   };
 
-  const handleCancelarPedidoInternal = () => {
-    setModalKey(prevKey => prevKey + 1); // Incrementar la key para forzar re-render
-    openModal(
-      "Cancelar Pedido",
-      (
-        <div>
-          <p className="mb-4">Por favor, especifique la razón de la cancelación para el pedido {pedido._id}:</p>
-          <textarea
-            key={modalKey} // Añadir key para forzar re-render
-            ref={cancelReasonRef} // Asignar el ref
-            placeholder="Escriba aquí la razón de la cancelación..."
-            className="border border-gray-700 rounded-md p-2 w-full h-24" // Clases originales sin z-index
-            style={{ color: 'black', backgroundColor: 'white' }} // Forzar color de texto y fondo
-            value={cancelReason}
-            onChange={(e) => setCancelReason(e.target.value)}
-            tabIndex={0} // Asegura que sea enfocable
-          />
-        </div>
-      ),
-      'default',
-      () => handleConfirmCancelacionInternal(),
-      () => setCancelReason(''),
-      true,
-      "Confirmar Cancelación",
-      "Volver",
-      () => { // onOpenedCallback para enfocar el textarea después de abrir el modal
-        if (cancelReasonRef.current) {
-          cancelReasonRef.current.focus();
-        }
-      }
+  const handleCancelarPedidoInternal = async () => {
+    const confirmed = await showConfirmDialog(
+      `¿Estás seguro de que quieres cancelar este pedido? Esta acción no se puede deshacer.`,
+      "Confirmar Cancelación"
     );
-  };
 
-  const handleConfirmCancelacionInternal = async () => {
-    if (!cancelReason.trim()) {
-      showPopUp('Por favor, especifique la razón de la cancelación.', 'error');
-      return;
-    }
-    try {
-      await onCancelarPedido(pedido._id, cancelReason.trim());
-    } finally {
-      setCancelReason('');
+    if (confirmed) {
+      try {
+        await onCancelarPedido(pedido._id, ""); // Razón vacía
+      } finally {
+        // No es necesario resetear cancelReason ya que no se usa
+      }
+    } else {
+      showPopUp("La cancelación del pedido ha sido anulada.", "info");
     }
   };
 
