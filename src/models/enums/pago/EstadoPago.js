@@ -5,7 +5,9 @@
 export const EstadoPago = {
     PENDIENTE: 'PENDIENTE',
     PAGADO: 'PAGADO',
-    CANCELADO: 'CANCELADO'
+    CANCELADO: 'CANCELADO',
+    REEMBOLSADO: 'REEMBOLSADO',
+    FALLIDO: 'FALLIDO',
 }
 
 export default EstadoPago

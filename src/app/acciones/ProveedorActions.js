@@ -3,11 +3,82 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import connectDB from "@/utils/DBconection";
-import Proveedor from "@/models/Proveedor";
+import { getModel } from "@/utils/modelLoader"; // Import getModel
+import { getUsuarioModel, getDesignModel, getPedidoModel } from "@/models"; // Import models needed for metrics
 import { revalidatePath } from "next/cache";
 import { Rol } from "@/models/enums/usuario/Rol";
 import bcrypt from "bcryptjs";
 import logger from '@/utils/logger';
+import { transporter } from '@/utils/nodemailer'; // Import the centralized transporter
+import { toPlainObject } from '@/utils/dbUtils'; // Import toPlainObject
+import Papa from 'papaparse'; // Import papaparse
+
+// Function to export suppliers to CSV
+export async function exportarProveedoresCSV(searchParams = {}) {
+  await connectDB();
+  try {
+    const ProveedorModel = await getModel('Proveedor');
+    let query = {};
+
+    const disponibilidad = searchParams.hasOwnProperty('disponibilidad') ? searchParams.disponibilidad : undefined;
+    const especialidad = searchParams.hasOwnProperty('especialidad') ? (searchParams.especialidad === 'Todos' ? undefined : searchParams.especialidad) : undefined;
+    const metodosPagoAceptados = searchParams.hasOwnProperty('metodosPagoAceptados') ? (searchParams.metodosPagoAceptados === 'Todos' ? undefined : searchParams.metodosPagoAceptados) : undefined;
+    const habilitado = searchParams.hasOwnProperty('habilitado') ? (searchParams.habilitado === 'true' ? true : (searchParams.habilitado === 'false' ? false : undefined)) : undefined;
+    const ordenesActivasMin = searchParams.hasOwnProperty('ordenesActivasMin') ? searchParams.ordenesActivasMin : undefined;
+    const ordenesActivasMax = searchParams.hasOwnProperty('ordenesActivasMax') ? searchParams.ordenesActivasMax : undefined;
+    const fechaUltimaAsignacionStart = searchParams.hasOwnProperty('fechaUltimaAsignacionStart') ? searchParams.fechaUltimaAsignacionStart : undefined;
+    const fechaUltimaAsignacionEnd = searchParams.hasOwnProperty('fechaUltimaAsignacionEnd') ? searchParams.fechaUltimaAsignacionEnd : undefined;
+
+    if (disponibilidad) {
+      query.disponibilidad = disponibilidad;
+    }
+    if (especialidad) {
+      query.especialidad = especialidad;
+    }
+    if (metodosPagoAceptados) {
+      query.metodosPagoAceptados = metodosPagoAceptados;
+    }
+    if (habilitado !== undefined) {
+      query.habilitado = habilitado;
+    }
+    if (ordenesActivasMin) {
+      query.activeOrders = { ...query.activeOrders, $gte: parseInt(ordenesActivasMin) };
+    }
+    if (ordenesActivasMax) {
+      query.activeOrders = { ...query.activeOrders, $lte: parseInt(ordenesActivasMax) };
+    }
+    if (fechaUltimaAsignacionStart) {
+      query.lastAssignedAt = { ...query.lastAssignedAt, $gte: new Date(fechaUltimaAsignacionStart) };
+    }
+    if (fechaUltimaAsignacionEnd) {
+      query.lastAssignedAt = { ...query.lastAssignedAt, $lte: new Date(fechaUltimaAsignacionEnd) };
+    }
+
+    const proveedores = await ProveedorModel.find(query).lean();
+
+    const csvData = proveedores.map(proveedor => ({
+      ID: proveedor._id.toString(),
+      'Nombre Empresa': proveedor.nombreEmpresa,
+      NIT: proveedor.nit,
+      'Dirección Empresa': proveedor.direccionEmpresa,
+      Especialidad: proveedor.especialidad.join(', '),
+      Comisión: proveedor.comision,
+      'Teléfono Contacto': proveedor.telefonoContacto,
+      'Email Contacto': proveedor.emailContacto,
+      'Métodos Pago Aceptados': proveedor.metodosPagoAceptados.join(', '),
+      Habilitado: proveedor.habilitado ? 'Sí' : 'No',
+      'Órdenes Activas': proveedor.activeOrders || 0,
+      'Fecha Última Asignación': proveedor.lastAssignedAt ? new Date(proveedor.lastAssignedAt).toLocaleDateString() : 'N/A',
+      'Fecha Creación': proveedor.createdAt ? new Date(proveedor.createdAt).toLocaleDateString() : 'N/A',
+    }));
+
+    const csv = Papa.unparse(csvData);
+    return { success: true, csv, message: 'CSV de proveedores generado exitosamente.' };
+  } catch (error) {
+    logger.error('ERROR in exportarProveedoresCSV:', error);
+    return { success: false, error: 'Error al generar el CSV de proveedores: ' + error.message };
+  }
+}
 
 export async function crearProveedor(prevState, formData) {
   const session = await getServerSession(authOptions);
@@ -16,88 +87,114 @@ export async function crearProveedor(prevState, formData) {
     return { message: "Acceso denegado. Solo los administradores pueden crear proveedores.", success: false };
   }
 
-    await connectDB();
+  await connectDB();
+
+  try {
+    // Extract user-related fields
+    const nombre = formData.get("nombre");
+    const primerApellido = formData.get("primerApellido");
+    const numeroDocumento = formData.get("numeroDocumento");
+    const numeroTelefonoUsuario = formData.get("numeroTelefono"); // Renamed to avoid conflict
+    const emailContacto = formData.get("emailContacto"); // This will be used for both User and Proveedor
+
+    // Extract supplier-related fields
+    const nombreEmpresa = formData.get("nombreEmpresa");
+    const nit = formData.get("nit");
+    const direccionEmpresa = formData.get("direccionEmpresa");
+    const especialidad = formData.get("especialidad").split(',').map(s => s.trim()); // Split by comma and trim whitespace
+    const comision = formData.get("comision");
+    const telefonoContactoProveedor = formData.get("telefonoContacto"); // Renamed to avoid conflict
+    const metodosPagoAceptados = formData.getAll("metodosPagoAceptados").flatMap(item => item.split(',').map(s => s.trim())); // Split each item by comma and flatten
+
+    // Basic validation for required fields for both User and Proveedor
+    if (!nombre || !primerApellido || !numeroDocumento || !numeroTelefonoUsuario || !emailContacto ||
+        !nombreEmpresa || !nit || !direccionEmpresa || !especialidad || !comision || !telefonoContactoProveedor || metodosPagoAceptados.length === 0) {
+      return { message: "Todos los campos obligatorios deben ser completados.", success: false };
+    }
+
+    // Check if a user with this email already exists
+    const UsuarioModel = await getUsuarioModel(); // Use getUsuarioModel
+    const existingUser = await UsuarioModel.findOne({ correo: emailContacto });
+    if (existingUser) {
+      return { message: "Ya existe un usuario registrado con este correo electrónico.", success: false };
+    }
+
+    // Generate a random access key for the new supplier (and user password)
+    const generatedAccessKey = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const hashedAccessKey = await bcrypt.hash(generatedAccessKey, 10);
+
+    // Create a new Usuario entry
+    const nuevoUsuario = new UsuarioModel({ // Use UsuarioModel here
+      Nombre: nombre,
+      primerApellido: primerApellido,
+      numeroDocumento: numeroDocumento,
+      numeroTelefono: numeroTelefonoUsuario,
+      correo: emailContacto,
+      password: hashedAccessKey,
+      rol: Rol.PROVEEDOR,
+      habilitado: true,
+    });
+    await nuevoUsuario.save();
+
+    // Create the new Proveedor entry, linking it to the newly created Usuario
+    const ProveedorModel = await getModel('Proveedor');
+    const nuevoProveedor = new ProveedorModel({
+      userId: nuevoUsuario._id, // Link to the new user
+      nombreEmpresa,
+      nit,
+      direccionEmpresa,
+      especialidad,
+      comision: parseFloat(comision),
+      telefonoContacto: telefonoContactoProveedor,
+      emailContacto,
+      metodosPagoAceptados,
+      habilitado: true,
+    });
+
+    logger.info("Attempting to save new Proveedor with data:", nuevoProveedor.toObject());
+    await nuevoProveedor.save();
+    logger.info("Proveedor saved successfully with ID:", nuevoProveedor._id);
+
+    // Send the access key to the provider's email
+    const emailSubject = "Tu clave de acceso para el Portal de Proveedores Black Noise";
+    const emailBody = `Hola ${nombre},\n\nTu empresa ${nombreEmpresa} ha sido registrada como proveedor en Black Noise.\n\nTu clave de acceso para iniciar sesión en el portal de proveedores es: ${generatedAccessKey}\n\nPor favor, guarda esta clave en un lugar seguro. Puedes acceder al portal de proveedores en [URL del portal de proveedores].\n\nSaludos,\nEl equipo de Black Noise`;
 
     try {
-      const nombreEmpresa = formData.get("nombreEmpresa");
-      const nit = formData.get("nit");
-      const direccionEmpresa = formData.get("direccionEmpresa");
-      const especialidad = formData.get("especialidad");
-      const comision = formData.get("comision");
-      const nombreDueño = formData.get("nombreDueño");
-      const telefonoContacto = formData.get("telefonoContacto");
-      const emailContacto = formData.get("emailContacto");
-      const metodosPagoAceptados = formData.getAll("metodosPagoAceptados"); // Get all selected payment methods
-
-      if (!nombreEmpresa || !nit || !direccionEmpresa || !especialidad || !comision || !nombreDueño || !telefonoContacto || !emailContacto || metodosPagoAceptados.length === 0) {
-        return { message: "Todos los campos son obligatorios, incluyendo al menos un método de pago.", success: false };
-      }
-
-      // Generate a random access key for the new supplier
-      const generatedAccessKey = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-      const hashedAccessKey = await bcrypt.hash(generatedAccessKey, 10);
-
-      const nuevoProveedor = new Proveedor({
-        nombreEmpresa,
-        nit,
-        direccionEmpresa,
-        especialidad,
-        comision: parseFloat(comision), // Ensure commission is a number
-        nombreDueño,
-        telefonoContacto,
-        emailContacto,
-        metodosPagoAceptados, // Include the new field
-        habilitado: true, // New providers are enabled by default
-        accessKey: hashedAccessKey, // Store the hashed access key
-      });
-
-      await nuevoProveedor.save();
-
-      // Send the access key to the provider's email
-      const emailSubject = "Tu clave de acceso para el Portal de Proveedores Black Noise";
-      const emailBody = `Hola ${nombreDueño},\n\nTu empresa ${nombreEmpresa} ha sido registrada como proveedor en Black Noise.\n\nTu clave de acceso para iniciar sesión en el portal de proveedores es: ${generatedAccessKey}\n\nPor favor, guarda esta clave en un lugar seguro. Puedes acceder al portal de proveedores en [URL del portal de proveedores].\n\nSaludos,\nEl equipo de Black Noise`;
-
-      try {
-        const emailApiUrl = `${process.env.NEXTAUTH_URL}/api/email`;
-        const emailResponse = await fetch(emailApiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            to: emailContacto,
-            subject: emailSubject,
-            body: emailBody,
-          }),
-        });
-
-        const emailResult = await emailResponse.json();
-        if (!emailResult.success) {
-          logger.warn("Advertencia: No se pudo enviar el correo electrónico al proveedor. Detalles:", emailResult.message);
-          // Decide if you want to return an error here or just log a warning
-        }
-      } catch (emailError) {
-        logger.error("Error al intentar enviar el correo electrónico de la clave de acceso:", emailError);
-        // Decide if you want to return an error here or just log a warning
-      }
-
-      revalidatePath("/admin/proveedores");
-      return {
-        message: "Proveedor creado exitosamente. La clave de acceso ha sido enviada al correo electrónico del proveedor.",
-        success: true,
-        accessKey: generatedAccessKey // Add the generated access key here
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: emailContacto,
+        subject: emailSubject,
+        html: emailBody,
       };
-    } catch (error) {
-      logger.error("Error al crear proveedor:", error);
-      return { message: `Error al crear proveedor: ${error.message}`, success: false };
+      await transporter.sendMail(mailOptions);
+    } catch (emailError) {
+      logger.error("Error al intentar enviar el correo electrónico de la clave de acceso:", emailError);
+      // Decide if you want to return an error here or just log a warning
     }
+
+    revalidatePath("/admin/proveedores");
+    return {
+      message: "Proveedor creado exitosamente. La clave de acceso ha sido enviada al correo electrónico del proveedor.",
+      success: true,
+      data: {
+        ...nuevoProveedor.toObject(),
+        _id: nuevoProveedor._id.toString(),
+        userId: nuevoProveedor.userId ? nuevoProveedor.userId.toString() : null,
+      },
+      // Do NOT return accessKey here as per user's request
+    };
+  } catch (error) {
+    logger.error("Error al crear proveedor:", error);
+    return { message: `Error al crear proveedor: ${error.message}`, success: false };
   }
+}
 
 export async function generarYGuardarAccessKey(proveedorId, newAccessKey) {
   await connectDB();
   try {
+    const ProveedorModel = await getModel('Proveedor');
     const hashedPassword = await bcrypt.hash(newAccessKey, 10);
-    const proveedor = await Proveedor.findByIdAndUpdate(
+    const proveedor = await ProveedorModel.findByIdAndUpdate(
       proveedorId,
       { accessKey: hashedPassword },
       { new: true }
@@ -159,14 +256,23 @@ export async function actualizarProveedor(prevState, formData) {
       updateData.accessKey = await bcrypt.hash(newAccessKey, 10);
     }
 
-    const updatedProveedor = await Proveedor.findByIdAndUpdate(id, updateData, { new: true });
+    const ProveedorModel = await getModel('Proveedor');
+    const updatedProveedor = await ProveedorModel.findByIdAndUpdate(id, updateData, { new: true });
 
     if (!updatedProveedor) {
       return { message: "Proveedor no encontrado para actualizar.", success: false };
     }
 
     revalidatePath("/admin/proveedores");
-    return { message: "Proveedor actualizado exitosamente.", success: true };
+    return {
+      message: "Proveedor actualizado exitosamente.",
+      success: true,
+      data: {
+        ...updatedProveedor.toObject(),
+        _id: updatedProveedor._id.toString(),
+        userId: updatedProveedor.userId ? updatedProveedor.userId.toString() : null,
+      },
+    };
   } catch (error) {
     logger.error("Error al actualizar proveedor:", error);
     return { message: `Error al actualizar proveedor: ${error.message}`, success: false };
@@ -176,14 +282,12 @@ export async function actualizarProveedor(prevState, formData) {
 export async function obtenerProveedoresHabilitados() {
   await connectDB();
   try {
-    const proveedores = await Proveedor.find({ habilitado: true }).lean();
+    const ProveedorModel = await getModel('Proveedor');
+    const proveedores = await ProveedorModel.find({ habilitado: true }).lean();
+    // Deep clone and serialize to ensure all fields are plain objects/primitives
+    const serializedProveedores = JSON.parse(JSON.stringify(proveedores));
     return {
-      proveedores: proveedores.map(p => ({
-        ...p,
-        _id: p._id.toString(),
-        createdAt: p.createdAt ? new Date(p.createdAt).toISOString() : null,
-        updatedAt: p.updatedAt ? new Date(p.updatedAt).toISOString() : null,
-      })),
+      proveedores: serializedProveedores,
       success: true
     };
   } catch (error) {
@@ -192,14 +296,54 @@ export async function obtenerProveedoresHabilitados() {
   }
 }
 
-export async function obtenerProveedores() {
+export async function obtenerProveedores(searchParams = {}) {
   await connectDB();
   try {
-    const proveedores = await Proveedor.find({}).lean();
+    const ProveedorModel = await getModel('Proveedor');
+    let query = {};
+
+    // Extraer y normalizar filtros de searchParams de forma explícita
+    const disponibilidad = searchParams.hasOwnProperty('disponibilidad') ? searchParams.disponibilidad : undefined;
+    const especialidad = searchParams.hasOwnProperty('especialidad') ? (searchParams.especialidad === 'Todos' ? undefined : searchParams.especialidad) : undefined;
+    const metodosPagoAceptados = searchParams.hasOwnProperty('metodosPagoAceptados') ? (searchParams.metodosPagoAceptados === 'Todos' ? undefined : searchParams.metodosPagoAceptados) : undefined;
+    const habilitado = searchParams.hasOwnProperty('habilitado') ? (searchParams.habilitado === 'true' ? true : (searchParams.habilitado === 'false' ? false : undefined)) : undefined;
+    const ordenesActivasMin = searchParams.hasOwnProperty('ordenesActivasMin') ? searchParams.ordenesActivasMin : undefined;
+    const ordenesActivasMax = searchParams.hasOwnProperty('ordenesActivasMax') ? searchParams.ordenesActivasMax : undefined;
+    const fechaUltimaAsignacionStart = searchParams.hasOwnProperty('fechaUltimaAsignacionStart') ? searchParams.fechaUltimaAsignacionStart : undefined;
+    const fechaUltimaAsignacionEnd = searchParams.hasOwnProperty('fechaUltimaAsignacionEnd') ? searchParams.fechaUltimaAsignacionEnd : undefined;
+
+    // Aplicar filtros
+    if (disponibilidad) {
+      query.disponibilidad = disponibilidad;
+    }
+    if (especialidad) {
+      query.especialidad = especialidad;
+    }
+    if (metodosPagoAceptados) {
+      query.metodosPagoAceptados = metodosPagoAceptados;
+    }
+    if (habilitado !== undefined) {
+      query.habilitado = habilitado;
+    }
+    if (ordenesActivasMin) {
+      query.activeOrders = { ...query.activeOrders, $gte: parseInt(ordenesActivasMin) };
+    }
+    if (ordenesActivasMax) {
+      query.activeOrders = { ...query.activeOrders, $lte: parseInt(ordenesActivasMax) };
+    }
+    if (fechaUltimaAsignacionStart) {
+      query.lastAssignedAt = { ...query.lastAssignedAt, $gte: new Date(fechaUltimaAsignacionStart) };
+    }
+    if (fechaUltimaAsignacionEnd) {
+      query.lastAssignedAt = { ...query.lastAssignedAt, $lte: new Date(fechaUltimaAsignacionEnd) };
+    }
+
+    const proveedores = await ProveedorModel.find(query).lean();
     return {
       proveedores: proveedores.map(p => ({
         ...p,
         _id: p._id.toString(),
+        userId: p.userId ? p.userId.toString() : null,
         createdAt: p.createdAt ? new Date(p.createdAt).toISOString() : null,
         updatedAt: p.updatedAt ? new Date(p.updatedAt).toISOString() : null,
       })),
@@ -214,7 +358,8 @@ export async function obtenerProveedores() {
 export async function obtenerProveedorPorId(id) {
   await connectDB();
   try {
-    const proveedor = await Proveedor.findById(id).lean();
+    const ProveedorModel = await getModel('Proveedor');
+    const proveedor = await ProveedorModel.findById(id).lean();
     if (!proveedor) {
       return { proveedor: null, success: false, message: "Proveedor no encontrado." };
     }
@@ -242,8 +387,9 @@ export async function eliminarProveedor(prevState, formData) {
 
   await connectDB();
   try {
+    const ProveedorModel = await getModel('Proveedor');
     const id = formData.get("id");
-    const result = await Proveedor.findByIdAndDelete(id);
+    const result = await ProveedorModel.findByIdAndDelete(id);
     if (!result) {
       return { message: "Proveedor no encontrado para eliminar.", success: false };
     }
@@ -264,24 +410,45 @@ export async function obtenerMiPerfilProveedor() {
 
   await connectDB();
   try {
+    const ProveedorModel = await getModel('Proveedor');
     // Assuming the provider's email is stored in the session user object
-    const proveedor = await Proveedor.findOne({ emailContacto: session.user.email }).lean();
+    const proveedor = await ProveedorModel.findOne({ emailContacto: session.user.email }).lean();
 
     if (!proveedor) {
       return { proveedor: null, success: false, message: "Perfil de proveedor no encontrado." };
     }
 
     return {
-      proveedor: {
-        ...proveedor,
-        _id: proveedor._id.toString(),
-        createdAt: proveedor.createdAt ? new Date(proveedor.createdAt).toISOString() : null,
-        updatedAt: proveedor.updatedAt ? new Date(proveedor.updatedAt).toISOString() : null,
-      },
+      proveedor: toPlainObject(proveedor), // Convert to plain object
       success: true
     };
   } catch (error) {
     logger.error("Error al obtener el perfil del proveedor:", error);
     return { proveedor: null, success: false, message: `Error al obtener el perfil del proveedor: ${error.message}` };
+  }
+}
+
+export async function obtenerMetricasProveedor(proveedorId) {
+  await connectDB();
+  try {
+    const Design = await getDesignModel();
+    const Pedido = await getPedidoModel();
+
+    const totalDesignsProveedor = await Design.countDocuments({ proveedorId: proveedorId });
+    const devolucionesPendientesProveedor = await Pedido.countDocuments({ proveedorId: proveedorId, estado: 'devolucion_pendiente' });
+
+    return {
+      success: true,
+      data: {
+        totalDesignsProveedor,
+        devolucionesPendientesProveedor,
+      },
+    };
+  } catch (error) {
+    logger.error("Error en obtenerMetricasProveedor:", error);
+    return {
+      success: false,
+      error: "Error al obtener las métricas del proveedor.",
+    };
   }
 }

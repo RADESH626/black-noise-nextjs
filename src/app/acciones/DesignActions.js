@@ -1,7 +1,7 @@
 "use server"
 
 import connectDB from '@/utils/DBconection';
-import Design from '@/models/Design';
+import getDesignModel from '@/models/Design';
 import Papa from 'papaparse';
 import { revalidatePath } from 'next/cache';
 import { getServerSession } from 'next-auth';
@@ -9,10 +9,79 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Assuming th
 import logger from '@/utils/logger';
 import { Rol } from '@/models/enums/usuario/Rol';
 
+// Function to export designs to CSV
+export async function exportarDesignsCSV(searchParams = {}) {
+    await connectDB();
+    try {
+        const Design = getDesignModel();
+        let query = {};
+
+        const fechaCreacionStart = searchParams.hasOwnProperty('fechaCreacionStart') ? searchParams.fechaCreacionStart : undefined;
+        const fechaCreacionEnd = searchParams.hasOwnProperty('fechaCreacionEnd') ? searchParams.fechaCreacionEnd : undefined;
+        const categoria = searchParams.hasOwnProperty('categoria') ? searchParams.categoria : undefined;
+        const estadoDesing = searchParams.hasOwnProperty('estadoDesing') ? searchParams.estadoDesing : undefined;
+        const disenadorUsuarioId = searchParams.hasOwnProperty('disenadorUsuarioId') ? searchParams.disenadorUsuarioId : undefined;
+        const precioMin = searchParams.hasOwnProperty('precioMin') ? searchParams.precioMin : undefined;
+        const precioMax = searchParams.hasOwnProperty('precioMax') ? searchParams.precioMax : undefined;
+        const tallasDisponibles = searchParams.hasOwnProperty('tallasDisponibles') && searchParams.tallasDisponibles ? searchParams.tallasDisponibles.split(',') : [];
+
+        if (fechaCreacionStart) {
+            query.createdAt = { ...query.createdAt, $gte: new Date(fechaCreacionStart) };
+        }
+        if (fechaCreacionEnd) {
+            query.createdAt = { ...query.createdAt, $lte: new Date(fechaCreacionEnd) };
+        }
+        if (categoria) {
+            query.categoria = categoria;
+        }
+        if (estadoDesing) {
+            query.estadoDesing = estadoDesing;
+        }
+        if (disenadorUsuarioId) {
+            query.usuarioId = disenadorUsuarioId;
+        }
+        if (precioMin) {
+            query.valorDesing = { ...query.valorDesing, $gte: parseFloat(precioMin) };
+        }
+        if (precioMax) {
+            query.valorDesing = { ...query.valorDesing, $lte: parseFloat(precioMax) };
+        }
+        if (tallasDisponibles && tallasDisponibles.length > 0) {
+            query.tallasDisponibles = { $in: tallasDisponibles };
+        }
+
+        const designs = await Design.find(query)
+            .populate({
+                path: 'usuarioId',
+                select: 'Nombre primerApellido'
+            })
+            .lean();
+
+        const csvData = designs.map(design => ({
+            ID: design._id.toString(),
+            'Nombre Diseño': design.nombreDesing,
+            Descripción: design.descripcion,
+            'Valor Diseño': design.valorDesing,
+            Categoría: design.categoria,
+            Estado: design.estadoDesing,
+            'Colores Disponibles': design.coloresDisponibles.join(', '),
+            'Tallas Disponibles': design.tallasDisponibles.join(', '),
+            'Diseñador Nombre': design.usuarioId ? `${design.usuarioId.Nombre} ${design.usuarioId.primerApellido}` : 'N/A',
+            'Fecha Creación': design.createdAt ? new Date(design.createdAt).toLocaleDateString() : 'N/A',
+        }));
+
+        const csv = Papa.unparse(csvData);
+        return { success: true, csv, message: 'CSV de diseños generado exitosamente.' };
+    } catch (error) {
+        logger.error('ERROR in exportarDesignsCSV:', error);
+        return { success: false, error: 'Error al generar el CSV de diseños: ' + error.message };
+    }
+}
+
 // Function to save a single design
 export async function guardarDesigns(prevState, formData) {
     await connectDB();
-    logger.debug('Entering guardarDesigns with formData:', formData);
+    console.log('Entering guardarDesigns with formData:', formData);
 
     const session = await getServerSession(authOptions);
 
@@ -50,7 +119,7 @@ export async function guardarDesigns(prevState, formData) {
             const buffer = Buffer.from(bytes);
             mimeType = imageFile.type;
             imageData = buffer;
-            logger.debug(`[guardarDesigns] Buffer length: ${buffer.length}, Hex snippet: ${buffer.toString('hex').substring(0, 60)}...`);
+            console.log(`[guardarDesigns] Buffer length: ${buffer.length}, Hex snippet: ${buffer.toString('hex').substring(0, 60)}...`);
         } else {
             return { success: false, message: 'No se proporcionó una imagen para el diseño.' };
         }
@@ -68,57 +137,124 @@ export async function guardarDesigns(prevState, formData) {
             tallasDisponibles: formData.get('tallasDisponibles') ? formData.get('tallasDisponibles').split(',') : []
         };
 
+        const Design = getDesignModel();
         const newDesign = await Design.create(data);
-        logger.debug('Design saved successfully:', newDesign);
+        console.log('Design saved successfully:', newDesign);
 
         revalidatePath('/admin/designs');
         revalidatePath('/catalogo');
         revalidatePath('/perfil'); // Revalidate path for user profile page
 
-        return { success: true, message: 'Diseño registrado exitosamente', data: JSON.parse(JSON.stringify(newDesign)) };
+        return {
+            success: true,
+            message: 'Diseño registrado exitosamente',
+            data: {
+                ...JSON.parse(JSON.stringify(newDesign)),
+                _id: newDesign._id.toString(),
+                // imageData: undefined, // Remove imageData
+                // imageMimeType: undefined, // Remove imageMimeType
+            }
+        };
     } catch (error) {
-        logger.error('ERROR in guardarDesigns:', error);
+        console.error('ERROR in guardarDesigns:', error);
         return { success: false, message: 'Error al registrar el diseño: ' + error.message };
     }
 }
 
 // Function to get all designs
-export async function obtenerDesigns() {
+export async function obtenerDesigns(page = 1, limit = 10, searchParams = {}) {
     await connectDB();
-    logger.debug('Entering obtenerDesigns.');
     try {
-        const designs = await Design.find({})
+        const Design = getDesignModel();
+        let query = {};
+
+        // Convertir searchParams a un objeto plano para asegurar acceso síncrono
+        const params = {};
+        for (const [key, value] of Object.entries(searchParams)) {
+            params[key] = value;
+        }
+
+        // Extraer y normalizar filtros de searchParams de forma explícita
+        const fechaCreacionStart = params.hasOwnProperty('fechaCreacionStart') ? params.fechaCreacionStart : undefined;
+        const fechaCreacionEnd = params.hasOwnProperty('fechaCreacionEnd') ? params.fechaCreacionEnd : undefined;
+        const categoria = params.hasOwnProperty('categoria') ? params.categoria : undefined;
+        const estadoDesing = params.hasOwnProperty('estadoDesing') ? params.estadoDesing : undefined;
+        const disenadorUsuarioId = params.hasOwnProperty('disenadorUsuarioId') ? params.disenadorUsuarioId : undefined;
+        const precioMin = params.hasOwnProperty('precioMin') ? params.precioMin : undefined;
+        const precioMax = params.hasOwnProperty('precioMax') ? params.precioMax : undefined;
+        const tallasDisponibles = params.hasOwnProperty('tallasDisponibles') && params.tallasDisponibles ? params.tallasDisponibles.split(',') : [];
+
+        // Aplicar filtros
+        if (fechaCreacionStart) {
+            query.createdAt = { ...query.createdAt, $gte: new Date(fechaCreacionStart) };
+        }
+        if (fechaCreacionEnd) {
+            query.createdAt = { ...query.createdAt, $lte: new Date(fechaCreacionEnd) };
+        }
+        if (categoria) {
+            query.categoria = categoria;
+        }
+        if (estadoDesing) {
+            query.estadoDesing = estadoDesing;
+        }
+        if (disenadorUsuarioId) {
+            query.usuarioId = disenadorUsuarioId;
+        }
+        if (precioMin) {
+            query.valorDesing = { ...query.valorDesing, $gte: parseFloat(precioMin) };
+        }
+        if (precioMax) {
+            query.valorDesing = { ...query.valorDesing, $lte: parseFloat(precioMax) };
+        }
+        if (tallasDisponibles && tallasDisponibles.length > 0) {
+            query.tallasDisponibles = { $in: tallasDisponibles };
+        }
+
+const skip = (page - 1) * limit;
+
+        const designs = await Design.find(query)
+            .skip(skip)
+            .limit(limit)
             .populate({
                 path: 'usuarioId',
-                select: 'nombreUsuario imageData imageMimeType' // Select only necessary fields
+                select: 'Nombre primerApellido imageData imageMimeType'
             })
             .lean();
 
         const formattedDesigns = designs.map(design => {
-            const userAvatar = design.usuarioId && design.usuarioId.imageData && design.usuarioId.imageMimeType
-                ? `/api/images/usuario/${design.usuarioId._id}`
-                : '/img/perfil/FotoPerfil.webp'; // Default avatar if no image data
+            const processedDesign = { ...design, _id: design._id.toString() };
 
-            const designImageUrl = design.imageData && design.imageMimeType
-                ? `data:${design.imageMimeType};base64,${design.imageData.toString('base64')}`
-                : null; // Provide the image as a data URL
+            delete processedDesign.imageData;
+            delete processedDesign.imageMimeType;
+
+            const designImageUrl = design.imageData && design.imageData.buffer instanceof Buffer && design.imageMimeType
+                ? `data:${design.imageMimeType};base64,${design.imageData.buffer.toString('base64')}`
+                : null;
+
+            const processedUsuario = design.usuarioId ? {
+                _id: design.usuarioId._id.toString(),
+                Nombre: design.usuarioId.Nombre,
+                primerApellido: design.usuarioId.primerApellido,
+            } : null;
+
+            const userAvatar = design.usuarioId && design.usuarioId.imageData && design.usuarioId.imageData.buffer instanceof Buffer && design.usuarioId.imageMimeType
+                ? `data:${design.usuarioId.imageMimeType};base64,${design.usuarioId.imageData.buffer.toString('base64')}`
+                : null;
 
             return {
-                ...design,
-                id: design._id.toString(), // Ensure a string ID for frontend key
-                prenda: design.nombreDesing, // Map nombreDesing to prenda
-                price: design.valorDesing,   // Map valorDesing to price
-                usuario: design.usuarioId ? design.usuarioId.nombreUsuario : 'Usuario Desconocido', // Map user name
-                userAvatar: userAvatar, // Add user avatar URL
-                imagen: designImageUrl, // Provide the image as a data URL
-                // Keep imageData and imageMimeType as they are used for data URL
+                ...processedDesign,
+                prenda: processedDesign.nombreDesing,
+                price: processedDesign.valorDesing,
+                usuario: processedUsuario ? `${processedUsuario.Nombre} ${processedUsuario.primerApellido}` : 'Usuario Desconocido',
+                userAvatar: userAvatar,
+                imagen: designImageUrl,
+                usuarioId: processedUsuario,
             };
         });
 
-        logger.debug('Designs obtained and formatted successfully:', formattedDesigns);
-        return { data: JSON.parse(JSON.stringify(formattedDesigns)) };
+        return { data: formattedDesigns };
     } catch (error) {
-        logger.error('ERROR in obtenerDesigns:', error);
+        console.error('ERROR in obtenerDesigns:', error);
         return { error: 'Error al obtener los diseños: ' + error.message };
     }
 }
@@ -126,29 +262,44 @@ export async function obtenerDesigns() {
 // Function to get designs by user ID
 export async function obtenerDesignsPorUsuarioId(usuarioId) {
     await connectDB();
-    logger.debug('Entering obtenerDesignsPorUsuarioId with usuarioId:', usuarioId);
+    console.log('Entering obtenerDesignsPorUsuarioId with usuarioId:', usuarioId);
     try {
+        const Design = getDesignModel();
         const designs = await Design.find({ usuarioId: usuarioId }).lean();
 
         const formattedDesigns = designs.map(design => {
-            const designImageUrl = design.imageData && design.imageMimeType
-                ? `/api/images/design/${design._id}`
-                : null; // Or a default image path if no image data
+            
+            const designImageUrl = design.imageData && design.imageData.buffer instanceof Buffer && design.imageMimeType
+                ? `data:${design.imageMimeType};base64,${design.imageData.buffer.toString('base64')}`
+                : null;
+
+            // Create a new plain object to ensure no Mongoose objects are passed
+            const plainDesign = {
+                _id: design._id.toString(),
+                usuarioId: design.usuarioId.toString(), // Convert ObjectId to string
+                nombreDesing: design.nombreDesing,
+                descripcion: design.descripcion,
+                valorDesing: design.valorDesing,
+                categoria: design.categoria,
+                estadoDesing: design.estadoDesing,
+                coloresDisponibles: design.coloresDisponibles,
+                tallasDisponibles: design.tallasDisponibles,
+                createdAt: design.createdAt.toISOString(),
+                updatedAt: design.updatedAt.toISOString(),
+                // Exclude imageData and imageMimeType from the top level if they are Buffers
+            };
 
             return {
-                ...design,
-                imagen: design.imageData && design.imageMimeType
-                    ? `data:${design.imageMimeType};base64,${design.imageData.toString('base64')}`
-                    : null, // Provide the image as a data URL
-                imageData: design.imageData, // Keep imageData for data URL
-                imageMimeType: design.imageMimeType, // Keep imageMimeType for data URL
+                ...plainDesign,
+                imagen: designImageUrl,
             };
         });
 
-        logger.debug('Designs obtained by usuarioId successfully and formatted:', formattedDesigns);
+        // console.log('Designs obtained by usuarioId successfully and formatted:', formattedDesigns);
+
         return { designs: JSON.parse(JSON.stringify(formattedDesigns)), error: null };
     } catch (error) {
-        logger.error('ERROR in obtenerDesignsPorUsuarioId:', error);
+        console.error('ERROR in obtenerDesignsPorUsuarioId:', error);
         return { designs: null, error: 'Error al obtener los diseños por usuario: ' + error.message };
     }
 }
@@ -157,16 +308,17 @@ export async function obtenerDesignsPorUsuarioId(usuarioId) {
 // Function to find a design by ID
 export async function encontrarDesignsPorId(id) {
     await connectDB();
-    logger.debug('Entering encontrarDesignsPorId with ID:', id);
+    console.log('Entering encontrarDesignsPorId with ID:', id);
     try {
+        const Design = getDesignModel();
         const design = await Design.findById(id).lean();
-        logger.debug('Design found by ID:', design);
+        console.log('Design found by ID:', design);
         if (!design) {
             return { error: 'Diseño no encontrado.' };
         }
         return { data: JSON.parse(JSON.stringify(design)) };
     } catch (error) {
-        logger.error('ERROR in encontrarDesignsPorId:', error);
+        console.error('ERROR in encontrarDesignsPorId:', error);
         return { error: 'Error al encontrar el diseño por ID: ' + error.message };
     }
 }
@@ -174,7 +326,7 @@ export async function encontrarDesignsPorId(id) {
 // Function to update a design
 export async function actualizarDesign(prevState, formData) {
     await connectDB();
-    logger.debug('Entering actualizarDesign with formData:', formData);
+    console.log('Entering actualizarDesign with formData:', formData);
 
     const id = formData.get('id');
     if (!id) {
@@ -226,18 +378,28 @@ export async function actualizarDesign(prevState, formData) {
         };
 
         if (updateImageData.imageData) {
-            logger.debug(`[actualizarDesign] Buffer length: ${updateImageData.imageData.length}, Hex snippet: ${updateImageData.imageData.toString('hex').substring(0, 60)}...`);
+            console.log(`[actualizarDesign] Buffer length: ${updateImageData.imageData.length}, Hex snippet: ${updateImageData.imageData.toString('hex').substring(0, 60)}...`);
         }
+        const Design = getDesignModel();
         const updatedDesign = await Design.findByIdAndUpdate(id, data, { new: true }).lean();
-        logger.debug('Design updated successfully:', updatedDesign);
+        console.log('Design updated successfully:', updatedDesign);
 
         revalidatePath('/admin/designs');
         revalidatePath('/catalogo');
         revalidatePath(`/admin/designs/editar/${id}`); // Revalidate specific edit page
 
-        return { success: true, message: 'Diseño actualizado exitosamente', data: JSON.parse(JSON.stringify(updatedDesign)) };
+        return {
+            success: true,
+            message: 'Diseño actualizado exitosamente',
+            data: {
+                ...JSON.parse(JSON.stringify(updatedDesign)),
+                _id: updatedDesign._id.toString(),
+                imageData: undefined, // Remove imageData
+                imageMimeType: undefined, // Remove imageMimeType
+            }
+        };
     } catch (error) {
-        logger.error('ERROR in actualizarDesign:', error);
+        console.error('ERROR in actualizarDesign:', error);
         return { success: false, message: 'Error al actualizar el diseño: ' + error.message };
     }
 }
@@ -245,17 +407,18 @@ export async function actualizarDesign(prevState, formData) {
 // Function to delete a design
 export async function eliminarDesign(id) {
     await connectDB();
-    logger.debug('Entering eliminarDesign with ID:', id);
+    console.log('Entering eliminarDesign with ID:', id);
     try {
+        const Design = getDesignModel();
         const deletedDesign = await Design.findByIdAndDelete(id).lean();
-        logger.debug('Design deleted successfully:', deletedDesign);
+        console.log('Design deleted successfully:', deletedDesign);
 
         revalidatePath('/admin/designs');
         revalidatePath('/catalogo');
 
         return { success: true, message: 'Diseño eliminado exitosamente' };
     } catch (error) {
-        logger.error('ERROR in eliminarDesign:', error);
+        console.error('ERROR in eliminarDesign:', error);
         return { success: false, message: 'Error al eliminar el diseño: ' + error.message };
     }
 }

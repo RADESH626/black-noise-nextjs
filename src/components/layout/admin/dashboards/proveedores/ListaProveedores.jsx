@@ -8,10 +8,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import BotonEditar from '@/components/common/botones/BotonEditar';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
-import { usePopUp } from '@/context/PopUpContext';
+import { useDialog } from '@/context/DialogContext';
 import { useActionState } from 'react'; // For React 19
 import { useFormStatus } from 'react-dom'; // For React 19
 import { MetodoPago } from '@/models/enums/pago/MetodoPago';
+import BotonGeneral from '@/components/common/botones/BotonGeneral'; // Import BotonGeneral
+import Loader from '@/components/Loader';
 
 const PAYMENT_METHODS = Object.values(MetodoPago);
 const PAYMENT_METHOD_DISPLAY_NAMES = {
@@ -26,7 +28,7 @@ const PAYMENT_METHOD_DISPLAY_NAMES = {
 
 // Component for the delete provider button, using Server Actions pattern
 function DeleteProviderForm({ providerId, onProviderDeleted }) {
-    const { showPopUp } = usePopUp();
+    const { showPopUp } = useDialog();
     const [state, formAction] = useActionState(eliminarProveedor, { message: null, success: false });
     const { pending } = useFormStatus();
 
@@ -42,13 +44,14 @@ function DeleteProviderForm({ providerId, onProviderDeleted }) {
     return (
         <form action={formAction}>
             <input type="hidden" name="id" value={providerId} />
-            <button
+            <BotonGeneral
                 type="submit"
                 disabled={pending}
-                className="px-3 py-1.5 font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75 text-sm whitespace-nowrap bg-red-600 text-white hover:bg-red-700 focus:ring-red-500"
+                variant="danger"
+                className="px-3 py-1.5 text-sm whitespace-nowrap"
             >
                 {pending ? 'Eliminando...' : 'Eliminar'}
-            </button>
+            </BotonGeneral>
         </form>
     );
 }
@@ -59,7 +62,7 @@ export default function ListaProveedores({ initialProviders }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('ALL'); // 'ALL' for no filter
-  const { showPopUp } = usePopUp();
+  const { showPopUp } = useDialog();
 
   const fetchAndSetProviders = useCallback(async () => {
     setLoading(true);
@@ -103,7 +106,7 @@ export default function ListaProveedores({ initialProviders }) {
   };
 
   if (loading && allProviders.length === 0) {
-    return <p>Cargando proveedores...</p>;
+    return <Loader />;
   }
 
   if (error) {

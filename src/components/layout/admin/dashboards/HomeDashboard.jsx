@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import SeccionHeader from '../secciones/acciones/SeccionHeader';
 import { obtenerMetricasDashboard } from '@/app/acciones/DashboardActions';
+import Loader from '@/components/Loader';
 
 function HomeDashboard() {
     const [metrics, setMetrics] = useState(null);
@@ -31,7 +32,7 @@ function HomeDashboard() {
     }, []);
 
     if (loading) {
-        return <p>Cargando métricas del dashboard...</p>;
+        return <Loader />;
     }
 
     if (error) {
@@ -64,4 +65,4 @@ function HomeDashboard() {
     );
 }
 
-export default HomeDashboard;
+export default HomeDashboard;

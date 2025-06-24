@@ -15,10 +15,21 @@ export const validateEmail = (email) => {
 };
 
 export const validatePassword = (password) => {
-    if (password.length < 6) {
-        throw new ValidationError('Password must be at least 6 characters long');
+    if (password.length < 8) {
+        throw new ValidationError('La contraseña debe tener al menos 8 caracteres.');
     }
-    // Add more password complexity rules if needed
+    if (!/[A-Z]/.test(password)) {
+        throw new ValidationError('La contraseña debe contener al menos una letra mayúscula.');
+    }
+    if (!/[a-z]/.test(password)) {
+        throw new ValidationError('La contraseña debe contener al menos una letra minúscula.');
+    }
+    if (!/[0-9]/.test(password)) {
+        throw new ValidationError('La contraseña debe contener al menos un número.');
+    }
+    if (!/[!@#$%^&*()]/.test(password)) {
+        throw new ValidationError('La contraseña debe contener al menos un carácter especial (!@#$%^&*()).');
+    }
 };
 
 // You can add more specific validation functions here

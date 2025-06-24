@@ -1,9 +1,7 @@
 "use server";
 
 import connectDB from "@/utils/DBconection";
-import Venta from "@/models/Venta";
-import Usuario from "@/models/Usuario";
-import Pedido from "@/models/Pedido";
+import { getVentaModel, getUsuarioModel, getPedidoModel, getDesignModel, getProveedorModel, getPagoModel } from "@/models";
 import logger from '@/utils/logger';
 
 export async function obtenerMetricasDashboard() {
@@ -11,6 +9,13 @@ export async function obtenerMetricasDashboard() {
 
   try {
     await connectDB();
+
+    const Venta = await getVentaModel();
+    const Usuario = await getUsuarioModel();
+    const Pedido = await getPedidoModel();
+    const Design = await getDesignModel();
+    const Proveedor = await getProveedorModel();
+    const Pago = await getPagoModel();
 
     // Total de ventas
     const totalVentasResult = await Venta.aggregate([
@@ -28,6 +33,10 @@ export async function obtenerMetricasDashboard() {
 
     // Pedidos pendientes (asumiendo un campo 'estado' en el modelo Pedido)
     const pedidosPendientes = await Pedido.countDocuments({ estado: "pendiente" });
+    const totalDesigns = await Design.countDocuments();
+    const totalProveedores = await Proveedor.countDocuments();
+    const pagosPendientes = await Pago.countDocuments({ estado: "pendiente" });
+    const devolucionesPendientes = await Pedido.countDocuments({ estado: "devolucion_pendiente" });
 
     return {
       success: true,
@@ -35,10 +44,14 @@ export async function obtenerMetricasDashboard() {
         totalVentas,
         totalUsuarios,
         pedidosPendientes,
+        totalDesigns,
+        totalProveedores,
+        pagosPendientes,
+        devolucionesPendientes,
       },
     };
   } catch (error) {
-    logger.error("Error en obtenerMetricasDashboard:", error.message);
+    logger.error("Error en obtenerMetricasDashboard:", error); // Log the full error object
     return {
       success: false,
       error: "Error al obtener las métricas del dashboard.",

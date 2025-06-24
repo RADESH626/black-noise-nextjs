@@ -1,6 +1,17 @@
-import mongoose from 'mongoose';
+import { Schema, model, models } from 'mongoose';
+import connectDB from '@/utils/DBconection';
 
-const CartSchema = new mongoose.Schema({
+let mongoose;
+
+async function getMongoose() {
+  if (!mongoose) {
+    const { mongoose: mongooseInstance } = await connectDB();
+    mongoose = mongooseInstance;
+  }
+  return mongoose;
+}
+
+const CartSchema = new Schema({
   userId: {
     type: String,
     required: true,
@@ -9,7 +20,7 @@ const CartSchema = new mongoose.Schema({
   items: [
     {
       designId: {
-        type: mongoose.Schema.Types.ObjectId, // Use ObjectId to reference Design model
+        type: Schema.Types.ObjectId, // Use ObjectId to reference Design model
         ref: 'Design', // Reference the Design model
         required: true,
       },
@@ -19,10 +30,17 @@ const CartSchema = new mongoose.Schema({
         default: 1,
         min: 1,
       },
+      proveedorId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Proveedor',
+        required: false, // Make it optional, as a design might not always have a direct supplier in all contexts
+      },
     },
   ],
 });
 
-const Cart = mongoose.models.Cart || mongoose.model('Cart', CartSchema);
-
-export default Cart;
+// Check if the model exists before creating a new one
+export default async function getCartModel() {
+  const mongooseInstance = await getMongoose();
+  return mongooseInstance.models.Cart || model('Cart', CartSchema);
+}

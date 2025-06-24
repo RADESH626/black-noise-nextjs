@@ -16,6 +16,11 @@
 ### Commit Procedure
 - **Directive:** To make a commit, you must first use the `git add` command to stage your changes, and then use the `git commit` command to record them.
 
+## Code Style Directives
+
+### Alias Imports
+- **Directive:** Always use path aliases for imports (e.g., `import Component from '@/components/path/Component'` or `import action from '@/app/acciones/action'`) instead of relative paths (`../../`). This ensures consistency and readability.
+
 ## File Deletion Rule
 - When deleting a file, always check if the parent directory becomes empty. If it does, delete the empty directory as well.
 

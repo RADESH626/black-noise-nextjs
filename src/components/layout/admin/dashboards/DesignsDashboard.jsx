@@ -7,6 +7,8 @@ import { obtenerDesigns } from '@/app/acciones/DesignActions.js';
 import FormFiltrarDesigns from './designs/FormFiltrarDesigns';
 import DesignsTable from './designs/DesignsTable'; // Import DesignsTable
 import BotonAgregarDesigns from '../../../common/botones/BotonAgregarDesigns';
+import Loader from '@/components/Loader';
+import BotonExportarPDF from '@/components/common/botones/BotonExportarPDF'; // Importar BotonExportarPDF
 
 function DesignsDashboard() { // Remove async keyword
     const [designs, setDesigns] = useState([]);
@@ -35,7 +37,7 @@ function DesignsDashboard() { // Remove async keyword
     }, []); // Empty dependency array means this runs once on mount
 
     if (loading) {
-        return <p>Cargando diseños...</p>;
+        return <Loader />;
     }
 
     if (error) {
@@ -47,9 +49,27 @@ function DesignsDashboard() { // Remove async keyword
             <SeccionHeader>
                 <div className="flex justify-between items-center w-full">
                     <h4 className='font-bold text-2xl text-black'>Gestión de Diseños</h4>
-                    <Link href="/admin/designs/agregar" className="flex flex-row justify-center items-center gap-4">
-                        <BotonAgregarDesigns />
-                    </Link>
+                    <BotonExportarPDF
+                        data={designs}
+                        reportTitle="Reporte de Diseños"
+                        tableHeaders={[
+                            'ID Diseño', 'Nombre Diseño', 'Descripción', 'Valor Diseño', 'Categoría',
+                            'Estado', 'Colores Disponibles', 'Tallas Disponibles', 'Diseñador', 'Fecha Creación'
+                        ]}
+                        tableBodyMapper={(design) => [
+                            design._id,
+                            design.nombreDesing,
+                            design.descripcion,
+                            `$${typeof design.valorDesing === 'number' ? design.valorDesing.toFixed(2) : '0.00'}`,
+                            design.categoria,
+                            design.estadoDesing,
+                            design.coloresDisponibles.join(', '),
+                            design.tallasDisponibles.join(', '),
+                            design.usuarioId ? `${design.usuarioId.Nombre} ${design.usuarioId.primerApellido}` : 'N/A',
+                            design.createdAt ? new Date(design.createdAt).toLocaleDateString() : 'N/A',
+                        ]}
+                        className="py-2 px-4"
+                    />
                 </div>
             </SeccionHeader>
 

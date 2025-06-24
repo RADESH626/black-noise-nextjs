@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useActionState } from 'react'; // Import hooks
 import { useFormStatus } from 'react-dom'; // Import useFormStatus
 import { signIn } from "next-auth/react"; // Import signIn
-import { usePopUp } from '@/context/PopUpContext';
+import { useDialog } from '@/context/DialogContext';
 import { InputEmail, InputPassword } from "@/components/common/inputs";
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import { loginAction } from '@/app/acciones/UsuariosActions'; // Import Server Action
@@ -17,6 +17,7 @@ function SubmitButton() {
     <BotonGeneral
       type="submit"
       disabled={pending} // Disable button while pending
+      variant="secondary"
     >
       {pending ? 'Iniciando Sesión...' : 'Iniciar Sesión'}
     </BotonGeneral>
@@ -34,7 +35,7 @@ const initialState = {
 };
 
 function FormLogin() {
-  const { showPopUp } = usePopUp();
+  const { showPopUp } = useDialog();
   const router = useRouter();
 
   // Usar useActionState para manejar el estado de la acción
@@ -42,12 +43,12 @@ function FormLogin() {
 
   // Efecto para manejar la respuesta de la Server Action y llamar a signIn
   useEffect(() => {
-    console.log('Frontend Login: State changed:', state);
+    // console.log('Frontend Login: State changed:', state);
     
     // If the server action was successful and indicates readiness for client-side signIn
     if (state.success && state.data?.readyForSignIn && state.data?.email && state.data?.password) { // Access data from state.data
-      console.log('Frontend Login: Datos recibidos de Server Action, intentando signIn.');
-      console.log('Frontend Login: User role from state:', state.data.userRole); // Access userRole from state.data
+      // console.log('Frontend Login: Datos recibidos de Server Action, intentando signIn.');
+      // console.log('Frontend Login: User role from state:', state.data.userRole); // Access userRole from state.data
       
       const handleSignIn = async () => {
         const result = await signIn('credentials', {
@@ -56,25 +57,27 @@ function FormLogin() {
           redirect: false,
         });
 
-        console.log('Frontend Login: Resultado de signIn:', result);
+        // console.log('Frontend Login: Resultado de signIn:', result);
 
         if (result.error) {
-          console.log('Frontend Login: Error en signIn:', result.error);
-          showPopUp('Credenciales incorrectas', 'error');
+          // Si signIn falla, siempre usamos el mensaje que viene de la Server Action (state.message)
+          // Si state.message es null (lo cual no debería pasar si loginAction devuelve un mensaje),
+          // entonces usamos un mensaje genérico de fallback.
+          showPopUp(state.message || 'Credenciales incorrectas', 'error');
         } else {
-          console.log('Frontend Login: Inicio de sesión exitoso.');
-          console.log('Frontend Login: Verificando rol para redirección:', state.data.userRole); // Access userRole from state.data
+          // console.log('Frontend Login: Inicio de sesión exitoso.');
+          // console.log('Frontend Login: Verificando rol para redirección:', state.data.userRole); // Access userRole from state.data
           showPopUp('¡Inicio de sesión exitoso!', 'success');
           
           // Redirección basada en el rol del usuario
           if (state.data.userRole === 'ADMINISTRADOR') { // Access userRole from state.data
-            console.log('Frontend Login: Redirigiendo administrador al panel de admin.');
+            // console.log('Frontend Login: Redirigiendo administrador al panel de admin.');
             router.push('/admin');
           } else if (state.data.userRole === 'PROVEEDOR') { // Access userRole from state.data
-            console.log('Frontend Login: Redirigiendo proveedor a la lista de pedidos.');
+            // console.log('Frontend Login: Redirigiendo proveedor a la lista de pedidos.');
             router.push('/proveedor/pedidos');
           } else {
-            console.log('Frontend Login: Redirigiendo cliente al catálogo. Rol actual:', state.data.userRole); // Access userRole from state.data
+            // console.log('Frontend Login: Redirigiendo cliente al catálogo. Rol actual:', state.data.userRole); // Access userRole from state.data
             router.push('/catalogo');
           }
         }
@@ -120,7 +123,7 @@ function FormLogin() {
 
       <div className="text-center mt-5">
         <p className="mb-4">¿No tienes una cuenta?</p>
-        <BotonGeneral type="button" onClick={() => { console.log('Attempting to redirect to /registro'); router.push('/registro'); }}>
+        <BotonGeneral type="button" onClick={() => { console.log('Attempting to redirect to /registro'); router.push('/registro'); }} variant="secondary">
           Regístrate ahora
         </BotonGeneral>
       </div>

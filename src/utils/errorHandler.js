@@ -1,16 +1,27 @@
 import { NextResponse } from 'next/server';
 import logger from './logger';
 
-export const handleError = (error, message = 'An unexpected error occurred', status = 500) => {
+export const handleError = (error, message = 'An unexpected error occurred', status = 500, formData = null) => {
     logger.error(message, error);
-    // Ensure that the returned object is a plain JavaScript object
-    return {
+    const errorResponse = {
         success: false,
-        message: error.message || message,
+        message: (error instanceof Error) ? error.message : message, // Asegura que siempre haya un mensaje
         statusCode: error.statusCode || status,
-        // Optionally, include more details if needed, ensuring they are serializable
-        details: error.details || null, 
+        details: error.details || null,
     };
+
+    if (formData) {
+        const dataToReturn = {};
+        for (let [key, value] of formData.entries()) {
+            if (key !== 'password' && key !== 'confirmPassword') {
+                dataToReturn[key] = value;
+            }
+        }
+        errorResponse.formData = dataToReturn;
+    }
+
+    // Return a plain JavaScript object instead of NextResponse.json
+    return errorResponse;
 };
 
 export class CustomError extends Error {

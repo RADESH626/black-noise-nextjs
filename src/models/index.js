@@ -1,17 +1,17 @@
-import Design from './Design';
-import Pago from './Pago';
-import Pedido from './Pedido';
-import Proveedor from './Proveedor';
-import Usuario from './Usuario';
-import Venta from './Venta';
-import Cart from './Cart';
+import getDesignModel from './Design';
+import getPagoModel from './Pago';
+import getPedidoModel from './Pedido';
+import getProveedorModel from './Proveedor';
+import getUsuarioModel from './Usuario';
+import getVentaModel from './Venta';
+import getCartModel from './Cart';
 
 export {
-  Design,
-  Pago,
-  Pedido,
-  Proveedor,
-  Usuario,
-  Venta,
-  Cart,
+  getDesignModel,
+  getPagoModel,
+  getPedidoModel,
+  getProveedorModel,
+  getUsuarioModel,
+  getVentaModel,
+  getCartModel,
 };

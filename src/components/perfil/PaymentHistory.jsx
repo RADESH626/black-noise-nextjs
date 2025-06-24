@@ -2,50 +2,126 @@ import React from 'react';
 
 function PaymentHistory({ payments }) {
   if (!payments || payments.length === 0) {
-    return <p className="text-center text-gray-300">No hay historial de pagos disponible.</p>;
+    return (
+      <p style={{ textAlign: "center", color: "#D1D5DB" }}>
+        No hay historial de pagos disponible.
+      </p>
+    );
   }
 
   return (
-    <div className="bg-black p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4 text-white">Historial de Pagos</h2>
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-black">
+    <div
+      style={{
+        backgroundColor: "#f5f5f5",
+        padding: "1.5rem",
+        borderRadius: "0.5rem",
+        boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+      }}
+    >
+      <h2
+        style={{
+          fontSize: "1.5rem",
+          fontWeight: "bold",
+          marginBottom: "1rem",
+          color: "#000000FF",
+        }}
+      >
+        Historial de Pagos
+      </h2>
+      <div style={{ overflowX: "auto" }}>
+        <table style={{ minWidth: "100%", backgroundColor: "#000000FF" }}>
           <thead>
-            <tr>
-              <th className="py-2 px-4 border-b border-gray-700 bg-gray-900 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                Fecha
-              </th>
-              <th className="py-2 px-4 border-b border-gray-700 bg-gray-900 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                Valor
-              </th>
-              <th className="py-2 px-4 border-b border-gray-700 bg-gray-900 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                Método
-              </th>
-              <th className="py-2 px-4 border-b border-gray-700 bg-gray-900 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                Estado
-              </th>
-              <th className="py-2 px-4 border-b border-gray-700 bg-gray-900 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                Pedido ID
-              </th>
+            <tr style={{ backgroundColor: "#FFFFFFFF" }}>
+              {["Fecha", "Valor", "Método", "Estado", "Pedido ID", "Motivo"].map((text) => (
+                <th
+                  key={text}
+                  style={{
+                    padding: "0.5rem 1rem",
+                    borderBottom: "1px solid #000000FF",
+                    textAlign: "left",
+                    fontSize: "0.75rem",
+                    fontWeight: "600",
+                    color: "#000000FF",  //NOMBRES 
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                  }}
+                >
+                  {text}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {payments.map((payment) => (
-              <tr key={payment._id} className="hover:bg-gray-800">
-                <td className="py-2 px-4 border-b border-gray-700 text-sm text-gray-200">
-                  {new Date(payment.fechaRealizacion).toLocaleDateString()}
+              <tr
+                key={payment._id}
+                style={{ backgroundColor: "#FFFFFFFF" }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = "#FFFFFFFF";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = "#FFFFFFFF";
+                }}
+              >
+                <td
+                  style={{
+                    padding: "0.5rem 1rem",
+                    borderBottom: "1px solid #030303FF",
+                    fontSize: "0.875rem",
+                    color: "#000000FF",
+                  }}
+                >
+                  {new Date(payment.createdAt).toLocaleDateString()}
                 </td>
-                <td className="py-2 px-4 border-b border-gray-700 text-sm text-gray-200">
+                <td
+                  style={{
+                    padding: "0.5rem 1rem",
+                    borderBottom: "1px solid #000000FF",
+                    fontSize: "0.875rem",
+                    color: "#000000FF",
+                  }}
+                >
                   ${payment.valorPago.toFixed(2)}
                 </td>
-                <td className="py-2 px-4 border-b border-gray-700 text-sm text-gray-200">
+                <td
+                  style={{
+                    padding: "0.5rem 1rem",
+                    borderBottom: "1px solid #000000FF",
+                    fontSize: "0.875rem",
+                    color: "#000000FF",
+                  }}
+                >
                   {payment.metodoPago}
                 </td>
-                <td className="py-2 px-4 border-b border-gray-700 text-sm text-gray-200">
+                <td
+                  style={{
+                    padding: "0.5rem 1rem",
+                    borderBottom: "1px solid #000000FF",
+                    fontSize: "0.875rem",
+                    color: "#000000FF",
+                  }}
+                >
                   {payment.estadoTransaccion}
                 </td>
-                <td className="py-2 px-4 border-b border-gray-700 text-sm text-gray-200">
-                  {payment.pedidoId ? payment.pedidoId._id : 'N/A'}
+                <td
+                  style={{
+                    padding: "0.5rem 1rem",
+                    borderBottom: "1px solid #000000FF",
+                    fontSize: "0.875rem",
+                    color: "#000000FF",
+                  }}
+                >
+                  {payment.pedidoId}
+                </td>
+                <td
+                  style={{
+                    padding: "0.5rem 1rem",
+                    borderBottom: "1px solid #000000FF",
+                    fontSize: "0.875rem",
+                    color: "#000000FF",
+                  }}
+                >
+                  {payment.motivo || 'N/A'}
                 </td>
               </tr>
             ))}

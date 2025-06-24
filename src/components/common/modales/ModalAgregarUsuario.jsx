@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from 'react';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import { useActionState } from 'react'; // For React 19
 import { useFormStatus } from 'react-dom'; // For React 19
-import { usePopUp } from '@/context/PopUpContext';
+import { useDialog } from '@/context/DialogContext';
 import { bulkUploadUsersAction } from '@/app/acciones/UsuariosActions'; // Import the Server Action
 
 // Submit button component for bulk upload with pending state
@@ -19,7 +19,11 @@ function BulkUploadSubmitButton() {
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
             </svg>
-            {pending ? "Cargando..." : "Carga Masiva"}
+            {pending ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+            ) : (
+                "Carga Masiva"
+            )}
         </BotonGeneral>
     );
 }
@@ -33,7 +37,7 @@ const initialState = {
 function ModalAgregarUsuario({ isOpen, onClose, onUserAdded }) {
     const dialogRef = useRef(null);
     const fileInputRef = useRef(null);
-    const { showPopUp } = usePopUp();
+    const { showPopUp } = useDialog();
 
     const [state, formAction] = useActionState(bulkUploadUsersAction, initialState);
 

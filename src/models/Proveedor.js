@@ -2,8 +2,33 @@ import { Schema, model, models } from 'mongoose'
 import { Disponibilidad } from './enums/proveedor/Disponibilidad'
 import { CategoriaProducto } from './enums/CategoriaProducto'
 import { MetodoPago } from './enums/pago'
+import connectDB from '@/utils/DBconection';
+
+let mongoose;
+
+async function getMongoose() {
+  if (!mongoose) {
+    const { mongoose: mongooseInstance } = await connectDB();
+    mongoose = mongooseInstance;
+  }
+  return mongoose;
+}
 
 const ProveedorSchema = new Schema({
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Usuario',
+        required: true,
+        unique: true
+    },
+    activeOrders: {
+        type: Number,
+        default: 0
+    },
+    lastAssignedAt: {
+        type: Date,
+        default: null
+    },
     nombreEmpresa: {
         type: String,
         required: true
@@ -17,10 +42,6 @@ const ProveedorSchema = new Schema({
         type: String,
         required: true
     },
-    nombreDueño: {
-        type: String,
-        required: true
-    },
     emailContacto: {
         type: String,
         required: true
@@ -29,16 +50,11 @@ const ProveedorSchema = new Schema({
         type: String,
         required: true
     },
-    accessKey: {
-        type: String,
-        unique: true,
-        sparse: true // Allows null values to not violate the unique constraint
-    },
-    especialidad: {
+    especialidad: [{
         type: String,
         enum: Object.values(CategoriaProducto),
         required: true
-    },
+    }],
     disponibilidad: {
         type: String,
         enum: Object.values(Disponibilidad),
@@ -52,17 +68,18 @@ const ProveedorSchema = new Schema({
         type: Number,
         required: true
     },
-    permisosDetallesCredito: {
-        type: Boolean,
-        default: false
-    },
     habilitado: {
         type: Boolean,
         default: true
     }
-},{
+}, {
     timestamps: true
 })
 
+
 // Check if the model exists before creating a new one
-export default models.Proveedor || model('Proveedor', ProveedorSchema)
+
+export default async function getProveedorModel() {
+  const mongooseInstance = await getMongoose();
+  return mongooseInstance.models.Proveedor || model('Proveedor', ProveedorSchema);
+}

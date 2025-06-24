@@ -1,77 +1,137 @@
-'use client';
-import React, { useEffect, useState } from "react";
+"use client";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import SeccionHeader from '../secciones/acciones/SeccionHeader';
-import { obtenerPedidos } from '@/app/acciones/PedidoActions'; // Import the action to get all orders
+import { obtenerPedidos } from '@/app/acciones/PedidoActions';
+import Loader from '@/components/Loader';
+import BotonExportarPDF from '@/components/common/botones/BotonExportarPDF'; // Import BotonExportarPDF
+import PedidoFilters from '@/components/admin/filters/PedidoFilters'; // Importar el componente de filtros
+import { useRouter, useSearchParams } from 'next/navigation';
+import PedidoCard from '@/components/common/PedidoCard'; // Importar PedidoCard
 
 export default function PedidosDashboard() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [filteredPedidos, setFilteredPedidos] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1); // Ahora se obtiene del backend si se implementa paginación en el backend
+  const pedidosPerPage = 12; // Mantener el límite por defecto o hacerlo configurable
+  const [expandedOrders, setExpandedOrders] = useState(new Set()); // Estado para controlar la expansión de pedidos
+  const [expandedDesigns, setExpandedDesigns] = useState(new Set()); // Estado para controlar la expansión de diseños dentro de pedidos
+
+  const currentFilters = useMemo(() => ({
+    estadoPedido: searchParams.get('estadoPedido') || undefined,
+    estadoPago: searchParams.get('estadoPago') || undefined,
+    metodoEntrega: searchParams.get('metodoEntrega') || undefined,
+    proveedorId: searchParams.get('proveedorId') || undefined,
+    usuarioCompradorId: searchParams.get('usuarioCompradorId') || undefined,
+    valorTotalMin: searchParams.get('valorTotalMin') || undefined,
+    valorTotalMax: searchParams.get('valorTotalMax') || undefined,
+    fechaPedidoStart: searchParams.get('fechaPedidoStart') || undefined,
+    fechaPedidoEnd: searchParams.get('fechaPedidoEnd') || undefined,
+    pedidoCancelado: searchParams.get('pedidoCancelado') === 'true' ? true : (searchParams.get('pedidoCancelado') === 'false' ? false : undefined),
+    pedidoRefabricado: searchParams.get('pedidoRefabricado') === 'true' ? true : (searchParams.get('pedidoRefabricado') === 'false' ? false : undefined),
+    searchText: searchParams.get('searchText') || undefined,
+  }), [searchParams]);
 
   useEffect(() => {
     const fetchPedidos = async () => {
       setLoading(true);
       setError(null);
-      const { pedidos: fetchedPedidos, error: fetchError } = await obtenerPedidos();
+      // Pasar los filtros y la paginación a la acción del servidor
+      const { pedidos: fetchedPedidos, totalPedidos, totalPages: fetchedTotalPages, error: fetchError } = await obtenerPedidos({
+        ...currentFilters,
+        page: currentPage,
+        limit: pedidosPerPage,
+      });
+
+      console.log("PedidosDashboard: fetchedPedidos", fetchedPedidos);
+      console.log("PedidosDashboard: totalPedidos", totalPedidos);
+      console.log("PedidosDashboard: fetchedTotalPages", fetchedTotalPages);
+      console.log("PedidosDashboard: fetchError", fetchError);
+
       if (fetchError) {
         setError({ message: fetchError });
         setPedidos([]);
+        setTotalPages(1);
       } else {
         setPedidos(fetchedPedidos || []);
+        // Si el backend no devuelve totalPages, calcularlo aquí
+        setTotalPages(fetchedTotalPages || Math.ceil((fetchedPedidos?.length || 0) / pedidosPerPage));
       }
       setLoading(false);
     };
 
     fetchPedidos();
+  }, [currentPage, currentFilters, pedidosPerPage]);
+
+  const handleToggleExpand = useCallback((pedidoId) => {
+    setExpandedOrders(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(pedidoId)) {
+        newSet.delete(pedidoId);
+      } else {
+        newSet.add(pedidoId);
+      }
+      return newSet;
+    });
   }, []);
 
-  useEffect(() => {
-    const filterPedidos = () => {
-      const filtered = pedidos.filter(pedido => {
-        const userEmail = pedido.userId?.email ? pedido.userId.email.toLowerCase() : '';
-        const pedidoId = pedido._id.toLowerCase();
-        const lowerCaseSearchTerm = searchTerm.toLowerCase();
+  const handleToggleDesignExpand = useCallback((designId) => {
+    setExpandedDesigns(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(designId)) {
+        newSet.delete(designId);
+      } else {
+        newSet.add(designId);
+      }
+      return newSet;
+    });
+  }, []);
 
-        const matchesSearchTerm = userEmail.includes(lowerCaseSearchTerm) || pedidoId.includes(lowerCaseSearchTerm);
+  const handleApplyFilters = useCallback((filters) => {
+    const params = new URLSearchParams(searchParams);
+    Object.keys(filters).forEach(key => {
+      if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
+        params.set(key, filters[key]);
+      } else {
+        params.delete(key);
+      }
+    });
+    router.push(`/admin/pedidos?${params.toString()}`);
+    setCurrentPage(1); // Reiniciar a la primera página al aplicar filtros
+  }, [router, searchParams]);
 
-        const pedidoDate = new Date(pedido.createdAt);
-        const start = startDate ? new Date(startDate) : null;
-        const end = endDate ? new Date(endDate) : null;
+  const handleClearFilters = useCallback(() => {
+    router.push('/admin/pedidos');
+    setCurrentPage(1); // Reiniciar a la primera página al limpiar filtros
+  }, [router]);
 
-        const matchesDateRange = (!start || pedidoDate >= start) && (!end || pedidoDate <= end);
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
 
-        return matchesSearchTerm && matchesDateRange;
-      });
-      setFilteredPedidos(filtered);
-    };
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
 
-    filterPedidos();
-  }, [pedidos, searchTerm, startDate, endDate]);
-
+  // PDF Export Mappers
   if (loading) {
-    return (
-      <>
-        <SeccionHeader>
-          <h4 className='font-bold text-2xl text-black'>Gestión de Pedidos</h4>
-        </SeccionHeader>
-        <div className="min-h-full flex justify-center items-center text-gray-400">
-          Cargando pedidos...
-        </div>
-      </>
-    );
+    return <Loader />;
   }
 
   if (error) {
     return (
       <>
         <SeccionHeader>
-          <h4 className='font-bold text-2xl text-black'>Gestión de Pedidos</h4>
+          <h4 className='font-bold text-2xl' style={{ color: '#000000' }}>Gestión de Pedidos</h4>
         </SeccionHeader>
-        <div className="min-h-full flex justify-center items-center text-red-500">
+        <div className="min-h-full flex justify-center items-center" style={{ color: '#EF4444' }}>
           Error al cargar pedidos: {error.message}
         </div>
       </>
@@ -82,9 +142,9 @@ export default function PedidosDashboard() {
     return (
       <>
         <SeccionHeader>
-          <h4 className='font-bold text-2xl text-black'>Gestión de Pedidos</h4>
+          <h4 className='font-bold text-2xl' style={{ color: '#000000' }}>Gestión de Pedidos</h4>
         </SeccionHeader>
-        <div className="min-h-full flex justify-center items-center text-gray-400">
+        <div className="min-h-full flex justify-center items-center" style={{ color: '#9CA3AF' }}>
           No hay pedidos para mostrar.
         </div>
       </>
@@ -94,81 +154,61 @@ export default function PedidosDashboard() {
   return (
     <>
       <SeccionHeader>
-        <h4 className='font-bold text-2xl text-black'>Gestión de Pedidos</h4>
+        <h4 className='font-bold text-2xl' style={{ color: '#000000' }}>Gestión de Pedidos</h4>
       </SeccionHeader>
-      <div className="mt-4 p-4 bg-white rounded-lg shadow-md flex flex-wrap gap-4">
-        <input
-          type="text"
-          placeholder="Buscar por usuario o ID de pedido"
-          className="p-2 border border-gray-300 rounded-md flex-grow"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <input
-          type="date"
-          className="p-2 border border-gray-300 rounded-md"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        />
-        <span className="self-center text-gray-500">-</span>
-        <input
-          type="date"
-          className="p-2 border border-gray-300 rounded-md"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
+
+      <div className="flex justify-end mb-4">
+        <BotonExportarPDF 
+            data={pedidos} 
+            reportTitle="Reporte de Pedidos" 
+            tableHeaders={[
+              'ID Pedido', 'Nombre Usuario', 'Email Usuario', 'Valor Total', 'Estado Pedido', 'Fecha Pedido'
+            ]} 
+            tableBodyMapper={(pedido) => [
+              pedido._id || 'N/A',
+              pedido.userName || 'N/A',
+              pedido.userEmail || 'N/A',
+              `$${typeof pedido.total === 'number' ? pedido.total.toFixed(2) : '0.00'}`,
+              pedido.estadoPedido || 'N/A',
+              pedido.createdAt ? new Date(pedido.createdAt).toLocaleDateString() : 'N/A'
+            ]} 
         />
       </div>
-      <div className="overflow-x-auto bg-white rounded-lg shadow-md mt-4">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                ID Pedido
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Nombre Usuario
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Email Usuario
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Valor Total
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Estado Pedido
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Fecha Pedido
-              </th>
-              {/* Add more headers for other relevant fields */}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {filteredPedidos.map((pedido) => (
-              <tr key={pedido._id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {pedido._id}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {pedido.userId ? pedido.userId.nombre : 'N/A'} {/* Display user name */}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {pedido.userId ? pedido.userId.email : 'N/A'} {/* Display user email */}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ${typeof pedido.valorPedido === 'number' ? pedido.valorPedido.toFixed(2) : '0.00'}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {pedido.estadoPago}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {pedido.createdAt ? new Date(pedido.createdAt).toLocaleDateString() : 'N/A'} {/* Display order date */}
-                </td>
-                {/* Add more cells for other relevant fields */}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <PedidoFilters onApplyFilters={handleApplyFilters} onClearFilters={handleClearFilters} initialFilters={currentFilters} />
+
+      <main className="grid grid-cols-1 gap-6 mt-8">
+        {pedidos.map((pedido) => (
+          <PedidoCard
+            key={pedido._id}
+            pedido={pedido}
+            userRole="admin"
+            expandedOrders={expandedOrders}
+            handleToggleExpand={handleToggleExpand}
+            expandedDesigns={expandedDesigns}
+            handleToggleDesignExpand={handleToggleDesignExpand}
+          />
+        ))}
+      </main>
+
+      {/* Paginación */}
+      <div className="flex justify-center items-center mt-6 space-x-4">
+        <button
+          onClick={prevPage}
+          disabled={currentPage === 1}
+          className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded disabled:opacity-50"
+        >
+          Anterior
+        </button>
+        <span className="text-gray-700 font-medium">
+          Página {currentPage} de {totalPages}
+        </span>
+        <button
+          onClick={nextPage}
+          disabled={currentPage === totalPages}
+          className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded disabled:opacity-50"
+        >
+          Siguiente
+        </button>
       </div>
     </>
   );

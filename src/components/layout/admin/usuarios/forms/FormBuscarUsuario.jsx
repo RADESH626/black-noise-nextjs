@@ -2,10 +2,10 @@
 import { useEffect } from "react";
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
-import { usePopUp } from '@/context/PopUpContext';
+import { useDialog } from '@/context/DialogContext';
 import { FiltrarUsuarios } from '@/app/acciones/UsuariosActions';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
-import Input from '@/components/common/inputs/InputGeneral';
+import InputGeneral from '@/components/common/inputs/InputGeneral';
 
 function SubmitButton({ customText = 'Buscar' }) {
   const { pending } = useFormStatus();
@@ -23,7 +23,7 @@ const initialState = {
 };
 
 function FormBuscarUsuario({ onSearchSuccess }) {
-  const { showPopUp } = usePopUp();
+  const { showPopUp } = useDialog();
   const [state, formAction] = useActionState(FiltrarUsuarios, initialState);
 
   useEffect(() => {
@@ -36,24 +36,28 @@ function FormBuscarUsuario({ onSearchSuccess }) {
   }, [state, showPopUp, onSearchSuccess]);
 
   return (
-    <form action={formAction} className="space-y-5 text-white">
+    <form action={formAction} className="space-y-5 text-[#FFFFFF]">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
-          <label htmlFor="searchText" className="block mb-1 text-sm font-medium text-purple-400">
+          <label
+            htmlFor="searchText"
+            className="block mb-1 text-sm font-medium"
+            style={{ color: '#FFFFFFFF' }}
+          >
             Buscar Usuario
           </label>
-          <Input
+          <InputGeneral
             type="text"
             id="searchText"
             name="searchText"
             placeholder="Nombre, correo, documento..."
-            className="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50"
+            className="w-full p-2 rounded bg-[#374151] border border-[#ffffff] focus:border-[#8a8c94] focus:ring focus:ring-[#ffffff] focus:ring-opacity-50"
           />
         </div>
       </div>
       <SubmitButton />
     </form>
   );
-  }
+}
 
 export default FormBuscarUsuario;

@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ObtenerPedidoPorId } from "@/app/acciones/PedidoActions"; // Import the server action
+import { getPedidoById } from "@/app/acciones/PedidoActions"; // Import the server action
 import DesignImageDisplay from "@/components/common/DesignImageDisplay"; // Import for displaying images
 
-export default function Confirmacion() {
+import { Suspense } from 'react';
+
+function ConfirmacionContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pedidoId = searchParams.get('pedidoId');
@@ -25,13 +27,13 @@ export default function Confirmacion() {
 
       setLoading(true);
       setError(null);
-      const { success, pedido: fetchedPedido, message } = await ObtenerPedidoPorId(pedidoId);
+      const result = await getPedidoById(pedidoId);
 
-      if (success) {
-        setPedido(fetchedPedido);
+      if (result && !result.error) {
+        setPedido(result);
       } else {
-        setError(message || "Error al cargar los detalles del pedido.");
-        console.error("Error fetching order:", message);
+        setError(result ? result.error : "Error al cargar los detalles del pedido.");
+        console.error("Error fetching order:", result ? result.error : "Unknown error");
         router.push("/perfil"); // Redirect on error
       }
       setLoading(false);
@@ -117,5 +119,13 @@ export default function Confirmacion() {
 
       <p className="mt-8 text-lg text-center">Redirigiendo a tu perfil en breve...</p>
     </div>
+  );
+}
+
+export default function ConfirmacionPage() {
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <ConfirmacionContent />
+    </Suspense>
   );
 }

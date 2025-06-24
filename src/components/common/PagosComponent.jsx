@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { obtenerPagosPorUsuarioId } from '@/app/acciones/PagoActions';
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
+import Loader from '@/components/Loader';
 
 const PagosComponent = ({ userId }) => {
   const [pagos, setPagos] = useState([]);
@@ -36,7 +38,7 @@ const PagosComponent = ({ userId }) => {
   }, [userId]);
 
   if (loading) {
-    return <div className="text-center py-4">Cargando historial de compras...</div>;
+    return <Loader />;
   }
 
   if (error) {
@@ -60,12 +62,13 @@ const PagosComponent = ({ userId }) => {
                 className="w-full h-full object-cover"
               />
               <div className="absolute top-0 right-0 m-3">
-                <button
+                <BotonGeneral
                   onClick={() => alert(`Ver detalles del pago: ${pago._id}`)}
-                  className="bg-white text-purple-700 font-semibold py-1 px-4 rounded-md text-sm hover:bg-gray-200 transition duration-150"
+                  variant="info"
+                  className="py-1 px-4 text-sm"
                 >
                   VER DETALLES
-                </button>
+                </BotonGeneral>
               </div>
             </div>
             <div className="p-4 gradient-text-bg flex justify-between items-center text-white">

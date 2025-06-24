@@ -31,6 +31,13 @@ module.exports = {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        "gradient-hero": "linear-gradient(to bottom, #000000, #0A1828, #000000)",
+        "gradient-section": "linear-gradient(to bottom, #000000, #1f2937, #000000 )",
+        "gradient-primary-button": "var(--gradient-primary)",
+        "gradient-secondary-button": "var(--gradient-secondary)",
+        "gradient-danger-button": "var(--gradient-danger)",
+        "gradient-success-button": "var(--gradient-success)",
+        "gradient-info-button": "var(--gradient-info)",
       },
     },
   },

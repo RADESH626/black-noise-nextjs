@@ -1,11 +1,12 @@
 'use client'
 import React, { useState } from 'react';
+import { MetodoPago } from '../../models/enums/pago/MetodoPago';
 
 function PaymentForm({ handlePago }) {
   const [nombre, setNombre] = useState("");
   const [correo, setCorreo] = useState("");
   const [direccion, setDireccion] = useState("");
-  const [metodoPago, setMetodoPago] = useState("tarjeta"); // Default to 'tarjeta'
+  const [metodoPago, setMetodoPago] = useState(MetodoPago.TARJETA_CREDITO); // Default to 'TARJETA_CREDITO'
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
@@ -18,7 +19,7 @@ function PaymentForm({ handlePago }) {
       return;
     }
 
-    if (metodoPago === "tarjeta") {
+    if (metodoPago === MetodoPago.TARJETA_CREDITO || metodoPago === MetodoPago.TARJETA_DEBITO) {
       if (!cardNumber || !expiryDate || !cvv) {
         setError("Por favor completa todos los campos de la tarjeta.");
         return;
@@ -42,9 +43,10 @@ function PaymentForm({ handlePago }) {
   };
 
   return (
+    
     <form
       onSubmit={handleSubmit}
-      style={{ backgroundColor: "#FFFFFFFF", padding: "1.5rem", borderRadius: "0.5rem", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", maxWidth: "28rem", margin: "0 auto" }}
+      style={{ backgroundColor: "#FFFFFFFF", padding: "1.5rem", borderRadius: "0.5rem", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", margin: "0 auto" }}
     >
       <h1 style={{ fontWeight: "600", fontSize: "1.25rem", marginBottom: "1rem" }}>
         Metodo de pago
@@ -114,12 +116,15 @@ function PaymentForm({ handlePago }) {
             marginTop: "0.25rem",
           }}
         >
-          <option value="tarjeta">Tarjeta de Crédito/Débito</option>
-          <option value="paypal">PayPal</option>
+          {Object.values(MetodoPago).map((method) => (
+            <option key={method} value={method}>
+              {method.replace(/_/g, ' ')}
+            </option>
+          ))}
         </select>
       </label>
 
-      {metodoPago === "tarjeta" && (
+      {(metodoPago === MetodoPago.TARJETA_CREDITO || metodoPago === MetodoPago.TARJETA_DEBITO) && (
         <>
           <h2 style={{ fontWeight: "600", fontSize: "1.25rem", marginBottom: "1rem", marginTop: "1rem" }}>
             Datos de la Tarjeta

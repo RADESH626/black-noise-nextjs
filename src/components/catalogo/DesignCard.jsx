@@ -1,15 +1,20 @@
 'use client'
 import React from 'react';
+import BotonGeneral from '@/components/common/botones/BotonGeneral';
 
 function DesignCard({ diseño, addItem, isInCart }) {
+  console.log('Valor de diseño.userAvatar:', diseño.userAvatar);
+  // console.log('Valor de diseño.imagen:', diseño.imagen);
+  // console.log(`DesignCard re-rendered for ${diseño.prenda}, isInCart: ${isInCart}`);
+  // console.log('Design data in DesignCard:', JSON.stringify(diseño, null, 2)); // Stringify to see full content
   return (
     <div
-      className="flex flex-col rounded-2xl overflow-hidden shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl bg-black/80"
+      className="flex flex-col rounded-2xl overflow-hidden shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl bg-black/100"
     >
       {/* Social media post header */}
       <div className="flex items-center p-4 pb-2">
         <img
-          src={diseño.userAvatar}
+          src={diseño.userAvatar || '/img/perfil/FotoPerfil.webp'}
           alt="User Avatar"
           className="w-10 h-10 rounded-full mr-3 object-cover"
         />
@@ -18,7 +23,11 @@ function DesignCard({ diseño, addItem, isInCart }) {
 
       <div className="w-full h-64 flex items-center justify-center bg-black overflow-hidden">
         <img
-          src={diseño.imagen || '/next.svg'}
+          src={
+            diseño.imagen 
+            || 
+            '/next.svg'
+          }
           alt={`Imagen de ${diseño.prenda}`}
           className="h-full object-contain transition-transform duration-500 ease-in-out hover:scale-110"
         />
@@ -30,19 +39,18 @@ function DesignCard({ diseño, addItem, isInCart }) {
         <p>Precio: ${diseño.price !== undefined && diseño.price !== null ? diseño.price.toFixed(2) : '0.00'}</p>
 
         <div className="flex items-center justify-end mt-2">
-          <button
-            className={`px-3 py-1 rounded transition ${
-              isInCart ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
-            }`}
+          <BotonGeneral
+            variant="secondary"
             onClick={() => addItem(diseño)}
             disabled={isInCart}
+            className="px-3 py-1"
           >
             {isInCart ? 'En el carrito' : 'Añadir al carrito'}
-          </button>
+          </BotonGeneral>
         </div>
       </div>
     </div>
   );
 }
 
-export default DesignCard;
+export default React.memo(DesignCard);

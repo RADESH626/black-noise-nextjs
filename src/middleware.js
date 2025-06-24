@@ -5,7 +5,7 @@ export async function middleware(req) {
   const pathname = req.nextUrl.pathname;
 
   // Define paths that do NOT require authentication
-  const publicPaths = ["/login", "/registro", "/api/email", "/api/auth"];
+  const publicPaths = ["/", "/login", "/registro","/api/auth"];
 
   // Check if the current path is a public path
   const isPublicPath = publicPaths.some(path => pathname.startsWith(path));
@@ -35,7 +35,11 @@ export async function middleware(req) {
   }
 
   // Allow access if authenticated and no specific redirection is needed
-  return NextResponse.next();
+  const res = NextResponse.next();
+  res.headers.set('Access-Control-Allow-Origin', '*');
+  res.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+  return res;
 }
 
 export const config = {

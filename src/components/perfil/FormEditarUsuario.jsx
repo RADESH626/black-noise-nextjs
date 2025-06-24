@@ -2,9 +2,10 @@
 import { useEffect, useState } from "react";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { usePopUp } from "@/context/PopUpContext";
+import { useDialog } from "@/context/DialogContext";
 import BotonGeneral from "@/components/common/botones/BotonGeneral"; // Assuming this component exists
 import { updateUserAction } from "@/app/acciones/UsuariosActions"; // Import the server action
+import Image from "next/image"; // Import Image component
 
 // Submit button component with pending state
 function SubmitButton({ customText = "Guardar Cambios" }) {
@@ -23,7 +24,7 @@ const initialState = {
 };
 
 function FormEditarUsuario({ userData, userId, onSuccess }) {
-  const { showPopUp } = usePopUp();
+  const { showPopUp } = useDialog();
   const [state, formAction] = useActionState(updateUserAction.bind(null, userId), initialState);
 
   // State for form fields, initialized with userData
@@ -41,12 +42,14 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
     correo: userData?.correo || "",
     rol: userData?.rol || "", // Assuming rol can be edited or needs to be passed
   });
+  const [profileImageFile, setProfileImageFile] = useState(null);
+  const [profileImagePreview, setProfileImagePreview] = useState(userData?.profileImageUrl || "/img/perfil/FotoPerfil.webp"); // Default image if none exists
 
   useEffect(() => {
     if (state.message) {
       showPopUp(state.message, state.success ? "success" : "error");
       if (state.success && onSuccess) {
-        onSuccess();
+        onSuccess(state.data); // Pass the updated user data
       }
     }
   }, [state, showPopUp, onSuccess]);
@@ -59,11 +62,54 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
     }));
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProfileImageFile(file);
+      setProfileImagePreview(URL.createObjectURL(file));
+    } else {
+      setProfileImageFile(null);
+      setProfileImagePreview(userData?.profileImageUrl || "/img/perfil/FotoPerfil.webp");
+    }
+  };
+
+  const handleSubmit = (event) => {
+    const data = new FormData(event.target);
+    if (profileImageFile) {
+      data.append('profileImage', profileImageFile);
+    }
+    formAction(data);
+  };
+
   return (
-    <form action={formAction} className="space-y-5 text-white">
+    <form action={handleSubmit} className="space-y-5 text-black">
+      {/* Profile Image Preview */}
+      <div className="flex flex-col items-center mb-6">
+        <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-gray-600 mb-4">
+          <Image
+            src={profileImagePreview}
+            alt="Profile Preview"
+            layout="fill"
+            objectFit="cover"
+            className="rounded-full"
+          />
+        </div>
+        <label htmlFor="profileImage" className="cursor-pointer bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out">
+          Cambiar Imagen de Perfil
+        </label>
+        <input
+          type="file"
+          id="profileImage"
+          name="profileImage"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={handleImageChange}
+          className="hidden"
+        />
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
-          <label htmlFor="tipoDocumento" className="block mb-1 text-sm font-medium text-purple-400">
+          <label htmlFor="tipoDocumento" className="block mb-1 text-sm font-medium ">
             Tipo de Documento
           </label>
           <select
@@ -71,7 +117,7 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
             name="tipoDocumento"
             value={formData.tipoDocumento}
             onChange={handleChange}
-            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-purple-500 focus:border-purple-500"
+            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-black  focus:border-white"
             required
           >
             <option value="">Seleccione</option>
@@ -83,7 +129,7 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
         </div>
 
         <div className="relative">
-          <label htmlFor="numeroDocumento" className="block mb-1 text-sm font-medium text-purple-400">
+          <label htmlFor="numeroDocumento" className="block mb-1 text-sm font-medium ">
             Número de Documento
           </label>
           <input
@@ -92,13 +138,13 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
             name="numeroDocumento"
             value={formData.numeroDocumento}
             onChange={handleChange}
-            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-purple-500 focus:border-purple-500"
+            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-black  focus:border-white"
             required
           />
         </div>
 
         <div className="relative">
-          <label htmlFor="primerNombre" className="block mb-1 text-sm font-medium text-purple-400">
+          <label htmlFor="primerNombre" className="block mb-1 text-sm font-medium ">
             Primer Nombre
           </label>
           <input
@@ -107,13 +153,13 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
             name="primerNombre"
             value={formData.primerNombre}
             onChange={handleChange}
-            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-purple-500 focus:border-purple-500"
+            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-black  focus:border-white"
             required
           />
         </div>
 
         <div className="relative">
-          <label htmlFor="segundoNombre" className="block mb-1 text-sm font-medium text-purple-400">
+          <label htmlFor="segundoNombre" className="block mb-1 text-sm font-medium">
             Segundo Nombre
           </label>
           <input
@@ -122,12 +168,12 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
             name="segundoNombre"
             value={formData.segundoNombre}
             onChange={handleChange}
-            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-purple-500 focus:border-purple-500"
+            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-black  focus:border-white"
           />
         </div>
 
         <div className="relative">
-          <label htmlFor="primerApellido" className="block mb-1 text-sm font-medium text-purple-400">
+          <label htmlFor="primerApellido" className="block mb-1 text-sm font-medium ">
             Primer Apellido
           </label>
           <input
@@ -136,13 +182,13 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
             name="primerApellido"
             value={formData.primerApellido}
             onChange={handleChange}
-            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-purple-500 focus:border-purple-500"
+            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-black  focus:border-white"
             required
           />
         </div>
 
         <div className="relative">
-          <label htmlFor="segundoApellido" className="block mb-1 text-sm font-medium text-purple-400">
+          <label htmlFor="segundoApellido" className="block mb-1 text-sm font-medium ">
             Segundo Apellido
           </label>
           <input
@@ -151,13 +197,13 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
             name="segundoApellido"
             value={formData.segundoApellido}
             onChange={handleChange}
-            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-purple-500 focus:border-purple-500"
+            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-black  focus:border-white"
             required
           />
         </div>
 
         <div className="relative">
-          <label htmlFor="fechaNacimiento" className="block mb-1 text-sm font-medium text-purple-400">
+          <label htmlFor="fechaNacimiento" className="block mb-1 text-sm font-medium ">
             Fecha de Nacimiento
           </label>
           <input
@@ -166,13 +212,13 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
             name="fechaNacimiento"
             value={formData.fechaNacimiento}
             onChange={handleChange}
-            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-purple-500 focus:border-purple-500"
+            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-black  focus:border-white"
             required
           />
         </div>
 
         <div className="relative">
-          <label htmlFor="genero" className="block mb-1 text-sm font-medium text-purple-400">
+          <label htmlFor="genero" className="block mb-1 text-sm font-medium ">
             Género
           </label>
           <select
@@ -180,7 +226,7 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
             name="genero"
             value={formData.genero}
             onChange={handleChange}
-            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-purple-500 focus:border-purple-500"
+            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-black focus:border-white"
             required
           >
             <option value="">Seleccione</option>
@@ -191,7 +237,7 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
         </div>
 
         <div className="relative">
-          <label htmlFor="numeroTelefono" className="block mb-1 text-sm font-medium text-purple-400">
+          <label htmlFor="numeroTelefono" className="block mb-1 text-sm font-medium ">
             Número de Teléfono
           </label>
           <input
@@ -200,13 +246,13 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
             name="numeroTelefono"
             value={formData.numeroTelefono}
             onChange={handleChange}
-            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-purple-500 focus:border-purple-500"
+            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-black focus:border-white"
             required
           />
         </div>
 
         <div className="relative md:col-span-2">
-          <label htmlFor="direccion" className="block mb-1 text-sm font-medium text-purple-400">
+          <label htmlFor="direccion" className="block mb-1 text-sm font-medium ">
             Dirección
           </label>
           <input
@@ -215,13 +261,13 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
             name="direccion"
             value={formData.direccion}
             onChange={handleChange}
-            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-purple-500 focus:border-purple-500"
+            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-black focus:border-white"
             required
           />
         </div>
 
         <div className="relative">
-          <label htmlFor="correo" className="block mb-1 text-sm font-medium text-purple-400">
+          <label htmlFor="correo" className="block mb-1 text-sm font-medium">
             Correo Electrónico
           </label>
           <input
@@ -230,7 +276,7 @@ function FormEditarUsuario({ userData, userId, onSuccess }) {
             name="correo"
             value={formData.correo}
             onChange={handleChange}
-            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-purple-500 focus:border-purple-500"
+            className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:ring-black focus:border-white"
             required
           />
         </div>

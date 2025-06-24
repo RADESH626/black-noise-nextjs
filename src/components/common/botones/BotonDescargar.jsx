@@ -1,23 +1,23 @@
 "use client";
 
-
 import React from 'react';
-
+import BotonGeneral from './BotonGeneral';
 
 export function BotonDescargar({ children, onClick, type = 'button', disabled = false, className = '' }) {
     return (
-        <button
+        <BotonGeneral
             type={type}
             onClick={onClick}
             disabled={disabled}
-            className={`px-8 py-2 bg-gradient-to-r from-[#FFFFFF] to-[#3656e2] text-black font-semibold 
-            ${!disabled ? 'hover:from-[#4866ec] hover:to-[#FFFFFF]' : 'opacity-50 cursor-not-allowed'} 
-            rounded-[20px] transition duration-300 ${className}`}
+            variant="primary"
+            textColor="text-black"
+            className={`bg-gradient-to-r from-[#FFFFFF] to-[#3656e2] 
+            ${!disabled ? 'hover:from-[#4866ec] hover:to-[#FFFFFF] hover:text-white' : ''} 
+            ${className}`}
         >
             {children}
-        </button>
+        </BotonGeneral>
     );
 }
 
 export default BotonDescargar;
-

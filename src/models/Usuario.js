@@ -1,27 +1,25 @@
 import { Schema, model, models } from 'mongoose'
 import { TipoDocumentoIdentidad } from './enums/usuario/TipoDocumentoIdentidad';
 import { Rol } from './enums/usuario/Rol';
+import connectDB from '@/utils/DBconection';
+
+let mongoose;
+
+async function getMongoose() {
+    if (!mongoose) {
+        const { mongoose: mongooseInstance } = await connectDB();
+        mongoose = mongooseInstance;
+    }
+    return mongoose;
+}
 
 // Removed the `id` field causing duplicate key errors by ensuring it is not part of the schema.
 // MongoDB already provides a unique `_id` field by default.
 
 const UsuarioSchema = new Schema({
-    tipoDocumento: {
-        type: String,
-        enum: Object.values(TipoDocumentoIdentidad),
-        required: true
-    },
-    numeroDocumento: {
-        type: String,
-        required: true
-    },
-    primerNombre: {
+    Nombre: {
         type: String,
         required: true,
-        trim: true
-    },
-    segundoNombre: {
-        type: String,
         trim: true
     },
     primerApellido: {
@@ -33,17 +31,19 @@ const UsuarioSchema = new Schema({
         type: String,
         trim: true
     },
-    nombreUsuario: {
+    tipoDocumento: {
         type: String,
-        unique: true
+        enum: Object.values(TipoDocumentoIdentidad),
+    },
+    numeroDocumento: {
+        type: String,
+        required: true
     },
     fechaNacimiento: {
-        type: Date,
-        required: true
+        type: Date
     },
     genero: {
         type: String,
-        required: true,
         default: "OTRO"
     },
     numeroTelefono: {
@@ -51,8 +51,7 @@ const UsuarioSchema = new Schema({
         required: true
     },
     direccion: {
-        type: String,
-        required: true
+        type: String
     },
     correo: {
         type: String,
@@ -79,11 +78,14 @@ const UsuarioSchema = new Schema({
         type: Boolean,
         default: true
     }
-},{
+}, {
     timestamps: true
 }
 
 )
 
 // Check if the model exists before creating a new one
-export default models.Usuario || model('Usuario', UsuarioSchema)
+export default async function getUsuarioModel() {
+    const mongooseInstance = await getMongoose();
+    return mongooseInstance.models.Usuario || model('Usuario', UsuarioSchema);
+}

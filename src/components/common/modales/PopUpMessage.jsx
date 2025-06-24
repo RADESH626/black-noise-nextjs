@@ -1,51 +1,68 @@
-import React, { useEffect, useState } from 'react';
-import styles from './PopUpMessage.module.css';
+"use client";
 
-const PopUpMessage = ({ message, type, onClose }) => {
+import React, { useEffect, useRef, useState } from 'react';
+// Removed: import styles from './PopUpMessage.module.css';
+
+const PopUpMessage = ({ message, type, onClose, persistent = false }) => { // Add persistent prop
   const [isVisible, setIsVisible] = useState(true);
-
-  console.log('PopUpMessage: Component rendered with message:', message, 'type:', type, 'isVisible:', isVisible);
+  const dialogRef = useRef(null); // Ref for the dialog element
 
   useEffect(() => {
-    console.log('PopUpMessage: useEffect triggered. Setting auto-hide timer.');
-    const timer = setTimeout(() => {
-      console.log('PopUpMessage: Auto-hide timer expired. Setting isVisible to false and calling onClose.');
-      setIsVisible(false);
-      onClose();
-    }, 5000); // Auto-hide after 5 seconds (increased for debugging visibility)
+    if (isVisible) {
+      dialogRef.current?.showModal(); // Show the dialog
+    } else {
+      dialogRef.current?.close(); // Close the dialog
+    }
+
+    let timer;
+    if (!persistent) { // Only set timer if not persistent
+      timer = setTimeout(() => {
+        setIsVisible(false);
+        onClose();
+      }, 2000); // Auto-hide after 2 seconds
+    }
 
     return () => {
-      console.log('PopUpMessage: Clearing auto-hide timer.');
-      clearTimeout(timer);
+      if (timer) { // Only clear if timer was set
+        clearTimeout(timer);
+      }
     };
-  }, [onClose]);
+  }, [isVisible, onClose, persistent]); // Add persistent to dependency array
 
-  if (!isVisible) {
-    console.log('PopUpMessage: isVisible is false, returning null.');
-    return null;
-  }
+  // No need for `if (!isVisible) return null;` here, as dialogRef.current?.close() handles hiding
 
-  const popupClass = type === 'success' ? styles.popupSuccess : styles.popupError;
+  // Removed: const popupClass = type === 'success' ? styles.popupSuccess : styles.popupError;
 
   return (
-   <div className="fixed top-0 left-0 right-0 flex justify-center z-50 animate-slideDown">
-      <div className={`${popupClass} text-secondary px-6 py-4 rounded-b-lg popup-shadow min-w-[300px] max-w-[500px] mx-4 mt-0`}>
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-3 bg-green-700 p-2 rounded">
-            <span className={`text-2xl ${type === 'success' ? 'text-neutral-100' : 'text-neutral-100'}`}>
-              {type === 'success' ? '✓' : '✕'}
-            </span>
-            <p className="font-medium text-lg text-neutral-100">{message}</p>
-          </div>
+    <dialog
+      ref={dialogRef}
+      className={`
+${type === 'success' ? 'bg-green-700' : type === 'error' ? 'bg-red-700' : 'bg-gray-700'}
+        text-secondary px-6 py-4 rounded-b-lg
+        min-w-[300px] max-w-[500px] absolute top-4 left-1/2 -translate-x-1/2 z-50
+        border-0 outline-0
+      `}
+    >
+      <div className="flex justify-between items-center">
+        <div className="flex items-center space-x-3 p-2 rounded">
+          {type === 'success' && (
+            <span className="text-2xl text-neutral-100">✓</span>
+          )}
+          {type === 'error' && (
+            <span className="text-2xl text-neutral-100">✕</span>
+          )}
+          <span className="font-medium text-lg text-neutral-100">{message}</span>
+        </div>
+        {!persistent && (
           <button 
             onClick={() => { setIsVisible(false); onClose(); }} 
             className="ml-4 text-secondary hover:text-neutral-300 transition-colors duration-200"
           >
             ✕
           </button>
-        </div>
-      </div>
-    </div>
+        )}
+      </div >
+    </dialog>
   );
 };
 

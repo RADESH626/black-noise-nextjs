@@ -26,6 +26,20 @@ graph TD
 *   **Server Actions:** Utilización extensiva de Server Actions para manejar envíos de formularios y lógica de negocio del lado del servidor, reduciendo la necesidad de rutas API REST tradicionales para operaciones internas.
     *   **Estructura de Formularios:** Componentes de formulario (`"use client"`) que utilizan `useActionState` y `useFormStatus` para manejar estados de envío y retroalimentación.
     *   **Estructura de Server Actions:** Funciones asíncronas (`"use server"`) que validan datos, ejecutan lógica de negocio, manejan errores y revalidan rutas (`revalidatePath`).
+
+### Obtención de Datos Iniciales con Server Components
+
+*   **Racional:** Para la carga inicial de datos en páginas que muestran listas o colecciones de información (especialmente en dashboards administrativos), se prioriza el uso de Server Components. Esto permite que los datos se obtengan directamente en el servidor, reduciendo el JavaScript enviado al cliente y mejorando el rendimiento de la carga inicial.
+*   **Flujo:**
+    1.  **Página como Server Component:** La página principal del dashboard (ej. `src/app/admin/proveedores/page.jsx`) se define como un Server Component (sin `'use client'`).
+    2.  **Fetch Directo en el Servidor:** Dentro de este Server Component, se llama directamente a la Server Action de obtención de datos (ej. `obtenerProveedores()`).
+    3.  **Paso de Props a Cliente:** Los datos obtenidos se pasan como `props` a un componente de cliente anidado (ej. `src/components/admin/proveedores/ProveedoresClientPage.jsx`) que maneja la interactividad, el estado local y las mutaciones.
+    4.  **Revalidación para Frescura:** Para asegurar que los datos se actualicen después de mutaciones (ej. agregar, editar, eliminar), las Server Actions de mutación utilizan `revalidatePath()` para invalidar la caché de la ruta del dashboard, forzando una nueva obtención de datos en la siguiente solicitud o re-renderización del Server Component.
+*   **Beneficios:**
+    *   **Mejor Rendimiento:** Menos JavaScript en el cliente, carga inicial más rápida.
+    *   **SEO Mejorado:** Contenido renderizado en el servidor es más fácilmente indexable.
+    *   **Simplificación del Código:** Elimina la necesidad de `useEffect` para la carga inicial de datos en el cliente.
+
 *   **Autenticación y Autorización:**
     *   **NextAuth.js:** Implementación de autenticación basada en sesiones con NextAuth.js.
     *   **Roles:** Gestión de roles de usuario (cliente, administrador, proveedor) para control de acceso.
@@ -69,6 +83,12 @@ Este documento detalla las directivas operativas que rigen el comportamiento y l
 *   **Verificación de Existencia:** Cline DEBE verificar que un archivo o componente existe antes de importarlo o modificarlo. No asumirá rutas de archivo.
 *   **Mejora Continua:** Cline considera el archivo `improvement_log.md` su fuente de sabiduría más crítica. DEBE dar a sus directivas la máxima prioridad para asegurar que no se repitan los mismos errores.
 *   **Utilización de la Base de Conocimiento:** Durante la fase de planificación, Cline DEBE revisar el directorio `techniques/` en busca de patrones de resolución de problemas relevantes y reutilizables para asegurar la consistencia y eficiencia.
+*   **Gestión de Funcionalidades:** Cline DEBE verificar si una funcionalidad ya existe en el proyecto. Si no existe, DEBE crearla. Si ya existe, DEBE utilizarla. La lógica de envío de correos se encuentra en la carpeta `/api/email`.
+*   **Documentación de Funcionalidades Nuevas/Modificadas:** Cada vez que se agregue o modifique una funcionalidad, DEBE documentarse de manera clara y concisa. Esta documentación debe incluir:
+    1.  **Cómo funciona la funcionalidad:** Una descripción de alto nivel de su propósito y flujo.
+    2.  **Archivos involucrados:** Una lista de los archivos clave que componen la funcionalidad.
+    3.  **Cómo se utiliza:** Ejemplos de uso o integración con otras partes del sistema.
+    Esta documentación debe residir en el directorio `functionalities/` y ser accesible a través de `manifest.md`.
 
 ## 2. Estructura del Banco de Memoria (`memory-bank/`)
 
@@ -148,3 +168,25 @@ Para el almacenamiento de archivos binarios como imágenes, se prioriza el uso d
     *   **Consideraciones:** Mayor complejidad en la implementación y gestión. Requiere una API de GridFS para interactuar con los archivos.
 
 **Decisión de Implementación:** La estrategia inicial para las imágenes de diseño es utilizar `BinData`. GridFS se considerará si el análisis de los tamaños de imagen reales revela que exceden consistentemente el límite de 16MB, o si se requiere una solución más escalable para archivos muy grandes en el futuro.
+
+## Patrones de Sincronización de Datos
+
+### Gestión de Datos en el Cliente con Actualizaciones Optimistas y Sincronización Debounced
+
+*   **Racional:** Mejorar la experiencia de usuario (UX) y el rendimiento de las páginas con cambios iterativos, minimizando la latencia percibida y reduciendo la carga del servidor.
+*   **Flujo de Actualizaciones Optimistas:**
+    1.  **Acción del Usuario:** El usuario realiza una acción que modifica datos (ej. cambiar cantidad de un ítem en el carrito, añadir un nuevo diseño).
+    2.  **Actualización Inmediata de UI y Estado Local:** La interfaz de usuario se actualiza instantáneamente para reflejar el cambio, y el estado de los datos en el cliente (ej. un arreglo local) se modifica de inmediato.
+    3.  **Sincronización Debounced con el Servidor:** Se programa una llamada a la API para sincronizar el cambio con el servidor. Esta llamada se "debouncea", lo que significa que solo se ejecutará después de un período de inactividad del usuario (ej. 500ms-1000ms) sin más cambios en los datos relevantes. Esto evita enviar múltiples solicitudes al servidor por cambios rápidos y consecutivos.
+*   **Manejo de Errores y Rollback:**
+    *   Si la sincronización con el servidor falla (ej. error de red, validación fallida), el estado local del cliente se revertirá a su estado anterior válido, y se mostrará un mensaje de error al usuario.
+    *   Si la sincronización es exitosa, el estado local ya está actualizado, por lo que no se requiere acción adicional.
+*   **Inicialización y Caché de Datos (Optimización para Grandes Volúmenes):**
+    *   **Carga Inicial:** Para páginas que muestran grandes volúmenes de datos (ej. catálogos), se implementará **paginación** o **infinite scrolling** para cargar solo un subconjunto inicial de datos.
+    *   **Pre-renderizado:** Se considerará el uso de **Server-Side Rendering (SSR)** o **Static Site Generation (SSG)** de Next.js para la carga inicial de páginas con datos críticos, mejorando el rendimiento percibido.
+    *   **Caché Robusto:** Se utilizarán librerías de gestión de estado del servidor como **React Query (TanStack Query)** para manejar el caché de datos en el cliente, la revalidación en segundo plano y la sincronización, reduciendo significativamente las solicitudes repetidas al servidor y acelerando las cargas posteriores de la página.
+*   **Indicadores de Carga:** Se mostrarán "loading skeletons" o el componente `Loader` global mientras los datos iniciales se están cargando.
+*   **Beneficios:**
+    *   **Mejora de UX:** La interfaz de usuario se siente más rápida y reactiva.
+    *   **Reducción de Carga del Servidor:** Menos solicitudes al servidor por cambios iterativos.
+    *   **Carga de Página Más Rápida:** Aprovechamiento de la caché del cliente y estrategias de carga eficiente.
