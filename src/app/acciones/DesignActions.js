@@ -93,7 +93,7 @@ export async function guardarDesigns(prevState, formData) {
 }
 
 // Function to get all designs
-export async function obtenerDesigns(searchParams = {}) {
+export async function obtenerDesigns(page = 1, limit = 10, searchParams = {}) {
     await connectDB();
     // console.log('Entering obtenerDesigns with searchParams:', searchParams);
     try {
@@ -136,7 +136,11 @@ export async function obtenerDesigns(searchParams = {}) {
             query.tallasDisponibles = { $in: tallasDisponibles };
         }
 
+const skip = (page - 1) * limit;
+
         const designs = await Design.find(query)
+            .skip(skip)
+            .limit(limit)
             .populate({
                 path: 'usuarioId',
                 select: 'Nombre primerApellido imageData imageMimeType'

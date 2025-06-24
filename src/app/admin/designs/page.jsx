@@ -6,11 +6,13 @@ import { Suspense } from 'react';
 import DesignFilters from '@/components/admin/filters/DesignFilters';
 
 export default async function AdminDesignsPage({ searchParams }) {
+    const page = searchParams.page || 1;
+    const limit = 9; // Number of designs per page
     let designs = [];
     let error = null;
 
     try {
-        const result = await obtenerDesigns(searchParams); // Pasar searchParams directamente
+        const result = await obtenerDesigns(page, limit, searchParams); // Pasar searchParams directamente
         if (result.data) {
             designs = result.data;
         } else {

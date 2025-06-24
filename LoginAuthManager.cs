@@ -16,7 +16,7 @@ public class LoginAuthManager : MonoBehaviour
     public GameObject loadingIndicator;
 
     [Header("API Configuration")]
-    public string apiUrl = "http://4.228.49.46:3000/api/auth/login"; // Desarrollo local
+    public string apiUrl = "https://4.228.49.46:3000/api/auth/login"; // Desarrollo local
 
     void Start()
     {
@@ -75,9 +75,6 @@ public class LoginAuthManager : MonoBehaviour
             request.uploadHandler = new UploadHandlerRaw(jsonBytes);
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");
-
-            // Solución SSL para desarrollo y producción
-            request.certificateHandler = new CustomCertificateHandler();
 
             // Mostrar estado de carga
             SetLoadingState(true);
@@ -191,21 +188,6 @@ public class LoginAuthManager : MonoBehaviour
         public bool valid;
         public string message;
         public UserData userData;
-    }
-
-    // Handler personalizado para certificados
-    private class CustomCertificateHandler : CertificateHandler
-    {
-        protected override bool ValidateCertificate(byte[] certificateData)
-        {
-            // Permitir cualquier certificado en desarrollo
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-            return true;
-#else
-            // Deshabilitar la validación del certificado en producción
-            return true;
-#endif
-        }
     }
 
     public void ShowInicioPanel()

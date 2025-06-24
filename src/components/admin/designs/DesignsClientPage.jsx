@@ -12,7 +12,7 @@ import { eliminarDesign } from '@/app/acciones/DesignActions';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import DesignFilters from '@/components/admin/filters/DesignFilters'; // Importar el componente de filtros
 
-const DesignsClientPage = ({ initialDesigns, currentFilters }) => {
+const DesignsClientPage = ({ initialDesigns, initialSearchParams }) => {
     const { data: session, status } = useSession();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -20,9 +20,8 @@ const DesignsClientPage = ({ initialDesigns, currentFilters }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // Paginación
-    const [currentPage, setCurrentPage] = useState(1);
-    const designsPerPage = 9;
+    const page = parseInt(searchParams.get('page')) || 1;
+    const limit = 9;
 
     useEffect(() => {
         if (status === 'loading') return;
@@ -44,6 +43,7 @@ const DesignsClientPage = ({ initialDesigns, currentFilters }) => {
                 params.delete(key);
             }
         });
+        params.set('page', 1); // Reset to first page when applying filters
         router.push(`/admin/designs?${params.toString()}`);
         router.refresh(); // Forzar la revalidación de datos del servidor
     }, [router, searchParams]);
@@ -72,18 +72,25 @@ const DesignsClientPage = ({ initialDesigns, currentFilters }) => {
         }
     };
 
-    // Cálculo de índices de la página actual
-    const indexOfLastDesign = currentPage * designsPerPage;
-    const indexOfFirstDesign = indexOfLastDesign - designsPerPage;
-    const currentDesigns = designs.slice(indexOfFirstDesign, indexOfLastDesign);
-    const totalPages = Math.ceil(designs.length / designsPerPage);
+    const totalPages = Math.ceil(initialDesigns.length / limit);
+    const currentDesigns = initialDesigns.slice((page - 1) * limit, page * limit);
+
+    const createPageURL = (newPage) => {
+        const params = new URLSearchParams(searchParams);
+        params.set('page', newPage);
+        return `/admin/designs?${params.toString()}`;
+    };
 
     const nextPage = () => {
-        if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
+        if (page < totalPages) {
+            router.push(createPageURL(page + 1));
+        }
     };
 
     const prevPage = () => {
-        if (currentPage > 1) setCurrentPage(prev => prev - 1);
+        if (page > 1) {
+            router.push(createPageURL(page - 1));
+        }
     };
 
     if (loading) {
@@ -103,7 +110,7 @@ const DesignsClientPage = ({ initialDesigns, currentFilters }) => {
             <h1 className="text-3xl font-bold mb-6 text-gray-800">Gestión de Diseños</h1>
 
             <div className="mb-6">
-                <DesignFilters onApplyFilters={handleApplyFilters} onClearFilters={handleClearFilters} initialFilters={currentFilters} />
+                <DesignFilters onApplyFilters={handleApplyFilters} onClearFilters={handleClearFilters} initialFilters={initialSearchParams} />
             </div>
 
             {designs.length === 0 ? (
@@ -113,7 +120,7 @@ const DesignsClientPage = ({ initialDesigns, currentFilters }) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {currentDesigns.map((design) => (
                             <div key={design._id} className="bg-white shadow-md rounded-lg overflow-hidden">
-                                {design.imagen && ( // Use 'imagen' prop from formattedDesigns
+                                {design.imagen && (
                                     <Image
                                         src={design.imagen}
                                         alt={design.nombreDesing}
@@ -155,17 +162,17 @@ const DesignsClientPage = ({ initialDesigns, currentFilters }) => {
                     <div className="flex justify-center items-center mt-6 space-x-4">
                         <button
                             onClick={prevPage}
-                            disabled={currentPage === 1}
+                            disabled={page === 1}
                             className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded disabled:opacity-50"
                         >
                             Anterior
                         </button>
                         <span className="text-gray-700 font-medium">
-                            Página {currentPage} de {totalPages}
+                            Página {page} de {totalPages}
                         </span>
                         <button
                             onClick={nextPage}
-                            disabled={currentPage === totalPages}
+                            disabled={page === totalPages}
                             className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded disabled:opacity-50"
                         >
                             Siguiente
