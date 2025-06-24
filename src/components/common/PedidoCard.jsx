@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { EstadoPedido } from "@/models/enums/PedidoEnums";
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
@@ -35,6 +35,8 @@ export default function PedidoCard({
   const { showPopUp, showConfirmDialog, openModal } = useDialog();
   const [isUpdating, setIsUpdating] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
+  const cancelReasonRef = useRef(null); // Ref para el textarea
+  const [modalKey, setModalKey] = useState(0); // Nuevo estado para forzar re-render del modal
 
   // handleCostoEnvioChangeInternal ahora llama a la prop del padre
   const handleCostoEnvioChangeInternal = (value) => {
@@ -66,38 +68,20 @@ export default function PedidoCard({
     }
   };
 
-  const handleCancelarPedidoInternal = () => {
-    openModal(
-      "Cancelar Pedido",
-      (
-        <div>
-          <p className="mb-4">Por favor, especifique la razón de la cancelación para el pedido {pedido._id}:</p>
-          <textarea
-            placeholder="Escriba aquí la razón de la cancelación..."
-            className="border border-gray-700 rounded-md p-2 text-black w-full h-24"
-            value={cancelReason}
-            onChange={(e) => setCancelReason(e.target.value)}
-          />
-        </div>
-      ),
-      'default', // El tipo 'confirm' no es necesario si showActions es true
-      () => handleConfirmCancelacionInternal(),
-      () => setCancelReason(''),
-      true, // showActions
-      "Confirmar Cancelación",
-      "Volver"
+  const handleCancelarPedidoInternal = async () => {
+    const confirmed = await showConfirmDialog(
+      `¿Estás seguro de que quieres cancelar este pedido? Esta acción no se puede deshacer.`,
+      "Confirmar Cancelación"
     );
-  };
 
-  const handleConfirmCancelacionInternal = async () => {
-    if (!cancelReason.trim()) {
-      showPopUp('Por favor, especifique la razón de la cancelación.', 'error');
-      return;
-    }
-    try {
-      await onCancelarPedido(pedido._id, cancelReason.trim());
-    } finally {
-      setCancelReason('');
+    if (confirmed) {
+      try {
+        await onCancelarPedido(pedido._id, ""); // Razón vacía
+      } finally {
+        // No es necesario resetear cancelReason ya que no se usa
+      }
+    } else {
+      showPopUp("La cancelación del pedido ha sido anulada.", "info");
     }
   };
 

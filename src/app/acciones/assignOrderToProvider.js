@@ -1,6 +1,6 @@
 "use server"
 
-import Pedido from '@/models/Pedido';
+import getPedidoModel from '@/models/Pedido';
 import Usuario from '@/models/Usuario';
 import { transporter } from '@/utils/nodemailer';
 import connectDB from '@/utils/DBconection';
@@ -20,6 +20,7 @@ export async function assignOrderToProvider(order) {
   logger.debug(`Entering assignOrderToProvider for order ID: ${order._id}`);
 
   try {
+    const Pedido = await getPedidoModel(); // Obtener el modelo Pedido
     const ProveedorModel = await getModel('Proveedor'); // Obtener el modelo Proveedor
     const orderId = order._id;
 

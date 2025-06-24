@@ -14,7 +14,7 @@ import { cancelarPedido } from "@/app/acciones/PedidoActions";
 export default function PedidosClientePage({ initialPedidos }) {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { showPopUp } = useDialog();
+  const { showPopUp, showConfirmDialog } = useDialog(); // Agregado showConfirmDialog
 
   const [pedidos, setPedidos] = useState(initialPedidos);
   const [loading, setLoading] = useState(true);
@@ -24,41 +24,24 @@ export default function PedidosClientePage({ initialPedidos }) {
   const [expandedDesigns, setExpandedDesigns] = useState(new Set());
 
   const handleCancelOrder = async (pedidoId) => {
-    showPopUp({
-      title: "¿Estás seguro de que quieres cancelar este pedido?",
-      message: "Esta acción no se puede deshacer. Por favor, proporciona una razón para la cancelación.",
-      type: "confirm",
-      input: {
-        type: "textarea",
-        placeholder: "Razón de la cancelación (opcional)",
-      },
-      onConfirm: async (razon) => {
-        setLoading(true);
-        const { success, message, error } = await cancelarPedido(pedidoId, razon);
-        if (success) {
-          showPopUp({
-            title: "Pedido Cancelado",
-            message: message,
-            type: "success",
-          });
-          fetchAndSetPedidos(); // Refrescar la lista de pedidos
-        } else {
-          showPopUp({
-            title: "Error al Cancelar Pedido",
-            message: error || message || "Ocurrió un error desconocido.",
-            type: "error",
-          });
-        }
-        setLoading(false);
-      },
-      onCancel: () => {
-        showPopUp({
-          title: "Cancelación Anulada",
-          message: "La cancelación del pedido ha sido anulada.",
-          type: "info",
-        });
-      },
-    });
+    const confirmed = await showConfirmDialog(
+      "¿Estás seguro de que quieres cancelar este pedido? Esta acción no se puede deshacer.",
+      "Confirmar Cancelación"
+    );
+
+    if (confirmed) {
+      setLoading(true);
+      const { success, message, error } = await cancelarPedido(pedidoId, ""); // Razón vacía si no hay input
+      if (success) {
+        showPopUp(message, "success");
+        fetchAndSetPedidos(); // Refrescar la lista de pedidos
+      } else {
+        showPopUp(error || message || "Ocurrió un error desconocido.", "error");
+      }
+      setLoading(false);
+    } else {
+      showPopUp("La cancelación del pedido ha sido anulada.", "info");
+    }
   };
 
   const fetchAndSetPedidos = useCallback(async () => {

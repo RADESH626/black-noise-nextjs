@@ -59,63 +59,41 @@ const PedidosContent = () => {
     setShowDevolucionModal(true);
   };
 
-  const { showDialog } = useDialog();
-  const [cancelReason, setCancelReason] = useState('');
+  // Se elimina el estado cancelReason ya que no se usará un input para la razón de cancelación
+  // const [cancelReason, setCancelReason] = useState(''); 
+  const { showConfirmDialog } = useDialog(); // Usar showConfirmDialog en lugar de showDialog
 
-  const handleCancelarPedido = (pedidoId) => {
+  const handleCancelarPedido = async (pedidoId) => {
     setSelectedPedidoId(pedidoId);
-    showDialog({
-      title: "Cancelar Pedido",
-      content: (
-        <div>
-          <p className="mb-4">Por favor, especifique la razón de la cancelación para el pedido {pedidoId}:</p>
-          <textarea
-            placeholder="Escriba aquí la razón de la cancelación..."
-            className="border border-gray-700 rounded-md p-2 text-black w-full h-24"
-            value={cancelReason}
-            onChange={(e) => setCancelReason(e.target.value)}
-          />
-        </div>
-      ),
-      type: "confirm",
-      onConfirm: () => handleConfirmCancelacion(pedidoId),
-      onCancel: () => {
-        setCancelReason('');
-        setSelectedPedidoId(null);
-      },
-      confirmBtnText: "Confirmar Cancelación",
-      cancelBtnText: "Volver"
-    });
-  };
+    const confirmed = await showConfirmDialog(
+      `¿Estás seguro de que quieres cancelar este pedido? Esta acción no se puede deshacer.`,
+      "Confirmar Cancelación"
+    );
 
-  const handleConfirmCancelacion = async (pedidoId) => {
-    if (!cancelReason.trim()) {
-      showPopUp('Por favor, especifique la razón de la cancelación.', 'error');
-      return;
-    }
-
-    try {
-      const { cancelarPedido } = await import('@/app/acciones/PedidoActions');
-      const result = await cancelarPedido(pedidoId, cancelReason.trim());
-
-      if (result.success) {
-        showPopUp('Pedido cancelado correctamente', 'success');
-        const { pedidos: fetchedPedidos, error: fetchError } = await obtenerPedidosPagadosPorUsuarioId(userId);
-        if (fetchError) {
-          setError({ message: fetchError });
-          setPedidos([]);
+    if (confirmed) {
+      try {
+        const { cancelarPedido } = await import('@/app/acciones/PedidoActions');
+        const result = await cancelarPedido(pedidoId, ""); // Razón vacía
+        if (result.success) {
+          showPopUp('Pedido cancelado correctamente', 'success');
+          const { pedidos: fetchedPedidos, error: fetchError } = await obtenerPedidosPagadosPorUsuarioId(userId);
+          if (fetchError) {
+            setError({ message: fetchError });
+            setPedidos([]);
+          } else {
+            setPedidos(fetchedPedidos || []);
+          }
         } else {
-          setPedidos(fetchedPedidos || []);
+          showPopUp(result.message || 'Error al cancelar el pedido', 'error');
         }
-      } else {
-        showPopUp(result.message || 'Error al cancelar el pedido', 'error');
+      } catch (error) {
+        console.error('Error al cancelar el pedido:', error);
+        showPopUp('Error al cancelar el pedido', 'error');
+      } finally {
+        setSelectedPedidoId(null);
       }
-    } catch (error) {
-      console.error('Error al cancelar el pedido:', error);
-      showPopUp('Error al cancelar el pedido', 'error');
-    } finally {
-      setCancelReason('');
-      setSelectedPedidoId(null);
+    } else {
+      showPopUp("La cancelación del pedido ha sido anulada.", "info");
     }
   };
 
@@ -207,7 +185,7 @@ const PedidosContent = () => {
       <h2 className="text-center text-2xl font-bold mt-4">Tus Pedidos</h2>
 
       <div className="flex justify-end mb-4">
-        <label className="inline-flex items-center cursor-pointer">
+        {/* <label className="inline-flex items-center cursor-pointer">
           <input
             type="checkbox"
             className="sr-only peer"
@@ -218,8 +196,8 @@ const PedidosContent = () => {
             peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:content-[''] after:absolute
             after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full
             after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:after:border-white"></div>
-          <span className="ml-3 text-sm font-medium text-black">Mostrar Pedidos Cancelados</span>
-        </label>
+           <span className="ml-3 text-sm font-medium text-black">Mostrar Pedidos Cancelados</span> 
+        </label> */}
       </div>
 
       <main className="grid grid-cols-1 gap-6 mt-8">

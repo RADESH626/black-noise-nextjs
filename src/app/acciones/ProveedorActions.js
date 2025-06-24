@@ -11,6 +11,74 @@ import bcrypt from "bcryptjs";
 import logger from '@/utils/logger';
 import { transporter } from '@/utils/nodemailer'; // Import the centralized transporter
 import { toPlainObject } from '@/utils/dbUtils'; // Import toPlainObject
+import Papa from 'papaparse'; // Import papaparse
+
+// Function to export suppliers to CSV
+export async function exportarProveedoresCSV(searchParams = {}) {
+  await connectDB();
+  try {
+    const ProveedorModel = await getModel('Proveedor');
+    let query = {};
+
+    const disponibilidad = searchParams.hasOwnProperty('disponibilidad') ? searchParams.disponibilidad : undefined;
+    const especialidad = searchParams.hasOwnProperty('especialidad') ? (searchParams.especialidad === 'Todos' ? undefined : searchParams.especialidad) : undefined;
+    const metodosPagoAceptados = searchParams.hasOwnProperty('metodosPagoAceptados') ? (searchParams.metodosPagoAceptados === 'Todos' ? undefined : searchParams.metodosPagoAceptados) : undefined;
+    const habilitado = searchParams.hasOwnProperty('habilitado') ? (searchParams.habilitado === 'true' ? true : (searchParams.habilitado === 'false' ? false : undefined)) : undefined;
+    const ordenesActivasMin = searchParams.hasOwnProperty('ordenesActivasMin') ? searchParams.ordenesActivasMin : undefined;
+    const ordenesActivasMax = searchParams.hasOwnProperty('ordenesActivasMax') ? searchParams.ordenesActivasMax : undefined;
+    const fechaUltimaAsignacionStart = searchParams.hasOwnProperty('fechaUltimaAsignacionStart') ? searchParams.fechaUltimaAsignacionStart : undefined;
+    const fechaUltimaAsignacionEnd = searchParams.hasOwnProperty('fechaUltimaAsignacionEnd') ? searchParams.fechaUltimaAsignacionEnd : undefined;
+
+    if (disponibilidad) {
+      query.disponibilidad = disponibilidad;
+    }
+    if (especialidad) {
+      query.especialidad = especialidad;
+    }
+    if (metodosPagoAceptados) {
+      query.metodosPagoAceptados = metodosPagoAceptados;
+    }
+    if (habilitado !== undefined) {
+      query.habilitado = habilitado;
+    }
+    if (ordenesActivasMin) {
+      query.activeOrders = { ...query.activeOrders, $gte: parseInt(ordenesActivasMin) };
+    }
+    if (ordenesActivasMax) {
+      query.activeOrders = { ...query.activeOrders, $lte: parseInt(ordenesActivasMax) };
+    }
+    if (fechaUltimaAsignacionStart) {
+      query.lastAssignedAt = { ...query.lastAssignedAt, $gte: new Date(fechaUltimaAsignacionStart) };
+    }
+    if (fechaUltimaAsignacionEnd) {
+      query.lastAssignedAt = { ...query.lastAssignedAt, $lte: new Date(fechaUltimaAsignacionEnd) };
+    }
+
+    const proveedores = await ProveedorModel.find(query).lean();
+
+    const csvData = proveedores.map(proveedor => ({
+      ID: proveedor._id.toString(),
+      'Nombre Empresa': proveedor.nombreEmpresa,
+      NIT: proveedor.nit,
+      'Dirección Empresa': proveedor.direccionEmpresa,
+      Especialidad: proveedor.especialidad.join(', '),
+      Comisión: proveedor.comision,
+      'Teléfono Contacto': proveedor.telefonoContacto,
+      'Email Contacto': proveedor.emailContacto,
+      'Métodos Pago Aceptados': proveedor.metodosPagoAceptados.join(', '),
+      Habilitado: proveedor.habilitado ? 'Sí' : 'No',
+      'Órdenes Activas': proveedor.activeOrders || 0,
+      'Fecha Última Asignación': proveedor.lastAssignedAt ? new Date(proveedor.lastAssignedAt).toLocaleDateString() : 'N/A',
+      'Fecha Creación': proveedor.createdAt ? new Date(proveedor.createdAt).toLocaleDateString() : 'N/A',
+    }));
+
+    const csv = Papa.unparse(csvData);
+    return { success: true, csv, message: 'CSV de proveedores generado exitosamente.' };
+  } catch (error) {
+    logger.error('ERROR in exportarProveedoresCSV:', error);
+    return { success: false, error: 'Error al generar el CSV de proveedores: ' + error.message };
+  }
+}
 
 export async function crearProveedor(prevState, formData) {
   const session = await getServerSession(authOptions);

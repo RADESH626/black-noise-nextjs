@@ -13,6 +13,80 @@ import { MetodoPago } from '@/models/enums/pago/MetodoPago'; // Import MetodoPag
 import { assignOrderToProvider } from '@/app/acciones/assignOrderToProvider'; // Import the new server action
 import { sendEmail } from '@/utils/nodemailer'; // Import sendEmail
 import Proveedor from '@/models/Proveedor'; // Importar el modelo Proveedor
+import Papa from 'papaparse'; // Import papaparse
+
+// Function to export payments to CSV
+async function exportarPagosCSV(filters = {}) {
+    logger.debug('Entering exportarPagosCSV with filters:', filters);
+    try {
+        await connectDB();
+        logger.debug('Database connected for exportarPagosCSV.');
+        const Pago = await getModel('Pago');
+
+        let query = {};
+
+        if (filters.metodoPago) {
+            query.metodoPago = filters.metodoPago;
+        }
+        if (filters.estadoTransaccion) {
+            query.estadoTransaccion = filters.estadoTransaccion;
+        }
+        if (filters.usuarioId) {
+            query.usuarioId = filters.usuarioId;
+        }
+        if (filters.pedidoId) {
+            query.pedidoId = filters.pedidoId;
+        }
+        if (filters.ventaId) {
+            query.ventaId = filters.ventaId;
+        }
+        if (filters.valorPagoMin) {
+            query.valorPago = { ...query.valorPago, $gte: parseFloat(filters.valorPagoMin) };
+        }
+        if (filters.valorPagoMax) {
+            query.valorPago = { ...query.valorPago, $lte: parseFloat(filters.valorPagoMax) };
+        }
+        if (filters.fechaPagoStart) {
+            query.createdAt = { ...query.createdAt, $gte: new Date(filters.fechaPagoStart) };
+        }
+        if (filters.fechaPagoEnd) {
+            query.createdAt = { ...query.createdAt, $lte: new Date(filters.fechaPagoEnd) };
+        }
+
+        const pagos = await Pago.find(query)
+            .populate('usuarioId', 'Nombre primerApellido correo')
+            .populate('ventaId', '_id valorVenta estadoVenta')
+            .populate({
+                path: 'pedidoId',
+                select: 'metodoEntrega estadoPedido total',
+            })
+            .lean();
+
+        const csvData = pagos.map(pago => ({
+            'ID Pago': pago._id.toString(),
+            'Valor Pago': pago.valorPago,
+            'Método Pago': pago.metodoPago,
+            'Estado Transacción': pago.estadoTransaccion,
+            'Motivo': pago.motivo || 'N/A',
+            'Fecha Pago': pago.createdAt ? new Date(pago.createdAt).toLocaleDateString() : 'N/A',
+            'Nombre Usuario': pago.usuarioId ? `${pago.usuarioId.Nombre} ${pago.usuarioId.primerApellido}` : 'N/A',
+            'Email Usuario': pago.usuarioId ? pago.usuarioId.correo : 'N/A',
+            'ID Venta Asociada': pago.ventaId ? pago.ventaId._id.toString() : 'N/A',
+            'Valor Venta Asociada': pago.ventaId ? pago.ventaId.valorVenta : 'N/A',
+            'Estado Venta Asociada': pago.ventaId ? pago.ventaId.estadoVenta : 'N/A',
+            'ID Pedido Asociado': pago.pedidoId ? pago.pedidoId._id.toString() : 'N/A',
+            'Método Entrega Pedido': pago.pedidoId ? pago.pedidoId.metodoEntrega : 'N/A',
+            'Estado Pedido': pago.pedidoId ? pago.pedidoId.estadoPedido : 'N/A',
+            'Total Pedido': pago.pedidoId ? pago.pedidoId.total : 'N/A',
+        }));
+
+        const csv = Papa.unparse(csvData);
+        return { success: true, csv, message: 'CSV de pagos generado exitosamente.' };
+    } catch (error) {
+        logger.error('ERROR in exportarPagosCSV:', error);
+        return { success: false, error: 'Error al generar el CSV de pagos: ' + error.message };
+    }
+}
 
 // Crear un nuevo pago
 async function guardarPago(data) {
@@ -395,7 +469,7 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
             <p>El equipo de BlackNoise</p>
         `;
         try {
-            await sendEmail(correo, emailSubject, emailBody);
+            await sendEmail({ to: correo, subject: emailSubject, html: emailBody });
             logger.debug(`Confirmation email sent to ${correo} for order ${nuevoPedido._id}.`);
         } catch (emailError) {
             logger.error(`Failed to send confirmation email to ${correo} for order ${nuevoPedido._id}:`, emailError);
@@ -423,7 +497,8 @@ export {
     obtenerPagosPorUsuarioId,
     procesarPagoYCrearPedido,
     obtenerPagosPendientesPorUsuario,
-    registrarPagoEnvioSimulado // Exportar la nueva acción de servidor
+    registrarPagoEnvioSimulado, // Exportar la nueva acción de servidor
+    exportarPagosCSV // Exportar la función exportarPagosCSV
 };
 
 // Registrar un pago de envío simulado

@@ -20,6 +20,7 @@ export const DialogProvider = ({ children }) => {
   const [showModalActions, setShowModalActions] = useState(false);
   const [confirmText, setConfirmText] = useState('Confirmar');
   const [cancelText, setCancelText] = useState('Cancelar');
+  const [modalOnOpenedCallback, setModalOnOpenedCallback] = useState(null); // Nuevo estado para el callback onOpened
 
   const showPopUp = useCallback((msg, msgType = 'success', persistent = false) => {
     console.log('DialogContext: showPopUp called with message:', msg, 'type:', msgType, 'persistent:', persistent);
@@ -33,7 +34,7 @@ export const DialogProvider = ({ children }) => {
     setIsPopUpPersistent(false); // Reset persistence when hiding
   }, []);
 
-  const openModal = useCallback((title, content, type = 'default', onConfirm = null, onCancel = null, showActions = false, confirmBtnText = 'Confirmar', cancelBtnText = 'Cancelar') => {
+  const openModal = useCallback((title, content, type = 'default', onConfirm = null, onCancel = null, showActions = false, confirmBtnText = 'Confirmar', cancelBtnText = 'Cancelar', onOpenedCallback = null) => {
     setModalTitle(title);
     setModalContent(content);
     setModalType(type);
@@ -42,6 +43,7 @@ export const DialogProvider = ({ children }) => {
     setShowModalActions(showActions);
     setConfirmText(confirmBtnText);
     setCancelText(cancelBtnText);
+    setModalOnOpenedCallback(() => onOpenedCallback); // Guardar el callback
     setIsModalOpen(true);
   }, []);
 
@@ -55,6 +57,7 @@ export const DialogProvider = ({ children }) => {
     setShowModalActions(false);
     setConfirmText('Confirmar');
     setCancelText('Cancelar');
+    setModalOnOpenedCallback(null); // Limpiar el callback
   }, []);
 
   const showConfirmDialog = useCallback((message, title = 'Confirmación', confirmBtnText = 'Confirmar', cancelBtnText = 'Cancelar') => {
@@ -100,6 +103,7 @@ export const DialogProvider = ({ children }) => {
           showActions={showModalActions}
           confirmText={confirmText}
           cancelText={cancelText}
+          onOpened={modalOnOpenedCallback} // Pasar el callback al Modal
         >
           {modalContent}
         </Modal>

@@ -366,7 +366,8 @@ async function cancelarPedido(pedidoId, razonCancelacion) {
     // decrementar activeOrders del proveedor
     const finalStates = [EstadoPedido.ENTREGADO, EstadoPedido.CANCELADO, EstadoPedido.LISTO];
     if (pedido.proveedorId && !finalStates.includes(oldEstado)) {
-      const proveedor = await getModel('Proveedor').findById(pedido.proveedorId); // Usar getModel
+      const ProveedorModel = await getModel('Proveedor'); // Obtener el modelo Proveedor
+      const proveedor = await ProveedorModel.findById(pedido.proveedorId);
       if (proveedor && proveedor.activeOrders > 0) {
         proveedor.activeOrders -= 1;
         await proveedor.save();

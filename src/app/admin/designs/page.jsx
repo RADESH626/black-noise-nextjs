@@ -5,6 +5,8 @@ import ErrorMessage from '@/components/common/ErrorMessage';
 import { Suspense } from 'react';
 import DesignFilters from '@/components/admin/filters/DesignFilters';
 
+export const dynamic = 'force-dynamic'; // Forzar renderizado dinámico para usar searchParams
+
 export default async function AdminDesignsPage({ searchParams }) {
     const page = searchParams.page || 1;
     const limit = 9; // Number of designs per page

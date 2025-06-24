@@ -16,6 +16,7 @@ import { useDialog } from '@/context/DialogContext';
 import AddSupplierModal from '@/components/admin/proveedores/AddSupplierModal';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import ProveedorFilters from '@/components/admin/filters/ProveedorFilters'; // Importar el componente de filtros
+import BotonExportarPDF from '@/components/common/botones/BotonExportarPDF'; // Importar BotonExportarPDF
 
 const ProveedoresClientPage = ({ initialProveedores, initialSearchParams }) => {
     const { data: session, status } = useSession();
@@ -116,13 +117,38 @@ const ProveedoresClientPage = ({ initialProveedores, initialSearchParams }) => {
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-3xl font-bold mb-6 text-gray-800">Gestión de Proveedores</h1>
-            <div className="mb-4">
+            <div className="mb-4 flex justify-between items-center">
                 <BotonGeneral
                     onClick={handleOpenModal}
                     variant="primary"
                 >
                     Agregar Proveedor
                 </BotonGeneral>
+                <BotonExportarPDF
+                    data={proveedores}
+                    reportTitle="Reporte de Proveedores"
+                    tableHeaders={[
+                        'ID', 'Nombre Empresa', 'NIT', 'Dirección Empresa', 'Especialidad',
+                        'Comisión', 'Teléfono Contacto', 'Email Contacto', 'Métodos Pago Aceptados',
+                        'Habilitado', 'Órdenes Activas', 'Fecha Última Asignación', 'Fecha Creación'
+                    ]}
+                    tableBodyMapper={(proveedor) => [
+                        proveedor._id,
+                        proveedor.nombreEmpresa,
+                        proveedor.nit,
+                        proveedor.direccionEmpresa,
+                        proveedor.especialidad.join(', '),
+                        proveedor.comision,
+                        proveedor.telefonoContacto,
+                        proveedor.emailContacto,
+                        proveedor.metodosPagoAceptados.join(', '),
+                        proveedor.habilitado ? 'Sí' : 'No',
+                        proveedor.activeOrders || 0,
+                        proveedor.lastAssignedAt ? new Date(proveedor.lastAssignedAt).toLocaleDateString() : 'N/A',
+                        proveedor.createdAt ? new Date(proveedor.createdAt).toLocaleDateString() : 'N/A',
+                    ]}
+                    className="py-2 px-4"
+                />
             </div>
 
             <div className="mb-6">

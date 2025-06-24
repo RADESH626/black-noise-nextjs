@@ -146,7 +146,7 @@ export default function UsuariosClientPage() {
   const userTableBodyMapper = (user) => [
     user.tipoDocumento || 'N/A',
     user.numeroDocumento || 'N/A',
-    user.primerNombre || 'N/A',
+    user.Nombre || 'N/A',
     user.primerApellido || 'N/A',
     user.fechaNacimiento ? new Date(user.fechaNacimiento).toLocaleDateString() : 'N/A',
     user.genero || 'N/A',
