@@ -215,13 +215,13 @@ function ProfileContent({ userId, initialUser, initialDesigns, initialPayments, 
   };
 
   return (
-    <div className="mx-auto p-4 md:p-8 bg-gray-300 text-white w-screen flex flex-col min-h-screen">
+    <div className="mx-auto p-4 md:p-8 bg-gray-400 text-white w-screen flex flex-col min-h-screen">
       {/* Header */}
       <HeaderPrincipal />
 
 
       {/* User Info Section */}
-      <div className="bg-gray-400 p-6 md:p-8 rounded-lg shadow-lg mb-8 flex-shrink-0 text-black mt-10">
+      <div className="bg-gray-300 p-6 md:p-8 rounded-lg shadow-lg mb-8 flex-shrink-0 text-black mt-10">
 
         <div className="flex flex-col md:flex-row items-center">
           <div className="w-32 h-32 md:w-60 md:h-60 bg-white rounded-lg mb-4 md:mb-0 md:mr-8 ">
@@ -286,7 +286,7 @@ function ProfileContent({ userId, initialUser, initialDesigns, initialPayments, 
             <>
               <div className="flex justify-center mb-4">
                 <BotonGeneral onClick={handleAddDesign} className="bg-black rounded-full p-2">
-                  <img src="/icons/icono +.svg" alt="Agregar" className="w-8 h-8" />
+                  <img src="/icons/icono-+.svg" alt="+" className="w-8 h-8" />
                 </BotonGeneral>
               </div>
               {userDesigns.length === 0 ? (
