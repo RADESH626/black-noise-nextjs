@@ -16,7 +16,7 @@ public class LoginAuthManager : MonoBehaviour
     public GameObject loadingIndicator;
 
     [Header("API Configuration")]
-    public string apiUrl = "http://localhost:3000/api/auth/login"; // Desarrollo local
+    public string apiUrl = "http://4.228.49.46:3000/api/auth/login"; // Desarrollo local
 
     void Start()
     {
