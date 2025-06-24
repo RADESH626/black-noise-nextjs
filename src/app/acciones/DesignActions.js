@@ -103,8 +103,10 @@ export async function guardarDesigns(prevState, formData) {
         const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15 MB
 
         if (imageFile) {
-            if (!(imageFile instanceof File)) {
-                return { success: false, message: 'El archivo de imagen proporcionado no es válido.' };
+            // On the server, imageFile is not an instance of the browser's File class.
+            // We check for expected properties instead.
+            if (!imageFile.type || !imageFile.size) {
+                return { success: false, message: 'El archivo de imagen proporcionado no es válido o está corrupto.' };
             }
 
             if (!ALLOWED_MIME_TYPES.includes(imageFile.type)) {
@@ -345,8 +347,10 @@ export async function actualizarDesign(prevState, formData) {
         const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15 MB
 
         if (imageFile) {
-            if (!(imageFile instanceof File)) {
-                return { success: false, message: 'El archivo de imagen proporcionado no es válido.' };
+            // On the server, imageFile is not an instance of the browser's File class.
+            // We check for expected properties instead.
+            if (!imageFile.type || !imageFile.size) {
+                return { success: false, message: 'El archivo de imagen proporcionado no es válido o está corrupto para la actualización.' };
             }
 
             if (!ALLOWED_MIME_TYPES.includes(imageFile.type)) {
