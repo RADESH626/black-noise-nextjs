@@ -1,6 +1,7 @@
 "use client";
 
 import AdminSidebar from '../../components/layout/admin/AdminSidebar';
+import SessionHeader from '@/components/common/SessionHeader';
 
 function AdminLayoutContent({ children }) {
   return (
@@ -9,7 +10,7 @@ function AdminLayoutContent({ children }) {
       <AdminSidebar />
 
       <main className="flex flex-col flex-1 overflow-y-auto">
-
+        <SessionHeader />
         {children}
 
       </main>

@@ -137,6 +137,7 @@ const DesignsClientPage = ({ initialDesigns, currentFilters }) => {
                                     <p className="text-gray-700 font-bold">Valor: ${design.valorDesing}</p>
                                     <p className="text-gray-500 text-xs">Categoría: {design.categoria}</p>
                                     <p className="text-gray-500 text-xs">Estado: {design.estadoDesing}</p>
+                                    <p className="text-gray-500 text-xs">Fecha de Creación: {new Date(design.createdAt).toLocaleDateString()}</p>
                                     <div className="mt-4 flex justify-end space-x-2">
                                         <BotonGeneral
                                             onClick={() => router.push(`/admin/designs/editar/${design._id}`)}

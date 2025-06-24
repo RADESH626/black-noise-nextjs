@@ -15,15 +15,17 @@ async function ProfilePage() {
   const userId = session.user.id;
 
   // Obtener datos en el Server Component
-  const [userData, userDesignsData, userPaymentsData] = await Promise.all([
+  const [userData, userDesignsData, userPaymentsData, userOrdersData] = await Promise.all([
     ObtenerUsuarioPorId(userId),
     obtenerDesignsPorUsuarioId(userId),
-    obtenerPagosPorUsuarioId(userId)
+    obtenerPagosPorUsuarioId(userId),
+    obtenerPedidosPorUsuarioId(userId) // Obtener pedidos del usuario
   ]);
 
   const user = userData && !userData.error ? userData : null;
   const designs = userDesignsData && !userDesignsData.error ? userDesignsData.designs : [];
   const payments = userPaymentsData && !userPaymentsData.error ? userPaymentsData.pagos : [];
+  const orders = userOrdersData && userOrdersData.success ? userOrdersData.pedidos : []; // Obtener pedidos
 
   return (
       <ProfileContent
@@ -31,6 +33,7 @@ async function ProfilePage() {
         initialUser={user}
         initialDesigns={designs}
         initialPayments={payments}
+        initialPedidos={orders} // Pasar los pedidos al componente
       />
   );
 }

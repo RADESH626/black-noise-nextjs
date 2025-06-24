@@ -7,7 +7,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { eliminarDesign, actualizarDesign } from "@/app/acciones/DesignActions";
 import DesignsComponent from "../common/DesignsComponent";
 import Loader from '@/components/Loader';
-import PedidosComponent from "../common/PedidosComponent";
+import PedidosClientePage from "../perfil/pedidos/PedidosClientePage"; // Importar el nuevo componente
 import FormEditarUsuario from "@/components/perfil/FormEditarUsuario";
 import DesignUploadModal from "@/components/perfil/DesignUploadModal";
 import PaymentHistory from "@/components/perfil/PaymentHistory";
@@ -17,7 +17,7 @@ import { useCart } from "@/context/CartContext";
 import HeaderPrincipal from "./general/HeaderPrincipal";
 // Removed: import NewOrderModal from "@/components/common/modales/NewOrderModal";
 
-function ProfileContent({ userId, initialUser, initialDesigns, initialPayments }) {
+function ProfileContent({ userId, initialUser, initialDesigns, initialPayments, initialPedidos }) {
   const { data: session, status } = useSession();
   const [activeTab, setActiveTab] = useState('designs');
   const [currentUser, setCurrentUser] = useState(initialUser);
@@ -308,9 +308,9 @@ function ProfileContent({ userId, initialUser, initialDesigns, initialPayments }
         )}
         {activeTab === 'orders' && (
           <>
-            {userId && console.log('DEBUG - Renderizando PedidosComponent con userId:', userId)}
+            {userId && console.log('DEBUG - Renderizando PedidosClientePage con userId:', userId)}
             {userId ? (
-              <PedidosComponent userId={userId} />
+              <PedidosClientePage initialPedidos={initialPedidos} /> 
             ) : (
               <Loader />
             )}

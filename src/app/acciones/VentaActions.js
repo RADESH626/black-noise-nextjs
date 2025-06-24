@@ -52,6 +52,8 @@ async function obtenerVentas(filters = {}) {
         const Venta = await getVentaModel();
         let query = {};
 
+        logger.debug('Initial filters received:', filters);
+
         // Apply filters
         if (filters.estadoVenta) {
             query.estadoVenta = filters.estadoVenta;
@@ -72,6 +74,8 @@ async function obtenerVentas(filters = {}) {
             query.fechaVenta = { ...query.fechaVenta, $lte: new Date(filters.fechaVentaEnd) };
         }
 
+        logger.debug('MongoDB query being executed:', JSON.stringify(query));
+
         const ventas = await Venta.find(query)
             .populate('pagoIds', 'valorPago metodoPago estadoPago') 
             .populate({
@@ -81,6 +85,7 @@ async function obtenerVentas(filters = {}) {
             })
             .lean();
         logger.debug('Sales retrieved from DB:', ventas.length, 'sales found.');
+        logger.debug('First 5 sales (if any):', ventas.slice(0, 5).map(v => ({ _id: v._id, valorVenta: v.valorVenta, estadoVenta: v.estadoVenta, pedidoId: v.pedidoId?._id })));
         return { ventas: JSON.parse(JSON.stringify(ventas)) };
     } catch (error) {
         logger.error('ERROR in obtenerVentas:', error);

@@ -12,6 +12,7 @@ import BotonGeneral from '@/components/common/botones/BotonGeneral';
 import { obtenerMiPerfilProveedor } from '@/app/acciones/ProveedorActions';
 import { obtenerPedidosPorProveedorId } from '@/app/acciones/ProveedorPedidoActions';
 import DevolucionesProveedor from '@/components/proveedor/DevolucionesProveedor';
+import SessionHeader from '@/components/common/SessionHeader';
 
 function ProveedorPage() {
     const { data: session, status } = useSession();
@@ -97,7 +98,8 @@ function ProveedorPage() {
     // Finally, render the actual content if miPerfil is available
     return (
         <div className="h-full p-4">
-            <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">Bienvenido, {miPerfil?.nombreEmpresa || 'Proveedor'}</h1>
+            <SessionHeader />
+            <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">Portal de Proveedores</h1>
 
             <div className="max-w-6xl mx-auto mb-8">
                 <h2 className="text-2xl font-semibold mb-6 text-gray-700">Métricas de Pedidos</h2>

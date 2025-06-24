@@ -6,6 +6,7 @@ import Loader from '@/components/Loader';
 import BotonExportarPDF from '@/components/common/botones/BotonExportarPDF'; // Import BotonExportarPDF
 import PedidoFilters from '@/components/admin/filters/PedidoFilters'; // Importar el componente de filtros
 import { useRouter, useSearchParams } from 'next/navigation';
+import PedidoCard from '@/components/common/PedidoCard'; // Importar PedidoCard
 
 export default function PedidosDashboard() {
   const router = useRouter();
@@ -94,19 +95,6 @@ export default function PedidosDashboard() {
   };
 
   // PDF Export Mappers
-  const pedidoTableHeaders = [
-    'ID Pedido', 'Nombre Usuario', 'Email Usuario', 'Valor Total', 'Estado Pedido', 'Fecha Pedido'
-  ];
-
-  const pedidoTableBodyMapper = (pedido) => [
-    pedido._id || 'N/A',
-    pedido.userName || 'N/A',
-    pedido.userEmail || 'N/A',
-    `$${typeof pedido.total === 'number' ? pedido.total.toFixed(2) : '0.00'}`,
-    pedido.estadoPedido || 'N/A',
-    pedido.createdAt ? new Date(pedido.createdAt).toLocaleDateString() : 'N/A'
-  ];
-
   if (loading) {
     return <Loader />;
   }
@@ -145,56 +133,28 @@ export default function PedidosDashboard() {
 
       <div className="flex justify-end mb-4">
         <BotonExportarPDF 
-            data={pedidos} // Usar 'pedidos' directamente ya que el filtrado es en el servidor
+            data={pedidos} 
             reportTitle="Reporte de Pedidos" 
-            tableHeaders={pedidoTableHeaders} 
-            tableBodyMapper={pedidoTableBodyMapper} 
+            tableHeaders={[
+              'ID Pedido', 'Nombre Usuario', 'Email Usuario', 'Valor Total', 'Estado Pedido', 'Fecha Pedido'
+            ]} 
+            tableBodyMapper={(pedido) => [
+              pedido._id || 'N/A',
+              pedido.userName || 'N/A',
+              pedido.userEmail || 'N/A',
+              `$${typeof pedido.total === 'number' ? pedido.total.toFixed(2) : '0.00'}`,
+              pedido.estadoPedido || 'N/A',
+              pedido.createdAt ? new Date(pedido.createdAt).toLocaleDateString() : 'N/A'
+            ]} 
         />
       </div>
       <PedidoFilters onApplyFilters={handleApplyFilters} onClearFilters={handleClearFilters} initialFilters={currentFilters} />
 
-      <div className="overflow-x-auto rounded-lg shadow-md mt-4" style={{ backgroundColor: '#FFFFFF' }}>
-        <table className="min-w-full divide-y" style={{ borderColor: '#FFFFFFFF' }}>
-          <thead style={{ backgroundColor: '#F9FAFB' }}>
-            <tr>
-              {['ID Pedido', 'Nombre Usuario', 'Email Usuario', 'Valor Total', 'Estado Pedido', 'Fecha Pedido'].map((title) => (
-                <th
-                  key={title}
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                  style={{ color: '#030303FF' }}
-                >
-                  {title}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody style={{ backgroundColor: '#FFFFFFFF', borderColor: '#E5E7EBFF' }}>
-            {pedidos.map((pedido) => ( // Usar 'pedidos' directamente ya que el filtrado es en el servidor
-              <tr key={pedido._id} style={{ borderBottom: '1px solid #000000FF' }}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: '#111827' }}>
-                  {pedido._id}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#6B7280' }}>
-                  {pedido.userName || 'N/A'}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#6B7280' }}>
-                  {pedido.userEmail || 'N/A'}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#50545CFF' }}>
-                  ${typeof pedido.total === 'number' ? pedido.total.toFixed(2) : '0.00'}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#50545CFF' }}>
-                  {pedido.estadoPedido}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#50545CFF' }}>
-                  {pedido.createdAt ? new Date(pedido.createdAt).toLocaleDateString() : 'N/A'}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <main className="grid grid-cols-1 gap-6 mt-8">
+        {pedidos.map((pedido, index) => (
+          <PedidoCard key={pedido._id} pedido={pedido} userRole="admin" />
+        ))}
+      </main>
 
       {/* Paginación */}
       <div className="flex justify-center items-center mt-6 space-x-4">

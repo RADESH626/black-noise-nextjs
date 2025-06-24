@@ -15,3 +15,8 @@ export const EstadoPedido = {
     DEVUELTO: 'DEVUELTO',
     SOLICITUD_CANCELACION: 'SOLICITUD_CANCELACION',
 }
+
+export const MetodoEntrega = {
+    ENVIO_A_DOMICILIO: 'ENVIO_A_DOMICILIO',
+    RECOGIDA_EN_TIENDA: 'RECOGIDA_EN_TIENDA',
+};

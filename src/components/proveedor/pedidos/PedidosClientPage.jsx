@@ -5,25 +5,29 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { actualizarPedidoPorProveedor, obtenerPedidosPorProveedorId } from "@/app/acciones/ProveedorPedidoActions"; // Import obtenerPedidosPorProveedorId
 import { useDialog } from "@/context/DialogContext";
-import { useState, useEffect, useCallback } from "react"; // Import useCallback
+import { useState, useEffect, useCallback, useMemo } from "react"; // Import useCallback y useMemo
 import Loader from '@/components/Loader';
 import { useQueryClient } from "@tanstack/react-query";
-import { EstadoPedido } from "@/models/enums/PedidoEnums";
+import { EstadoPedido, MetodoEntrega } from "@/models/enums/PedidoEnums"; // Importar enums adicionales
+import { EstadoPago } from "@/models/enums/pago/EstadoPago"; // Importar EstadoPago desde su ubicación correcta
 import { updateEstadoPedido } from "@/app/acciones/PedidoActions";
 import { motion } from "framer-motion";
 import FilterBar from '@/components/common/FilterBar'; // Import FilterBar
 import BotonExportarPDF from '@/components/common/botones/BotonExportarPDF'; // Import BotonExportarPDF
+import PedidoCard from '@/components/common/PedidoCard'; // Importar PedidoCard
+import { useSearchParams } from 'next/navigation'; // Importar useSearchParams
 
 export default function PedidosClientPage({ initialPedidos }) {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams(); // Obtener searchParams
   const { showPopUp, showConfirmDialog } = useDialog();
   const queryClient = useQueryClient();
 
   const [pedidos, setPedidos] = useState(initialPedidos);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filters, setFilters] = useState({}); // State for filters
+  // const [filters, setFilters] = useState({}); // Eliminado, ahora se inicializa con useMemo
   const [editableCostoEnvio, setEditableCostoEnvio] = useState(() => {
     const initialCostoEnvio = {};
     initialPedidos.forEach(pedido => {
@@ -35,38 +39,61 @@ export default function PedidosClientPage({ initialPedidos }) {
   const [expandedOrders, setExpandedOrders] = useState(new Set());
   const [expandedDesigns, setExpandedDesigns] = useState(new Set());
 
-  const fetchAndSetPedidos = useCallback(async (currentFilters) => {
+  // Inicializar filtros desde searchParams
+  const currentFilters = useMemo(() => ({
+    searchText: searchParams.get('searchText') || undefined,
+    estadoPedido: searchParams.get('estadoPedido') || undefined,
+    estadoPago: searchParams.get('estadoPago') || undefined,
+    metodoEntrega: searchParams.get('metodoEntrega') || undefined,
+    usuarioComprador: searchParams.get('usuarioComprador') || undefined,
+    minValorTotal: searchParams.get('minValorTotal') || undefined,
+    maxValorTotal: searchParams.get('maxValorTotal') || undefined,
+    fechaPedidoStart: searchParams.get('fechaPedidoStart') || undefined,
+    fechaPedidoEnd: searchParams.get('fechaPedidoEnd') || undefined,
+    pedidoCancelado: searchParams.get('pedidoCancelado') === 'true' ? 'true' : (searchParams.get('pedidoCancelado') === 'false' ? 'false' : undefined),
+    pedidoRefabricado: searchParams.get('pedidoRefabricado') === 'true' ? 'true' : (searchParams.get('pedidoRefabricado') === 'false' ? 'false' : undefined),
+  }), [searchParams]);
+
+  const fetchAndSetPedidos = useCallback(async (filters) => {
     setLoading(true);
     setError(null);
-    if (!session?.user?.proveedorId) {
-        setError("ID de proveedor no disponible.");
-        setLoading(false);
-        return;
+    try {
+      const proveedorId = session.user.proveedorId;
+      if (!proveedorId) {
+        throw new Error("ID de proveedor no encontrado en la sesión.");
+      }
+      const data = await obtenerPedidosPorProveedorId({ proveedorId, ...filters });
+      if (data.success) {
+        setPedidos(data.pedidos);
+      } else {
+        setError(new Error(data.message || "Error al cargar los pedidos."));
+      }
+    } catch (err) {
+      console.error("Error fetching orders:", err);
+      setError(err);
+    } finally {
+      setLoading(false);
     }
-    const combinedFilters = { ...currentFilters, proveedorId: session.user.proveedorId };
-    const { pedidos: fetchedPedidos, error: fetchError } = await obtenerPedidosPorProveedorId(combinedFilters);
-    if (fetchError) {
-      setError({ message: fetchError });
-      setPedidos([]);
-    } else {
-      setPedidos(fetchedPedidos || []);
-      const newInitialCostoEnvio = {};
-      (fetchedPedidos || []).forEach(pedido => {
-        newInitialCostoEnvio[pedido._id.toString()] = pedido.costoEnvio || 0;
-      });
-      setEditableCostoEnvio(newInitialCostoEnvio);
-    }
-    setLoading(false);
-  }, [session?.user?.proveedorId]);
+  }, [session?.user?.proveedorId]); // Dependencia de proveedorId de la sesión
 
   useEffect(() => {
     if (status === 'authenticated') {
-        fetchAndSetPedidos(filters);
+        // Usar currentFilters directamente para la llamada a la API
+        fetchAndSetPedidos(currentFilters);
     }
-  }, [filters, fetchAndSetPedidos, status]);
+  }, [currentFilters, fetchAndSetPedidos, status]); // Dependencia de currentFilters
 
   const handleFilterChange = (newFilters) => {
-    setFilters(newFilters);
+    // Actualizar la URL con los nuevos filtros
+    const params = new URLSearchParams(searchParams);
+    Object.keys(newFilters).forEach(key => {
+      if (newFilters[key] !== undefined && newFilters[key] !== null && newFilters[key] !== '') {
+        params.set(key, newFilters[key]);
+      } else {
+        params.delete(key);
+      }
+    });
+    router.push(`/proveedor/pedidos?${params.toString()}`);
   };
 
   const handleToggleExpand = (pedidoId) => {
@@ -135,7 +162,7 @@ export default function PedidosClientPage({ initialPedidos }) {
         if (result.success) {
           showPopUp("Estado del pedido actualizado exitosamente!", "success");
           // Re-fetch with current filters to ensure the list is up-to-date
-          fetchAndSetPedidos(filters);
+          fetchAndSetPedidos(currentFilters); // CAMBIO AQUÍ
         } else {
           showPopUp(result.message || "Error al actualizar el estado del pedido.", "error");
         }
@@ -149,19 +176,6 @@ export default function PedidosClientPage({ initialPedidos }) {
   }
 
   // PDF Export Mappers
-  const pedidoTableHeaders = [
-    'ID Pedido', 'Nombre Usuario', 'Email Usuario', 'Valor Total', 'Estado Pedido', 'Fecha Pedido'
-  ];
-
-  const pedidoTableBodyMapper = (pedido) => [
-    pedido._id || 'N/A',
-    pedido.userName || 'N/A',
-    pedido.userEmail || 'N/A',
-    `$${typeof pedido.total === 'number' ? pedido.total.toFixed(2) : '0.00'}`,
-    pedido.estadoPedido || 'N/A',
-    pedido.createdAt ? new Date(pedido.createdAt).toLocaleDateString() : 'N/A'
-  ];
-
   if (loading || status === 'loading') {
     return <Loader />;
   }
@@ -174,17 +188,11 @@ export default function PedidosClientPage({ initialPedidos }) {
     );
   }
 
-  const filteredPedidos = pedidos.filter(pedido => {
-    // Aplicar lógica de filtrado basada en el estado `filters`
-    // Por ahora, solo se aplica el filtro de estadoPedido
-    if (filters.estadoPedido && filters.estadoPedido !== "" && pedido.estadoPedido !== filters.estadoPedido) {
-        return false;
-    }
-    // Aquí se pueden añadir más lógicas de filtrado si es necesario
-    return true;
-  });
+  // La lógica de filtrado en el cliente ya no es necesaria, ya que el filtrado principal se realiza en el servidor.
+  // Se mantiene filteredPedidos para compatibilidad con el resto del componente.
+  const filteredPedidos = pedidos;
 
-  if (filteredPedidos.length === 0 && Object.keys(filters).length > 0) {
+  if (filteredPedidos.length === 0 && Object.keys(currentFilters).some(key => currentFilters[key] !== undefined && currentFilters[key] !== null && currentFilters[key] !== '')) {
     return (
       <div className="min-h-full flex justify-center items-center text-gray-400">
         No hay pedidos que coincidan con los filtros aplicados.
@@ -209,14 +217,29 @@ export default function PedidosClientPage({ initialPedidos }) {
         <BotonExportarPDF 
             data={pedidos} 
             reportTitle="Reporte de Pedidos de Proveedor" 
-            tableHeaders={pedidoTableHeaders} 
-            tableBodyMapper={pedidoTableBodyMapper} 
+            tableHeaders={[
+              'ID Pedido', 'Nombre Usuario', 'Email Usuario', 'Valor Total', 'Estado Pedido', 'Fecha Pedido'
+            ]} 
+            tableBodyMapper={(pedido) => [
+              pedido._id || 'N/A',
+              pedido.userName || 'N/A',
+              pedido.userEmail || 'N/A',
+              `$${typeof pedido.total === 'number' ? pedido.total.toFixed(2) : '0.00'}`,
+              pedido.estadoPedido || 'N/A',
+              pedido.createdAt ? new Date(pedido.createdAt).toLocaleDateString() : 'N/A'
+            ]} 
         />
       </div>
       <FilterBar 
         onFilterChange={handleFilterChange} 
-        initialFilters={filters} 
+        initialFilters={currentFilters} 
         additionalFilters={[
+            {
+                name: "searchText",
+                label: "Buscar:",
+                type: "text",
+                placeholder: "ID Pedido o Email/Nombre Usuario"
+            },
             {
                 name: "estadoPedido",
                 label: "Estado del Pedido:",
@@ -234,6 +257,75 @@ export default function PedidosClientPage({ initialPedidos }) {
                     { value: EstadoPedido.DEVOLUCION_RECHAZADA, label: "Devolución Rechazada" },
                     { value: EstadoPedido.DEVOLUCION_COMPLETADA, label: "Devolución Completada" },
                 ]
+            },
+            {
+                name: "estadoPago",
+                label: "Estado del Pago:",
+                type: "select",
+                options: [
+                    { value: "", label: "Todos" },
+                    { value: EstadoPago.PAGADO, label: "Pagado" },
+                    { value: EstadoPago.PENDIENTE, label: "Pendiente" },
+                    { value: EstadoPago.REEMBOLSADO, label: "Reembolsado" },
+                ]
+            },
+            {
+                name: "metodoEntrega",
+                label: "Método de Entrega:",
+                type: "select",
+                options: [
+                    { value: "", label: "Todos" },
+                    { value: MetodoEntrega.ENVIO_A_DOMICILIO, label: "Envío a Domicilio" },
+                    { value: MetodoEntrega.RECOGIDA_EN_TIENDA, label: "Recogida en Tienda" },
+                ]
+            },
+            {
+                name: "usuarioComprador",
+                label: "Email Comprador:",
+                type: "text",
+                placeholder: "Filtrar por email del comprador"
+            },
+            {
+                name: "minValorTotal",
+                label: "Valor Total Mínimo:",
+                type: "number",
+                placeholder: "Mínimo"
+            },
+            {
+                name: "maxValorTotal",
+                label: "Valor Total Máximo:",
+                type: "number",
+                placeholder: "Máximo"
+            },
+            {
+                name: "fechaPedidoStart",
+                label: "Fecha Pedido Desde:",
+                type: "date"
+            },
+            {
+                name: "fechaPedidoEnd",
+                label: "Fecha Pedido Hasta:",
+                type: "date"
+            },
+            {
+                name: "pedidoCancelado",
+                label: "¿Pedido Cancelado?:",
+                type: "select",
+                options: [
+                    { value: "", label: "Todos" },
+                    { value: "true", label: "Sí" },
+                    { value: "false", label: "No" },
+                ]
+            },
+            {
+                name: "pedidoRefabricado",
+                label: "¿Pedido Refabricado?:",
+                type: "select",
+                options: [
+                    { value: "", label: "Todos" },
+                    { value: "true", label: "Sí" },
+                    { value: "false", label: "No" },
+                ]
             }
         ]}
       />
@@ -246,169 +338,17 @@ export default function PedidosClientPage({ initialPedidos }) {
         </div>
 
         {filteredPedidos.map((pedido, index) => (
-          <motion.div
-            key={pedido._id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className={`bg-gray-800 rounded-xl shadow-lg overflow-hidden ${pedido.estadoPedido === 'CANCELADO' ? 'border-2 border-red-500 opacity-70' : ''}`}
-          >
-            <div className="flex flex-col bg-gray-400 rounded-lg p-4 border border-gray-200 hover:shadow-lg transition-all duration-200 gap-4" suppressHydrationWarning={true}>
-              {/* Sección de Resumen */}
-              <div
-                className="flex flex-col md:flex-row justify-between items-start md:items-center cursor-pointer"
-                onClick={() => handleToggleExpand(pedido._id.toString())}
-              >
-                <h2 className="text-lg font-semibold text-white bg-gray-600 p-2 rounded">Pedido ID: {pedido._id.toString()}</h2>
-                <div className="flex items-center space-x-2">
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${pedido.estadoPedido === EstadoPedido.PENDIENTE ? 'bg-yellow-100 text-yellow-800' :
-                    pedido.estadoPedido === EstadoPedido.ASIGNADO ? 'bg-blue-100 text-blue-800' :
-                      pedido.estadoPedido === EstadoPedido.EN_PROCESO ? 'bg-purple-100 text-purple-800' :
-                        pedido.estadoPedido === EstadoPedido.LISTO_PARA_RECOGER ? 'bg-green-100 text-green-800' :
-                          pedido.estadoPedido === EstadoPedido.ENVIADO ? 'bg-indigo-100 text-indigo-800' :
-                            pedido.estadoPedido === EstadoPedido.ENTREGADO ? 'bg-teal-100 text-teal-800' :
-                              pedido.estadoPedido === EstadoPedido.CANCELADO ? 'bg-red-100 text-red-800' :
-                                'bg-gray-100 text-gray-800'
-                    }`}>
-                    {pedido.estadoPedido.replace(/_/g, ' ')}
-                  </span>
-
-                  <svg
-                    className={`w-5 h-5 text-gray-600 transform transition-transform duration-200 ${expandedOrders.has(pedido._id.toString()) ? 'rotate-180' : ''
-                      }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </div>
-              </div>
-
-              {/* Sección de Detalles (condicional) */}
-              {expandedOrders.has(pedido._id.toString()) && (
-                <div className="flex flex-col gap-2">
-                  <div className="flex gap-4">
-                    {/* informacion basica del pedido */}
-                    <div className="flex flex-col gap-2 bg-gray-500 text-white rounded p-2">
-                      <div>
-                        <p className="font-medium">Usuario:</p>
-                        <p>{pedido.userId?.Nombre || 'N/A'}</p>
-                      </div>
-                      {pedido.userId?.direccion && (
-                        <div>
-                          <p className="font-medium">Dirección:</p>
-                          <p>{pedido.userId.direccion}</p>
-                        </div>
-                      )}
-                      <div>
-                        <p className="font-medium">Total:</p>
-                        <p className="text-xl font-bold text-green-500">${pedido.total ? pedido.total.toFixed(2) : '0.00'}</p>
-                      </div>
-                      <div>
-                        <p className="font-medium">Método de Entrega:</p>
-                        <p>{pedido.metodoEntrega || 'N/A'}</p>
-                      </div>
-                      {pedido.fechaPedido && (
-                        <div>
-                          <p className="font-medium">Fecha del Pedido:</p>
-                          <p>{new Date(pedido.fechaPedido).toLocaleDateString()}</p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Información de los diseños */}
-                    <div className="flex flex-col flex-1 gap-2 bg-gray-500 rounded-md">
-                      <p className="font-medium text-white mb-2 text-center">Diseños:</p>
-                      {pedido.items && pedido.items.length > 0 ? (
-                        <div className="flex flex-col p-2 rounded-md gap-4">
-                          {pedido.items.map((item, index) => (
-                            <div key={index} className="flex flex-col bg-gray-400 rounded-md p-2">
-                              <div
-                                className="flex items-center space-x-3 cursor-pointer"
-                                onClick={() => handleToggleDesignExpand(item.designId?._id?.toString() || `design-${index}`)}
-                              >
-                                <div className="flex items-center space-x-2">
-                                  {console.log('DEBUG - item.designId en PedidosClientPage:', item.designId)}
-                                  {item.designId?.imagen && (
-                                    <img
-                                      src={item.designId.imagen}
-                                      alt={item.designId.nombreDesing || 'Diseño'}
-                                      className="w-8 h-8 object-cover rounded-full border border-gray-300"
-                                    />
-                                  )}
-                                  <p className="font-semibold">{item.designId?.nombreDesing || 'Diseño Desconocido'}</p>
-                                </div>
-                                <p className="text-sm text-gray-600">Cantidad: <span className="font-bold text-white">{item.quantity}</span></p>
-                                <svg
-                                  className={`w-5 h-5 text-gray-600 transform transition-transform duration-200 ${expandedDesigns.has(item.designId?._id?.toString() || `design-${index}`) ? 'rotate-180' : ''
-                                    }`}
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                              </div>
-                              {expandedDesigns.has(item.designId?._id?.toString() || `design-${index}`) && (
-                                <div className="mt-2 text-sm text-gray-700 bg-gray-300 p-2 rounded-md">
-                                  <p><span className="font-medium">Categoría:</span> {item.designId?.categoria || 'N/A'}</p>
-                                  <p><span className="font-medium">Precio Unitario:</span> ${item.designId?.valorDesing ? parseFloat(item.designId.valorDesing).toFixed(2) : '0.00'}</p>
-                                  <p><span className="font-medium">Subtotal por Diseño:</span> ${item.designId?.valorDesing && item.quantity ? (parseFloat(item.designId.valorDesing) * item.quantity).toFixed(2) : '0.00'}</p>
-                                  <p><span className="font-medium">Descripción:</span> {item.designId?.descripcion || 'N/A'}</p>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-gray-600">No hay diseños asociados.</p>
-                      )}
-                    </div>
-                  </div>
-                  {pedido.metodoEntrega === 'DOMICILIO' && (
-                    <div className="flex items-center space-x-2 bg-gray-500 p-2 rounded text-black">
-                      <label htmlFor={`costoEnvio-${pedido._id.toString()}`} className="font-medium ">Costo de Envío:</label>
-                      <input
-                        id={`costoEnvio-${pedido._id.toString()}`}
-                        type="number"
-                        min={0}
-                        max={100}
-                        value={editableCostoEnvio[pedido._id.toString()]}
-                        onChange={(e) => handleCostoEnvioChange(pedido._id.toString(), e.target.value)}
-                        className="w-24 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Costo"
-                      />
-                      <button
-                        onClick={() => handleUpdateCostoEnvio(pedido._id.toString())}
-                        disabled={isUpdating[pedido._id.toString()] || editableCostoEnvio[pedido._id.toString()] === pedido.costoEnvio}
-                        className={`bg-green-500 hover:bg-green-600 text-black font-bold py-2 px-4 rounded-md text-sm transition-colors duration-200 ${isUpdating[pedido._id.toString()] || editableCostoEnvio[pedido._id.toString()] === pedido.costoEnvio ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      >
-                        {isUpdating[pedido._id.toString()] ? 'Guardando...' : 'Guardar'}
-                      </button>
-                    </div>
-                  )}
-                  <div className="flex items-center space-x-2 bg-gray-500 p-2 rounded text-black">
-                    <label htmlFor={`estadoPedido-${pedido._id.toString()}`} className="font-medium">Estado:</label>
-                    <select
-                      id={`estadoPedido-${pedido._id.toString()}`}
-                      value={pedido.estadoPedido}
-                      onChange={(e) => handleEstadoPedidoChange(pedido._id.toString(), e.target.value, pedido.estadoPedido)}
-                      className="p-2 border border-gray-300 rounded-md  focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      {Object.values(EstadoPedido).map((estado) => (
-                        <option key={estado} value={estado}>
-                          {estado.replace(/_/g, ' ')}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              )}
-            </div>
-          </motion.div>
+          <PedidoCard 
+            key={pedido._id} 
+            pedido={pedido} 
+            userRole="supplier" 
+            onUpdateCostoEnvio={(id, costo) => handleUpdateCostoEnvio(id, costo)}
+            onEstadoPedidoChange={(id, newEstado, oldEstado) => handleEstadoPedidoChange(id, newEstado, oldEstado)}
+            expandedOrders={expandedOrders}
+            handleToggleExpand={handleToggleExpand}
+            expandedDesigns={expandedDesigns}
+            handleToggleDesignExpand={handleToggleDesignExpand}
+          />
         ))}
       </main>
     </div>
