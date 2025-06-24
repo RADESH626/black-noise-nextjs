@@ -1,12 +1,13 @@
 import H3Footer from "@/components/common/textos/H/H3Footer";
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 function MetodosDePagoFooter() {
   const metodos = [
-    { name: "Visa", logo: "/img/logos/Logo Visa.jpg" },
-    { name: "Mastercard", logo: "/img/logos/Logo Mastercard.jpg",  },
-    { name: "Paypal", logo: "/img/logos/Logo Paypal.jpg",  },
-    { name: "American Express", logo: "/img/logos/Logo Aexpress.jpg", }
+    { name: "Visa", logo: "/icons/icono-visa-nuevo.svg" },
+    { name: "Mastercard", logo: "/icons/icono-mastercard.svg" },
+    { name: "Paypal", logo: "/icons/icono-paypal.svg" },
+    // { name: "American Express", logo: "/img/logos/Logo Aexpress.jpg", }
   ];
 
   return (
@@ -29,9 +30,11 @@ function MetodosDePagoFooter() {
             className="flex items-center gap-3 group"
           >
             <div className="bg-white p-1 rounded-md">
-              <img 
+              <Image 
                 src={metodo.logo} 
                 alt={metodo.name} 
+                width={48} // Ajusta el ancho según sea necesario
+                height={32} // Ajusta el alto según sea necesario
                 className="h-8 w-12 object-contain"
               />
             </div>

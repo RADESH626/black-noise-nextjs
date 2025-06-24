@@ -101,14 +101,6 @@ const DesignsClientPage = ({ initialDesigns, currentFilters }) => {
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-3xl font-bold mb-6 text-gray-800">Gestión de Diseños</h1>
-            <div className="mb-4">
-                <BotonGeneral
-                    onClick={() => router.push('/admin/designs/agregar')}
-                    variant="primary"
-                >
-                    Agregar Nuevo Diseño
-                </BotonGeneral>
-            </div>
 
             <div className="mb-6">
                 <DesignFilters onApplyFilters={handleApplyFilters} onClearFilters={handleClearFilters} initialFilters={currentFilters} />
@@ -137,6 +129,7 @@ const DesignsClientPage = ({ initialDesigns, currentFilters }) => {
                                     <p className="text-gray-700 font-bold">Valor: ${design.valorDesing}</p>
                                     <p className="text-gray-500 text-xs">Categoría: {design.categoria}</p>
                                     <p className="text-gray-500 text-xs">Estado: {design.estadoDesing}</p>
+                                    <p className="text-gray-500 text-xs">Fecha de Creación: {new Date(design.createdAt).toLocaleDateString()}</p>
                                     <div className="mt-4 flex justify-end space-x-2">
                                         <BotonGeneral
                                             onClick={() => router.push(`/admin/designs/editar/${design._id}`)}

@@ -9,10 +9,9 @@ import Link from 'next/link';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
-import { obtenerMiPerfilProveedor } from '@/app/acciones/ProveedorActions';
+import { obtenerMiPerfilProveedor, obtenerMetricasProveedor } from '@/app/acciones/ProveedorActions';
 import { obtenerPedidosPorProveedorId } from '@/app/acciones/ProveedorPedidoActions';
 import DevolucionesProveedor from '@/components/proveedor/DevolucionesProveedor';
-
 function ProveedorPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
@@ -30,6 +29,24 @@ function ProveedorPage() {
         },
         enabled: status === "authenticated" && !!session?.user?.id, // Only run query if authenticated and user ID is available
         staleTime: Infinity,
+        cacheTime: 10 * 60 * 1000,
+        retry: 1,
+        refetchOnWindowFocus: false,
+    });
+
+    // Use useQuery to fetch additional supplier metrics
+    const { data: proveedorMetrics, isLoading: isLoadingProveedorMetrics, isError: isErrorProveedorMetrics, error: errorProveedorMetrics } = useQuery({
+        queryKey: ['proveedorMetrics', miPerfil?._id],
+        queryFn: async () => {
+            const result = await obtenerMetricasProveedor(miPerfil._id);
+            if (result.success) {
+                return result.data;
+            } else {
+                throw new Error(result.error || "Error al cargar las métricas del proveedor.");
+            }
+        },
+        enabled: status === "authenticated" && !!miPerfil?._id,
+        staleTime: 5 * 60 * 1000,
         cacheTime: 10 * 60 * 1000,
         retry: 1,
         refetchOnWindowFocus: false,
@@ -64,7 +81,7 @@ function ProveedorPage() {
     }
 
     // Render logic for authenticated suppliers
-    if (isLoadingPerfil || isLoadingPedidos) {
+    if (isLoadingPerfil || isLoadingPedidos || isLoadingProveedorMetrics) {
         return <LoadingSpinner />;
     }
 
@@ -74,6 +91,10 @@ function ProveedorPage() {
 
     if (isErrorPedidos) {
         return <ErrorMessage message={errorPedidos.message || "Error al cargar los pedidos del proveedor."} />;
+    }
+
+    if (isErrorProveedorMetrics) {
+        return <ErrorMessage message={errorProveedorMetrics.message || "Error al cargar las métricas adicionales del proveedor."} />;
     }
 
     // If session exists and user is a supplier, but profile not loaded (e.g., not found after fetch attempt)
@@ -97,26 +118,36 @@ function ProveedorPage() {
     // Finally, render the actual content if miPerfil is available
     return (
         <div className="h-full p-4">
-            <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">Bienvenido, {miPerfil?.nombreEmpresa || 'Proveedor'}</h1>
+            <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">Portal de Proveedores</h1>
 
             <div className="max-w-6xl mx-auto mb-8">
                 <h2 className="text-2xl font-semibold mb-6 text-gray-700">Métricas de Pedidos</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div className="bg-white rounded-lg shadow-md p-6 text-center border border-blue-200">
-                        <h3 className="text-lg font-medium text-blue-600 mb-2">Pedidos Pendientes</h3>
-                        <p className="text-4xl font-bold text-blue-800">{totalPedidosPendientes}</p>
+                    {/* Aquí irían los componentes de métricas específicos para proveedor si se necesitan */}
+                    {/* Por ahora, se eliminan los MetricCard del administrador */}
+                    <div className="bg-white p-4 rounded-lg shadow-md">
+                        <h3 className="text-lg font-medium text-gray-900">Pedidos Pendientes</h3>
+                        <p className="text-2xl font-bold text-gray-800">{totalPedidosPendientes}</p>
                     </div>
-                    <div className="bg-white rounded-lg shadow-md p-6 text-center border border-yellow-200">
-                        <h3 className="text-lg font-medium text-yellow-600 mb-2">Pedidos en Proceso</h3>
-                        <p className="text-4xl font-bold text-yellow-800">{totalPedidosEnProceso}</p>
+                    <div className="bg-white p-4 rounded-lg shadow-md">
+                        <h3 className="text-lg font-medium text-gray-900">Pedidos en Proceso</h3>
+                        <p className="text-2xl font-bold text-gray-800">{totalPedidosEnProceso}</p>
                     </div>
-                    <div className="bg-white rounded-lg shadow-md p-6 text-center border border-green-200">
-                        <h3 className="text-lg font-medium text-green-600 mb-2">Pedidos Completados</h3>
-                        <p className="text-4xl font-bold text-green-800">{totalPedidosCompletados}</p>
+                    <div className="bg-white p-4 rounded-lg shadow-md">
+                        <h3 className="text-lg font-medium text-gray-900">Pedidos Completados</h3>
+                        <p className="text-2xl font-bold text-gray-800">{totalPedidosCompletados}</p>
                     </div>
-                    <div className="bg-white rounded-lg shadow-md p-6 text-center border border-purple-200">
-                        <h3 className="text-lg font-medium text-purple-600 mb-2">Ingresos Totales</h3>
-                        <p className="text-4xl font-bold text-purple-800">${ingresosTotales.toFixed(2)}</p>
+                    <div className="bg-white p-4 rounded-lg shadow-md">
+                        <h3 className="text-lg font-medium text-gray-900">Ingresos Totales</h3>
+                        <p className="text-2xl font-bold text-gray-800">{`$${ingresosTotales.toFixed(2)}`}</p>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg shadow-md">
+                        <h3 className="text-lg font-medium text-gray-900">Diseños Subidos</h3>
+                        <p className="text-2xl font-bold text-gray-800">{proveedorMetrics.totalDesignsProveedor}</p>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg shadow-md">
+                        <h3 className="text-lg font-medium text-gray-900">Devoluciones Pendientes</h3>
+                        <p className="text-2xl font-bold text-gray-800">{proveedorMetrics.devolucionesPendientesProveedor}</p>
                     </div>
                 </div>
             </div>

@@ -14,7 +14,7 @@ function InputGeneral({
     className = '',
     ...props
 }) {
-    const inputClasses = `w-full p-3 bg-neutral-800 border border-accent1 rounded-[10px] text-secondary focus:ring-2 focus:ring-accent1 focus:border-accent1 outline-none ${className}`;
+    const inputClasses = `w-full p-3 bg-white border border-accent1 rounded-[10px] text-black focus:ring-2 focus:ring-accent1 focus:border-accent1 outline-none ${className}`;
 
     if (type === 'textarea') {
         return (

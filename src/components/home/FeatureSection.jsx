@@ -1,6 +1,7 @@
 'use client'
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
 
 function FeatureSection({ 
   imgSrc, 
@@ -74,9 +75,13 @@ function FeatureSection({
             viewport={{ once: true }}
           >
             {/* Botón azul con mismo estilo que "Ver Demostración Completa" */}
-            <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 ease-in-out transform hover:scale-105 w-full md:w-auto">
-              EMPIEZA AHORA
-            </button>
+            <Link href="/login" passHref>
+              <button 
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 ease-in-out transform hover:scale-105 w-full md:w-auto"
+              >
+                EMPIEZA AHORA
+              </button>
+            </Link>
           </motion.div>
         </div>
       </div>

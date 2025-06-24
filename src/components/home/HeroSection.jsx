@@ -1,6 +1,7 @@
 'use client';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
 import BotonDescargar from '@/components/common/botones/BotonDescargar';
 
 export default function HeroSection() {
@@ -114,9 +115,13 @@ export default function HeroSection() {
               transition={{ delay: 0.6, duration: 0.5 }}
               viewport={{ once: true }}
             >
-              <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 ease-in-out transform hover:scale-105">
-                Registrarme ahora
-              </button>
+              <Link href="/login" passHref>
+                <button 
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 ease-in-out transform hover:scale-105"
+                >
+                  Registrarme ahora
+                </button>
+              </Link>
             </motion.div>
           </motion.div>
         </div>
@@ -160,9 +165,13 @@ export default function HeroSection() {
         transition={{ delay: 0.6, duration: 0.5 }}
         viewport={{ once: true }}
       >
-        <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 ease-in-out transform hover:scale-105">
-          Registrarme ahora
-        </button>
+        <Link href="/login" passHref>
+          <button 
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            Registrarme ahora
+          </button>
+        </Link>
       </motion.div>
     </motion.div>
 

@@ -80,7 +80,7 @@ export async function loginAction(prevState, formData) {
             email: proveedor.emailContacto,
             password: password, // NextAuth needs the raw password for CredentialsProvider
             isSupplier: true,
-            userRole: 'PROVEEDOR', // Explicitly set userRole for supplier
+            userRole: 'PROVEVEDOR', // Explicitly set userRole for supplier
             proveedorId: proveedor._id.toString(),
             profileImageUrl: "/img/proveedores/IMAGEN-SOLICITUD-PROVEEDOR.jpg" // Default image for suppliers
           }
@@ -296,7 +296,8 @@ async function ObtenerUsuarioPorCorreo(email) {
         return plainUser;
         
     } catch (error) {
-        return handleError(error, 'Error al obtener el usuario por correo');
+        // Re-throw the error so it can be caught by the authorize callback
+        throw error;
     }
 }
 
@@ -534,11 +535,14 @@ const UsuarioModel = await getModel('Usuario');
 
 // Función para editar un usuario
 async function EditarUsuario(id, formData) {
+    console.log('EditarUsuario: id', id);
+    console.log('EditarUsuario: formData entries', Array.from(formData.entries()));
     try {
         await connectDB();
 
-        const Usuario = await getUsuarioModel();
-        const usuarioExistente = await Usuario.findById(id);
+        const UsuarioModel = await getModel('Usuario');
+        console.log('EditarUsuario: UsuarioModel', UsuarioModel); // Log the model
+        const usuarioExistente = await UsuarioModel.findById(id);
 
         if (!usuarioExistente) {
             throw new NotFoundError(`No se encontró ningún usuario con el ID ${id}.`);
@@ -629,6 +633,8 @@ export async function registerAction(prevState, formData) {
 
 // Server Action para manejar la actualización de usuario
 export async function updateUserAction(userId, prevState, formData) {
+    console.log('updateUserAction: userId', userId);
+    console.log('updateUserAction: formData entries', Array.from(formData.entries()));
     try {
         if (!userId) {
             return handleError('ID de usuario no proporcionado para actualizar.', 'Validation Error', 400);
@@ -644,13 +650,14 @@ export async function updateUserAction(userId, prevState, formData) {
             return { message: result.message || 'Usuario actualizado exitosamente.', success: true, data: result.data };
         } else {
             // EditarUsuario returns an error object with a message.
-            return handleError(result.error, 'Validation Error', 400);
+            return handleError(null, result.error, 400); // Pass message as second argument, error object as null
         }
     } catch (error) {
+        console.error('ERROR en updateUserAction:', error); // Add log for debugging
         if (error instanceof ValidationError) {
-            return handleError(error.message, 'Validation Error', error.statusCode);
+            return handleError(error, error.message, error.statusCode); // Pass the error object itself
         }
-        return handleError(error, 'Error al actualizar el usuario.');
+        return handleError(error, 'Error al actualizar el usuario.'); // Pass the error object itself
     }
 }
 

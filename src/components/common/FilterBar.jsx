@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { BotonAccion } from '@/components/common/botones/BotonAccion';
 
-function FilterBar({ onFilterChange, initialFilters = {} }) {
+function FilterBar({ onFilterChange, initialFilters = {}, additionalFilters = [] }) {
     const [filters, setFilters] = useState(initialFilters);
 
     useEffect(() => {
@@ -11,17 +11,10 @@ function FilterBar({ onFilterChange, initialFilters = {} }) {
     }, [initialFilters]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, type, checked } = e.target;
         setFilters(prevFilters => ({
             ...prevFilters,
-            [name]: value
-        }));
-    };
-
-    const handleDateChange = (name, date) => {
-        setFilters(prevFilters => ({
-            ...prevFilters,
-            [name]: date
+            [name]: type === 'checkbox' ? checked : value
         }));
     };
 
@@ -30,10 +23,15 @@ function FilterBar({ onFilterChange, initialFilters = {} }) {
     };
 
     const handleClearFilters = () => {
-        const clearedFilters = Object.keys(filters).reduce((acc, key) => {
-            acc[key] = ''; // Clear all filter values
-            return acc;
-        }, {});
+        const clearedFilters = {};
+        // Clear all filter values based on additionalFilters structure
+        additionalFilters.forEach(filter => {
+            if (filter.type === 'checkbox') {
+                clearedFilters[filter.name] = false;
+            } else {
+                clearedFilters[filter.name] = '';
+            }
+        });
         setFilters(clearedFilters);
         onFilterChange(clearedFilters);
     };
@@ -42,57 +40,47 @@ function FilterBar({ onFilterChange, initialFilters = {} }) {
         <div className="bg-white p-4 rounded-lg shadow-md mb-6">
             <h3 className="text-lg font-semibold mb-4">Filtros de Búsqueda</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                    <label htmlFor="searchText" className="block text-sm font-medium text-gray-700">Buscar por texto:</label>
-                    <input
-                        type="text"
-                        id="searchText"
-                        name="searchText"
-                        value={filters.searchText || ''}
-                        onChange={handleChange}
-                        placeholder="Nombre, ID, etc."
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                </div>
-                <div>
-                    <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">Fecha Inicio:</label>
-                    <input
-                        type="date"
-                        id="startDate"
-                        name="startDate"
-                        value={filters.startDate || ''}
-                        onChange={handleChange}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                </div>
-                <div>
-                    <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">Fecha Fin:</label>
-                    <input
-                        type="date"
-                        id="endDate"
-                        name="endDate"
-                        value={filters.endDate || ''}
-                        onChange={handleChange}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                </div>
-                {/* Ejemplo de filtro de estado, se puede hacer dinámico si es necesario */}
-                <div>
-                    <label htmlFor="status" className="block text-sm font-medium text-gray-700">Estado:</label>
-                    <select
-                        id="status"
-                        name="status"
-                        value={filters.status || ''}
-                        onChange={handleChange}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    >
-                        <option value="">Todos</option>
-                        <option value="pendiente">Pendiente</option>
-                        <option value="completado">Completado</option>
-                        <option value="cancelado">Cancelado</option>
-                        {/* Añadir más opciones según sea necesario */}
-                    </select>
-                </div>
+                {additionalFilters.map((filter, index) => (
+                    <div key={filter.name || index}>
+                        <label htmlFor={filter.name} className="block text-sm font-medium text-gray-700">
+                            {filter.label}
+                        </label>
+                        {filter.type === 'text' || filter.type === 'number' || filter.type === 'date' ? (
+                            <input
+                                type={filter.type}
+                                id={filter.name}
+                                name={filter.name}
+                                value={filters[filter.name] || ''}
+                                onChange={handleChange}
+                                placeholder={filter.placeholder}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            />
+                        ) : filter.type === 'select' ? (
+                            <select
+                                id={filter.name}
+                                name={filter.name}
+                                value={filters[filter.name] || ''}
+                                onChange={handleChange}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            >
+                                {filter.options.map((option, idx) => (
+                                    <option key={option.value || idx} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </select>
+                        ) : filter.type === 'checkbox' ? (
+                            <input
+                                type="checkbox"
+                                id={filter.name}
+                                name={filter.name}
+                                checked={filters[filter.name] || false}
+                                onChange={handleChange}
+                                className="mt-1 h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                            />
+                        ) : null}
+                    </div>
+                ))}
             </div>
             <div className="mt-6 flex justify-end space-x-4">
                 <BotonAccion

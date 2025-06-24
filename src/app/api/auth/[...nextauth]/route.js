@@ -8,6 +8,23 @@ import logger from '@/utils/logger';
 import { Rol } from "@/models/enums/usuario/Rol"; // Import Rol enum
 import { NextResponse } from "next/server"; // Import NextResponse
 
+// Define custom error classes
+class UnauthorizedError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "UnauthorizedError";
+    this.statusCode = 401;
+  }
+}
+
+class NotFoundError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "NotFoundError";
+    this.statusCode = 404;
+  }
+}
+
 export const authOptions = {
   providers: [
     CredentialsProvider({
@@ -47,7 +64,7 @@ export const authOptions = {
                 isSupplier: false, // Default to false
                 proveedorId: undefined, // Default to undefined
                 numeroTelefono: user.numeroTelefono
-};
+              };
 
               // If the user is a PROVEEDOR, fetch the corresponding Proveedor document
               if (user.rol === Rol.PROVEEDOR) {
@@ -68,16 +85,21 @@ export const authOptions = {
               return sessionUser;
             } else {
               logger.warn('Password invalid for user:', credentials.email);
-              return null; // Return null for invalid password
+              throw new UnauthorizedError('Credenciales inválidas.'); // Throw error instead of returning null
             }
           } else {
             logger.warn('User not found with email:', credentials.email);
-            return null; // Return null for user not found
+            throw new NotFoundError('Usuario no encontrado.'); // Throw error instead of returning null
           }
 
         } catch (error) {
           logger.error("Auth error in authorize callback:", error);
-          return null; // Return null for any other errors
+          // Re-throw custom errors to be caught by safeHandler,
+          // or wrap generic errors in a CustomError
+          if (error instanceof UnauthorizedError || error instanceof NotFoundError) {
+            throw error;
+          }
+          throw new Error('Error de autenticación inesperado.'); // Generic error
         }
       },
     }),
@@ -122,14 +144,4 @@ export const authOptions = {
 
 const handler = NextAuth(authOptions);
 
-async function safeHandler(req, res) {
-  try {
-    return await handler(req, res);
-  } catch (error) {
-    logger.error("Unhandled error in NextAuth route:", error);
-    // Return a JSON error response
-    return NextResponse.json({ error: "Internal Server Error", details: error.message }, { status: 500 });
-  }
-}
-
-export { safeHandler as GET, safeHandler as POST };
+export { handler as GET, handler as POST };

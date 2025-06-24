@@ -5,7 +5,7 @@ function RedesSocialesFooter() {
   const redes = [
     { name: "Facebook", logo: "/icons/icono-facebook-nuevo.svg", url: "https://www.facebook.com/" },
     { name: "Instagram", logo: "/icons/icono-logo-de-instagram.svg", url: "https://www.instagram.com/black_noise222?igsh=MWNpcTZ4aTc2NGh3Yg==" },
-    { name: "X", logo: "/icons/icono-x.svg", url: "https://x.com/" },
+    { name: "X", logo: "/icons/icono-x.svg", url: "https://x.com/?lang=es" },
     { name: "Youtube", logo: "/icons/icono-youtube-play.svg", url: "https://youtube.com/@blacknoise222?si=KNs_M8N9eHNnLn2Z" }
   ];
 
@@ -28,7 +28,7 @@ function RedesSocialesFooter() {
             rel="noopener noreferrer"
             className="flex items-center gap-3 group"
           >
-            <div className="bg-white p-1 rounded-full">
+            <div className="bg-black p-1 rounded-full">
               <img 
                 src={red.logo} 
                 alt={red.name} 

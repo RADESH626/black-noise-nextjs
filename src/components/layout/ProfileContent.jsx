@@ -7,7 +7,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { eliminarDesign, actualizarDesign } from "@/app/acciones/DesignActions";
 import DesignsComponent from "../common/DesignsComponent";
 import Loader from '@/components/Loader';
-import PedidosComponent from "../common/PedidosComponent";
+import PedidosComponent from "../common/PedidosComponent"; // Importar el componente PedidosComponent
 import FormEditarUsuario from "@/components/perfil/FormEditarUsuario";
 import DesignUploadModal from "@/components/perfil/DesignUploadModal";
 import PaymentHistory from "@/components/perfil/PaymentHistory";
@@ -17,7 +17,7 @@ import { useCart } from "@/context/CartContext";
 import HeaderPrincipal from "./general/HeaderPrincipal";
 // Removed: import NewOrderModal from "@/components/common/modales/NewOrderModal";
 
-function ProfileContent({ userId, initialUser, initialDesigns, initialPayments }) {
+function ProfileContent({ userId, initialUser, initialDesigns, initialPayments, initialPedidos }) {
   const { data: session, status } = useSession();
   const [activeTab, setActiveTab] = useState('designs');
   const [currentUser, setCurrentUser] = useState(initialUser);
@@ -58,31 +58,6 @@ function ProfileContent({ userId, initialUser, initialDesigns, initialPayments }
     console.log('--- [CLIENTE] FIN DEBUGGING INICIAL ---');
   }, [userId]);
 
-  // Mantener fetchUserData para re-obtener datos si el perfil se edita
-  const fetchUserData = useCallback(async () => {
-    if (status === 'authenticated' && userId) {
-      // Aquí necesitarías una acción de servidor para obtener el usuario por ID
-      // Si no hay una acción de servidor que solo obtenga el usuario,
-      // podrías necesitar crear una o reevaluar cómo se actualiza el usuario.
-      // Por ahora, asumimos que la edición de perfil ya maneja la actualización del estado local.
-      // Si se necesita re-fetch, se haría a través de una API route o Server Action.
-      // Por simplicidad, si la edición de perfil ya actualiza el estado, esta función podría no ser necesaria.
-      // Si se necesita, se debería llamar a una acción de servidor aquí.
-      // Por ejemplo: const fetchedUser = await ObtenerUsuarioPorId(userId);
-      // Para este caso, la eliminamos ya que la carga inicial se hace en el servidor.
-    }
-  }, [status, userId]);
-
-  // Estas funciones ya no son necesarias para la carga inicial, ya que los datos vienen de props.
-  // Si se necesita re-fetch de diseños o pagos, se debería implementar una Server Action o API Route.
-  // Por ahora, las eliminamos.
-
-  useEffect(() => {
-    // No es necesario llamar a fetchUserData, fetchUserDesigns, fetchUserPayments aquí
-    // ya que los datos iniciales se pasan como props.
-    // Si se necesita re-fetch después de ciertas acciones, se llamaría a las acciones de servidor correspondientes.
-  }, [userId, status]);
-
   const user = currentUser;
 
   const handleEditProfile = () => {
@@ -91,7 +66,8 @@ function ProfileContent({ userId, initialUser, initialDesigns, initialPayments }
       <FormEditarUsuario
         userData={currentUser}
         userId={userId}
-        onSuccess={() => {
+        onSuccess={(updatedUser) => {
+          setCurrentUser(updatedUser); // Update the local state with the new user data
           openModal(
             "Perfil Actualizado",
             <div className="text-white">
@@ -99,7 +75,6 @@ function ProfileContent({ userId, initialUser, initialDesigns, initialPayments }
             </div>,
             'default'
           );
-          fetchUserData();
         }}
       />,
       'default'
@@ -215,13 +190,13 @@ function ProfileContent({ userId, initialUser, initialDesigns, initialPayments }
   };
 
   return (
-    <div className="mx-auto p-4 md:p-8 bg-gray-300 text-white w-screen flex flex-col min-h-screen">
+    <div className="mx-auto p-4 md:p-8 bg-gray-400 text-white w-screen flex flex-col min-h-screen">
       {/* Header */}
       <HeaderPrincipal />
 
 
       {/* User Info Section */}
-      <div className="bg-gray-400 p-6 md:p-8 rounded-lg shadow-lg mb-8 flex-shrink-0 text-black mt-10">
+      <div className="bg-gray-300 p-6 md:p-8 rounded-lg shadow-lg mb-8 flex-shrink-0 text-black mt-10">
 
         <div className="flex flex-col md:flex-row items-center">
           <div className="w-32 h-32 md:w-60 md:h-60 bg-white rounded-lg mb-4 md:mb-0 md:mr-8 ">
@@ -286,7 +261,7 @@ function ProfileContent({ userId, initialUser, initialDesigns, initialPayments }
             <>
               <div className="flex justify-center mb-4">
                 <BotonGeneral onClick={handleAddDesign} className="bg-black rounded-full p-2">
-                  <img src="/icons/icono +.svg" alt="Agregar" className="w-8 h-8" />
+                  <img src="/icons/icono-+.svg" alt="+" className="w-8 h-8" />
                 </BotonGeneral>
               </div>
               {userDesigns.length === 0 ? (
@@ -308,9 +283,8 @@ function ProfileContent({ userId, initialUser, initialDesigns, initialPayments }
         )}
         {activeTab === 'orders' && (
           <>
-            {userId && console.log('DEBUG - Renderizando PedidosComponent con userId:', userId)}
             {userId ? (
-              <PedidosComponent userId={userId} />
+              <PedidosComponent initialPedidos={initialPedidos} /> 
             ) : (
               <Loader />
             )}

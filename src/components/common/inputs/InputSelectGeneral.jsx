@@ -4,8 +4,8 @@ function InputSelectGeneral({ children, options, placeholder, defaultValue, ...r
       className='
         w-full
         p-3
-        bg-black
-        text-white
+        bg-white
+        text-black
         border
         border-bn-accent
         rounded-md
