@@ -2,7 +2,7 @@
 
 import mongoose from 'mongoose';
 import logger from './logger';
-import { loadModels } from './modelLoader'; // Importar loadModels
+import { getCartModel, getDesignModel, getPagoModel, getPedidoModel, getProveedorModel, getUsuarioModel, getVentaModel } from '@/models';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -21,9 +21,8 @@ export default async function connectDB() {
 
   if (!cached.promise) {
     mongoose.set('strictQuery', false); // Mover aquí
-    cached.promise = mongoose.connect(MONGODB_URI, {}).then(async m => { // Add async here
+    cached.promise = mongoose.connect(MONGODB_URI, {}).then(m => {
       // logger.info('Database connected successfully');
-      await loadModels(); // Ensure all models are loaded and registered after connection
       return m;
     }).catch(error => {
       logger.error('Error connecting to database:', error);
