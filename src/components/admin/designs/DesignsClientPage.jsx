@@ -101,14 +101,6 @@ const DesignsClientPage = ({ initialDesigns, currentFilters }) => {
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-3xl font-bold mb-6 text-gray-800">Gestión de Diseños</h1>
-            <div className="mb-4">
-                <BotonGeneral
-                    onClick={() => router.push('/admin/designs/agregar')}
-                    variant="primary"
-                >
-                    Agregar Nuevo Diseño
-                </BotonGeneral>
-            </div>
 
             <div className="mb-6">
                 <DesignFilters onApplyFilters={handleApplyFilters} onClearFilters={handleClearFilters} initialFilters={currentFilters} />
