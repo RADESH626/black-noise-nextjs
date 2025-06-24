@@ -48,9 +48,6 @@ function DesignsDashboard() { // Remove async keyword
             <SeccionHeader>
                 <div className="flex justify-between items-center w-full">
                     <h4 className='font-bold text-2xl text-black'>Gestión de Diseños</h4>
-                    <Link href="/admin/designs/agregar" className="flex flex-row justify-center items-center gap-4">
-                        <BotonAgregarDesigns />
-                    </Link>
                 </div>
             </SeccionHeader>
 
