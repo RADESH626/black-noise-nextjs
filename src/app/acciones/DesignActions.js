@@ -164,20 +164,25 @@ export async function guardarDesigns(prevState, formData) {
 // Function to get all designs
 export async function obtenerDesigns(searchParams = {}) {
     await connectDB();
-    // console.log('Entering obtenerDesigns with searchParams:', searchParams);
     try {
         const Design = getDesignModel();
         let query = {};
 
+        // Convertir searchParams a un objeto plano para asegurar acceso síncrono
+        const params = {};
+        for (const [key, value] of Object.entries(searchParams)) {
+            params[key] = value;
+        }
+
         // Extraer y normalizar filtros de searchParams de forma explícita
-        const fechaCreacionStart = searchParams.hasOwnProperty('fechaCreacionStart') ? searchParams.fechaCreacionStart : undefined;
-        const fechaCreacionEnd = searchParams.hasOwnProperty('fechaCreacionEnd') ? searchParams.fechaCreacionEnd : undefined;
-        const categoria = searchParams.hasOwnProperty('categoria') ? searchParams.categoria : undefined;
-        const estadoDesing = searchParams.hasOwnProperty('estadoDesing') ? searchParams.estadoDesing : undefined;
-        const disenadorUsuarioId = searchParams.hasOwnProperty('disenadorUsuarioId') ? searchParams.disenadorUsuarioId : undefined;
-        const precioMin = searchParams.hasOwnProperty('precioMin') ? searchParams.precioMin : undefined;
-        const precioMax = searchParams.hasOwnProperty('precioMax') ? searchParams.precioMax : undefined;
-        const tallasDisponibles = searchParams.hasOwnProperty('tallasDisponibles') && searchParams.tallasDisponibles ? searchParams.tallasDisponibles.split(',') : [];
+        const fechaCreacionStart = params.hasOwnProperty('fechaCreacionStart') ? params.fechaCreacionStart : undefined;
+        const fechaCreacionEnd = params.hasOwnProperty('fechaCreacionEnd') ? params.fechaCreacionEnd : undefined;
+        const categoria = params.hasOwnProperty('categoria') ? params.categoria : undefined;
+        const estadoDesing = params.hasOwnProperty('estadoDesing') ? params.estadoDesing : undefined;
+        const disenadorUsuarioId = params.hasOwnProperty('disenadorUsuarioId') ? params.disenadorUsuarioId : undefined;
+        const precioMin = params.hasOwnProperty('precioMin') ? params.precioMin : undefined;
+        const precioMax = params.hasOwnProperty('precioMax') ? params.precioMax : undefined;
+        const tallasDisponibles = params.hasOwnProperty('tallasDisponibles') && params.tallasDisponibles ? params.tallasDisponibles.split(',') : [];
 
         // Aplicar filtros
         if (fechaCreacionStart) {

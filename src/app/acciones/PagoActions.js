@@ -469,7 +469,7 @@ async function procesarPagoYCrearPedido(cartItems, paymentDetails) {
             <p>El equipo de BlackNoise</p>
         `;
         try {
-            await sendEmail(correo, emailSubject, emailBody);
+            await sendEmail({ to: correo, subject: emailSubject, html: emailBody });
             logger.debug(`Confirmation email sent to ${correo} for order ${nuevoPedido._id}.`);
         } catch (emailError) {
             logger.error(`Failed to send confirmation email to ${correo} for order ${nuevoPedido._id}:`, emailError);
