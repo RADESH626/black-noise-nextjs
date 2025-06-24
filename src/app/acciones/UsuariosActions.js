@@ -296,7 +296,8 @@ async function ObtenerUsuarioPorCorreo(email) {
         return plainUser;
         
     } catch (error) {
-        return handleError(error, 'Error al obtener el usuario por correo');
+        // Re-throw the error so it can be caught by the authorize callback
+        throw error;
     }
 }
 
@@ -537,8 +538,8 @@ async function EditarUsuario(id, formData) {
     try {
         await connectDB();
 
-        const Usuario = await getUsuarioModel();
-        const usuarioExistente = await Usuario.findById(id);
+        const UsuarioModel = await getModel('Usuario');
+        const usuarioExistente = await UsuarioModel.findById(id);
 
         if (!usuarioExistente) {
             throw new NotFoundError(`No se encontró ningún usuario con el ID ${id}.`);
@@ -644,13 +645,13 @@ export async function updateUserAction(userId, prevState, formData) {
             return { message: result.message || 'Usuario actualizado exitosamente.', success: true, data: result.data };
         } else {
             // EditarUsuario returns an error object with a message.
-            return handleError(result.error, 'Validation Error', 400);
+            return handleError(null, result.error, 400); // Pass message as second argument, error object as null
         }
     } catch (error) {
         if (error instanceof ValidationError) {
-            return handleError(error.message, 'Validation Error', error.statusCode);
+            return handleError(error, error.message, error.statusCode); // Pass the error object itself
         }
-        return handleError(error, 'Error al actualizar el usuario.');
+        return handleError(error, 'Error al actualizar el usuario.'); // Pass the error object itself
     }
 }
 

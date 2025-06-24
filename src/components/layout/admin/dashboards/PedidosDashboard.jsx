@@ -17,6 +17,8 @@ export default function PedidosDashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1); // Ahora se obtiene del backend si se implementa paginación en el backend
   const pedidosPerPage = 12; // Mantener el límite por defecto o hacerlo configurable
+  const [expandedOrders, setExpandedOrders] = useState(new Set()); // Estado para controlar la expansión de pedidos
+  const [expandedDesigns, setExpandedDesigns] = useState(new Set()); // Estado para controlar la expansión de diseños dentro de pedidos
 
   const currentFilters = useMemo(() => ({
     estadoPedido: searchParams.get('estadoPedido') || undefined,
@@ -63,6 +65,30 @@ export default function PedidosDashboard() {
 
     fetchPedidos();
   }, [currentPage, currentFilters, pedidosPerPage]);
+
+  const handleToggleExpand = useCallback((pedidoId) => {
+    setExpandedOrders(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(pedidoId)) {
+        newSet.delete(pedidoId);
+      } else {
+        newSet.add(pedidoId);
+      }
+      return newSet;
+    });
+  }, []);
+
+  const handleToggleDesignExpand = useCallback((designId) => {
+    setExpandedDesigns(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(designId)) {
+        newSet.delete(designId);
+      } else {
+        newSet.add(designId);
+      }
+      return newSet;
+    });
+  }, []);
 
   const handleApplyFilters = useCallback((filters) => {
     const params = new URLSearchParams(searchParams);
@@ -151,8 +177,16 @@ export default function PedidosDashboard() {
       <PedidoFilters onApplyFilters={handleApplyFilters} onClearFilters={handleClearFilters} initialFilters={currentFilters} />
 
       <main className="grid grid-cols-1 gap-6 mt-8">
-        {pedidos.map((pedido, index) => (
-          <PedidoCard key={pedido._id} pedido={pedido} userRole="admin" />
+        {pedidos.map((pedido) => (
+          <PedidoCard
+            key={pedido._id}
+            pedido={pedido}
+            userRole="admin"
+            expandedOrders={expandedOrders}
+            handleToggleExpand={handleToggleExpand}
+            expandedDesigns={expandedDesigns}
+            handleToggleDesignExpand={handleToggleDesignExpand}
+          />
         ))}
       </main>
 

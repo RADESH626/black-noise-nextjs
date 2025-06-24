@@ -58,31 +58,6 @@ function ProfileContent({ userId, initialUser, initialDesigns, initialPayments, 
     console.log('--- [CLIENTE] FIN DEBUGGING INICIAL ---');
   }, [userId]);
 
-  // Mantener fetchUserData para re-obtener datos si el perfil se edita
-  const fetchUserData = useCallback(async () => {
-    if (status === 'authenticated' && userId) {
-      // Aquí necesitarías una acción de servidor para obtener el usuario por ID
-      // Si no hay una acción de servidor que solo obtenga el usuario,
-      // podrías necesitar crear una o reevaluar cómo se actualiza el usuario.
-      // Por ahora, asumimos que la edición de perfil ya maneja la actualización del estado local.
-      // Si se necesita re-fetch, se haría a través de una API route o Server Action.
-      // Por simplicidad, si la edición de perfil ya actualiza el estado, esta función podría no ser necesaria.
-      // Si se necesita, se debería llamar a una acción de servidor aquí.
-      // Por ejemplo: const fetchedUser = await ObtenerUsuarioPorId(userId);
-      // Para este caso, la eliminamos ya que la carga inicial se hace en el servidor.
-    }
-  }, [status, userId]);
-
-  // Estas funciones ya no son necesarias para la carga inicial, ya que los datos vienen de props.
-  // Si se necesita re-fetch de diseños o pagos, se debería implementar una Server Action o API Route.
-  // Por ahora, las eliminamos.
-
-  useEffect(() => {
-    // No es necesario llamar a fetchUserData, fetchUserDesigns, fetchUserPayments aquí
-    // ya que los datos iniciales se pasan como props.
-    // Si se necesita re-fetch después de ciertas acciones, se llamaría a las acciones de servidor correspondientes.
-  }, [userId, status]);
-
   const user = currentUser;
 
   const handleEditProfile = () => {
@@ -91,7 +66,8 @@ function ProfileContent({ userId, initialUser, initialDesigns, initialPayments, 
       <FormEditarUsuario
         userData={currentUser}
         userId={userId}
-        onSuccess={() => {
+        onSuccess={(updatedUser) => {
+          setCurrentUser(updatedUser); // Update the local state with the new user data
           openModal(
             "Perfil Actualizado",
             <div className="text-white">
@@ -99,7 +75,6 @@ function ProfileContent({ userId, initialUser, initialDesigns, initialPayments, 
             </div>,
             'default'
           );
-          fetchUserData();
         }}
       />,
       'default'
