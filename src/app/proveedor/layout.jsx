@@ -3,8 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import SessionHeader from '@/components/common/SessionHeader';
-import AdminSidebar from '@/components/layout/admin/AdminSidebar'; // Reutilizar el sidebar si es similar, o crear uno específico para proveedor
+import ProveedorSidebar from '@/components/proveedor/ProveedorSidebar';
 
 function ProveedorLayoutContent({ children }) {
   const { data: session, status } = useSession();
@@ -21,10 +20,8 @@ function ProveedorLayoutContent({ children }) {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Podrías usar AdminSidebar o crear un SupplierSidebar específico */}
-      <AdminSidebar /> 
+      <ProveedorSidebar />
       <main className="flex flex-col flex-1 overflow-y-auto">
-        <SessionHeader />
         {children}
       </main>
     </div>
