@@ -44,10 +44,8 @@ export default async function AdminProveedorPedidosPage() {
     }
 
     return (
-        <ProveedorLayout> {/* Envolver la página con el layout del proveedor */}
-            <Suspense fallback={<LoadingSpinner />}>
-                <PedidosClientPage initialPedidos={pedidos} />
-            </Suspense>
-        </ProveedorLayout>
+        <Suspense fallback={<LoadingSpinner />}>
+            <PedidosClientPage initialPedidos={pedidos} />
+        </Suspense>
     );
 }

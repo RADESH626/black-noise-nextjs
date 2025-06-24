@@ -9,10 +9,11 @@ import Link from 'next/link';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import BotonGeneral from '@/components/common/botones/BotonGeneral';
-import { obtenerMiPerfilProveedor } from '@/app/acciones/ProveedorActions';
+import { obtenerMiPerfilProveedor, obtenerMetricasProveedor } from '@/app/acciones/ProveedorActions';
 import { obtenerPedidosPorProveedorId } from '@/app/acciones/ProveedorPedidoActions';
 import DevolucionesProveedor from '@/components/proveedor/DevolucionesProveedor';
 import SessionHeader from '@/components/common/SessionHeader';
+import MetricCard from '@/components/admin/MetricCard'; // Importar MetricCard
 
 function ProveedorPage() {
     const { data: session, status } = useSession();
@@ -31,6 +32,24 @@ function ProveedorPage() {
         },
         enabled: status === "authenticated" && !!session?.user?.id, // Only run query if authenticated and user ID is available
         staleTime: Infinity,
+        cacheTime: 10 * 60 * 1000,
+        retry: 1,
+        refetchOnWindowFocus: false,
+    });
+
+    // Use useQuery to fetch additional supplier metrics
+    const { data: proveedorMetrics, isLoading: isLoadingProveedorMetrics, isError: isErrorProveedorMetrics, error: errorProveedorMetrics } = useQuery({
+        queryKey: ['proveedorMetrics', miPerfil?._id],
+        queryFn: async () => {
+            const result = await obtenerMetricasProveedor(miPerfil._id);
+            if (result.success) {
+                return result.data;
+            } else {
+                throw new Error(result.error || "Error al cargar las métricas del proveedor.");
+            }
+        },
+        enabled: status === "authenticated" && !!miPerfil?._id,
+        staleTime: 5 * 60 * 1000,
         cacheTime: 10 * 60 * 1000,
         retry: 1,
         refetchOnWindowFocus: false,
@@ -65,7 +84,7 @@ function ProveedorPage() {
     }
 
     // Render logic for authenticated suppliers
-    if (isLoadingPerfil || isLoadingPedidos) {
+    if (isLoadingPerfil || isLoadingPedidos || isLoadingProveedorMetrics) {
         return <LoadingSpinner />;
     }
 
@@ -75,6 +94,10 @@ function ProveedorPage() {
 
     if (isErrorPedidos) {
         return <ErrorMessage message={errorPedidos.message || "Error al cargar los pedidos del proveedor."} />;
+    }
+
+    if (isErrorProveedorMetrics) {
+        return <ErrorMessage message={errorProveedorMetrics.message || "Error al cargar las métricas adicionales del proveedor."} />;
     }
 
     // If session exists and user is a supplier, but profile not loaded (e.g., not found after fetch attempt)
@@ -104,22 +127,12 @@ function ProveedorPage() {
             <div className="max-w-6xl mx-auto mb-8">
                 <h2 className="text-2xl font-semibold mb-6 text-gray-700">Métricas de Pedidos</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div className="bg-white rounded-lg shadow-md p-6 text-center border border-blue-200">
-                        <h3 className="text-lg font-medium text-blue-600 mb-2">Pedidos Pendientes</h3>
-                        <p className="text-4xl font-bold text-blue-800">{totalPedidosPendientes}</p>
-                    </div>
-                    <div className="bg-white rounded-lg shadow-md p-6 text-center border border-yellow-200">
-                        <h3 className="text-lg font-medium text-yellow-600 mb-2">Pedidos en Proceso</h3>
-                        <p className="text-4xl font-bold text-yellow-800">{totalPedidosEnProceso}</p>
-                    </div>
-                    <div className="bg-white rounded-lg shadow-md p-6 text-center border border-green-200">
-                        <h3 className="text-lg font-medium text-green-600 mb-2">Pedidos Completados</h3>
-                        <p className="text-4xl font-bold text-green-800">{totalPedidosCompletados}</p>
-                    </div>
-                    <div className="bg-white rounded-lg shadow-md p-6 text-center border border-purple-200">
-                        <h3 className="text-lg font-medium text-purple-600 mb-2">Ingresos Totales</h3>
-                        <p className="text-4xl font-bold text-purple-800">${ingresosTotales.toFixed(2)}</p>
-                    </div>
+                    <MetricCard title="Pedidos Pendientes" value={totalPedidosPendientes} />
+                    <MetricCard title="Pedidos en Proceso" value={totalPedidosEnProceso} />
+                    <MetricCard title="Pedidos Completados" value={totalPedidosCompletados} />
+                    <MetricCard title="Ingresos Totales" value={`$${ingresosTotales.toFixed(2)}`} />
+                    <MetricCard title="Diseños Subidos" value={proveedorMetrics.totalDesignsProveedor} />
+                    <MetricCard title="Devoluciones Pendientes" value={proveedorMetrics.devolucionesPendientesProveedor} />
                 </div>
             </div>
 

@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import connectDB from "@/utils/DBconection";
 import { getModel } from "@/utils/modelLoader"; // Import getModel
-import Usuario from "@/models/Usuario"; // Import the Usuario model
+import { getUsuarioModel, getDesignModel, getPedidoModel } from "@/models"; // Import models needed for metrics
 import { revalidatePath } from "next/cache";
 import { Rol } from "@/models/enums/usuario/Rol";
 import bcrypt from "bcryptjs";
@@ -45,7 +45,8 @@ export async function crearProveedor(prevState, formData) {
     }
 
     // Check if a user with this email already exists
-    const existingUser = await Usuario.findOne({ correo: emailContacto });
+    const UsuarioModel = await getUsuarioModel(); // Use getUsuarioModel
+    const existingUser = await UsuarioModel.findOne({ correo: emailContacto });
     if (existingUser) {
       return { message: "Ya existe un usuario registrado con este correo electrónico.", success: false };
     }
@@ -356,5 +357,30 @@ export async function obtenerMiPerfilProveedor() {
   } catch (error) {
     logger.error("Error al obtener el perfil del proveedor:", error);
     return { proveedor: null, success: false, message: `Error al obtener el perfil del proveedor: ${error.message}` };
+  }
+}
+
+export async function obtenerMetricasProveedor(proveedorId) {
+  await connectDB();
+  try {
+    const Design = await getDesignModel();
+    const Pedido = await getPedidoModel();
+
+    const totalDesignsProveedor = await Design.countDocuments({ proveedorId: proveedorId });
+    const devolucionesPendientesProveedor = await Pedido.countDocuments({ proveedorId: proveedorId, estado: 'devolucion_pendiente' });
+
+    return {
+      success: true,
+      data: {
+        totalDesignsProveedor,
+        devolucionesPendientesProveedor,
+      },
+    };
+  } catch (error) {
+    logger.error("Error en obtenerMetricasProveedor:", error);
+    return {
+      success: false,
+      error: "Error al obtener las métricas del proveedor.",
+    };
   }
 }

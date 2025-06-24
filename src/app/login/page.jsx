@@ -4,6 +4,7 @@ import FormLogin from "@/components/layout/general/forms/FormLogin";
 import LoginInfoSection from '@/components/login/LoginInfoSection';
 import HeaderPrincipal from '@/components/layout/general/HeaderPrincipal';
 import Footer from '@/components/layout/general/footer/Footer';
+import estesiBackground from '/public/img/Logos/estesi.jpg'; // Importa la imagen
 
 function Login() {
   const containerVariants = {
@@ -52,7 +53,7 @@ function Login() {
       <main
         className="flex-1 flex items-center justify-center p-5 pt-32 bg-cover bg-center relative"
         style={{
-          backgroundImage: "url('/img/Logos/estesi.jpg')", // Asegúrate que la imagen esté en /public/imagenes/login-fondo.jpg
+          backgroundImage: `url(${estesiBackground.src})`, // Usa la src de la imagen importada
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
